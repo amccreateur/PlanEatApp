@@ -1,0 +1,352 @@
+export const TRANSLATIONS = {
+  fr: {
+    appName: "PlanEat",
+    appTagline: "Planning de repas & courses par IA",
+    
+    // Tabs
+    tabPlanner: "Planning",
+    tabGroceries: "Courses",
+    tabRecipes: "Recettes",
+    tabProfile: "Mon Foyer",
+    
+    // Header & Actions
+    generatePlan: "Générer avec l'IA",
+    regenerating: "Génération en cours...",
+    planDuration: "Durée du planning",
+    oneWeek: "1 Semaine",
+    twoWeeks: "2 Semaines",
+    oneMonth: "1 Mois (4 sem.)",
+    weeks: "semaines",
+    week: "Semaine",
+    day: "Jour",
+    today: "Aujourd'hui",
+    
+    // Meals
+    breakfast: "Petit-déjeuner",
+    lunch: "Déjeuner",
+    dinner: "Dîner",
+    snack: "Goûter / Collation",
+    swapMeal: "Changer ce plat",
+    viewRecipe: "Voir la recette",
+    servings: "personnes",
+    servingsShort: "pers.",
+    
+    // Days
+    monday: "Lundi",
+    tuesday: "Mardi",
+    wednesday: "Mercredi",
+    thursday: "Jeudi",
+    friday: "Vendredi",
+    saturday: "Samedi",
+    sunday: "Dimanche",
+    
+    // Groceries
+    groceryTitle: "Liste des Courses",
+    grocerySubtitle: "Calculée automatiquement selon vos repas",
+    addItem: "Ajouter un article",
+    itemPlaceholder: "Ex: Liquide vaisselle, Biscuits...",
+    categoryPlaceholder: "Rayon",
+    filterAll: "Tout",
+    checkedCount: "achetés",
+    clearChecked: "Effacer les articles cochés",
+    shareList: "Partager la liste",
+    shareMessageTitle: "🛒 Ma liste de courses PlanEat :",
+    copiedToClipboard: "Liste copiée dans le presse-papier !",
+    
+    // Grocery Departments
+    deptProduce: "🍎 Fruits & Légumes",
+    deptMeat: "🥩 Boucherie & Poissonnerie",
+    deptDairy: "🧀 Produits Laitiers & Œufs",
+    deptBakery: "🥖 Boulangerie",
+    deptPantry: "🥫 Épicerie & Féculents",
+    deptSpices: "🧂 Épices & Condiments",
+    deptFrozen: "❄️ Surgelés",
+    deptDrinks: "🧃 Boissons",
+    deptOther: "🧼 Maison & Divers",
+    
+    // Recipe Modal
+    prepTime: "Préparation",
+    cookTime: "Cuisson",
+    totalTime: "Total",
+    difficulty: "Difficulté",
+    easy: "Facile",
+    medium: "Moyen",
+    hard: "Élaboré",
+    ingredients: "Ingrédients",
+    instructions: "Étapes de préparation",
+    step: "Étape",
+    minutes: "min",
+    startTimer: "Minuteur",
+    nutritionCalories: "Calories estimées",
+    
+    // Profile & Family
+    profileTitle: "Configuration du Foyer",
+    profileSubtitle: "Personnalisez l'IA selon vos besoins",
+    adultsCount: "Nombre d'adultes",
+    childrenCount: "Nombre d'enfants",
+    childrenAges: "Âges des enfants",
+    addAge: "Ajouter un âge",
+    dietsAndPrefs: "Régimes & Préférences",
+    dietBalanced: "Équilibré & Familial",
+    dietHalal: "100% Halal",
+    dietVegetarian: "Végétarien",
+    dietVegan: "Végétalien",
+    dietGlutenFree: "Sans Gluten",
+    dietLactoseFree: "Sans Lactose",
+    dietLowCarb: "Low Carb / Minceur",
+    dietBudget: "Économique / Petit budget",
+    dietQuick: "Express (< 20 min)",
+    
+    dislikedTitle: "Aliments exclus ou non aimés",
+    dislikedPlaceholder: "Ex: Coriandre, Champignons, Fruits de mer...",
+    addDislike: "Exclure cet aliment",
+    saveProfile: "Enregistrer mon profil",
+    profileSaved: "Profil enregistré avec succès !",
+    
+    // Language selection
+    language: "Langue",
+    langFr: "Français",
+    langEn: "English",
+    langAr: "العربية",
+    
+    // Empty & Loading States
+    noMealsTitle: "Aucun planning pour le moment",
+    noMealsDesc: "Cliquez sur 'Générer avec l'IA' pour créer vos menus personnalisés et votre liste de courses.",
+    noGroceriesTitle: "Votre panier est vide",
+    noGroceriesDesc: "Générez un planning pour remplir automatiquement votre liste de courses."
+  },
+  
+  en: {
+    appName: "PlanEat",
+    appTagline: "AI Meal Planner & Smart Grocery List",
+    
+    // Tabs
+    tabPlanner: "Meal Plan",
+    tabGroceries: "Groceries",
+    tabRecipes: "Recipes",
+    tabProfile: "My Household",
+    
+    // Header & Actions
+    generatePlan: "Generate with AI",
+    regenerating: "Generating...",
+    planDuration: "Plan Duration",
+    oneWeek: "1 Week",
+    twoWeeks: "2 Weeks",
+    oneMonth: "1 Month (4 wks)",
+    weeks: "weeks",
+    week: "Week",
+    day: "Day",
+    today: "Today",
+    
+    // Meals
+    breakfast: "Breakfast",
+    lunch: "Lunch",
+    dinner: "Dinner",
+    snack: "Snack",
+    swapMeal: "Swap this meal",
+    viewRecipe: "View Recipe",
+    servings: "people",
+    servingsShort: "serv.",
+    
+    // Days
+    monday: "Monday",
+    tuesday: "Tuesday",
+    wednesday: "Wednesday",
+    thursday: "Thursday",
+    friday: "Friday",
+    saturday: "Saturday",
+    sunday: "Sunday",
+    
+    // Groceries
+    groceryTitle: "Grocery List",
+    grocerySubtitle: "Automatically calculated from your meals",
+    addItem: "Add an item",
+    itemPlaceholder: "E.g., Dish soap, Cookies...",
+    categoryPlaceholder: "Department",
+    filterAll: "All",
+    checkedCount: "bought",
+    clearChecked: "Clear checked items",
+    shareList: "Share List",
+    shareMessageTitle: "🛒 My PlanEat Grocery List:",
+    copiedToClipboard: "List copied to clipboard!",
+    
+    // Grocery Departments
+    deptProduce: "🍎 Fruits & Vegetables",
+    deptMeat: "🥩 Meat & Seafood",
+    deptDairy: "🧀 Dairy & Eggs",
+    deptBakery: "🥖 Bakery",
+    deptPantry: "🥫 Pantry & Grains",
+    deptSpices: "🧂 Spices & Condiments",
+    deptFrozen: "❄️ Frozen",
+    deptDrinks: "🧃 Drinks",
+    deptOther: "🧼 Household & Other",
+    
+    // Recipe Modal
+    prepTime: "Prep Time",
+    cookTime: "Cook Time",
+    totalTime: "Total",
+    difficulty: "Difficulty",
+    easy: "Easy",
+    medium: "Medium",
+    hard: "Advanced",
+    ingredients: "Ingredients",
+    instructions: "Step-by-step Instructions",
+    step: "Step",
+    minutes: "min",
+    startTimer: "Timer",
+    nutritionCalories: "Estimated Calories",
+    
+    // Profile & Family
+    profileTitle: "Household Settings",
+    profileSubtitle: "Customize the AI to your family's needs",
+    adultsCount: "Number of adults",
+    childrenCount: "Number of children",
+    childrenAges: "Children's ages",
+    addAge: "Add age",
+    dietsAndPrefs: "Diets & Preferences",
+    dietBalanced: "Balanced & Family-friendly",
+    dietHalal: "100% Halal",
+    dietVegetarian: "Vegetarian",
+    dietVegan: "Vegan",
+    dietGlutenFree: "Gluten-Free",
+    dietLactoseFree: "Dairy-Free",
+    dietLowCarb: "Low Carb / Fitness",
+    dietBudget: "Budget-Friendly",
+    dietQuick: "Quick & Easy (< 20 min)",
+    
+    dislikedTitle: "Disliked & Excluded Foods",
+    dislikedPlaceholder: "E.g., Cilantro, Mushrooms, Seafood...",
+    addDislike: "Exclude this food",
+    saveProfile: "Save Household Profile",
+    profileSaved: "Profile saved successfully!",
+    
+    // Language selection
+    language: "Language",
+    langFr: "Français",
+    langEn: "English",
+    langAr: "العربية",
+    
+    // Empty & Loading States
+    noMealsTitle: "No meal plan yet",
+    noMealsDesc: "Tap 'Generate with AI' to build customized weekly menus and smart shopping lists.",
+    noGroceriesTitle: "Your grocery list is empty",
+    noGroceriesDesc: "Generate a meal plan to automatically fill your grocery list."
+  },
+  
+  ar: {
+    appName: "PlanEat",
+    appTagline: "تخطيط الوجبات وقائمة التسوق بالذكاء الاصطناعي",
+    
+    // Tabs
+    tabPlanner: "جدول الوجبات",
+    tabGroceries: "قائمة التسوق",
+    tabRecipes: "الوصفات",
+    tabProfile: "الملف العائلي",
+    
+    // Header & Actions
+    generatePlan: "إنشاء بالذكاء الاصطناعي",
+    regenerating: "جارٍ الإنشاء...",
+    planDuration: "مدة الجدول",
+    oneWeek: "أسبوع واحد",
+    twoWeeks: "أسبوعان",
+    oneMonth: "شهر كامل (4 أسابيع)",
+    weeks: "أسابيع",
+    week: "أسبوع",
+    day: "يوم",
+    today: "اليوم",
+    
+    // Meals
+    breakfast: "فطور الصباح",
+    lunch: "الغداء",
+    dinner: "العشاء",
+    snack: "لمجة / وجبة خفيفة",
+    swapMeal: "تغيير هذه الوجبة",
+    viewRecipe: "عرض الوصفة",
+    servings: "أشخاص",
+    servingsShort: "أفراد",
+    
+    // Days
+    monday: "الإثنين",
+    tuesday: "الثلاثاء",
+    wednesday: "الأربعاء",
+    thursday: "الخميس",
+    friday: "الجمعة",
+    saturday: "السبت",
+    sunday: "الأحد",
+    
+    // Groceries
+    groceryTitle: "قائمة المقاضي",
+    grocerySubtitle: "محسوبة تلقائياً بحسب وجباتك وعدد الأفراد",
+    addItem: "إضافة منتج",
+    itemPlaceholder: "مثال: سائل غسيل، بسكويت...",
+    categoryPlaceholder: "القسم",
+    filterAll: "الكل",
+    checkedCount: "تم الشراء",
+    clearChecked: "مسح العناصر المشتراة",
+    shareList: "مشاركة القائمة",
+    shareMessageTitle: "🛒 قائمة تسوق PlanEat الخاصة بي:",
+    copiedToClipboard: "تم نسخ القائمة إلى الحافظة!",
+    
+    // Grocery Departments
+    deptProduce: "🍎 خضار وفواكه",
+    deptMeat: "🥩 لحوم وأسماك",
+    deptDairy: "🧀 ألبان وأجبان وبيض",
+    deptBakery: "🥖 مخبوزات",
+    deptPantry: "🥫 مؤونة وبقوليات",
+    deptSpices: "🧂 بهارات وتوابل",
+    deptFrozen: "❄️ مجمدات",
+    deptDrinks: "🧃 مشروبات",
+    deptOther: "🧼 مستلزمات المنزل",
+    
+    // Recipe Modal
+    prepTime: "التحضير",
+    cookTime: "الطهي",
+    totalTime: "الإجمالي",
+    difficulty: "مستوى الصعوبة",
+    easy: "سهل",
+    medium: "متوسط",
+    hard: "متقدم",
+    ingredients: "المكونات",
+    instructions: "خطوات التحضير",
+    step: "خطوة",
+    minutes: "دقيقة",
+    startTimer: "مؤقت",
+    nutritionCalories: "السعرات التقديرية",
+    
+    // Profile & Family
+    profileTitle: "إعدادات العائلة",
+    profileSubtitle: "تخصيص الذكاء الاصطناعي لاحتياجات أسرتك",
+    adultsCount: "عدد البالغين",
+    childrenCount: "عدد الأطفال",
+    childrenAges: "أعمار الأطفال",
+    addAge: "إضافة عمر",
+    dietsAndPrefs: "النظام الغذائي والتفضيلات",
+    dietBalanced: "متوازن وعائلي",
+    dietHalal: "100% حلال",
+    dietVegetarian: "نباتي",
+    dietVegan: "نباتي صرف",
+    dietGlutenFree: "خالٍ من الغلوتين",
+    dietLactoseFree: "خالٍ من اللاكتوز",
+    dietLowCarb: "حمية / قليل الكربوهيدرات",
+    dietBudget: "اقتصادي وموفر",
+    dietQuick: "سريع (< 20 دقيقة)",
+    
+    dislikedTitle: "أطعمة مستبعدة أو غير مرغوبة",
+    dislikedPlaceholder: "مثال: الكزبرة، الفطر، المأكولات البحرية...",
+    addDislike: "استبعاد هذا الطعام",
+    saveProfile: "حفظ إعدادات العائلة",
+    profileSaved: "تم حفظ الملف بنجاح!",
+    
+    // Language selection
+    language: "اللغة",
+    langFr: "Français",
+    langEn: "English",
+    langAr: "العربية",
+    
+    // Empty & Loading States
+    noMealsTitle: "لا يوجد جدول وجبات حتى الآن",
+    noMealsDesc: "اضغط على 'إنشاء بالذكاء الاصطناعي' لتجهيز وجباتك وقائمة التسوق تلقائياً.",
+    noGroceriesTitle: "قائمة التسوق فارغة",
+    noGroceriesDesc: "قم بإنشاء جدول وجبات لملء قائمة المقاضي تلقائياً."
+  }
+};

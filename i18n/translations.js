@@ -113,7 +113,22 @@ export const TRANSLATIONS = {
     noMealsTitle: "Aucun planning pour le moment",
     noMealsDesc: "Cliquez sur 'Générer avec l'IA' pour créer vos menus personnalisés et votre liste de courses.",
     noGroceriesTitle: "Votre panier est vide",
-    noGroceriesDesc: "Générez un planning pour remplir automatiquement votre liste de courses."
+    noGroceriesDesc: "Générez un planning pour remplir automatiquement votre liste de courses.",
+    
+    // Mistral AI Configuration
+    aiSectionTitle: "Moteur d'Intelligence Artificielle",
+    aiEngineLocal: "Catalogue Local (Hors-ligne)",
+    aiEngineMistral: "Mistral AI (Génération en direct)",
+    mistralApiKey: "Clé API Mistral",
+    mistralApiKeyPlaceholder: "Entrez votre clé sk-...",
+    mistralModel: "Modèle Mistral",
+    testApiKey: "Tester la connexion API",
+    testingApiKey: "Vérification...",
+    apiKeyValid: "Connexion réussie à Mistral AI !",
+    apiKeyInvalid: "Clé API invalide ou erreur réseau.",
+    generatingWithMistral: "Génération créative avec Mistral AI...",
+    mistralBadge: "⚡ Mistral AI",
+    localBadge: "💾 Mode Local"
   },
   
   en: {
@@ -230,7 +245,22 @@ export const TRANSLATIONS = {
     noMealsTitle: "No meal plan yet",
     noMealsDesc: "Tap 'Generate with AI' to build customized weekly menus and smart shopping lists.",
     noGroceriesTitle: "Your grocery list is empty",
-    noGroceriesDesc: "Generate a meal plan to automatically fill your grocery list."
+    noGroceriesDesc: "Generate a meal plan to automatically fill your grocery list.",
+    
+    // Mistral AI Configuration
+    aiSectionTitle: "Artificial Intelligence Engine",
+    aiEngineLocal: "Local Catalog (Offline)",
+    aiEngineMistral: "Mistral AI (Live Generation)",
+    mistralApiKey: "Mistral API Key",
+    mistralApiKeyPlaceholder: "Enter your key sk-...",
+    mistralModel: "Mistral Model",
+    testApiKey: "Test API Connection",
+    testingApiKey: "Testing...",
+    apiKeyValid: "Connected to Mistral AI successfully!",
+    apiKeyInvalid: "Invalid API key or network error.",
+    generatingWithMistral: "Generating creative plan with Mistral AI...",
+    mistralBadge: "⚡ Mistral AI",
+    localBadge: "💾 Local Mode"
   },
   
   ar: {
@@ -347,6 +377,22 @@ export const TRANSLATIONS = {
     noMealsTitle: "لا يوجد جدول وجبات حتى الآن",
     noMealsDesc: "اضغط على 'إنشاء بالذكاء الاصطناعي' لتجهيز وجباتك وقائمة التسوق تلقائياً.",
     noGroceriesTitle: "قائمة التسوق فارغة",
-    noGroceriesDesc: "قم بإنشاء جدول وجبات لملء قائمة المقاضي تلقائياً."
+    noGroceriesDesc: "قم بإنشاء جدول وجبات لملء قائمة المقاضي تلقائياً.",
+    
+    // Mistral AI Configuration
+    aiSectionTitle: "محرك الذكاء الاصطناعي",
+    aiEngineLocal: "الكتالوج المحلي (بدون إنترنت)",
+    aiEngineMistral: "Mistral AI (توليد مباشر)",
+    mistralApiKey: "مفتاح Mistral API",
+    mistralApiKeyPlaceholder: "أدخل مفتاح sk-...",
+    mistralModel: "نموذج Mistral",
+    testApiKey: "اختبار الاتصال بـ API",
+    testingApiKey: "جارٍ الفحص...",
+    apiKeyValid: "تم الاتصال بـ Mistral AI بنجاح!",
+    apiKeyInvalid: "مفتاح API غير صالح أو حدث خطأ في الاتصال.",
+    generatingWithMistral: "جارٍ التوليد الذكي باستخدام Mistral AI...",
+    mistralBadge: "⚡ Mistral AI",
+    localBadge: "💾 وضع محلي"
   }
 };
+

@@ -1,4 +1,5 @@
 import { RECIPES_CATALOG } from "./defaultRecipes";
+import { API_CONFIG } from "../config/apiConfig";
 
 export class AIPlannerService {
   /**
@@ -51,17 +52,188 @@ export class AIPlannerService {
   }
 
   /**
-   * Génère un planning complet sur 1, 2 ou 4 semaines
+   * Génération de planning en direct avec Mistral AI (avec fallback local automatique)
    */
-  static generateMealPlan(profile, durationWeeks = 1) {
+  static async generateMealPlan(profile, durationWeeks = 1, lang = "fr") {
     const servings = this.calculateHouseholdServings(profile);
     const daysCount = durationWeeks * 7;
-    
+
+    try {
+      if (API_CONFIG.MISTRAL_API_KEY) {
+        const aiPlan = await this.fetchPlanFromMistral(profile, durationWeeks, lang, servings);
+        if (aiPlan && aiPlan.days && aiPlan.days.length === daysCount) {
+          const groceries = this.compileGroceries(aiPlan);
+          return { plan: aiPlan, groceries };
+        }
+      }
+    } catch (e) {
+      console.log("Mistral AI fallback to local catalog:", e?.message);
+    }
+
+    // Fallback local instantané
+    return this.generateLocalMealPlan(profile, durationWeeks, servings);
+  }
+
+  /**
+   * Appel API Mistral / Codestral pour générer un planning sur-mesure
+   */
+  static async fetchPlanFromMistral(profile, durationWeeks, lang, servings) {
+    const daysCount = durationWeeks * 7;
+    const dietsList = (profile.diets || ["dietBalanced"]).join(", ");
+    const dislikesList = (profile.dislikedFoods || []).join(", ") || "aucun";
+    const dayKeys = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+
+    const prompt = `Tu es un chef cuisinier et nutritionniste expert pour l'application PlanEat.
+Génère un planning de repas équilibré et varié pour ${daysCount} jours en JSON.
+Foyer: ${profile.adults || 2} adultes, ${profile.children || 0} enfants (âges: ${(profile.childrenAges || []).join(", ") || "aucun"}).
+Portions totales: ${servings} personnes.
+Régimes & Préférences: ${dietsList}.
+Aliments strictement exclus: ${dislikesList}.
+Langue: ${lang === "ar" ? "arabe" : lang === "en" ? "anglais" : "français"}.
+
+Format JSON attendu:
+{
+  "days": [
+    {
+      "dayNumber": 1,
+      "meals": {
+        "breakfast": {
+          "title": "${lang === "ar" ? "..." : "Titre du petit-déjeuner"}",
+          "emoji": "🥣",
+          "prepTime": 5,
+          "cookTime": 5,
+          "caloriesPerPerson": 350,
+          "ingredients": [
+            { "name": "${lang === "ar" ? "..." : "Nom ingrédient"}", "quantity": 100, "unit": "g", "dept": "deptPantry" }
+          ],
+          "instructions": ["Étape 1", "Étape 2"]
+        },
+        "lunch": {
+          "title": "${lang === "ar" ? "..." : "Titre du déjeuner"}",
+          "emoji": "🍗",
+          "prepTime": 10,
+          "cookTime": 15,
+          "caloriesPerPerson": 520,
+          "ingredients": [
+            { "name": "${lang === "ar" ? "..." : "Nom ingrédient"}", "quantity": 150, "unit": "g", "dept": "deptMeat" }
+          ],
+          "instructions": ["Étape 1", "Étape 2"]
+        },
+        "snack": {
+          "title": "${lang === "ar" ? "..." : "Goûter"}",
+          "emoji": "🍎",
+          "prepTime": 5,
+          "cookTime": 0,
+          "caloriesPerPerson": 180,
+          "ingredients": [
+            { "name": "${lang === "ar" ? "..." : "Fruit"}", "quantity": 1, "unit": "pièce", "dept": "deptProduce" }
+          ],
+          "instructions": ["Déguster frais"]
+        },
+        "dinner": {
+          "title": "${lang === "ar" ? "..." : "Titre du dîner"}",
+          "emoji": "🥘",
+          "prepTime": 10,
+          "cookTime": 20,
+          "caloriesPerPerson": 480,
+          "ingredients": [
+            { "name": "${lang === "ar" ? "..." : "Nom ingrédient"}", "quantity": 120, "unit": "g", "dept": "deptProduce" }
+          ],
+          "instructions": ["Étape 1", "Étape 2"]
+        }
+      }
+    }
+  ]
+}`;
+
+    const response = await fetch(API_CONFIG.ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${API_CONFIG.MISTRAL_API_KEY}`,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        model: API_CONFIG.MODEL,
+        messages: [
+          { role: "system", content: "Tu es un assistant culinaire qui génère des plannings de repas au format JSON strict." },
+          { role: "user", content: prompt }
+        ],
+        response_format: { type: "json_object" }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Mistral API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = JSON.parse(data.choices[0].message.content);
+
+    const formattedDays = (content.days || []).map((d, i) => {
+      const weekIndex = Math.floor(i / 7) + 1;
+      const dayIndexInWeek = i % 7;
+      const dayKey = dayKeys[dayIndexInWeek];
+
+      const wrapMeal = (m) => {
+        if (!m) return null;
+        return {
+          id: `ai_${Math.random().toString(36).substr(2, 9)}`,
+          title: { [lang]: m.title, fr: m.title, en: m.title, ar: m.title },
+          emoji: m.emoji || "🍽️",
+          prepTime: m.prepTime || 10,
+          cookTime: m.cookTime || 15,
+          caloriesPerPerson: m.caloriesPerPerson || 400,
+          calculatedServings: servings,
+          ingredients: (m.ingredients || []).map(ing => ({
+            name: { [lang]: ing.name, fr: ing.name, en: ing.name, ar: ing.name },
+            quantity: ing.quantity || 1,
+            unit: ing.unit || "g",
+            dept: ing.dept || "deptProduce"
+          })),
+          instructions: {
+            [lang]: m.instructions || [],
+            fr: m.instructions || [],
+            en: m.instructions || [],
+            ar: m.instructions || []
+          }
+        };
+      };
+
+      return {
+        id: `day_${i + 1}`,
+        dayNumber: i + 1,
+        weekNumber: weekIndex,
+        dayKey: dayKey,
+        servings: servings,
+        meals: {
+          breakfast: wrapMeal(d.meals?.breakfast),
+          lunch: wrapMeal(d.meals?.lunch),
+          dinner: wrapMeal(d.meals?.dinner),
+          snack: wrapMeal(d.meals?.snack)
+        }
+      };
+    });
+
+    return {
+      id: `plan_ai_${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      durationWeeks: durationWeeks,
+      householdServings: servings,
+      isAIGenerated: true,
+      days: formattedDays
+    };
+  }
+
+  /**
+   * Génération locale à partir du catalogue interne
+   */
+  static generateLocalMealPlan(profile, durationWeeks = 1, servings = 2) {
+    const daysCount = durationWeeks * 7;
     const breakfasts = this.filterRecipes(profile, "breakfast");
-    const mains = this.filterRecipes(profile); // lunch or dinner
+    const mains = this.filterRecipes(profile);
     const snacks = this.filterRecipes(profile, "snack");
 
-    // Fallback si la sélection est trop stricte
     const safeBreakfasts = breakfasts.length > 0 ? breakfasts : RECIPES_CATALOG.filter(r => r.mealType === "breakfast");
     const safeMains = mains.length > 0 ? mains : RECIPES_CATALOG.filter(r => r.mealType === "lunch" || r.mealType === "dinner");
     const safeSnacks = snacks.length > 0 ? snacks : RECIPES_CATALOG.filter(r => r.mealType === "snack");
@@ -99,6 +271,7 @@ export class AIPlannerService {
       createdAt: new Date().toISOString(),
       durationWeeks: durationWeeks,
       householdServings: servings,
+      isAIGenerated: false,
       days: days
     };
 
@@ -115,18 +288,19 @@ export class AIPlannerService {
     plan.days.forEach(day => {
       Object.values(day.meals).forEach(meal => {
         if (!meal || !meal.ingredients) return;
-        const factor = (meal.calculatedServings || 2) / 2; // base recipes calculated for 2
+        const factor = (meal.calculatedServings || 2) / 2;
 
         meal.ingredients.forEach(ing => {
-          const key = ing.name.fr + "_" + ing.unit;
+          const frName = ing.name?.fr || ing.name || "Article";
+          const key = frName + "_" + ing.unit;
           const qty = (ing.quantity * factor);
 
           if (!itemsMap[key]) {
             itemsMap[key] = {
               id: `item_${Math.random().toString(36).substr(2, 9)}`,
-              name: ing.name,
+              name: typeof ing.name === "object" ? ing.name : { fr: ing.name, en: ing.name, ar: ing.name },
               totalQuantity: qty,
-              unit: ing.unit,
+              unit: ing.unit || "g",
               dept: ing.dept || "deptOther",
               checked: false
             };
@@ -137,7 +311,6 @@ export class AIPlannerService {
       });
     });
 
-    // Formater et arrondir les quantités proprement
     const result = Object.values(itemsMap).map(item => {
       let rounded = item.totalQuantity;
       if (item.unit === "g" || item.unit === "ml") {
@@ -151,7 +324,6 @@ export class AIPlannerService {
       };
     });
 
-    // Trier par rayon
     return result.sort((a, b) => (a.dept || "").localeCompare(b.dept || ""));
   }
 

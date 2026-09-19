@@ -15,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
 import { TRANSLATIONS } from "./i18n/translations";
-import { StorageService, DEFAULT_PROFILE } from "./utils/storage";
+import { StorageService, DEFAULT_PROFILE, DEFAULT_AI_CONFIG } from "./utils/storage";
 import { AIPlannerService } from "./services/aiPlannerService";
 import { RECIPES_CATALOG } from "./services/defaultRecipes";
 
@@ -31,6 +31,7 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState("planner"); // planner, groceries, recipes, profile
   const [profile, setProfile] = useState(DEFAULT_PROFILE);
+  const [aiConfig, setAiConfig] = useState(DEFAULT_AI_CONFIG);
   const [currentPlan, setCurrentPlan] = useState(null);
   const [groceries, setGroceries] = useState([]);
   const [selectedWeek, setSelectedWeek] = useState(1);
@@ -55,6 +56,9 @@ export default function App() {
     const savedProfile = await StorageService.getProfile();
     setProfile(savedProfile);
 
+    const savedAiConfig = await StorageService.getAiConfig();
+    setAiConfig(savedAiConfig);
+
     const savedPlan = await StorageService.getCurrentPlan();
     if (savedPlan) {
       setCurrentPlan(savedPlan);
@@ -62,7 +66,7 @@ export default function App() {
       setGroceries(savedGroceries.length > 0 ? savedGroceries : AIPlannerService.compileGroceries(savedPlan));
     } else {
       // Génération automatique initiale
-      handleGeneratePlan(savedProfile, 1);
+      handleGeneratePlan(savedProfile, 1, savedAiConfig, savedLang);
     }
   };
 
@@ -76,12 +80,24 @@ export default function App() {
     await StorageService.saveProfile(updatedProfile);
   };
 
-  const handleGeneratePlan = (customProfile = profile, durationWeeks = 1) => {
+  const handleSaveAiConfig = async (updatedConfig) => {
+    setAiConfig(updatedConfig);
+    await StorageService.saveAiConfig(updatedConfig);
+  };
+
+  const handleGeneratePlan = async (
+    customProfile = profile,
+    durationWeeks = 1,
+    config = aiConfig,
+    activeLang = lang
+  ) => {
     setIsGenerating(true);
-    setTimeout(async () => {
-      const { plan, groceries: compiledGroceries } = AIPlannerService.generateMealPlan(
+    try {
+      const { plan, groceries: compiledGroceries } = await AIPlannerService.generateMealPlan(
         customProfile,
-        durationWeeks
+        durationWeeks,
+        config,
+        activeLang
       );
       setCurrentPlan(plan);
       setGroceries(compiledGroceries);
@@ -90,36 +106,53 @@ export default function App() {
 
       await StorageService.saveCurrentPlan(plan);
       await StorageService.saveGroceries(compiledGroceries);
+    } catch (err) {
+      console.error("Erreur lors de la génération du plan:", err);
+    } finally {
       setIsGenerating(false);
-    }, 600);
+    }
   };
 
-  const handleSwapMeal = (dayId, mealType, currentMealId) => {
+  const handleSwapMeal = async (dayId, mealType, currentMeal) => {
     if (!currentPlan) return;
-    const newMeal = AIPlannerService.swapMeal(currentMealId, mealType, profile);
-    const updatedDays = currentPlan.days.map(day => {
-      if (day.id === dayId) {
-        return {
-          ...day,
-          meals: {
-            ...day.meals,
-            [mealType]: {
-              ...newMeal,
-              calculatedServings: day.servings
+    setIsGenerating(true);
+    try {
+      const newMeal = await AIPlannerService.swapMeal(
+        currentMeal?.id,
+        mealType,
+        profile,
+        currentMeal,
+        aiConfig,
+        lang
+      );
+      const updatedDays = currentPlan.days.map(day => {
+        if (day.id === dayId) {
+          return {
+            ...day,
+            meals: {
+              ...day.meals,
+              [mealType]: {
+                ...newMeal,
+                calculatedServings: day.servings
+              }
             }
-          }
-        };
-      }
-      return day;
-    });
+          };
+        }
+        return day;
+      });
 
-    const updatedPlan = { ...currentPlan, days: updatedDays };
-    const updatedGroceries = AIPlannerService.compileGroceries(updatedPlan);
+      const updatedPlan = { ...currentPlan, days: updatedDays };
+      const updatedGroceries = AIPlannerService.compileGroceries(updatedPlan);
 
-    setCurrentPlan(updatedPlan);
-    setGroceries(updatedGroceries);
-    StorageService.saveCurrentPlan(updatedPlan);
-    StorageService.saveGroceries(updatedGroceries);
+      setCurrentPlan(updatedPlan);
+      setGroceries(updatedGroceries);
+      await StorageService.saveCurrentPlan(updatedPlan);
+      await StorageService.saveGroceries(updatedGroceries);
+    } catch (err) {
+      console.error("Erreur lors du swap:", err);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleToggleGrocery = (itemId) => {
@@ -209,7 +242,29 @@ export default function App() {
           </View>
         </View>
 
-        <View style={styles.topActions}>
+        <View style={[styles.topActions, isRTL && styles.rtlRow]}>
+          <TouchableOpacity
+            style={[
+              styles.engineBadge,
+              aiConfig.engine === "mistral" ? styles.engineBadgeMistral : styles.engineBadgeLocal
+            ]}
+            onPress={() => setIsProfileModalOpen(true)}
+          >
+            <Ionicons
+              name={aiConfig.engine === "mistral" ? "sparkles" : "hardware-chip"}
+              size={13}
+              color={aiConfig.engine === "mistral" ? "#c084fc" : "#38bdf8"}
+            />
+            <Text
+              style={[
+                styles.engineBadgeText,
+                aiConfig.engine === "mistral" ? styles.engineBadgeTextMistral : styles.engineBadgeTextLocal
+              ]}
+            >
+              {aiConfig.engine === "mistral" ? "Mistral" : "Local"}
+            </Text>
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.profileBtn}
             onPress={() => setIsProfileModalOpen(true)}
@@ -229,19 +284,21 @@ export default function App() {
           <View style={[styles.plannerControls, isRTL && styles.rtlRow]}>
             <TouchableOpacity
               style={[styles.aiGenerateBtn, isGenerating && styles.btnDisabled]}
-              onPress={() => handleGeneratePlan(profile, currentPlan?.durationWeeks || 1)}
+              onPress={() => handleGeneratePlan(profile, currentPlan?.durationWeeks || 1, aiConfig, lang)}
               disabled={isGenerating}
             >
               <LinearGradient
-                colors={["#0284c7", "#0369a1"]}
+                colors={aiConfig.engine === "mistral" ? ["#7c3aed", "#6d28d9"] : ["#0284c7", "#0369a1"]}
                 style={styles.aiGradient}
               >
                 {isGenerating ? (
                   <ActivityIndicator size="small" color="#ffffff" />
                 ) : (
                   <>
-                    <Ionicons name="sparkles" size={16} color="#f8fafc" />
-                    <Text style={styles.aiBtnText}>{t.generatePlan}</Text>
+                    <Ionicons name={aiConfig.engine === "mistral" ? "sparkles" : "flash"} size={16} color="#f8fafc" />
+                    <Text style={styles.aiBtnText}>
+                      {aiConfig.engine === "mistral" ? "Mistral AI" : t.generatePlan}
+                    </Text>
                   </>
                 )}
               </LinearGradient>
@@ -256,7 +313,7 @@ export default function App() {
                     styles.durationChip,
                     (currentPlan?.durationWeeks || 1) === w && styles.durationChipActive
                   ]}
-                  onPress={() => handleGeneratePlan(profile, w)}
+                  onPress={() => handleGeneratePlan(profile, w, aiConfig, lang)}
                 >
                   <Text style={[
                     styles.durationChipText,
@@ -340,7 +397,7 @@ export default function App() {
                   mealType="breakfast"
                   meal={currentDay.meals.breakfast}
                   onPressRecipe={() => setSelectedRecipe(currentDay.meals.breakfast)}
-                  onPressSwap={() => handleSwapMeal(currentDay.id, "breakfast", currentDay.meals.breakfast?.id)}
+                  onPressSwap={() => handleSwapMeal(currentDay.id, "breakfast", currentDay.meals.breakfast)}
                   lang={lang}
                 />
 
@@ -348,7 +405,7 @@ export default function App() {
                   mealType="lunch"
                   meal={currentDay.meals.lunch}
                   onPressRecipe={() => setSelectedRecipe(currentDay.meals.lunch)}
-                  onPressSwap={() => handleSwapMeal(currentDay.id, "lunch", currentDay.meals.lunch?.id)}
+                  onPressSwap={() => handleSwapMeal(currentDay.id, "lunch", currentDay.meals.lunch)}
                   lang={lang}
                 />
 
@@ -356,7 +413,7 @@ export default function App() {
                   mealType="snack"
                   meal={currentDay.meals.snack}
                   onPressRecipe={() => setSelectedRecipe(currentDay.meals.snack)}
-                  onPressSwap={() => handleSwapMeal(currentDay.id, "snack", currentDay.meals.snack?.id)}
+                  onPressSwap={() => handleSwapMeal(currentDay.id, "snack", currentDay.meals.snack)}
                   lang={lang}
                 />
 
@@ -364,7 +421,7 @@ export default function App() {
                   mealType="dinner"
                   meal={currentDay.meals.dinner}
                   onPressRecipe={() => setSelectedRecipe(currentDay.meals.dinner)}
-                  onPressSwap={() => handleSwapMeal(currentDay.id, "dinner", currentDay.meals.dinner?.id)}
+                  onPressSwap={() => handleSwapMeal(currentDay.id, "dinner", currentDay.meals.dinner)}
                   lang={lang}
                 />
               </>
@@ -571,7 +628,9 @@ export default function App() {
       <FamilyProfileModal
         visible={isProfileModalOpen}
         profile={profile}
+        aiConfig={aiConfig}
         onSave={handleSaveProfile}
+        onSaveAiConfig={handleSaveAiConfig}
         onClose={() => setIsProfileModalOpen(false)}
         lang={lang}
         onLanguageChange={handleLanguageChange}
@@ -618,7 +677,35 @@ const styles = StyleSheet.create({
   },
   topActions: {
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
+    gap: 8
+  },
+  engineBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 10,
+    borderWidth: 1
+  },
+  engineBadgeMistral: {
+    backgroundColor: "#3b0764",
+    borderColor: "#a855f7"
+  },
+  engineBadgeLocal: {
+    backgroundColor: "#082f49",
+    borderColor: "#0284c7"
+  },
+  engineBadgeText: {
+    fontSize: 11,
+    fontWeight: "700"
+  },
+  engineBadgeTextMistral: {
+    color: "#e9d5ff"
+  },
+  engineBadgeTextLocal: {
+    color: "#bae6fd"
   },
   profileBtn: {
     flexDirection: "row",

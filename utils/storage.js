@@ -6,7 +6,14 @@ const KEYS = {
   GROCERIES: "@planeat_groceries_list",
   CUSTOM_GROCERIES: "@planeat_custom_groceries",
   LANGUAGE: "@planeat_app_language",
-  DIETS: "@planeat_diets"
+  DIETS: "@planeat_diets",
+  AI_CONFIG: "@planeat_ai_config"
+};
+
+export const DEFAULT_AI_CONFIG = {
+  engine: "local", // 'local' | 'mistral'
+  mistralApiKey: "",
+  mistralModel: "mistral-small-latest"
 };
 
 export const DEFAULT_PROFILE = {
@@ -90,4 +97,23 @@ export class StorageService {
       return false;
     }
   }
+
+  static async getAiConfig() {
+    try {
+      const data = await AsyncStorage.getItem(KEYS.AI_CONFIG);
+      return data ? { ...DEFAULT_AI_CONFIG, ...JSON.parse(data) } : DEFAULT_AI_CONFIG;
+    } catch {
+      return DEFAULT_AI_CONFIG;
+    }
+  }
+
+  static async saveAiConfig(config) {
+    try {
+      await AsyncStorage.setItem(KEYS.AI_CONFIG, JSON.stringify(config));
+      return true;
+    } catch {
+      return false;
+    }
+  }
 }
+

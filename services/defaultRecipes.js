@@ -416,3 +416,4 @@ export const RECIPES_CATALOG = [
     }
   }
 ];
+

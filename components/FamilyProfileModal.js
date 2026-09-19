@@ -8,15 +8,19 @@ import {
   ScrollView,
   SafeAreaView,
   TextInput,
+  ActivityIndicator,
   Alert
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { TRANSLATIONS } from "../i18n/translations";
+import { MistralService } from "../services/mistralService";
 
 export default function FamilyProfileModal({
   visible,
   profile,
+  aiConfig,
   onSave,
+  onSaveAiConfig,
   onClose,
   lang,
   onLanguageChange
@@ -30,6 +34,13 @@ export default function FamilyProfileModal({
   const [diets, setDiets] = useState(profile?.diets || ["dietBalanced"]);
   const [dislikedFoods, setDislikedFoods] = useState(profile?.dislikedFoods || []);
   const [newDislike, setNewDislike] = useState("");
+
+  // Mistral AI Configuration State
+  const [aiEngine, setAiEngine] = useState(aiConfig?.engine || "local");
+  const [mistralApiKey, setMistralApiKey] = useState(aiConfig?.mistralApiKey || "");
+  const [mistralModel, setMistralModel] = useState(aiConfig?.mistralModel || "mistral-small-latest");
+  const [isTestingKey, setIsTestingKey] = useState(false);
+  const [testResult, setTestResult] = useState(null); // { success: boolean, message: string }
 
   const dietOptions = [
     { key: "dietBalanced", label: t.dietBalanced, emoji: "🥗" },
@@ -80,6 +91,22 @@ export default function FamilyProfileModal({
     setDislikedFoods(dislikedFoods.filter(f => f !== food));
   };
 
+  const handleTestApiKey = async () => {
+    if (!mistralApiKey.trim()) {
+      setTestResult({ success: false, message: t.apiKeyInvalid });
+      return;
+    }
+    setIsTestingKey(true);
+    setTestResult(null);
+    const result = await MistralService.testApiKey(mistralApiKey);
+    setIsTestingKey(false);
+    if (result.success) {
+      setTestResult({ success: true, message: t.apiKeyValid });
+    } else {
+      setTestResult({ success: false, message: result.error || t.apiKeyInvalid });
+    }
+  };
+
   const handleSave = () => {
     const updated = {
       ...profile,
@@ -90,6 +117,13 @@ export default function FamilyProfileModal({
       dislikedFoods
     };
     onSave(updated);
+    if (onSaveAiConfig) {
+      onSaveAiConfig({
+        engine: aiEngine,
+        mistralApiKey: mistralApiKey.trim(),
+        mistralModel
+      });
+    }
     Alert.alert("✅", t.profileSaved);
     onClose();
   };
@@ -280,6 +314,149 @@ export default function FamilyProfileModal({
                 </View>
               ))}
             </View>
+          </View>
+
+          {/* Configuration Moteur IA (Mistral AI) */}
+          <View style={styles.card}>
+            <View style={[styles.cardHeader, isRTL && styles.rtlRow]}>
+              <Ionicons name="sparkles" size={20} color="#a855f7" />
+              <Text style={styles.cardTitle}>{t.aiSectionTitle}</Text>
+            </View>
+
+            {/* Choix du mode IA */}
+            <View style={styles.engineRow}>
+              <TouchableOpacity
+                style={[
+                  styles.engineBtn,
+                  aiEngine === "local" && styles.engineBtnActive
+                ]}
+                onPress={() => setAiEngine("local")}
+              >
+                <Ionicons
+                  name="hardware-chip-outline"
+                  size={18}
+                  color={aiEngine === "local" ? "#38bdf8" : "#94a3b8"}
+                />
+                <Text
+                  style={[
+                    styles.engineBtnText,
+                    aiEngine === "local" && styles.engineBtnTextActive
+                  ]}
+                >
+                  {t.aiEngineLocal}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.engineBtn,
+                  aiEngine === "mistral" && styles.engineBtnActive
+                ]}
+                onPress={() => setAiEngine("mistral")}
+              >
+                <Ionicons
+                  name="cloud-outline"
+                  size={18}
+                  color={aiEngine === "mistral" ? "#a855f7" : "#94a3b8"}
+                />
+                <Text
+                  style={[
+                    styles.engineBtnText,
+                    aiEngine === "mistral" && styles.engineBtnTextActive
+                  ]}
+                >
+                  {t.aiEngineMistral}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Options Mistral si sélectionné */}
+            {aiEngine === "mistral" && (
+              <View style={styles.mistralSettings}>
+                {/* Clé API */}
+                <Text style={[styles.inputLabel, isRTL && styles.rtlText]}>
+                  {t.mistralApiKey} :
+                </Text>
+                <View style={[styles.inputRow, isRTL && styles.rtlRow]}>
+                  <TextInput
+                    style={[styles.input, styles.apiKeyInput, isRTL && styles.rtlText]}
+                    placeholder={t.mistralApiKeyPlaceholder}
+                    placeholderTextColor="#64748b"
+                    value={mistralApiKey}
+                    onChangeText={setMistralApiKey}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    secureTextEntry={true}
+                  />
+                  <TouchableOpacity
+                    style={[styles.testKeyBtn, isTestingKey && styles.btnDisabled]}
+                    onPress={handleTestApiKey}
+                    disabled={isTestingKey}
+                  >
+                    {isTestingKey ? (
+                      <ActivityIndicator size="small" color="#ffffff" />
+                    ) : (
+                      <Ionicons name="checkmark-done" size={20} color="#ffffff" />
+                    )}
+                  </TouchableOpacity>
+                </View>
+
+                {/* Résultat du test de connexion */}
+                {testResult && (
+                  <View
+                    style={[
+                      styles.testResultBox,
+                      testResult.success ? styles.testSuccessBox : styles.testErrorBox,
+                      isRTL && styles.rtlRow
+                    ]}
+                  >
+                    <Ionicons
+                      name={testResult.success ? "checkmark-circle" : "alert-circle"}
+                      size={18}
+                      color={testResult.success ? "#10b981" : "#ef4444"}
+                    />
+                    <Text
+                      style={[
+                        styles.testResultText,
+                        testResult.success ? styles.testSuccessText : styles.testErrorText
+                      ]}
+                    >
+                      {testResult.message}
+                    </Text>
+                  </View>
+                )}
+
+                {/* Modèle Mistral */}
+                <Text style={[styles.inputLabel, isRTL && styles.rtlText, { marginTop: 12 }]}>
+                  {t.mistralModel} :
+                </Text>
+                <View style={styles.modelChipsRow}>
+                  {[
+                    { key: "mistral-small-latest", label: "Mistral Small (Rapide & Éco)" },
+                    { key: "open-mistral-7b", label: "Mistral 7B (Open)" },
+                    { key: "mistral-large-latest", label: "Mistral Large (Chef Expert)" }
+                  ].map(mod => (
+                    <TouchableOpacity
+                      key={mod.key}
+                      style={[
+                        styles.modelChip,
+                        mistralModel === mod.key && styles.modelChipActive
+                      ]}
+                      onPress={() => setMistralModel(mod.key)}
+                    >
+                      <Text
+                        style={[
+                          styles.modelChipText,
+                          mistralModel === mod.key && styles.modelChipTextActive
+                        ]}
+                      >
+                        {mod.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            )}
           </View>
 
           {/* Save Button */}
@@ -556,6 +733,118 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     fontSize: 16
   },
+  engineRow: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 12
+  },
+  engineBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    backgroundColor: "#0f172a",
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: "#334155"
+  },
+  engineBtnActive: {
+    backgroundColor: "#1e1b4b",
+    borderColor: "#a855f7"
+  },
+  engineBtnText: {
+    color: "#94a3b8",
+    fontSize: 12,
+    fontWeight: "600"
+  },
+  engineBtnTextActive: {
+    color: "#f8fafc",
+    fontWeight: "700"
+  },
+  mistralSettings: {
+    marginTop: 6,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#334155"
+  },
+  inputLabel: {
+    color: "#cbd5e1",
+    fontSize: 13,
+    fontWeight: "600",
+    marginBottom: 6
+  },
+  apiKeyInput: {
+    fontFamily: "monospace",
+    fontSize: 13
+  },
+  testKeyBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: "#7c3aed",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  btnDisabled: {
+    opacity: 0.6
+  },
+  testResultBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    marginTop: 8
+  },
+  testSuccessBox: {
+    backgroundColor: "#064e3b/40",
+    borderWidth: 1,
+    borderColor: "#10b981/50"
+  },
+  testErrorBox: {
+    backgroundColor: "#7f1d1d/40",
+    borderWidth: 1,
+    borderColor: "#ef4444/50"
+  },
+  testResultText: {
+    fontSize: 12,
+    fontWeight: "600"
+  },
+  testSuccessText: {
+    color: "#34d399"
+  },
+  testErrorText: {
+    color: "#f87171"
+  },
+  modelChipsRow: {
+    gap: 8,
+    marginTop: 4
+  },
+  modelChip: {
+    backgroundColor: "#0f172a",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#334155"
+  },
+  modelChipActive: {
+    backgroundColor: "#3b0764",
+    borderColor: "#c084fc"
+  },
+  modelChipText: {
+    color: "#94a3b8",
+    fontSize: 12,
+    fontWeight: "500"
+  },
+  modelChipTextActive: {
+    color: "#f3e8ff",
+    fontWeight: "700"
+  },
   rtlRow: {
     flexDirection: "row-reverse"
   },
@@ -563,3 +852,4 @@ const styles = StyleSheet.create({
     textAlign: "right"
   }
 });
+

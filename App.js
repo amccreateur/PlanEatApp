@@ -3,14 +3,16 @@ import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   TextInput,
   Share,
   ActivityIndicator,
-  StatusBar
+  StatusBar,
+  Alert,
+  Platform
 } from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -18,16 +20,23 @@ import { TRANSLATIONS } from "./i18n/translations";
 import { StorageService, DEFAULT_PROFILE, DEFAULT_AI_CONFIG } from "./utils/storage";
 import { AIPlannerService } from "./services/aiPlannerService";
 import { RECIPES_CATALOG } from "./services/defaultRecipes";
+import { THEMES } from "./utils/theme";
 
 import MealCard from "./components/MealCard";
 import RecipeModal from "./components/RecipeModal";
 import FamilyProfileModal from "./components/FamilyProfileModal";
 import GroceryItemRow from "./components/GroceryItemRow";
+import FridgeModal from "./components/FridgeModal";
+import QuickMenuModal from "./components/QuickMenuModal";
+import DriveCartModal from "./components/DriveCartModal";
 
 export default function App() {
   const [lang, setLang] = useState("fr");
   const t = TRANSLATIONS[lang] || TRANSLATIONS.fr;
   const isRTL = lang === "ar";
+
+  const [themeMode, setThemeMode] = useState("dark"); // "dark" | "light"
+  const currentTheme = THEMES[themeMode] || THEMES.dark;
 
   const [activeTab, setActiveTab] = useState("planner"); // planner, groceries, recipes, profile
   const [profile, setProfile] = useState(DEFAULT_PROFILE);
@@ -40,10 +49,17 @@ export default function App() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isFridgeModalOpen, setIsFridgeModalOpen] = useState(false);
+  const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
+  const [isDriveModalOpen, setIsDriveModalOpen] = useState(false);
 
   // Courses manuelles / filtre
   const [newCustomItem, setNewCustomItem] = useState("");
   const [selectedGroceryDept, setSelectedGroceryDept] = useState("all");
+
+  // Catalogue de recettes filtre / recherche
+  const [recipeSearchQuery, setRecipeSearchQuery] = useState("");
+  const [recipeCategoryFilter, setRecipeCategoryFilter] = useState("all");
 
   useEffect(() => {
     loadSavedData();
@@ -52,6 +68,11 @@ export default function App() {
   const loadSavedData = async () => {
     const savedLang = await StorageService.getLanguage();
     setLang(savedLang);
+
+    const savedTheme = await StorageService.getTheme();
+    if (savedTheme) {
+      setThemeMode(savedTheme);
+    }
 
     const savedProfile = await StorageService.getProfile();
     setProfile(savedProfile);
@@ -75,6 +96,11 @@ export default function App() {
     await StorageService.setLanguage(newLang);
   };
 
+  const handleToggleTheme = async (newThemeMode) => {
+    setThemeMode(newThemeMode);
+    await StorageService.saveTheme(newThemeMode);
+  };
+
   const handleSaveProfile = async (updatedProfile) => {
     setProfile(updatedProfile);
     await StorageService.saveProfile(updatedProfile);
@@ -93,12 +119,15 @@ export default function App() {
   ) => {
     setIsGenerating(true);
     try {
-      const { plan, groceries: compiledGroceries } = await AIPlannerService.generateMealPlan(
+      const { plan, groceries: compiledGroceries, error } = await AIPlannerService.generateMealPlan(
         customProfile,
         durationWeeks,
         config,
         activeLang
       );
+      if (error) {
+        Alert.alert("⚠️ Information Mistral AI", `${error}\n\nUn planning local a été généré.`);
+      }
       setCurrentPlan(plan);
       setGroceries(compiledGroceries);
       setSelectedWeek(1);
@@ -108,6 +137,7 @@ export default function App() {
       await StorageService.saveGroceries(compiledGroceries);
     } catch (err) {
       console.error("Erreur lors de la génération du plan:", err);
+      Alert.alert("Erreur", err.message || "Erreur inconnue");
     } finally {
       setIsGenerating(false);
     }
@@ -216,6 +246,24 @@ export default function App() {
   const weekDays = currentPlan?.days?.filter(d => d.weekNumber === selectedWeek) || [];
   const currentDay = weekDays[selectedDayIndex] || weekDays[0];
 
+  // Calculs nutritionnels et budget
+  const householdServings = AIPlannerService.calculateHouseholdServings(profile);
+  const currentDayCalories = currentDay ? (
+    (currentDay.meals?.breakfast?.caloriesPerPerson || 0) +
+    (currentDay.meals?.lunch?.caloriesPerPerson || 0) +
+    (currentDay.meals?.snack?.caloriesPerPerson || 0) +
+    (currentDay.meals?.dinner?.caloriesPerPerson || 0)
+  ) : 0;
+
+  const currentDayCookTime = currentDay ? (
+    ((currentDay.meals?.breakfast?.prepTime || 0) + (currentDay.meals?.breakfast?.cookTime || 0)) +
+    ((currentDay.meals?.lunch?.prepTime || 0) + (currentDay.meals?.lunch?.cookTime || 0)) +
+    ((currentDay.meals?.snack?.prepTime || 0) + (currentDay.meals?.snack?.cookTime || 0)) +
+    ((currentDay.meals?.dinner?.prepTime || 0) + (currentDay.meals?.dinner?.cookTime || 0))
+  ) : 0;
+
+  const estimatedWeeklyBudget = Math.round(householdServings * 7 * 5.5);
+
   // Groupement des courses par rayons
   const filteredGroceries = selectedGroceryDept === "all"
     ? groceries
@@ -223,12 +271,36 @@ export default function App() {
 
   const checkedCount = groceries.filter(g => g.checked).length;
 
+  // Filtrage du catalogue de recettes
+  const filteredRecipes = RECIPES_CATALOG.filter(rec => {
+    if (recipeCategoryFilter === "breakfast" && rec.mealType !== "breakfast") return false;
+    if (recipeCategoryFilter === "lunch" && rec.mealType !== "lunch") return false;
+    if (recipeCategoryFilter === "dinner" && rec.mealType !== "dinner") return false;
+    if (recipeCategoryFilter === "snack" && rec.mealType !== "snack") return false;
+    if (recipeCategoryFilter === "quick" && (rec.prepTime + rec.cookTime) > 20) return false;
+    if (recipeCategoryFilter === "vegetarian" && !rec.tags?.includes("dietVegetarian") && !rec.tags?.includes("dietVegan")) return false;
+    if (recipeCategoryFilter === "glutenFree" && !rec.tags?.includes("dietGlutenFree")) return false;
+
+    if (recipeSearchQuery.trim()) {
+      const q = recipeSearchQuery.toLowerCase().trim();
+      const titleMatch = (rec.title?.[lang] || rec.title?.fr || "").toLowerCase().includes(q);
+      const ingMatch = rec.ingredients?.some(ing => {
+        const name = (ing.name?.[lang] || ing.name?.fr || (typeof ing.name === "string" ? ing.name : "")).toLowerCase();
+        return name.includes(q);
+      });
+      return titleMatch || ingMatch;
+    }
+
+    return true;
+  });
+
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0f172a" />
+    <SafeAreaProvider>
+      <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.bg }]} edges={["top", "left", "right"]}>
+        <StatusBar barStyle={currentTheme.statusBar} backgroundColor={currentTheme.bg} />
 
       {/* Top Navbar */}
-      <View style={[styles.topBar, isRTL && styles.rtlRow]}>
+      <View style={[styles.topBar, { backgroundColor: currentTheme.headerBg, borderBottomColor: currentTheme.border }, isRTL && styles.rtlRow]}>
         <View style={[styles.brandRow, isRTL && styles.rtlRow]}>
           <LinearGradient
             colors={["#10b981", "#059669"]}
@@ -237,42 +309,23 @@ export default function App() {
             <Ionicons name="nutrition" size={20} color="#ffffff" />
           </LinearGradient>
           <View>
-            <Text style={styles.brandName}>PlanEat</Text>
-            <Text style={styles.brandTagline}>{t.appTagline}</Text>
+            <Text style={[styles.brandName, { color: currentTheme.text }]}>PlanEat</Text>
+            <Text style={[styles.brandTagline, { color: currentTheme.textSub }]}>{t.appTagline}</Text>
           </View>
         </View>
 
         <View style={[styles.topActions, isRTL && styles.rtlRow]}>
           <TouchableOpacity
-            style={[
-              styles.engineBadge,
-              aiConfig.engine === "mistral" ? styles.engineBadgeMistral : styles.engineBadgeLocal
-            ]}
-            onPress={() => setIsProfileModalOpen(true)}
+            style={[styles.menuBurgerBtn, { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.border }]}
+            onPress={() => setIsQuickMenuOpen(true)}
           >
-            <Ionicons
-              name={aiConfig.engine === "mistral" ? "sparkles" : "hardware-chip"}
-              size={13}
-              color={aiConfig.engine === "mistral" ? "#c084fc" : "#38bdf8"}
-            />
-            <Text
+            <Ionicons name="menu" size={22} color={currentTheme.text} />
+            <View
               style={[
-                styles.engineBadgeText,
-                aiConfig.engine === "mistral" ? styles.engineBadgeTextMistral : styles.engineBadgeTextLocal
+                styles.menuIndicatorDot,
+                aiConfig.engine === "mistral" ? styles.dotMistral : styles.dotLocal
               ]}
-            >
-              {aiConfig.engine === "mistral" ? "Mistral" : "Local"}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.profileBtn}
-            onPress={() => setIsProfileModalOpen(true)}
-          >
-            <Ionicons name="people" size={18} color="#38bdf8" />
-            <Text style={styles.profileBtnText}>
-              {profile.adults + profile.children} {t.servingsShort}
-            </Text>
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -305,19 +358,19 @@ export default function App() {
             </TouchableOpacity>
 
             {/* Durée selector */}
-            <View style={styles.durationRow}>
+            <View style={[styles.durationRow, { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.border, borderWidth: 1 }]}>
               {[1, 2, 4].map(w => (
                 <TouchableOpacity
                   key={w}
                   style={[
                     styles.durationChip,
-                    (currentPlan?.durationWeeks || 1) === w && styles.durationChipActive
+                    { backgroundColor: (currentPlan?.durationWeeks || 1) === w ? "#0284c7" : "transparent" }
                   ]}
                   onPress={() => handleGeneratePlan(profile, w, aiConfig, lang)}
                 >
                   <Text style={[
                     styles.durationChipText,
-                    (currentPlan?.durationWeeks || 1) === w && styles.durationChipTextActive
+                    { color: (currentPlan?.durationWeeks || 1) === w ? "#ffffff" : currentTheme.textSub }
                   ]}>
                     {w === 1 ? t.oneWeek : w === 2 ? t.twoWeeks : t.oneMonth}
                   </Text>
@@ -334,6 +387,7 @@ export default function App() {
                   key={idx}
                   style={[
                     styles.weekTabBtn,
+                    { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.border },
                     selectedWeek === idx + 1 && styles.weekTabBtnActive
                   ]}
                   onPress={() => {
@@ -343,6 +397,7 @@ export default function App() {
                 >
                   <Text style={[
                     styles.weekTabBtnText,
+                    { color: currentTheme.textSub },
                     selectedWeek === idx + 1 && styles.weekTabBtnTextActive
                   ]}>
                     {t.week} {idx + 1}
@@ -353,7 +408,7 @@ export default function App() {
           )}
 
           {/* Day of week tabs */}
-          <View style={styles.dayTabsWrapper}>
+          <View style={[styles.dayTabsWrapper, { borderBottomColor: currentTheme.border }]}>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -365,13 +420,13 @@ export default function App() {
                 return (
                   <TouchableOpacity
                     key={day.id}
-                    style={[styles.dayTab, isSelected && styles.dayTabActive]}
+                    style={[styles.dayTab, { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.border }, isSelected && styles.dayTabActive]}
                     onPress={() => setSelectedDayIndex(idx)}
                   >
-                    <Text style={[styles.dayTabShort, isSelected && styles.dayTabShortActive]}>
+                    <Text style={[styles.dayTabShort, { color: currentTheme.textSub }, isSelected && styles.dayTabShortActive]}>
                       {dayName.slice(0, 3)}
                     </Text>
-                    <Text style={[styles.dayTabNumber, isSelected && styles.dayTabNumberActive]}>
+                    <Text style={[styles.dayTabNumber, { color: currentTheme.text }, isSelected && styles.dayTabNumberActive]}>
                       {idx + 1}
                     </Text>
                   </TouchableOpacity>
@@ -385,12 +440,28 @@ export default function App() {
             {currentDay ? (
               <>
                 <View style={[styles.dayHeaderRow, isRTL && styles.rtlRow]}>
-                  <Text style={styles.dayFullTitle}>
+                  <Text style={[styles.dayFullTitle, { color: currentTheme.text }]}>
                     📅 {t[currentDay.dayKey] || currentDay.dayKey}
                   </Text>
                   <Text style={styles.dayServingsBadge}>
                     👥 {currentDay.servings} {t.servings}
                   </Text>
+                </View>
+
+                {/* Quick Stats Pills */}
+                <View style={[styles.statsRow, isRTL && styles.rtlRow]}>
+                  <View style={[styles.statPill, { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.border }]}>
+                    <Ionicons name="flame" size={13} color="#f97316" />
+                    <Text style={[styles.statPillText, { color: currentTheme.text }]}>{currentDayCalories} kcal</Text>
+                  </View>
+                  <View style={[styles.statPill, { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.border }]}>
+                    <Ionicons name="time" size={13} color="#38bdf8" />
+                    <Text style={[styles.statPillText, { color: currentTheme.text }]}>{currentDayCookTime} {t.minutes}</Text>
+                  </View>
+                  <View style={[styles.statPill, { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.border }]}>
+                    <Ionicons name="wallet" size={13} color="#10b981" />
+                    <Text style={[styles.statPillText, { color: currentTheme.text }]}>~{estimatedWeeklyBudget} €/sem</Text>
+                  </View>
                 </View>
 
                 <MealCard
@@ -399,6 +470,7 @@ export default function App() {
                   onPressRecipe={() => setSelectedRecipe(currentDay.meals.breakfast)}
                   onPressSwap={() => handleSwapMeal(currentDay.id, "breakfast", currentDay.meals.breakfast)}
                   lang={lang}
+                  theme={currentTheme}
                 />
 
                 <MealCard
@@ -407,6 +479,7 @@ export default function App() {
                   onPressRecipe={() => setSelectedRecipe(currentDay.meals.lunch)}
                   onPressSwap={() => handleSwapMeal(currentDay.id, "lunch", currentDay.meals.lunch)}
                   lang={lang}
+                  theme={currentTheme}
                 />
 
                 <MealCard
@@ -415,6 +488,7 @@ export default function App() {
                   onPressRecipe={() => setSelectedRecipe(currentDay.meals.snack)}
                   onPressSwap={() => handleSwapMeal(currentDay.id, "snack", currentDay.meals.snack)}
                   lang={lang}
+                  theme={currentTheme}
                 />
 
                 <MealCard
@@ -423,13 +497,14 @@ export default function App() {
                   onPressRecipe={() => setSelectedRecipe(currentDay.meals.dinner)}
                   onPressSwap={() => handleSwapMeal(currentDay.id, "dinner", currentDay.meals.dinner)}
                   lang={lang}
+                  theme={currentTheme}
                 />
               </>
             ) : (
               <View style={styles.emptyState}>
                 <Text style={styles.emptyEmoji}>🍽️</Text>
-                <Text style={styles.emptyTitle}>{t.noMealsTitle}</Text>
-                <Text style={styles.emptyDesc}>{t.noMealsDesc}</Text>
+                <Text style={[styles.emptyTitle, { color: currentTheme.text }]}>{t.noMealsTitle}</Text>
+                <Text style={[styles.emptyDesc, { color: currentTheme.textSub }]}>{t.noMealsDesc}</Text>
               </View>
             )}
           </ScrollView>
@@ -442,8 +517,8 @@ export default function App() {
           {/* Header Action Bar */}
           <View style={[styles.groceryHeaderBar, isRTL && styles.rtlRow]}>
             <View>
-              <Text style={styles.groceryMainTitle}>{t.groceryTitle}</Text>
-              <Text style={styles.grocerySub}>
+              <Text style={[styles.groceryMainTitle, { color: currentTheme.text }]}>{t.groceryTitle}</Text>
+              <Text style={[styles.grocerySub, { color: currentTheme.textSub }]}>
                 {checkedCount} / {groceries.length} {t.checkedCount}
               </Text>
             </View>
@@ -468,12 +543,37 @@ export default function App() {
             </View>
           </View>
 
+          {/* Banner Commande Drive (Leclerc, Carrefour...) */}
+          {groceries.length > 0 && (
+            <TouchableOpacity
+              style={styles.driveBannerBtn}
+              onPress={() => setIsDriveModalOpen(true)}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={["#0066c0", "#0284c7"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={[styles.driveBannerGradient, isRTL && styles.rtlRow]}
+              >
+                <View style={styles.driveBannerIconBadge}>
+                  <Ionicons name="cart" size={20} color="#ffffff" />
+                </View>
+                <View style={styles.driveBannerTextBox}>
+                  <Text style={styles.driveBannerTitle}>{t.driveOrderBtn}</Text>
+                  <Text style={styles.driveBannerSubtitle}>{t.driveOrderSubtitle}</Text>
+                </View>
+                <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={18} color="#ffffff" />
+              </LinearGradient>
+            </TouchableOpacity>
+          )}
+
           {/* Add custom item input */}
           <View style={[styles.addGroceryRow, isRTL && styles.rtlRow]}>
             <TextInput
-              style={[styles.groceryInput, isRTL && styles.rtlText]}
+              style={[styles.groceryInput, { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.border, color: currentTheme.text }, isRTL && styles.rtlText]}
               placeholder={t.itemPlaceholder}
-              placeholderTextColor="#64748b"
+              placeholderTextColor={currentTheme.textMuted}
               value={newCustomItem}
               onChangeText={setNewCustomItem}
               onSubmitEditing={handleAddCustomGrocery}
@@ -484,7 +584,12 @@ export default function App() {
           </View>
 
           {/* Department Filter Chips */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.deptFilterScroll}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.deptFilterScroll}
+            contentContainerStyle={[styles.deptFilterScrollContent, isRTL && styles.rtlRow]}
+          >
             {[
               { key: "all", label: t.filterAll },
               { key: "deptProduce", label: t.deptProduce },
@@ -498,12 +603,14 @@ export default function App() {
                 key={dept.key}
                 style={[
                   styles.deptChip,
+                  { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.border },
                   selectedGroceryDept === dept.key && styles.deptChipActive
                 ]}
                 onPress={() => setSelectedGroceryDept(dept.key)}
               >
                 <Text style={[
                   styles.deptChipText,
+                  { color: currentTheme.textSub },
                   selectedGroceryDept === dept.key && styles.deptChipTextActive
                 ]}>
                   {dept.label}
@@ -521,13 +628,14 @@ export default function App() {
                   item={item}
                   onToggle={handleToggleGrocery}
                   lang={lang}
+                  theme={currentTheme}
                 />
               ))
             ) : (
               <View style={styles.emptyState}>
                 <Text style={styles.emptyEmoji}>🛒</Text>
-                <Text style={styles.emptyTitle}>{t.noGroceriesTitle}</Text>
-                <Text style={styles.emptyDesc}>{t.noGroceriesDesc}</Text>
+                <Text style={[styles.emptyTitle, { color: currentTheme.text }]}>{t.noGroceriesTitle}</Text>
+                <Text style={[styles.emptyDesc, { color: currentTheme.textSub }]}>{t.noGroceriesDesc}</Text>
               </View>
             )}
           </ScrollView>
@@ -536,23 +644,91 @@ export default function App() {
 
       {/* TAB 3 : RECETTES CATALOGUE */}
       {activeTab === "recipes" && (
-        <ScrollView style={styles.tabContent} contentContainerStyle={styles.recipesContent}>
-          <Text style={styles.sectionHeaderTitle}>📖 {t.tabRecipes}</Text>
-          {RECIPES_CATALOG.map(rec => (
-            <MealCard
-              key={rec.id}
-              mealType={rec.mealType}
-              meal={{ ...rec, calculatedServings: AIPlannerService.calculateHouseholdServings(profile) }}
-              onPressRecipe={() => setSelectedRecipe({ ...rec, calculatedServings: AIPlannerService.calculateHouseholdServings(profile) })}
-              onPressSwap={() => {}}
-              lang={lang}
-            />
-          ))}
-        </ScrollView>
+        <View style={styles.tabContent}>
+          {/* Search & Filter Header */}
+          <View style={[styles.recipesSearchBox, { borderBottomColor: currentTheme.border }]}>
+            <View style={[styles.recipesSearchInputRow, { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.border }, isRTL && styles.rtlRow]}>
+              <Ionicons name="search" size={18} color={currentTheme.textMuted} />
+              <TextInput
+                style={[styles.recipesSearchInput, { color: currentTheme.text }, isRTL && styles.rtlText]}
+                placeholder={t.searchRecipesPlaceholder}
+                placeholderTextColor={currentTheme.textMuted}
+                value={recipeSearchQuery}
+                onChangeText={setRecipeSearchQuery}
+              />
+              {recipeSearchQuery ? (
+                <TouchableOpacity onPress={() => setRecipeSearchQuery("")}>
+                  <Ionicons name="close-circle" size={18} color={currentTheme.textMuted} />
+                </TouchableOpacity>
+              ) : null}
+            </View>
+
+            {/* Filter Chips */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.recipesFilterScroll}
+              contentContainerStyle={[styles.recipesFilterScrollContent, isRTL && styles.rtlRow]}
+            >
+              {[
+                { key: "all", label: t.filterAll },
+                { key: "quick", label: t.filterQuick },
+                { key: "breakfast", label: t.breakfast },
+                { key: "lunch", label: t.lunch },
+                { key: "snack", label: t.snack },
+                { key: "vegetarian", label: t.filterVegetarian },
+                { key: "glutenFree", label: t.filterGlutenFree }
+              ].map(filter => (
+                <TouchableOpacity
+                  key={filter.key}
+                  style={[
+                    styles.deptChip,
+                    { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.border },
+                    recipeCategoryFilter === filter.key && styles.deptChipActive
+                  ]}
+                  onPress={() => setRecipeCategoryFilter(filter.key)}
+                >
+                  <Text
+                    style={[
+                      styles.deptChipText,
+                      { color: currentTheme.textSub },
+                      recipeCategoryFilter === filter.key && styles.deptChipTextActive
+                    ]}
+                  >
+                    {filter.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+
+          {/* Recipes list */}
+          <ScrollView style={styles.recipesScroll} contentContainerStyle={styles.recipesContent}>
+            {filteredRecipes.length > 0 ? (
+              filteredRecipes.map(rec => (
+                <MealCard
+                  key={rec.id}
+                  mealType={rec.mealType}
+                  meal={{ ...rec, calculatedServings: householdServings }}
+                  onPressRecipe={() => setSelectedRecipe({ ...rec, calculatedServings: householdServings })}
+                  onPressSwap={() => {}}
+                  lang={lang}
+                  theme={currentTheme}
+                />
+              ))
+            ) : (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyEmoji}>🔍</Text>
+                <Text style={[styles.emptyTitle, { color: currentTheme.text }]}>Aucune recette trouvée</Text>
+                <Text style={[styles.emptyDesc, { color: currentTheme.textSub }]}>Essayez de modifier votre recherche ou filtre.</Text>
+              </View>
+            )}
+          </ScrollView>
+        </View>
       )}
 
       {/* BOTTOM TAB BAR */}
-      <View style={[styles.bottomTabBar, isRTL && styles.rtlRow]}>
+      <View style={[styles.bottomTabBar, { backgroundColor: currentTheme.tabBarBg, borderTopColor: currentTheme.border }, isRTL && styles.rtlRow]}>
         <TouchableOpacity
           style={styles.tabBtn}
           onPress={() => setActiveTab("planner")}
@@ -560,9 +736,9 @@ export default function App() {
           <Ionicons
             name={activeTab === "planner" ? "calendar" : "calendar-outline"}
             size={24}
-            color={activeTab === "planner" ? "#10b981" : "#64748b"}
+            color={activeTab === "planner" ? "#10b981" : currentTheme.textMuted}
           />
-          <Text style={[styles.tabLabel, activeTab === "planner" && styles.tabLabelActive]}>
+          <Text style={[styles.tabLabel, { color: currentTheme.textMuted }, activeTab === "planner" && styles.tabLabelActive]}>
             {t.tabPlanner}
           </Text>
         </TouchableOpacity>
@@ -575,7 +751,7 @@ export default function App() {
             <Ionicons
               name={activeTab === "groceries" ? "cart" : "cart-outline"}
               size={24}
-              color={activeTab === "groceries" ? "#10b981" : "#64748b"}
+              color={activeTab === "groceries" ? "#10b981" : currentTheme.textMuted}
             />
             {groceries.length > 0 && (
               <View style={styles.cartBadge}>
@@ -583,7 +759,7 @@ export default function App() {
               </View>
             )}
           </View>
-          <Text style={[styles.tabLabel, activeTab === "groceries" && styles.tabLabelActive]}>
+          <Text style={[styles.tabLabel, { color: currentTheme.textMuted }, activeTab === "groceries" && styles.tabLabelActive]}>
             {t.tabGroceries}
           </Text>
         </TouchableOpacity>
@@ -595,9 +771,9 @@ export default function App() {
           <Ionicons
             name={activeTab === "recipes" ? "book" : "book-outline"}
             size={24}
-            color={activeTab === "recipes" ? "#10b981" : "#64748b"}
+            color={activeTab === "recipes" ? "#10b981" : currentTheme.textMuted}
           />
-          <Text style={[styles.tabLabel, activeTab === "recipes" && styles.tabLabelActive]}>
+          <Text style={[styles.tabLabel, { color: currentTheme.textMuted }, activeTab === "recipes" && styles.tabLabelActive]}>
             {t.tabRecipes}
           </Text>
         </TouchableOpacity>
@@ -609,9 +785,9 @@ export default function App() {
           <Ionicons
             name="person-circle-outline"
             size={24}
-            color="#64748b"
+            color={currentTheme.textMuted}
           />
-          <Text style={styles.tabLabel}>
+          <Text style={[styles.tabLabel, { color: currentTheme.textMuted }]}>
             {t.tabProfile}
           </Text>
         </TouchableOpacity>
@@ -623,19 +799,59 @@ export default function App() {
         recipe={selectedRecipe}
         onClose={() => setSelectedRecipe(null)}
         lang={lang}
+        themeMode={themeMode}
       />
 
-      <FamilyProfileModal
-        visible={isProfileModalOpen}
-        profile={profile}
-        aiConfig={aiConfig}
-        onSave={handleSaveProfile}
-        onSaveAiConfig={handleSaveAiConfig}
-        onClose={() => setIsProfileModalOpen(false)}
-        lang={lang}
-        onLanguageChange={handleLanguageChange}
-      />
-    </SafeAreaView>
+        <FamilyProfileModal
+          visible={isProfileModalOpen}
+          profile={profile}
+          aiConfig={aiConfig}
+          onSave={handleSaveProfile}
+          onSaveAiConfig={handleSaveAiConfig}
+          onClose={() => setIsProfileModalOpen(false)}
+          lang={lang}
+          onLanguageChange={handleLanguageChange}
+          themeMode={themeMode}
+          onToggleTheme={handleToggleTheme}
+        />
+
+        <FridgeModal
+          visible={isFridgeModalOpen}
+          onClose={() => setIsFridgeModalOpen(false)}
+          profile={profile}
+          aiConfig={aiConfig}
+          lang={lang}
+          themeMode={themeMode}
+          onOpenRecipe={(recipe) => {
+            setIsFridgeModalOpen(false);
+            setSelectedRecipe(recipe);
+          }}
+        />
+
+        <QuickMenuModal
+          visible={isQuickMenuOpen}
+          onClose={() => setIsQuickMenuOpen(false)}
+          onOpenFridge={() => setIsFridgeModalOpen(true)}
+          onOpenProfile={() => setIsProfileModalOpen(true)}
+          onOpenDrive={() => setIsDriveModalOpen(true)}
+          aiConfig={aiConfig}
+          profile={profile}
+          lang={lang}
+          onLanguageChange={handleLanguageChange}
+          themeMode={themeMode}
+          onToggleTheme={handleToggleTheme}
+        />
+
+        <DriveCartModal
+          visible={isDriveModalOpen}
+          onClose={() => setIsDriveModalOpen(false)}
+          groceries={groceries}
+          onToggleItem={handleToggleGrocery}
+          lang={lang}
+          themeMode={themeMode}
+        />
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
@@ -649,7 +865,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#1e293b"
   },
@@ -679,6 +895,48 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8
+  },
+  fridgeBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "#0c4a6e",
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#0284c7"
+  },
+  fridgeBtnText: {
+    color: "#38bdf8",
+    fontSize: 11,
+    fontWeight: "700"
+  },
+  menuBurgerBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: "#1e293b",
+    borderWidth: 1,
+    borderColor: "#334155",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+    marginRight: 12
+  },
+  menuIndicatorDot: {
+    position: "absolute",
+    top: 5,
+    right: 5,
+    width: 8,
+    height: 8,
+    borderRadius: 4
+  },
+  dotMistral: {
+    backgroundColor: "#c084fc"
+  },
+  dotLocal: {
+    backgroundColor: "#38bdf8"
   },
   engineBadge: {
     flexDirection: "row",
@@ -869,6 +1127,29 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 10
   },
+  statsRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 14
+  },
+  statPill: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 5,
+    backgroundColor: "#1e293b",
+    paddingVertical: 7,
+    paddingHorizontal: 6,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#334155"
+  },
+  statPillText: {
+    color: "#f8fafc",
+    fontSize: 11,
+    fontWeight: "700"
+  },
   groceryHeaderBar: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -909,6 +1190,44 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 12
   },
+  driveBannerBtn: {
+    marginHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 16,
+    overflow: "hidden",
+    elevation: 4,
+    shadowColor: "#0284c7",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8
+  },
+  driveBannerGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    gap: 12
+  },
+  driveBannerIconBadge: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  driveBannerTextBox: {
+    flex: 1
+  },
+  driveBannerTitle: {
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: "800"
+  },
+  driveBannerSubtitle: {
+    color: "rgba(255, 255, 255, 0.8)",
+    fontSize: 11
+  },
   addGroceryRow: {
     flexDirection: "row",
     paddingHorizontal: 16,
@@ -935,17 +1254,23 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   deptFilterScroll: {
-    paddingHorizontal: 16,
+    flexGrow: 0,
     marginBottom: 10
+  },
+  deptFilterScrollContent: {
+    paddingHorizontal: 16,
+    alignItems: "center",
+    gap: 8
   },
   deptChip: {
     backgroundColor: "#1e293b",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 10,
-    marginRight: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#334155"
+    borderColor: "#334155",
+    alignItems: "center",
+    justifyContent: "center"
   },
   deptChipActive: {
     backgroundColor: "#0284c7",
@@ -954,7 +1279,7 @@ const styles = StyleSheet.create({
   deptChipText: {
     color: "#94a3b8",
     fontSize: 12,
-    fontWeight: "600"
+    fontWeight: "700"
   },
   deptChipTextActive: {
     color: "#ffffff"
@@ -965,6 +1290,41 @@ const styles = StyleSheet.create({
   groceryListContent: {
     paddingHorizontal: 16,
     paddingBottom: 24
+  },
+  recipesSearchBox: {
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    paddingBottom: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1e293b"
+  },
+  recipesSearchInputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#1e293b",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: "#334155",
+    gap: 8,
+    marginBottom: 10
+  },
+  recipesSearchInput: {
+    flex: 1,
+    color: "#f8fafc",
+    fontSize: 14,
+    padding: 0
+  },
+  recipesFilterScroll: {
+    flexGrow: 0,
+    marginBottom: 4
+  },
+  recipesFilterScrollContent: {
+    gap: 6
+  },
+  recipesScroll: {
+    flex: 1
   },
   recipesContent: {
     padding: 16,
@@ -981,7 +1341,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#0f172a",
     borderTopWidth: 1,
     borderTopColor: "#1e293b",
-    paddingVertical: 8,
+    paddingTop: 8,
+    paddingBottom: Platform.OS === "android" ? 14 : 8,
     paddingHorizontal: 16,
     justifyContent: "space-around"
   },

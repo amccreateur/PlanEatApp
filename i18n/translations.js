@@ -52,6 +52,8 @@ export const TRANSLATIONS = {
     shareList: "Partager la liste",
     shareMessageTitle: "🛒 Ma liste de courses PlanEat :",
     copiedToClipboard: "Liste copiée dans le presse-papier !",
+    driveOrderBtn: "🚗 Remplir mon panier Drive",
+    driveOrderSubtitle: "E.Leclerc, Carrefour, Auchan, Intermarché...",
     
     // Grocery Departments
     deptProduce: "🍎 Fruits & Légumes",
@@ -128,7 +130,33 @@ export const TRANSLATIONS = {
     apiKeyInvalid: "Clé API invalide ou erreur réseau.",
     generatingWithMistral: "Génération créative avec Mistral AI...",
     mistralBadge: "⚡ Mistral AI",
-    localBadge: "💾 Mode Local"
+    localBadge: "💾 Mode Local",
+    
+    // Fridge / Anti-Waste Mode
+    fridgeTitle: "Mode Vide-Frigo",
+    fridgeSubtitle: "Cuisinez avec ce qu'il vous reste !",
+    fridgeInputPlaceholder: "Ex: 3 œufs, courgette, riz...",
+    fridgeAddBtn: "Ajouter",
+    fridgeSuggestionsTitle: "Suggestions rapides :",
+    fridgeGenerateBtn: "✨ Créer ma recette Anti-Gaspi",
+    fridgeGenerating: "L'IA invente une recette...",
+    fridgeEmptyIngredients: "Ajoutez au moins un ingrédient pour créer une recette.",
+    fridgeResultTitle: "Votre recette Anti-Gaspi",
+    fridgeBtnShort: "Vide-Frigo",
+
+    // Recipe search & Weekly stats
+    searchRecipesPlaceholder: "Rechercher une recette ou ingrédient...",
+    filterQuick: "⚡ Express (< 20 min)",
+    filterVegetarian: "🌱 Végétarien",
+    filterGlutenFree: "🌾 Sans gluten",
+    weeklyStatsTitle: "Résumé Nutrition & Budget",
+    avgCaloriesPerDay: "Calories / jour",
+    estBudgetWeekly: "Budget estimé",
+    avgCookTime: "Temps cuisine / jour",
+    mealsCountLabel: "Repas planifiés",
+    themeTitle: "Apparence",
+    themeDark: "Mode Sombre",
+    themeLight: "Mode Clair"
   },
   
   en: {
@@ -184,6 +212,8 @@ export const TRANSLATIONS = {
     shareList: "Share List",
     shareMessageTitle: "🛒 My PlanEat Grocery List:",
     copiedToClipboard: "List copied to clipboard!",
+    driveOrderBtn: "🚗 Fill My Online Drive Cart",
+    driveOrderSubtitle: "E.Leclerc, Carrefour, Auchan, Intermarché...",
     
     // Grocery Departments
     deptProduce: "🍎 Fruits & Vegetables",
@@ -260,7 +290,33 @@ export const TRANSLATIONS = {
     apiKeyInvalid: "Invalid API key or network error.",
     generatingWithMistral: "Generating creative plan with Mistral AI...",
     mistralBadge: "⚡ Mistral AI",
-    localBadge: "💾 Local Mode"
+    localBadge: "💾 Local Mode",
+    
+    // Fridge / Anti-Waste Mode
+    fridgeTitle: "Fridge Cleaner",
+    fridgeSubtitle: "Cook with what's left in your fridge!",
+    fridgeInputPlaceholder: "E.g., 3 eggs, zucchini, rice...",
+    fridgeAddBtn: "Add",
+    fridgeSuggestionsTitle: "Quick suggestions:",
+    fridgeGenerateBtn: "✨ Generate Anti-Waste Recipe",
+    fridgeGenerating: "AI is crafting a recipe...",
+    fridgeEmptyIngredients: "Add at least one ingredient to generate a recipe.",
+    fridgeResultTitle: "Your Anti-Waste Recipe",
+    fridgeBtnShort: "Fridge",
+
+    // Recipe search & Weekly stats
+    searchRecipesPlaceholder: "Search recipe or ingredient...",
+    filterQuick: "⚡ Quick (< 20 min)",
+    filterVegetarian: "🌱 Vegetarian",
+    filterGlutenFree: "🌾 Gluten-Free",
+    weeklyStatsTitle: "Nutrition & Budget Summary",
+    avgCaloriesPerDay: "Calories / day",
+    estBudgetWeekly: "Estimated Budget",
+    avgCookTime: "Daily Cook Time",
+    mealsCountLabel: "Planned Meals",
+    themeTitle: "Appearance",
+    themeDark: "Dark Mode",
+    themeLight: "Light Mode"
   },
   
   ar: {
@@ -316,6 +372,8 @@ export const TRANSLATIONS = {
     shareList: "مشاركة القائمة",
     shareMessageTitle: "🛒 قائمة تسوق PlanEat الخاصة بي:",
     copiedToClipboard: "تم نسخ القائمة إلى الحافظة!",
+    driveOrderBtn: "🚗 طلب المقاضي عبر خدمة التوصيل",
+    driveOrderSubtitle: "E.Leclerc, Carrefour, Auchan, Intermarché...",
     
     // Grocery Departments
     deptProduce: "🍎 خضار وفواكه",
@@ -392,7 +450,33 @@ export const TRANSLATIONS = {
     apiKeyInvalid: "مفتاح API غير صالح أو حدث خطأ في الاتصال.",
     generatingWithMistral: "جارٍ التوليد الذكي باستخدام Mistral AI...",
     mistralBadge: "⚡ Mistral AI",
-    localBadge: "💾 وضع محلي"
+    localBadge: "💾 وضع محلي",
+    
+    // Fridge / Anti-Waste Mode
+    fridgeTitle: "وضع تفريغ الثلاجة",
+    fridgeSubtitle: "اطبخ بما تبقى في ثلاجتك دون هدر!",
+    fridgeInputPlaceholder: "مثال: 3 بيضات، كوسة، أرز...",
+    fridgeAddBtn: "إضافة",
+    fridgeSuggestionsTitle: "اقتراحات سريعة:",
+    fridgeGenerateBtn: "✨ ابتكار وصفة بالبقايا",
+    fridgeGenerating: "الذكاء الاصطناعي يبتكر الوصفة...",
+    fridgeEmptyIngredients: "أضف مكوناً واحداً على الأقل لإنشاء وصفة.",
+    fridgeResultTitle: "وصفتك المضادة للهدر",
+    fridgeBtnShort: "الثلاجة",
+
+    // Recipe search & Weekly stats
+    searchRecipesPlaceholder: "ابحث عن وصفة أو مكون...",
+    filterQuick: "⚡ سريع (< 20 د)",
+    filterVegetarian: "🌱 نباتي",
+    filterGlutenFree: "🌾 بدون غلوتين",
+    weeklyStatsTitle: "ملخص التغذية والميزانية",
+    avgCaloriesPerDay: "السعرات / يوم",
+    estBudgetWeekly: "الميزانية التقديرية",
+    avgCookTime: "وقت الطهي اليومي",
+    mealsCountLabel: "الوجبات المجدولة",
+    themeTitle: "المظهر",
+    themeDark: "الوضع الداكن",
+    themeLight: "الوضع الفاتح"
   }
 };
 

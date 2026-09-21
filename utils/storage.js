@@ -7,13 +7,14 @@ const KEYS = {
   CUSTOM_GROCERIES: "@planeat_custom_groceries",
   LANGUAGE: "@planeat_app_language",
   DIETS: "@planeat_diets",
-  AI_CONFIG: "@planeat_ai_config"
+  AI_CONFIG: "@planeat_ai_config",
+  THEME: "@planeat_theme_mode"
 };
 
 export const DEFAULT_AI_CONFIG = {
-  engine: "local", // 'local' | 'mistral'
-  mistralApiKey: "",
-  mistralModel: "mistral-small-latest"
+  engine: "mistral", // 'local' | 'mistral'
+  mistralApiKey: "oJZSFumYzCJu0mK054kieW9FiSo3qBiI",
+  mistralModel: "codestral-latest"
 };
 
 export const DEFAULT_PROFILE = {
@@ -98,10 +99,36 @@ export class StorageService {
     }
   }
 
+  static async getTheme() {
+    try {
+      const theme = await AsyncStorage.getItem(KEYS.THEME);
+      return theme || "dark";
+    } catch {
+      return "dark";
+    }
+  }
+
+  static async saveTheme(theme) {
+    try {
+      await AsyncStorage.setItem(KEYS.THEME, theme);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   static async getAiConfig() {
     try {
       const data = await AsyncStorage.getItem(KEYS.AI_CONFIG);
-      return data ? { ...DEFAULT_AI_CONFIG, ...JSON.parse(data) } : DEFAULT_AI_CONFIG;
+      if (!data) return DEFAULT_AI_CONFIG;
+      const parsed = JSON.parse(data);
+      return {
+        ...DEFAULT_AI_CONFIG,
+        ...parsed,
+        mistralApiKey: parsed.mistralApiKey || DEFAULT_AI_CONFIG.mistralApiKey,
+        mistralModel: parsed.mistralModel || DEFAULT_AI_CONFIG.mistralModel,
+        engine: parsed.engine || "mistral"
+      };
     } catch {
       return DEFAULT_AI_CONFIG;
     }

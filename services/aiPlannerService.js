@@ -1,5 +1,5 @@
-import { RECIPES_CATALOG } from "./defaultRecipes";
-import { API_CONFIG } from "../config/apiConfig";
+import { RECIPES_CATALOG } from "./defaultRecipes.js";
+import { MistralService } from "./mistralService.js";
 
 export class AIPlannerService {
   /**
@@ -52,195 +52,111 @@ export class AIPlannerService {
   }
 
   /**
-   * Génération de planning en direct avec Mistral AI (avec fallback local automatique)
+   * Génère un planning complet (Mistral AI ou Local déterministe avec variété)
    */
-  static async generateMealPlan(profile, durationWeeks = 1, lang = "fr") {
+  static async generateMealPlan(profile, durationWeeks = 1, aiConfig = null, lang = "fr") {
     const servings = this.calculateHouseholdServings(profile);
-    const daysCount = durationWeeks * 7;
-
-    try {
-      if (API_CONFIG.MISTRAL_API_KEY) {
-        const aiPlan = await this.fetchPlanFromMistral(profile, durationWeeks, lang, servings);
-        if (aiPlan && aiPlan.days && aiPlan.days.length === daysCount) {
-          const groceries = this.compileGroceries(aiPlan);
-          return { plan: aiPlan, groceries };
-        }
-      }
-    } catch (e) {
-      console.log("Mistral AI fallback to local catalog:", e?.message);
-    }
-
-    // Fallback local instantané
-    return this.generateLocalMealPlan(profile, durationWeeks, servings);
-  }
-
-  /**
-   * Appel API Mistral / Codestral pour générer un planning sur-mesure
-   */
-  static async fetchPlanFromMistral(profile, durationWeeks, lang, servings) {
-    const daysCount = durationWeeks * 7;
-    const dietsList = (profile.diets || ["dietBalanced"]).join(", ");
-    const dislikesList = (profile.dislikedFoods || []).join(", ") || "aucun";
     const dayKeys = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 
-    const prompt = `Tu es un chef cuisinier et nutritionniste expert pour l'application PlanEat.
-Génère un planning de repas équilibré et varié pour ${daysCount} jours en JSON.
-Foyer: ${profile.adults || 2} adultes, ${profile.children || 0} enfants (âges: ${(profile.childrenAges || []).join(", ") || "aucun"}).
-Portions totales: ${servings} personnes.
-Régimes & Préférences: ${dietsList}.
-Aliments strictement exclus: ${dislikesList}.
-Langue: ${lang === "ar" ? "arabe" : lang === "en" ? "anglais" : "français"}.
+    // 1. Tenter la génération avec Mistral AI si configuré
+    if (aiConfig?.engine === "mistral" && aiConfig?.mistralApiKey) {
+      try {
+        const mistralResult = await MistralService.generateMealPlan({
+          profile,
+          durationWeeks,
+          apiKey: aiConfig.mistralApiKey,
+          model: aiConfig.mistralModel || "mistral-small-latest",
+          lang
+        });
 
-Format JSON attendu:
-{
-  "days": [
-    {
-      "dayNumber": 1,
-      "meals": {
-        "breakfast": {
-          "title": "${lang === "ar" ? "..." : "Titre du petit-déjeuner"}",
-          "emoji": "🥣",
-          "prepTime": 5,
-          "cookTime": 5,
-          "caloriesPerPerson": 350,
-          "ingredients": [
-            { "name": "${lang === "ar" ? "..." : "Nom ingrédient"}", "quantity": 100, "unit": "g", "dept": "deptPantry" }
-          ],
-          "instructions": ["Étape 1", "Étape 2"]
-        },
-        "lunch": {
-          "title": "${lang === "ar" ? "..." : "Titre du déjeuner"}",
-          "emoji": "🍗",
-          "prepTime": 10,
-          "cookTime": 15,
-          "caloriesPerPerson": 520,
-          "ingredients": [
-            { "name": "${lang === "ar" ? "..." : "Nom ingrédient"}", "quantity": 150, "unit": "g", "dept": "deptMeat" }
-          ],
-          "instructions": ["Étape 1", "Étape 2"]
-        },
-        "snack": {
-          "title": "${lang === "ar" ? "..." : "Goûter"}",
-          "emoji": "🍎",
-          "prepTime": 5,
-          "cookTime": 0,
-          "caloriesPerPerson": 180,
-          "ingredients": [
-            { "name": "${lang === "ar" ? "..." : "Fruit"}", "quantity": 1, "unit": "pièce", "dept": "deptProduce" }
-          ],
-          "instructions": ["Déguster frais"]
-        },
-        "dinner": {
-          "title": "${lang === "ar" ? "..." : "Titre du dîner"}",
-          "emoji": "🥘",
-          "prepTime": 10,
-          "cookTime": 20,
-          "caloriesPerPerson": 480,
-          "ingredients": [
-            { "name": "${lang === "ar" ? "..." : "Nom ingrédient"}", "quantity": 120, "unit": "g", "dept": "deptProduce" }
-          ],
-          "instructions": ["Étape 1", "Étape 2"]
+        if (mistralResult?.days && Array.isArray(mistralResult.days)) {
+          const days = mistralResult.days.map((d, i) => {
+            const weekIndex = Math.floor(i / 7) + 1;
+            const dayIndexInWeek = i % 7;
+            const dayKey = dayKeys[dayIndexInWeek];
+
+            const formatMeal = (m, type) => {
+              if (!m) return null;
+              return {
+                id: `mistral_${type}_${i + 1}_${Date.now()}`,
+                mealType: type,
+                title: typeof m.title === "string" ? { fr: m.title, en: m.title, ar: m.title } : (m.title || { fr: "Plat" }),
+                emoji: m.emoji || "🍲",
+                prepTime: m.prepTime || 15,
+                cookTime: m.cookTime || 20,
+                difficulty: m.difficulty || "easy",
+                caloriesPerPerson: m.caloriesPerPerson || 400,
+                tags: profile?.diets || [],
+                calculatedServings: servings,
+                ingredients: (m.ingredients || []).map(ing => ({
+                  name: typeof ing.name === "string" ? { fr: ing.name, en: ing.name, ar: ing.name } : (ing.name || { fr: "Ingrédient" }),
+                  quantity: Number(ing.quantity) || 1,
+                  unit: ing.unit || "portion",
+                  dept: ing.dept || "deptProduce"
+                })),
+                instructions: m.instructions || { fr: ["Préparer les ingrédients", "Cuire et servir chaud."] }
+              };
+            };
+
+            return {
+              id: `day_${i + 1}`,
+              dayNumber: i + 1,
+              weekNumber: weekIndex,
+              dayKey: dayKey,
+              servings: servings,
+              meals: {
+                breakfast: formatMeal(d.meals?.breakfast, "breakfast"),
+                lunch: formatMeal(d.meals?.lunch, "lunch"),
+                snack: formatMeal(d.meals?.snack, "snack"),
+                dinner: formatMeal(d.meals?.dinner, "dinner")
+              }
+            };
+          });
+
+          const plan = {
+            id: `plan_mistral_${Date.now()}`,
+            createdAt: new Date().toISOString(),
+            durationWeeks: durationWeeks,
+            householdServings: servings,
+            generatedBy: "mistral",
+            days: days
+          };
+
+          const groceries = this.compileGroceries(plan);
+          return { plan, groceries, error: null };
         }
+      } catch (err) {
+        console.warn("Échec Mistral AI:", err.message);
+        // On retourne l'erreur pour que l'interface puisse notifier l'utilisateur
+        const localFallback = this.generateLocalPlan(profile, durationWeeks, servings);
+        return { ...localFallback, error: err.message };
       }
     }
-  ]
-}`;
 
-    const response = await fetch(API_CONFIG.ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${API_CONFIG.MISTRAL_API_KEY}`,
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      },
-      body: JSON.stringify({
-        model: API_CONFIG.MODEL,
-        messages: [
-          { role: "system", content: "Tu es un assistant culinaire qui génère des plannings de repas au format JSON strict." },
-          { role: "user", content: prompt }
-        ],
-        response_format: { type: "json_object" }
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Mistral API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const content = JSON.parse(data.choices[0].message.content);
-
-    const formattedDays = (content.days || []).map((d, i) => {
-      const weekIndex = Math.floor(i / 7) + 1;
-      const dayIndexInWeek = i % 7;
-      const dayKey = dayKeys[dayIndexInWeek];
-
-      const wrapMeal = (m) => {
-        if (!m) return null;
-        return {
-          id: `ai_${Math.random().toString(36).substr(2, 9)}`,
-          title: { [lang]: m.title, fr: m.title, en: m.title, ar: m.title },
-          emoji: m.emoji || "🍽️",
-          prepTime: m.prepTime || 10,
-          cookTime: m.cookTime || 15,
-          caloriesPerPerson: m.caloriesPerPerson || 400,
-          calculatedServings: servings,
-          ingredients: (m.ingredients || []).map(ing => ({
-            name: { [lang]: ing.name, fr: ing.name, en: ing.name, ar: ing.name },
-            quantity: ing.quantity || 1,
-            unit: ing.unit || "g",
-            dept: ing.dept || "deptProduce"
-          })),
-          instructions: {
-            [lang]: m.instructions || [],
-            fr: m.instructions || [],
-            en: m.instructions || [],
-            ar: m.instructions || []
-          }
-        };
-      };
-
-      return {
-        id: `day_${i + 1}`,
-        dayNumber: i + 1,
-        weekNumber: weekIndex,
-        dayKey: dayKey,
-        servings: servings,
-        meals: {
-          breakfast: wrapMeal(d.meals?.breakfast),
-          lunch: wrapMeal(d.meals?.lunch),
-          dinner: wrapMeal(d.meals?.dinner),
-          snack: wrapMeal(d.meals?.snack)
-        }
-      };
-    });
-
-    return {
-      id: `plan_ai_${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      durationWeeks: durationWeeks,
-      householdServings: servings,
-      isAIGenerated: true,
-      days: formattedDays
-    };
+    // 2. Génération locale avec mélange aléatoire (Variety)
+    const localResult = this.generateLocalPlan(profile, durationWeeks, servings);
+    return { ...localResult, error: null };
   }
 
   /**
-   * Génération locale à partir du catalogue interne
+   * Générateur local avec shuffle pour garantir que les repas changent à chaque clic
    */
-  static generateLocalMealPlan(profile, durationWeeks = 1, servings = 2) {
+  static generateLocalPlan(profile, durationWeeks = 1, servings = 2) {
     const daysCount = durationWeeks * 7;
-    const breakfasts = this.filterRecipes(profile, "breakfast");
-    const mains = this.filterRecipes(profile);
-    const snacks = this.filterRecipes(profile, "snack");
+    const dayKeys = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+
+    // Mélanger aléatoirement les recettes pour renouveler à chaque génération
+    const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+
+    const breakfasts = shuffle(this.filterRecipes(profile, "breakfast"));
+    const mains = shuffle(this.filterRecipes(profile));
+    const snacks = shuffle(this.filterRecipes(profile, "snack"));
 
     const safeBreakfasts = breakfasts.length > 0 ? breakfasts : RECIPES_CATALOG.filter(r => r.mealType === "breakfast");
     const safeMains = mains.length > 0 ? mains : RECIPES_CATALOG.filter(r => r.mealType === "lunch" || r.mealType === "dinner");
     const safeSnacks = snacks.length > 0 ? snacks : RECIPES_CATALOG.filter(r => r.mealType === "snack");
 
     const days = [];
-    const dayKeys = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
-
     for (let i = 0; i < daysCount; i++) {
       const weekIndex = Math.floor(i / 7) + 1;
       const dayIndexInWeek = i % 7;
@@ -271,7 +187,7 @@ Format JSON attendu:
       createdAt: new Date().toISOString(),
       durationWeeks: durationWeeks,
       householdServings: servings,
-      isAIGenerated: false,
+      generatedBy: "local",
       days: days
     };
 
@@ -291,16 +207,16 @@ Format JSON attendu:
         const factor = (meal.calculatedServings || 2) / 2;
 
         meal.ingredients.forEach(ing => {
-          const frName = ing.name?.fr || ing.name || "Article";
-          const key = frName + "_" + ing.unit;
-          const qty = (ing.quantity * factor);
+          const nameFr = typeof ing.name === "object" ? ing.name.fr : ing.name;
+          const key = (nameFr || "item") + "_" + (ing.unit || "");
+          const qty = ((Number(ing.quantity) || 1) * factor);
 
           if (!itemsMap[key]) {
             itemsMap[key] = {
               id: `item_${Math.random().toString(36).substr(2, 9)}`,
               name: typeof ing.name === "object" ? ing.name : { fr: ing.name, en: ing.name, ar: ing.name },
               totalQuantity: qty,
-              unit: ing.unit || "g",
+              unit: ing.unit || "",
               dept: ing.dept || "deptOther",
               checked: false
             };
@@ -330,12 +246,133 @@ Format JSON attendu:
   /**
    * Remplacement d'un seul repas dans un planning existant
    */
-  static swapMeal(currentMealId, mealType, profile) {
+  static async swapMeal(currentMealId, mealType, profile, currentMeal = null, aiConfig = null, lang = "fr") {
+    const servings = this.calculateHouseholdServings(profile);
+
+    // Si mode Mistral AI activé
+    if (aiConfig?.engine === "mistral" && aiConfig?.mistralApiKey) {
+      try {
+        const generated = await MistralService.swapSingleMeal({
+          currentMeal,
+          mealType,
+          profile,
+          apiKey: aiConfig.mistralApiKey,
+          model: aiConfig.mistralModel || "mistral-small-latest",
+          lang
+        });
+
+        if (generated) {
+          return {
+            id: `mistral_swap_${Date.now()}`,
+            mealType: mealType,
+            title: typeof generated.title === "string" ? { fr: generated.title, en: generated.title, ar: generated.title } : (generated.title || { fr: "Nouveau plat" }),
+            emoji: generated.emoji || "🍲",
+            prepTime: generated.prepTime || 15,
+            cookTime: generated.cookTime || 20,
+            difficulty: generated.difficulty || "easy",
+            caloriesPerPerson: generated.caloriesPerPerson || 400,
+            tags: profile?.diets || [],
+            calculatedServings: servings,
+            ingredients: (generated.ingredients || []).map(ing => ({
+              name: typeof ing.name === "string" ? { fr: ing.name, en: ing.name, ar: ing.name } : (ing.name || { fr: "Ingrédient" }),
+              quantity: Number(ing.quantity) || 1,
+              unit: ing.unit || "portion",
+              dept: ing.dept || "deptProduce"
+            })),
+            instructions: generated.instructions || { fr: ["Préparer et déguster."] }
+          };
+        }
+      } catch (err) {
+        console.warn("Échec du swap Mistral AI, repli sur local:", err.message);
+      }
+    }
+
+    // Fallback local avec choix aléatoire parmi les autres recettes
     const candidates = this.filterRecipes(profile, mealType).filter(r => r.id !== currentMealId);
     if (candidates.length === 0) {
-      return RECIPES_CATALOG.find(r => r.mealType === mealType && r.id !== currentMealId) || RECIPES_CATALOG[0];
+      const all = RECIPES_CATALOG.filter(r => r.mealType === mealType && r.id !== currentMealId);
+      return all.length > 0 ? all[Math.floor(Math.random() * all.length)] : RECIPES_CATALOG[0];
     }
     const randomIndex = Math.floor(Math.random() * candidates.length);
     return candidates[randomIndex];
+  }
+
+  /**
+   * Génération de recette Anti-Gaspillage (Vide-Frigo)
+   */
+  static async generateFridgeRecipe(ingredients = [], mealType = "lunch", profile = null, aiConfig = null, lang = "fr") {
+    const servings = this.calculateHouseholdServings(profile);
+
+    // 1. Tenter avec Mistral AI
+    if (aiConfig?.engine === "mistral" && aiConfig?.mistralApiKey) {
+      try {
+        const generated = await MistralService.generateFridgeRecipe({
+          ingredients,
+          mealType,
+          profile,
+          apiKey: aiConfig.mistralApiKey,
+          model: aiConfig.mistralModel || "mistral-small-latest",
+          lang
+        });
+
+        if (generated) {
+          return {
+            id: `fridge_mistral_${Date.now()}`,
+            mealType: mealType,
+            title: typeof generated.title === "string" ? { fr: generated.title, en: generated.title, ar: generated.title } : (generated.title || { fr: "Plat Anti-Gaspi" }),
+            emoji: generated.emoji || "🍳",
+            prepTime: generated.prepTime || 15,
+            cookTime: generated.cookTime || 15,
+            difficulty: generated.difficulty || "easy",
+            caloriesPerPerson: generated.caloriesPerPerson || 420,
+            tags: profile?.diets || [],
+            calculatedServings: servings,
+            ingredients: (generated.ingredients || []).map(ing => ({
+              name: typeof ing.name === "string" ? { fr: ing.name, en: ing.name, ar: ing.name } : (ing.name || { fr: "Ingrédient" }),
+              quantity: Number(ing.quantity) || 1,
+              unit: ing.unit || "portion",
+              dept: ing.dept || "deptProduce"
+            })),
+            instructions: generated.instructions || { fr: ["Préparer et cuisiner avec vos restes."] },
+            isAntiWaste: true,
+            fridgeInputs: ingredients
+          };
+        }
+      } catch (err) {
+        console.warn("Échec Vide-Frigo Mistral, repli local:", err.message);
+      }
+    }
+
+    // 2. Fallback local intelligent : recherche de la recette du catalogue qui contient le plus d'ingrédients demandés
+    const lowerInputs = ingredients.map(i => i.toLowerCase().trim());
+    const validRecipes = this.filterRecipes(profile);
+
+    let bestRecipe = null;
+    let maxMatch = -1;
+
+    validRecipes.forEach(recipe => {
+      let matchCount = 0;
+      recipe.ingredients.forEach(ing => {
+        const fullNames = [ing.name.fr, ing.name.en, ing.name.ar].join(" ").toLowerCase();
+        lowerInputs.forEach(input => {
+          if (input && fullNames.includes(input)) matchCount++;
+        });
+      });
+
+      if (matchCount > maxMatch) {
+        maxMatch = matchCount;
+        bestRecipe = recipe;
+      }
+    });
+
+    const chosen = bestRecipe || validRecipes[Math.floor(Math.random() * validRecipes.length)] || RECIPES_CATALOG[0];
+
+    return {
+      ...chosen,
+      id: `fridge_local_${Date.now()}`,
+      calculatedServings: servings,
+      isAntiWaste: true,
+      fridgeInputs: ingredients
+    };
   }
 }

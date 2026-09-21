@@ -3,3 +3,4 @@ export const API_CONFIG = {
   ENDPOINT: "https://codestral.mistral.ai/v1/chat/completions",
   MODEL: "codestral-latest"
 };
+

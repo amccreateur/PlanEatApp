@@ -6,14 +6,17 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   TextInput,
   ActivityIndicator,
-  Alert
+  Alert,
+  Platform,
+  StatusBar
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { TRANSLATIONS } from "../i18n/translations";
 import { MistralService } from "../services/mistralService";
+import { THEMES } from "../utils/theme";
 
 export default function FamilyProfileModal({
   visible,
@@ -23,10 +26,13 @@ export default function FamilyProfileModal({
   onSaveAiConfig,
   onClose,
   lang,
-  onLanguageChange
+  onLanguageChange,
+  themeMode = "dark",
+  onToggleTheme
 }) {
   const t = TRANSLATIONS[lang] || TRANSLATIONS.fr;
   const isRTL = lang === "ar";
+  const theme = THEMES[themeMode] || THEMES.dark;
 
   const [adults, setAdults] = useState(profile?.adults || 2);
   const [children, setChildren] = useState(profile?.children || 0);
@@ -130,24 +136,69 @@ export default function FamilyProfileModal({
 
   return (
     <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose}>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.bg }]}>
         {/* Header */}
-        <View style={[styles.header, isRTL && styles.rtlRow]}>
-          <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-            <Ionicons name="close" size={24} color="#f8fafc" />
+        <View style={[styles.header, { backgroundColor: theme.headerBg, borderBottomColor: theme.border }, isRTL && styles.rtlRow]}>
+          <TouchableOpacity onPress={onClose} style={[styles.closeBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, borderWidth: 1 }]}>
+            <Ionicons name="close" size={24} color={theme.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t.profileTitle}</Text>
+          <Text style={[styles.headerTitle, { color: theme.text }]}>{t.profileTitle}</Text>
           <TouchableOpacity onPress={handleSave} style={styles.saveHeaderBtn}>
             <Text style={styles.saveHeaderText}>{t.saveProfile.split(" ")[0]}</Text>
           </TouchableOpacity>
         </View>
 
         <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+          {/* Theme Selector */}
+          <View style={[styles.card, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+            <View style={[styles.cardHeader, isRTL && styles.rtlRow]}>
+              <Ionicons name="color-palette-outline" size={20} color="#a855f7" />
+              <Text style={[styles.cardTitle, { color: theme.text }]}>{t.themeTitle || "Thème / Apparence"}</Text>
+            </View>
+            <View style={styles.langRow}>
+              <TouchableOpacity
+                style={[
+                  styles.langBtn,
+                  { backgroundColor: theme.cardBgAlt, borderColor: theme.border },
+                  themeMode === "light" && styles.langBtnActive
+                ]}
+                onPress={() => onToggleTheme && onToggleTheme("light")}
+              >
+                <Text style={styles.langFlag}>☀️</Text>
+                <Text style={[
+                  styles.langBtnText,
+                  { color: theme.textSub },
+                  themeMode === "light" && styles.langBtnTextActive
+                ]}>
+                  {t.themeLight || "Mode Blanc"}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.langBtn,
+                  { backgroundColor: theme.cardBgAlt, borderColor: theme.border },
+                  themeMode === "dark" && styles.langBtnActive
+                ]}
+                onPress={() => onToggleTheme && onToggleTheme("dark")}
+              >
+                <Text style={styles.langFlag}>🌙</Text>
+                <Text style={[
+                  styles.langBtnText,
+                  { color: theme.textSub },
+                  themeMode === "dark" && styles.langBtnTextActive
+                ]}>
+                  {t.themeDark || "Mode Sombre"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
           {/* Language Selector */}
-          <View style={styles.card}>
+          <View style={[styles.card, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
             <View style={[styles.cardHeader, isRTL && styles.rtlRow]}>
               <Ionicons name="globe-outline" size={20} color="#38bdf8" />
-              <Text style={styles.cardTitle}>{t.language}</Text>
+              <Text style={[styles.cardTitle, { color: theme.text }]}>{t.language}</Text>
             </View>
             <View style={styles.langRow}>
               {[
@@ -159,12 +210,14 @@ export default function FamilyProfileModal({
                   key={item.code}
                   style={[
                     styles.langBtn,
+                    { backgroundColor: theme.cardBgAlt, borderColor: theme.border },
                     lang === item.code && styles.langBtnActive
                   ]}
                   onPress={() => onLanguageChange(item.code)}
                 >
                   <Text style={[
                     styles.langBtnText,
+                    { color: theme.textSub },
                     lang === item.code && styles.langBtnTextActive
                   ]}>
                     {item.label}
@@ -175,73 +228,73 @@ export default function FamilyProfileModal({
           </View>
 
           {/* Composition du foyer */}
-          <View style={styles.card}>
+          <View style={[styles.card, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
             <View style={[styles.cardHeader, isRTL && styles.rtlRow]}>
               <Ionicons name="people-outline" size={20} color="#10b981" />
-              <Text style={styles.cardTitle}>{t.profileSubtitle}</Text>
+              <Text style={[styles.cardTitle, { color: theme.text }]}>{t.profileSubtitle}</Text>
             </View>
 
             {/* Adultes */}
-            <View style={[styles.counterRow, isRTL && styles.rtlRow]}>
-              <Text style={styles.counterLabel}>{t.adultsCount}</Text>
+            <View style={[styles.counterRow, { borderBottomColor: theme.border }, isRTL && styles.rtlRow]}>
+              <Text style={[styles.counterLabel, { color: theme.text }]}>{t.adultsCount}</Text>
               <View style={styles.counterControls}>
                 <TouchableOpacity
-                  style={styles.counterBtn}
+                  style={[styles.counterBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, borderWidth: 1 }]}
                   onPress={() => setAdults(Math.max(1, adults - 1))}
                 >
-                  <Ionicons name="remove" size={20} color="#f8fafc" />
+                  <Ionicons name="remove" size={20} color={theme.text} />
                 </TouchableOpacity>
                 <Text style={styles.counterValue}>{adults}</Text>
                 <TouchableOpacity
-                  style={styles.counterBtn}
+                  style={[styles.counterBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, borderWidth: 1 }]}
                   onPress={() => setAdults(Math.min(10, adults + 1))}
                 >
-                  <Ionicons name="add" size={20} color="#f8fafc" />
+                  <Ionicons name="add" size={20} color={theme.text} />
                 </TouchableOpacity>
               </View>
             </View>
 
             {/* Enfants */}
-            <View style={[styles.counterRow, isRTL && styles.rtlRow]}>
-              <Text style={styles.counterLabel}>{t.childrenCount}</Text>
+            <View style={[styles.counterRow, { borderBottomColor: theme.border }, isRTL && styles.rtlRow]}>
+              <Text style={[styles.counterLabel, { color: theme.text }]}>{t.childrenCount}</Text>
               <View style={styles.counterControls}>
                 <TouchableOpacity
-                  style={styles.counterBtn}
+                  style={[styles.counterBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, borderWidth: 1 }]}
                   onPress={() => handleUpdateChildrenCount(children - 1)}
                 >
-                  <Ionicons name="remove" size={20} color="#f8fafc" />
+                  <Ionicons name="remove" size={20} color={theme.text} />
                 </TouchableOpacity>
                 <Text style={styles.counterValue}>{children}</Text>
                 <TouchableOpacity
-                  style={styles.counterBtn}
+                  style={[styles.counterBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, borderWidth: 1 }]}
                   onPress={() => handleUpdateChildrenCount(children + 1)}
                 >
-                  <Ionicons name="add" size={20} color="#f8fafc" />
+                  <Ionicons name="add" size={20} color={theme.text} />
                 </TouchableOpacity>
               </View>
             </View>
 
             {/* Âges des enfants */}
             {children > 0 && (
-              <View style={styles.agesBox}>
-                <Text style={[styles.agesTitle, isRTL && styles.rtlText]}>{t.childrenAges} :</Text>
+              <View style={[styles.agesBox, { backgroundColor: theme.cardBgAlt }]}>
+                <Text style={[styles.agesTitle, { color: theme.textSub }, isRTL && styles.rtlText]}>{t.childrenAges} :</Text>
                 <View style={styles.agesRow}>
                   {childrenAges.map((age, idx) => (
-                    <View key={idx} style={styles.ageItem}>
-                      <Text style={styles.ageLabel}>Enfant {idx + 1}</Text>
+                    <View key={idx} style={[styles.ageItem, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+                      <Text style={[styles.ageLabel, { color: theme.textSub }]}>Enfant {idx + 1}</Text>
                       <View style={styles.ageControls}>
                         <TouchableOpacity
                           onPress={() => updateChildAge(idx, age - 1)}
-                          style={styles.ageMiniBtn}
+                          style={[styles.ageMiniBtn, { backgroundColor: theme.cardBgAlt }]}
                         >
-                          <Text style={styles.ageMiniBtnText}>-</Text>
+                          <Text style={[styles.ageMiniBtnText, { color: theme.text }]}>-</Text>
                         </TouchableOpacity>
                         <Text style={styles.ageValue}>{age} ans</Text>
                         <TouchableOpacity
                           onPress={() => updateChildAge(idx, age + 1)}
-                          style={styles.ageMiniBtn}
+                          style={[styles.ageMiniBtn, { backgroundColor: theme.cardBgAlt }]}
                         >
-                          <Text style={styles.ageMiniBtnText}>+</Text>
+                          <Text style={[styles.ageMiniBtnText, { color: theme.text }]}>+</Text>
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -252,10 +305,10 @@ export default function FamilyProfileModal({
           </View>
 
           {/* Régimes alimentaires */}
-          <View style={styles.card}>
+          <View style={[styles.card, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
             <View style={[styles.cardHeader, isRTL && styles.rtlRow]}>
               <Ionicons name="leaf-outline" size={20} color="#f59e0b" />
-              <Text style={styles.cardTitle}>{t.dietsAndPrefs}</Text>
+              <Text style={[styles.cardTitle, { color: theme.text }]}>{t.dietsAndPrefs}</Text>
             </View>
 
             <View style={styles.dietGrid}>
@@ -266,6 +319,7 @@ export default function FamilyProfileModal({
                     key={diet.key}
                     style={[
                       styles.dietChip,
+                      { backgroundColor: theme.cardBgAlt, borderColor: theme.border },
                       isSelected && styles.dietChipActive
                     ]}
                     onPress={() => toggleDiet(diet.key)}
@@ -273,6 +327,7 @@ export default function FamilyProfileModal({
                     <Text style={styles.dietEmoji}>{diet.emoji}</Text>
                     <Text style={[
                       styles.dietLabel,
+                      { color: theme.textSub },
                       isSelected && styles.dietLabelActive
                     ]}>
                       {diet.label}
@@ -284,17 +339,17 @@ export default function FamilyProfileModal({
           </View>
 
           {/* Aliments exclus */}
-          <View style={styles.card}>
+          <View style={[styles.card, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
             <View style={[styles.cardHeader, isRTL && styles.rtlRow]}>
               <Ionicons name="ban-outline" size={20} color="#ef4444" />
-              <Text style={styles.cardTitle}>{t.dislikedTitle}</Text>
+              <Text style={[styles.cardTitle, { color: theme.text }]}>{t.dislikedTitle}</Text>
             </View>
 
             <View style={[styles.inputRow, isRTL && styles.rtlRow]}>
               <TextInput
-                style={[styles.input, isRTL && styles.rtlText]}
+                style={[styles.input, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, color: theme.text }, isRTL && styles.rtlText]}
                 placeholder={t.dislikedPlaceholder}
-                placeholderTextColor="#64748b"
+                placeholderTextColor={theme.textMuted}
                 value={newDislike}
                 onChangeText={setNewDislike}
                 onSubmitEditing={addDislikedFood}
@@ -306,7 +361,7 @@ export default function FamilyProfileModal({
 
             <View style={styles.chipsRow}>
               {dislikedFoods.map((food, idx) => (
-                <View key={idx} style={styles.dislikeChip}>
+                <View key={idx} style={[styles.dislikeChip, { backgroundColor: theme.cardBgAlt }]}>
                   <Text style={styles.dislikeText}>{food}</Text>
                   <TouchableOpacity onPress={() => removeDislikedFood(food)}>
                     <Ionicons name="close-circle" size={18} color="#ef4444" />
@@ -317,10 +372,10 @@ export default function FamilyProfileModal({
           </View>
 
           {/* Configuration Moteur IA (Mistral AI) */}
-          <View style={styles.card}>
+          <View style={[styles.card, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
             <View style={[styles.cardHeader, isRTL && styles.rtlRow]}>
               <Ionicons name="sparkles" size={20} color="#a855f7" />
-              <Text style={styles.cardTitle}>{t.aiSectionTitle}</Text>
+              <Text style={[styles.cardTitle, { color: theme.text }]}>{t.aiSectionTitle}</Text>
             </View>
 
             {/* Choix du mode IA */}
@@ -328,6 +383,7 @@ export default function FamilyProfileModal({
               <TouchableOpacity
                 style={[
                   styles.engineBtn,
+                  { backgroundColor: theme.cardBgAlt, borderColor: theme.border },
                   aiEngine === "local" && styles.engineBtnActive
                 ]}
                 onPress={() => setAiEngine("local")}
@@ -335,11 +391,12 @@ export default function FamilyProfileModal({
                 <Ionicons
                   name="hardware-chip-outline"
                   size={18}
-                  color={aiEngine === "local" ? "#38bdf8" : "#94a3b8"}
+                  color={aiEngine === "local" ? "#38bdf8" : theme.textMuted}
                 />
                 <Text
                   style={[
                     styles.engineBtnText,
+                    { color: theme.textSub },
                     aiEngine === "local" && styles.engineBtnTextActive
                   ]}
                 >
@@ -350,6 +407,7 @@ export default function FamilyProfileModal({
               <TouchableOpacity
                 style={[
                   styles.engineBtn,
+                  { backgroundColor: theme.cardBgAlt, borderColor: theme.border },
                   aiEngine === "mistral" && styles.engineBtnActive
                 ]}
                 onPress={() => setAiEngine("mistral")}
@@ -357,11 +415,12 @@ export default function FamilyProfileModal({
                 <Ionicons
                   name="cloud-outline"
                   size={18}
-                  color={aiEngine === "mistral" ? "#a855f7" : "#94a3b8"}
+                  color={aiEngine === "mistral" ? "#a855f7" : theme.textMuted}
                 />
                 <Text
                   style={[
                     styles.engineBtnText,
+                    { color: theme.textSub },
                     aiEngine === "mistral" && styles.engineBtnTextActive
                   ]}
                 >
@@ -372,16 +431,16 @@ export default function FamilyProfileModal({
 
             {/* Options Mistral si sélectionné */}
             {aiEngine === "mistral" && (
-              <View style={styles.mistralSettings}>
+              <View style={[styles.mistralSettings, { borderTopColor: theme.border }]}>
                 {/* Clé API */}
-                <Text style={[styles.inputLabel, isRTL && styles.rtlText]}>
+                <Text style={[styles.inputLabel, { color: theme.textSub }, isRTL && styles.rtlText]}>
                   {t.mistralApiKey} :
                 </Text>
                 <View style={[styles.inputRow, isRTL && styles.rtlRow]}>
                   <TextInput
-                    style={[styles.input, styles.apiKeyInput, isRTL && styles.rtlText]}
+                    style={[styles.input, styles.apiKeyInput, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, color: theme.text }, isRTL && styles.rtlText]}
                     placeholder={t.mistralApiKeyPlaceholder}
-                    placeholderTextColor="#64748b"
+                    placeholderTextColor={theme.textMuted}
                     value={mistralApiKey}
                     onChangeText={setMistralApiKey}
                     autoCapitalize="none"
@@ -427,19 +486,20 @@ export default function FamilyProfileModal({
                 )}
 
                 {/* Modèle Mistral */}
-                <Text style={[styles.inputLabel, isRTL && styles.rtlText, { marginTop: 12 }]}>
+                <Text style={[styles.inputLabel, { color: theme.textSub }, isRTL && styles.rtlText, { marginTop: 12 }]}>
                   {t.mistralModel} :
                 </Text>
                 <View style={styles.modelChipsRow}>
                   {[
-                    { key: "mistral-small-latest", label: "Mistral Small (Rapide & Éco)" },
-                    { key: "open-mistral-7b", label: "Mistral 7B (Open)" },
+                    { key: "codestral-latest", label: "⚡ Codestral (Recommandé - Ultra rapide)" },
+                    { key: "mistral-small-latest", label: "Mistral Small (Équilibré)" },
                     { key: "mistral-large-latest", label: "Mistral Large (Chef Expert)" }
                   ].map(mod => (
                     <TouchableOpacity
                       key={mod.key}
                       style={[
                         styles.modelChip,
+                        { backgroundColor: theme.cardBgAlt, borderColor: theme.border },
                         mistralModel === mod.key && styles.modelChipActive
                       ]}
                       onPress={() => setMistralModel(mod.key)}
@@ -447,6 +507,7 @@ export default function FamilyProfileModal({
                       <Text
                         style={[
                           styles.modelChipText,
+                          { color: theme.textSub },
                           mistralModel === mod.key && styles.modelChipTextActive
                         ]}
                       >
@@ -473,7 +534,8 @@ export default function FamilyProfileModal({
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#0f172a"
+    backgroundColor: "#0f172a",
+    paddingTop: Platform.OS === "android" ? (StatusBar.currentHeight || 28) : 0
   },
   header: {
     flexDirection: "row",

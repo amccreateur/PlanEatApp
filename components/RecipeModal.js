@@ -6,14 +6,18 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView
+  Platform,
+  StatusBar
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { TRANSLATIONS } from "../i18n/translations";
+import { THEMES } from "../utils/theme";
 
-export default function RecipeModal({ visible, recipe, onClose, lang = "fr" }) {
+export default function RecipeModal({ visible, recipe, onClose, lang = "fr", themeMode = "dark" }) {
   const t = TRANSLATIONS[lang] || TRANSLATIONS.fr;
   const isRTL = lang === "ar";
+  const theme = THEMES[themeMode] || THEMES.dark;
 
   const [checkedIngredients, setCheckedIngredients] = useState({});
   const [timerSeconds, setTimerSeconds] = useState(0);
@@ -58,36 +62,36 @@ export default function RecipeModal({ visible, recipe, onClose, lang = "fr" }) {
 
   return (
     <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose}>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.bg }]}>
         {/* Header */}
-        <View style={[styles.header, isRTL && styles.rtlRow]}>
-          <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-            <Ionicons name="close" size={26} color="#f8fafc" />
+        <View style={[styles.header, { backgroundColor: theme.headerBg, borderBottomColor: theme.border }, isRTL && styles.rtlRow]}>
+          <TouchableOpacity onPress={onClose} style={[styles.closeBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, borderWidth: 1 }]}>
+            <Ionicons name="close" size={26} color={theme.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle} numberOfLines={1}>{title}</Text>
+          <Text style={[styles.headerTitle, { color: theme.text }]} numberOfLines={1}>{title}</Text>
           <View style={{ width: 40 }} />
         </View>
 
         <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
           {/* Main Info Card */}
-          <View style={styles.heroCard}>
+          <View style={[styles.heroCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
             <Text style={styles.heroEmoji}>{recipe.emoji || "🍽️"}</Text>
-            <Text style={[styles.recipeTitle, isRTL && styles.rtlText]}>{title}</Text>
+            <Text style={[styles.recipeTitle, { color: theme.text }, isRTL && styles.rtlText]}>{title}</Text>
             
             <View style={styles.badgesRow}>
-              <View style={styles.badge}>
+              <View style={[styles.badge, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, borderWidth: 1 }]}>
                 <Ionicons name="time-outline" size={16} color="#38bdf8" />
-                <Text style={styles.badgeText}>{recipe.prepTime + recipe.cookTime} {t.minutes}</Text>
+                <Text style={[styles.badgeText, { color: theme.textSub }]}>{recipe.prepTime + recipe.cookTime} {t.minutes}</Text>
               </View>
 
-              <View style={styles.badge}>
+              <View style={[styles.badge, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, borderWidth: 1 }]}>
                 <Ionicons name="people-outline" size={16} color="#10b981" />
-                <Text style={styles.badgeText}>{servings} {t.servingsShort}</Text>
+                <Text style={[styles.badgeText, { color: theme.textSub }]}>{servings} {t.servingsShort}</Text>
               </View>
 
-              <View style={styles.badge}>
+              <View style={[styles.badge, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, borderWidth: 1 }]}>
                 <Ionicons name="flame-outline" size={16} color="#f59e0b" />
-                <Text style={styles.badgeText}>{recipe.caloriesPerPerson || 400} kcal</Text>
+                <Text style={[styles.badgeText, { color: theme.textSub }]}>{recipe.caloriesPerPerson || 400} kcal</Text>
               </View>
             </View>
           </View>
@@ -113,11 +117,11 @@ export default function RecipeModal({ visible, recipe, onClose, lang = "fr" }) {
           )}
 
           {/* Ingrédients */}
-          <View style={styles.sectionCard}>
+          <View style={[styles.sectionCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
             <View style={[styles.sectionHeader, isRTL && styles.rtlRow]}>
               <Ionicons name="basket-outline" size={20} color="#10b981" />
-              <Text style={[styles.sectionTitle, isRTL && styles.rtlText]}>{t.ingredients}</Text>
-              <Text style={styles.servingsIndicator}>({servings} {t.servings})</Text>
+              <Text style={[styles.sectionTitle, { color: theme.text }, isRTL && styles.rtlText]}>{t.ingredients}</Text>
+              <Text style={[styles.servingsIndicator, { color: theme.textMuted }]}>({servings} {t.servings})</Text>
             </View>
 
             {recipe.ingredients?.map((ing, idx) => {
@@ -128,23 +132,24 @@ export default function RecipeModal({ visible, recipe, onClose, lang = "fr" }) {
               return (
                 <TouchableOpacity
                   key={idx}
-                  style={[styles.ingredientRow, isRTL && styles.rtlRow]}
+                  style={[styles.ingredientRow, { borderBottomColor: theme.border }, isRTL && styles.rtlRow]}
                   onPress={() => toggleIngredient(idx)}
                   activeOpacity={0.7}
                 >
                   <Ionicons
                     name={isChecked ? "checkbox" : "square-outline"}
                     size={22}
-                    color={isChecked ? "#10b981" : "#64748b"}
+                    color={isChecked ? "#10b981" : theme.textMuted}
                   />
                   <Text style={[
                     styles.ingredientName,
-                    isChecked && styles.checkedText,
+                    { color: theme.text },
+                    isChecked && [styles.checkedText, { color: theme.textMuted }],
                     isRTL && styles.rtlText
                   ]}>
                     {ingName}
                   </Text>
-                  <Text style={[styles.ingredientQty, isChecked && styles.checkedText]}>
+                  <Text style={[styles.ingredientQty, isChecked && [styles.checkedText, { color: theme.textMuted }]]}>
                     {scaledQty} {ing.unit}
                   </Text>
                 </TouchableOpacity>
@@ -153,10 +158,10 @@ export default function RecipeModal({ visible, recipe, onClose, lang = "fr" }) {
           </View>
 
           {/* Instructions */}
-          <View style={styles.sectionCard}>
+          <View style={[styles.sectionCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
             <View style={[styles.sectionHeader, isRTL && styles.rtlRow]}>
               <Ionicons name="restaurant-outline" size={20} color="#38bdf8" />
-              <Text style={[styles.sectionTitle, isRTL && styles.rtlText]}>{t.instructions}</Text>
+              <Text style={[styles.sectionTitle, { color: theme.text }, isRTL && styles.rtlText]}>{t.instructions}</Text>
             </View>
 
             {instructions.map((stepText, idx) => (
@@ -165,7 +170,7 @@ export default function RecipeModal({ visible, recipe, onClose, lang = "fr" }) {
                   <Text style={styles.stepNumber}>{idx + 1}</Text>
                 </View>
                 <View style={styles.stepContent}>
-                  <Text style={[styles.stepText, isRTL && styles.rtlText]}>{stepText}</Text>
+                  <Text style={[styles.stepText, { color: theme.textSub }, isRTL && styles.rtlText]}>{stepText}</Text>
                 </View>
               </View>
             ))}
@@ -179,7 +184,8 @@ export default function RecipeModal({ visible, recipe, onClose, lang = "fr" }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#0f172a"
+    backgroundColor: "#0f172a",
+    paddingTop: Platform.OS === "android" ? (StatusBar.currentHeight || 28) : 0
   },
   header: {
     flexDirection: "row",

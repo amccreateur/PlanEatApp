@@ -89,8 +89,8 @@ export class MistralService {
     const diets = (profile?.diets || ["dietBalanced"]).join(", ");
     const dislikes = (profile?.dislikedFoods || []).join(", ") || "aucun";
 
-    // Découpage en blocs de 2 à 3 jours en parallèle (vitesse max, 0 erreur de tokens)
-    const chunkSize = 3;
+    // Découpage en blocs de 2 jours en parallèle pour une richesse maximale de chaque recette
+    const chunkSize = 2;
     const chunks = [];
     for (let i = 0; i < daysCount; i += chunkSize) {
       const startDay = i + 1;
@@ -101,15 +101,18 @@ export class MistralService {
     const endpoint = this.getEndpoint(activeModel);
 
     const generateChunk = async ({ startDay, endDay }) => {
-      const prompt = `Génère ${endDay - startDay + 1} jours de repas (du Jour ${startDay} au Jour ${endDay}, 4 repas par jour : breakfast, lunch, snack, dinner) pour ${adults} adulte(s) et ${children} enfant(s).
-Régimes : ${diets}.
-Exclusions : ${dislikes}.
+      const prompt = `Tu es un Chef cuisinier étoilé et nutritionniste passionné.
+Génère un menu gourmand et équilibré pour ${endDay - startDay + 1} jours (du Jour ${startDay} au Jour ${endDay}, avec 4 repas complets par jour : breakfast, lunch, snack, dinner) pour ${adults} adulte(s) et ${children} enfant(s).
+Régimes & Préférences : ${diets}.
+Aliments à exclure impérativement : ${dislikes}.
 Langue : ${lang}.
 
-RÈGLES IMPORTANTES :
-1. Réponds UNIQUEMENT avec un objet JSON valide.
-2. Inclus 2 à 4 ingrédients par plat avec rayon ('deptProduce', 'deptMeat', 'deptDairy', 'deptBakery', 'deptPantry', 'deptSpices', 'deptFrozen', 'deptDrinks', 'deptOther').
-3. Instructions courtes (1 ou 2 phrases claires).
+EXIGENCES CULINAIRES DE HAUTE QUALITÉ :
+1. Titres gourmands, précis et appétissants (ex: "Saumon poêlé à l'aneth, fondue de poireaux et riz basmati").
+2. Ingrédients complets (4 à 7 ingrédients réalistes par plat principal : protéine, féculent, légume, herbe/épice, matière grasse).
+3. Rayons autorisés ('deptProduce', 'deptMeat', 'deptDairy', 'deptBakery', 'deptPantry', 'deptSpices', 'deptFrozen', 'deptDrinks', 'deptOther').
+4. Instructions détaillées ÉTAPE PAR ÉTAPE (3 à 4 étapes précises avec découpe, temps de cuisson, puissance du feu, assaisonnement et dressage).
+5. Ajoute une astuce de chef 'chefTip' pour sublimer le plat.
 
 Format JSON attendu :
 {
@@ -118,49 +121,99 @@ Format JSON attendu :
       "dayIndex": ${startDay},
       "meals": {
         "breakfast": {
-          "title": { "fr": "Bowl Avoine & Fruits" },
+          "title": { "fr": "Bowl Énergétique Avoine, Banane & Beurre de Cacahuète", "en": "Energy Oatmeal Bowl with Banana & Peanut Butter", "ar": "وعاء الشوفان والموز وزبدة الفول السوداني" },
           "emoji": "🥣",
-          "prepTime": 10,
-          "cookTime": 0,
-          "caloriesPerPerson": 350,
+          "prepTime": 8,
+          "cookTime": 5,
+          "caloriesPerPerson": 380,
           "ingredients": [
             { "name": { "fr": "Flocons d'avoine" }, "quantity": 80, "unit": "g", "dept": "deptPantry" },
-            { "name": { "fr": "Lait" }, "quantity": 150, "unit": "ml", "dept": "deptDairy" }
+            { "name": { "fr": "Lait d'amande ou demi-écrémé" }, "quantity": 180, "unit": "ml", "dept": "deptDairy" },
+            { "name": { "fr": "Banane" }, "quantity": 1, "unit": "pcs", "dept": "deptProduce" },
+            { "name": { "fr": "Beurre de cacahuète" }, "quantity": 20, "unit": "g", "dept": "deptPantry" },
+            { "name": { "fr": "Graines de chia" }, "quantity": 10, "unit": "g", "dept": "deptPantry" }
           ],
-          "instructions": { "fr": ["Mélanger les ingrédients.", "Déguster frais."] }
+          "instructions": {
+            "fr": [
+              "Faire chauffer le lait avec les flocons d'avoine à feu moyen pendant 4 à 5 min en remuant régulièrement jusqu'à obtenir une texture crémeuse.",
+              "Verser le porridge chaud dans un bol.",
+              "Couper la banane en rondelles et la disposer harmonieusement sur le dessus.",
+              "Ajouter une belle cuillère de beurre de cacahuète et saupoudrer de graines de chia avant de déguster."
+            ]
+          },
+          "chefTip": { "fr": "Ajoutez une pointe de cannelle moulue pour rehausser naturellement la douceur sans sucre ajouté." }
         },
         "lunch": {
-          "title": { "fr": "Salade César Poulet" },
-          "emoji": "🥗",
+          "title": { "fr": "Filet de Poulet Mariné au Citron, Tagliatelles & Courgettes Grillées", "en": "Lemon Marinated Chicken Breast, Tagliatelle & Grilled Zucchini", "ar": "صدر دجاج متبل بالليمون مع المعكرونة والكوسا" },
+          "emoji": "🍗",
           "prepTime": 15,
-          "cookTime": 10,
-          "caloriesPerPerson": 480,
+          "cookTime": 15,
+          "caloriesPerPerson": 520,
           "ingredients": [
-            { "name": { "fr": "Poulet" }, "quantity": 300, "unit": "g", "dept": "deptMeat" },
-            { "name": { "fr": "Salade Romaine" }, "quantity": 1, "unit": "pcs", "dept": "deptProduce" }
+            { "name": { "fr": "Filets de poulet" }, "quantity": 300, "unit": "g", "dept": "deptMeat" },
+            { "name": { "fr": "Tagliatelles fraîches" }, "quantity": 200, "unit": "g", "dept": "deptPantry" },
+            { "name": { "fr": "Courgettes" }, "quantity": 2, "unit": "pcs", "dept": "deptProduce" },
+            { "name": { "fr": "Citron jaune" }, "quantity": 1, "unit": "pcs", "dept": "deptProduce" },
+            { "name": { "fr": "Huile d'olive vierge" }, "quantity": 2, "unit": "c.à.s", "dept": "deptPantry" },
+            { "name": { "fr": "Gousses d'ail" }, "quantity": 1, "unit": "pcs", "dept": "deptProduce" },
+            { "name": { "fr": "Parmesan râpé" }, "quantity": 30, "unit": "g", "dept": "deptDairy" }
           ],
-          "instructions": { "fr": ["Cuire le poulet.", "Mélanger avec la salade et assaisonner."] }
+          "instructions": {
+            "fr": [
+              "Émincer le poulet en aiguillettes et le faire mariner 10 min avec le jus d'un demi-citron, une gousse d'ail pressée et 1 c.à.s d'huile d'olive.",
+              "Laver les courgettes et les tailler en fines demi-rondelles.",
+              "Dans une grande poêle bien chaude, faire dorer le poulet 6 à 8 min à feu vif, puis ajouter les courgettes et cuire 5 min de plus.",
+              "Faire cuire les tagliatelles 'al dente' dans de l'eau bouillante salée, les égoutter en gardant 2 c.à.s d'eau de cuisson.",
+              "Mélanger les pâtes au poulet et courgettes, lier avec l'eau de cuisson et saupoudrer de parmesan frais."
+            ]
+          },
+          "chefTip": { "fr": "Conservez toujours un peu d'eau de cuisson des pâtes pour émulsionner la sauce et rendre le plat ultra-onctueux." }
         },
         "snack": {
-          "title": { "fr": "Pomme & Amandes" },
-          "emoji": "🍎",
+          "title": { "fr": "Tartine Toastée Ricotta, Miel & Éclats de Noix", "en": "Toasted Ricotta, Honey & Walnut Toast", "ar": "توست الريكوتا مع العسل والجوز" },
+          "emoji": "🍞",
           "prepTime": 5,
-          "cookTime": 0,
-          "caloriesPerPerson": 160,
-          "ingredients": [{ "name": { "fr": "Pommes" }, "quantity": 2, "unit": "pcs", "dept": "deptProduce" }],
-          "instructions": { "fr": ["Couper en tranches."] }
+          "cookTime": 3,
+          "caloriesPerPerson": 210,
+          "ingredients": [
+            { "name": { "fr": "Pain complet ou de campagne" }, "quantity": 2, "unit": "tranches", "dept": "deptBakery" },
+            { "name": { "fr": "Ricotta fraîche" }, "quantity": 60, "unit": "g", "dept": "deptDairy" },
+            { "name": { "fr": "Miel liquide" }, "quantity": 1, "unit": "c.à.c", "dept": "deptPantry" },
+            { "name": { "fr": "Noix concassées" }, "quantity": 15, "unit": "g", "dept": "deptPantry" }
+          ],
+          "instructions": {
+            "fr": [
+              "Faire griller les tranches de pain au grille-pain jusqu'à ce qu'elles soient bien dorées et croustillantes.",
+              "Tartiner généreusement de ricotta fraîche encore fraîche.",
+              "Napper d'un filet de miel et parsemer d'éclats de noix croquants."
+            ]
+          },
+          "chefTip": { "fr": "Un tour de moulin à poivre noir sur la ricotta crée un contraste sucré-salé irrésistible." }
         },
         "dinner": {
-          "title": { "fr": "Velouté de Courgettes" },
+          "title": { "fr": "Velouté Onctueux de Potimarron au Lait de Coco & Graines Grillées", "en": "Creamy Pumpkin Coconut Soup with Toasted Seeds", "ar": "شوربة القرع الكريمية بحليب جوز الهند" },
           "emoji": "🍲",
-          "prepTime": 10,
-          "cookTime": 20,
-          "caloriesPerPerson": 310,
+          "prepTime": 15,
+          "cookTime": 25,
+          "caloriesPerPerson": 340,
           "ingredients": [
-            { "name": { "fr": "Courgettes" }, "quantity": 3, "unit": "pcs", "dept": "deptProduce" },
-            { "name": { "fr": "Crème fraîche" }, "quantity": 50, "unit": "g", "dept": "deptDairy" }
+            { "name": { "fr": "Potimarron ou courge butternut" }, "quantity": 600, "unit": "g", "dept": "deptProduce" },
+            { "name": { "fr": "Lait de coco" }, "quantity": 150, "unit": "ml", "dept": "deptPantry" },
+            { "name": { "fr": "Oignon jaune" }, "quantity": 1, "unit": "pcs", "dept": "deptProduce" },
+            { "name": { "fr": "Bouillon de légumes" }, "quantity": 500, "unit": "ml", "dept": "deptPantry" },
+            { "name": { "fr": "Graines de courge" }, "quantity": 20, "unit": "g", "dept": "deptPantry" },
+            { "name": { "fr": "Huile d'olive" }, "quantity": 1, "unit": "c.à.s", "dept": "deptPantry" }
           ],
-          "instructions": { "fr": ["Cuire les courgettes et mixer avec la crème."] }
+          "instructions": {
+            "fr": [
+              "Éplucher et émincer l'oignon. Couper le potimarron en dés réguliers (inutile d'éplucher si potimarron bio).",
+              "Dans une cocotte, faire suer l'oignon dans l'huile d'olive 3 min, puis ajouter les dés de potimarron.",
+              "Couvrir avec le bouillon de légumes chaud, porter à ébullition puis laisser mijoter 20 min à feu moyen.",
+              "Mixer finement le velouté au mixeur plongeant en incorporant le lait de coco.",
+              "Faire torréfier à sec les graines de courge dans une poêle 2 min et parsemer au moment de servir."
+            ]
+          },
+          "chefTip": { "fr": "Une pincée de muscade ou de gingembre frais râpé sublime la saveur douce de la courge." }
         }
       }
     }
@@ -176,7 +229,7 @@ Format JSON attendu :
         body: JSON.stringify({
           model: activeModel,
           messages: [
-            { role: "system", content: "Tu es un chef cuisinier. Réponds uniquement en JSON valide." },
+            { role: "system", content: "Tu es un chef cuisinier professionnel et pédagogue. Tu génères des recettes précises, complètes et savoureuses. Réponds uniquement en JSON valide." },
             { role: "user", content: prompt }
           ],
           temperature: 0.7,
@@ -221,33 +274,40 @@ Format JSON attendu :
     const dislikes = (profile?.dislikedFoods || []).join(", ") || "aucun";
     const currentTitle = currentMeal?.title?.fr || currentMeal?.title?.en || "le plat précédent";
 
-    const prompt = `Génère une NOUVELLE recette de substitution pour le type de repas '${mealType}', différente de '${currentTitle}'.
+    const prompt = `Tu es un Chef cuisinier étoilé. Génère une NOUVELLE recette de chef détaillée et savoureuse pour le type de repas '${mealType}', originale et différente de '${currentTitle}'.
 Foyer : ${adults} adulte(s), ${children} enfant(s).
 Régimes : ${diets}.
 Exclusions : ${dislikes}.
 Langue principale : ${lang}.
 
-RÈGLES IMPORTANTES :
+RÈGLES DE QUALITÉ :
 - Réponds UNIQUEMENT en JSON valide.
-- dept autorisés : 'deptProduce', 'deptMeat', 'deptDairy', 'deptBakery', 'deptPantry', 'deptSpices', 'deptFrozen', 'deptDrinks', 'deptOther'.
-- Quantités données pour 2 portions de base.
+- Inclus 4 à 7 ingrédients précis (avec nom, quantité pour 2 personnes, unité, dept parmi 'deptProduce', 'deptMeat', 'deptDairy', 'deptBakery', 'deptPantry', 'deptSpices', 'deptFrozen', 'deptDrinks', 'deptOther').
+- Instructions détaillées étape par étape (3 à 5 étapes claires avec découpe, cuisson, température et dressage).
+- Ajoute une astuce du chef 'chefTip'.
 
 Format JSON attendu :
 {
-  "title": { "fr": "Nouveau Titre FR", "en": "New Title EN", "ar": "العنوان الجديد" },
+  "title": { "fr": "Titre Gourmand FR", "en": "Gourmet Title EN", "ar": "العنوان بالعربية" },
   "emoji": "🍲",
   "prepTime": 15,
   "cookTime": 20,
   "difficulty": "easy",
-  "caloriesPerPerson": 450,
+  "caloriesPerPerson": 480,
   "ingredients": [
-    { "name": { "fr": "Ingrédient", "en": "Ingredient", "ar": "مكون" }, "quantity": 100, "unit": "g", "dept": "deptProduce" }
+    { "name": { "fr": "Ingrédient 1", "en": "Ingredient 1", "ar": "مكون 1" }, "quantity": 200, "unit": "g", "dept": "deptProduce" }
   ],
   "instructions": {
-    "fr": ["..."],
-    "en": ["..."],
-    "ar": ["..."]
-  }
+    "fr": [
+      "Étape 1 : Préparation et découpe des ingrédients...",
+      "Étape 2 : Cuisson à feu moyen / vif...",
+      "Étape 3 : Assaisonnement et finition...",
+      "Étape 4 : Dressage et dégustation..."
+    ],
+    "en": ["Step 1...", "Step 2...", "Step 3...", "Step 4..."],
+    "ar": ["خطوة 1...", "خطوة 2...", "خطوة 3...", "خطوة 4..."]
+  },
+  "chefTip": { "fr": "Conseil de chef pour réussir ce plat..." }
 }`;
 
     const endpoint = this.getEndpoint(activeModel);
@@ -265,7 +325,7 @@ Format JSON attendu :
           { role: "user", content: prompt }
         ],
         temperature: 0.8,
-        max_tokens: 1500,
+        max_tokens: 2500,
         response_format: { type: "json_object" }
       })
     });
@@ -300,23 +360,24 @@ Format JSON attendu :
     const dislikes = (profile?.dislikedFoods || []).join(", ") || "aucun";
     const fridgeItems = ingredients.join(", ");
 
-    const prompt = `Tu es un chef cuisinier expert en cuisine anti-gaspillage pour PlanEat.
+    const prompt = `Tu es un Chef cuisinier expert en cuisine anti-gaspillage créative pour PlanEat.
 L'utilisateur a ces ingrédients dans son réfrigérateur/placard : [${fridgeItems}].
-Génère une recette délicieuse, inventive et facile qui utilise au maximum ces ingrédients (en ajoutant si besoin uniquement des basiques de cuisine comme sel, poivre, huile, eau).
+Génère une recette complète, délicieuse et inventive qui met en valeur ces ingrédients en ajoutant des basiques simples du placard si nécessaire (huile, ail, oignon, sel, poivre, épices).
 Foyer : ${adults} adulte(s), ${children} enfant(s).
 Régimes : ${diets}.
 Exclusions : ${dislikes}.
 Type de repas : ${mealType}.
 Langue principale : ${lang}.
 
-RÈGLES STRICTES :
+RÈGLES STRICTES DE QUALITÉ :
 - Réponds UNIQUEMENT en JSON valide.
-- dept autorisés : 'deptProduce', 'deptMeat', 'deptDairy', 'deptBakery', 'deptPantry', 'deptSpices', 'deptFrozen', 'deptDrinks', 'deptOther'.
-- Quantités données pour 2 portions de base.
+- Inclus 4 à 7 ingrédients précis avec quantité pour 2 personnes et rayon.
+- Instructions détaillées étape par étape (3 à 4 étapes complètes de préparation et cuisson).
+- Ajoute une astuce anti-gaspi du chef 'chefTip'.
 
 Format JSON attendu :
 {
-  "title": { "fr": "Titre en français", "en": "English title", "ar": "العنوان بالعربية" },
+  "title": { "fr": "Titre appétissant FR", "en": "Appetizing Title EN", "ar": "العنوان بالعربية" },
   "emoji": "🍳",
   "prepTime": 15,
   "cookTime": 15,
@@ -326,11 +387,16 @@ Format JSON attendu :
     { "name": { "fr": "Ingrédient 1", "en": "Ingredient 1", "ar": "مكون 1" }, "quantity": 100, "unit": "g", "dept": "deptProduce" }
   ],
   "instructions": {
-    "fr": ["Étape 1...", "Étape 2..."],
-    "en": ["Step 1...", "Step 2..."],
-    "ar": ["خطوة 1...", "خطوة 2..."]
-  }
-} `;
+    "fr": [
+      "Étape 1 : Préparer et tailler les ingrédients...",
+      "Étape 2 : Cuisson et assaisonnement...",
+      "Étape 3 : Finition et dressage..."
+    ],
+    "en": ["Step 1...", "Step 2...", "Step 3..."],
+    "ar": ["خطوة 1...", "خطوة 2...", "خطوة 3..."]
+  },
+  "chefTip": { "fr": "Astuce anti-gaspillage du chef..." }
+}`;
 
     const endpoint = this.getEndpoint(activeModel);
 
@@ -347,7 +413,7 @@ Format JSON attendu :
           { role: "user", content: prompt }
         ],
         temperature: 0.75,
-        max_tokens: 1800,
+        max_tokens: 2500,
         response_format: { type: "json_object" }
       })
     });

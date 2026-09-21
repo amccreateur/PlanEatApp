@@ -175,6 +175,21 @@ export default function RecipeModal({ visible, recipe, onClose, lang = "fr", the
               </View>
             ))}
           </View>
+
+          {/* Astuce du Chef (Chef Tip) */}
+          {(recipe.chefTip || recipe.tip) && (
+            <View style={[styles.chefTipBox, { backgroundColor: theme.isDark ? "rgba(245, 158, 11, 0.12)" : "#fef3c7", borderColor: "#f59e0b" }]}>
+              <Ionicons name="bulb" size={22} color="#f59e0b" style={{ marginTop: 1 }} />
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.chefTipTitle, { color: theme.isDark ? "#fbbf24" : "#b45309" }]}>Astuce du Chef :</Text>
+                <Text style={[styles.chefTipText, { color: theme.isDark ? "#fde68a" : "#78350f" }]}>
+                  {typeof (recipe.chefTip || recipe.tip) === "object"
+                    ? ((recipe.chefTip || recipe.tip)[lang] || (recipe.chefTip || recipe.tip).fr || Object.values(recipe.chefTip || recipe.tip)[0])
+                    : (recipe.chefTip || recipe.tip)}
+                </Text>
+              </View>
+            </View>
+          )}
         </ScrollView>
       </SafeAreaView>
     </Modal>
@@ -363,6 +378,26 @@ const styles = StyleSheet.create({
   },
   rtlText: {
     textAlign: "right"
+  },
+  chefTipBox: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    padding: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    gap: 12,
+    marginTop: 4,
+    marginBottom: 16
+  },
+  chefTipTitle: {
+    fontSize: 14,
+    fontWeight: "800",
+    marginBottom: 4
+  },
+  chefTipText: {
+    fontSize: 13,
+    lineHeight: 19,
+    fontStyle: "italic"
   }
 });
 

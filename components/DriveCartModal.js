@@ -129,6 +129,7 @@ export default function DriveCartModal({
       if (nextItem) {
         const query = getCleanItemName(nextItem);
         if (query) {
+          setSearchQuery(query);
           setCurrentUrl(selectedStore.searchUrl(query));
         }
       }
@@ -144,6 +145,7 @@ export default function DriveCartModal({
       if (prevItem) {
         const query = getCleanItemName(prevItem);
         if (query) {
+          setSearchQuery(query);
           setCurrentUrl(selectedStore.searchUrl(query));
         }
       }
@@ -450,6 +452,14 @@ export default function DriveCartModal({
               {/* Action Buttons Row */}
               <View style={styles.actionButtonsRow}>
                 <TouchableOpacity
+                  style={[styles.skipBtn, { backgroundColor: theme.cardBg, borderColor: theme.border }, currentIndex === 0 && styles.btnDisabled]}
+                  onPress={handlePrevItem}
+                  disabled={currentIndex === 0}
+                >
+                  <Ionicons name="play-back" size={16} color={theme.textSub} />
+                </TouchableOpacity>
+
+                <TouchableOpacity
                   style={styles.addedBtn}
                   onPress={handleItemAdded}
                 >
@@ -458,8 +468,9 @@ export default function DriveCartModal({
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[styles.skipBtn, { backgroundColor: theme.cardBg, borderColor: theme.border }]}
+                  style={[styles.skipBtn, { backgroundColor: theme.cardBg, borderColor: theme.border }, currentIndex >= activeItems.length - 1 && styles.btnDisabled]}
                   onPress={handleSkipItem}
+                  disabled={currentIndex >= activeItems.length - 1}
                 >
                   <Ionicons name="play-forward" size={16} color={theme.textSub} />
                 </TouchableOpacity>

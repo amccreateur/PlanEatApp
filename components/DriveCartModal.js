@@ -192,6 +192,13 @@ export default function DriveCartModal({
 
               <TouchableOpacity
                 style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }]}
+                onPress={() => setCurrentUrl(selectedStore.homeUrl)}
+              >
+                <Ionicons name="home-outline" size={17} color={theme.text} />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }]}
                 onPress={() => webViewRef.current?.reload()}
               >
                 <Ionicons name="reload" size={16} color={theme.text} />
@@ -242,6 +249,14 @@ export default function DriveCartModal({
               );
             })}
           </ScrollView>
+
+          {/* Bannière d'aide sélection magasin */}
+          <View style={[styles.storeTipBanner, { backgroundColor: theme.cardBgAlt }]}>
+            <Ionicons name="information-circle" size={14} color="#38bdf8" />
+            <Text style={[styles.storeTipText, { color: theme.textSub }]}>
+              Tapez votre code postal sur le site 1 fois pour activer votre Drive alimentaire local.
+            </Text>
+          </View>
         </View>
 
         {/* Center : WebView du Drive */}
@@ -548,6 +563,21 @@ const styles = StyleSheet.create({
   },
   storeChipTextActive: {
     color: "#ffffff"
+  },
+  storeTipBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    marginHorizontal: 14,
+    marginTop: 6,
+    borderRadius: 8,
+    gap: 6
+  },
+  storeTipText: {
+    flex: 1,
+    fontSize: 11,
+    fontWeight: "600"
   },
   webContainer: {
     flex: 1,

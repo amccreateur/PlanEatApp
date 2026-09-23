@@ -12,7 +12,7 @@ import {
   Alert,
   Platform
 } from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -30,7 +30,8 @@ import FridgeModal from "./components/FridgeModal";
 import QuickMenuModal from "./components/QuickMenuModal";
 import DriveCartModal from "./components/DriveCartModal";
 
-export default function App() {
+function MainApp() {
+  const insets = useSafeAreaInsets();
   const [lang, setLang] = useState("fr");
   const t = TRANSLATIONS[lang] || TRANSLATIONS.fr;
   const isRTL = lang === "ar";
@@ -295,9 +296,8 @@ export default function App() {
   });
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.bg }]} edges={["top", "left", "right"]}>
-        <StatusBar barStyle={currentTheme.statusBar} backgroundColor={currentTheme.bg} />
+    <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.bg }]} edges={["top", "left", "right"]}>
+      <StatusBar barStyle={currentTheme.statusBar} backgroundColor={currentTheme.bg} />
 
       {/* Top Navbar */}
       <View style={[styles.topBar, { backgroundColor: currentTheme.headerBg, borderBottomColor: currentTheme.border }, isRTL && styles.rtlRow]}>
@@ -728,7 +728,18 @@ export default function App() {
       )}
 
       {/* BOTTOM TAB BAR */}
-      <View style={[styles.bottomTabBar, { backgroundColor: currentTheme.tabBarBg, borderTopColor: currentTheme.border }, isRTL && styles.rtlRow]}>
+      <View
+        style={[
+          styles.bottomTabBar,
+          {
+            backgroundColor: currentTheme.tabBarBg,
+            borderTopColor: currentTheme.border,
+            paddingBottom: Math.max(insets.bottom, Platform.OS === "android" ? 22 : 10) + 8,
+            paddingTop: 10
+          },
+          isRTL && styles.rtlRow
+        ]}
+      >
         <TouchableOpacity
           style={styles.tabBtn}
           onPress={() => setActiveTab("planner")}
@@ -851,6 +862,13 @@ export default function App() {
           themeMode={themeMode}
         />
       </SafeAreaView>
+  );
+}
+
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <MainApp />
     </SafeAreaProvider>
   );
 }
@@ -1341,8 +1359,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#0f172a",
     borderTopWidth: 1,
     borderTopColor: "#1e293b",
-    paddingTop: 8,
-    paddingBottom: Platform.OS === "android" ? 14 : 8,
     paddingHorizontal: 16,
     justifyContent: "space-around"
   },

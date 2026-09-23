@@ -77,14 +77,22 @@ export class DriveService {
     // 1. Supprimer les parenthèses et leur contenu (ex: "(environ 200g)", "(bio)", "(facultatif)")
     cleaned = cleaned.replace(/\(.*?\)/g, "");
 
-    // 2. Supprimer les préfixes de découpes, contenants et portions
-    cleaned = cleaned.replace(/^(filets?|pavés?|paves?|tranches?|morceaux?|gousses?|sachets?|boîtes?|boites?|pots?|bâtonnets?|batonnets?|branches?|feuilles?|dés?|cubes?|cuillères?|cuilleres?|pincées?|pincees?|tasses?|verres?|gouttes?|brins?|poignées?|poignees?|bottes?|bouquets?|rondelles?|lamelles?|quartiers?|morceau|tranche|filet|pave|aiguillettes?|escalopes?|blancs?|cuisses?|steaks?|côtes?|cotes?|rôtis?|rotis?)\s+(d'|d’|de\s+la\s+|de\s+l'|de\s+l’|du\s+|des\s+|de\s+)?/i, "");
+    // 2. Gérer les alternatives : "Pain complet ou de campagne" -> "Pain complet"
+    if (/\s+(ou|ou\s+bien|\/)\s+/i.test(cleaned)) {
+      cleaned = cleaned.split(/\s+(ou|ou\s+bien|\/)\s+/i)[0];
+    }
 
-    // 3. Supprimer les adjectifs qualificatifs parasites (en préservant "crème fraîche")
+    // 3. Supprimer les préfixes de découpes, contenants et portions avec quantités optionnelles (ex: "24 tranches de", "2 filets de")
+    cleaned = cleaned.replace(/^(?:\d+[\s\/\.,\d]*\s*)?(filets?|pavés?|paves?|tranches?|morceaux?|gousses?|sachets?|boîtes?|boites?|pots?|bâtonnets?|batonnets?|branches?|feuilles?|dés?|cubes?|cuillères?|cuilleres?|pincées?|pincees?|tasses?|verres?|gouttes?|brins?|poignées?|poignees?|bottes?|bouquets?|rondelles?|lamelles?|quartiers?|morceau|tranche|filet|pave|aiguillettes?|escalopes?|blancs?|cuisses?|steaks?|côtes?|cotes?|rôtis?|rotis?)\s+(d'|d’|de\s+la\s+|de\s+l'|de\s+l’|du\s+|des\s+|de\s+)?/i, "");
+
+    // 4. Supprimer les unités de mesure brutes (ex: "200g de", "1L de")
+    cleaned = cleaned.replace(/^(?:\d+[\s\/\.,\d]*\s*)(g|kg|ml|cl|l|c\.à\.s|c\.a\.s|cas|cac|c\.à\.c|c\.a\.c)\s+(d'|d’|de\s+la\s+|de\s+l'|de\s+l’|du\s+|des\s+|de\s+)?/i, "");
+
+    // 5. Supprimer les adjectifs qualificatifs parasites (en préservant "crème fraîche")
     cleaned = cleaned.replace(/(?<!crème\s+)(frais|fraîche|fraiche|fraîches|fraiches)\b/gi, "");
     cleaned = cleaned.replace(/\b(bio|biologique|surgelé|surgelée|surgelés|surgelées|en boîte|en conserve|râpé|râpée|râpés|râpées|émincé|émincée|émincés|émincées|haché|hachée|hachés|hachées|concassé|concassés|coupé|coupés|cuit|cuits|cuite|cuites|entier|entiers|nature|maison|extra|vierge\s+extra|au\s+choix|selon\s+goût|environ)\b/gi, "");
 
-    // 4. Nettoyer les ponctuations et espaces multiples
+    // 6. Nettoyer les ponctuations et espaces multiples
     cleaned = cleaned.replace(/[,;:.!?]/g, " ");
     cleaned = cleaned.replace(/\s+/g, " ").trim();
 

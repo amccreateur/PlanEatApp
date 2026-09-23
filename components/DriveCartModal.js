@@ -8,7 +8,8 @@ import {
   ScrollView,
   ActivityIndicator,
   Animated,
-  Platform
+  Platform,
+  Linking
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { WebView } from "react-native-webview";
@@ -165,6 +166,13 @@ export default function DriveCartModal({
                 <Ionicons name="reload" size={16} color={theme.text} />
               </TouchableOpacity>
 
+              <TouchableOpacity
+                style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }]}
+                onPress={() => Linking.openURL(currentUrl)}
+              >
+                <Ionicons name="open-outline" size={17} color={theme.text} />
+              </TouchableOpacity>
+
               <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
                 <Ionicons name="close" size={22} color="#ffffff" />
               </TouchableOpacity>
@@ -216,7 +224,8 @@ export default function DriveCartModal({
             }}
             onLoadStart={() => setIsLoadingWeb(true)}
             onLoadEnd={() => setIsLoadingWeb(false)}
-            userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
+            originWhitelist={["*"]}
+            setSupportMultipleWindows={false}
             sharedCookiesEnabled={true}
             thirdPartyCookiesEnabled={true}
             domStorageEnabled={true}

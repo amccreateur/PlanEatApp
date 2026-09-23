@@ -706,7 +706,7 @@ export default function DriveCartModal({
                       onPress={handleItemAdded}
                     >
                       <Ionicons name="checkmark-circle" size={18} color="#ffffff" />
-                      <Text style={styles.addedBtnText}>Ajouté (Suivant ➔)</Text>
+                      <Text style={styles.addedBtnText}>Article suivant</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity

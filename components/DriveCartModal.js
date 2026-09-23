@@ -181,61 +181,75 @@ export default function DriveCartModal({
             }
           }
 
-          // 1. Chercher tous les inputs candidats dans le DOM
-          var allInputs = Array.from(document.querySelectorAll('input'));
-          log("🔍 Total <input> détectés dans le DOM: " + allInputs.length);
+          // 1. Chercher tous les inputs candidats dans le DOM (en excluant les traceurs/cookies)
+          var allInputs = Array.from(document.querySelectorAll('input, textarea'));
+          log("🔍 Total inputs détectés: " + allInputs.length);
           
-          var bestInput = null;
+          var candidates = [];
           for (var i = 0; i < allInputs.length; i++) {
             var inp = allInputs[i];
             var type = (inp.type || '').toLowerCase();
             if (type === 'hidden' || type === 'checkbox' || type === 'radio' || type === 'button' || type === 'submit') continue;
             
-            var str = ((inp.id || '') + ' ' + (inp.name || '') + ' ' + (inp.placeholder || '') + ' ' + (inp.className || '') + ' ' + (inp.getAttribute('aria-label') || '')).toLowerCase();
-            if (str.includes('recherche') || str.includes('search') || str.includes('produit') || str.includes('query') || str.includes('keyword') || str.includes('txtrecherche') || str.includes('find')) {
-              bestInput = inp;
-              break;
+            var id = (inp.id || '').toLowerCase();
+            var name = (inp.name || '').toLowerCase();
+            var ph = (inp.placeholder || '').toLowerCase();
+            var cls = (inp.className || '').toLowerCase();
+            var aria = (inp.getAttribute('aria-label') || '').toLowerCase();
+            var isVisible = (inp.offsetParent !== null);
+
+            // Exclure les scripts tiers et traceurs (ex: vendor-search-handler, trustarc, datadome)
+            if (id.includes('vendor') || name.includes('vendor') || id.includes('cookie') || name.includes('cookie') || id.includes('trustarc') || id.includes('optanon')) {
+              continue;
+            }
+
+            log("  📋 Input #" + i + " -> id=" + id + " name=" + name + " type=" + type + " ph=" + ph + " visible=" + isVisible);
+
+            var str = id + ' ' + name + ' ' + ph + ' ' + cls + ' ' + aria;
+            if (str.includes('recherche') || str.includes('search') || str.includes('produit') || str.includes('query') || str.includes('keyword') || str.includes('txtrecherche') || str.includes('find') || str.includes('article')) {
+              candidates.push({ input: inp, score: 10 + (isVisible ? 5 : 0) });
+            } else if (type === 'text' || type === 'search' || type === '') {
+              candidates.push({ input: inp, score: 1 + (isVisible ? 3 : 0) });
             }
           }
 
-          // Si pas de mot-clé trouvé, prendre le premier input texte visible
-          if (!bestInput) {
-            for (var j = 0; j < allInputs.length; j++) {
-              var inp2 = allInputs[j];
-              var type2 = (inp2.type || '').toLowerCase();
-              if (type2 === 'text' || type2 === 'search' || type2 === '') {
-                if (inp2.offsetParent !== null) {
-                  bestInput = inp2;
-                  break;
-                }
-              }
-            }
-          }
-
-          if (bestInput) {
-            fillAndSubmit(bestInput);
+          if (candidates.length > 0) {
+            candidates.sort(function(a, b) { return b.score - a.score; });
+            log("🎯 Meilleur champ sélectionné (score " + candidates[0].score + ")");
+            fillAndSubmit(candidates[0].input);
             return;
           }
 
-          // 2. Si pas trouvé, vérifier s'il y a un déclencheur/icône de recherche à cliquer
-          var searchTrigger = document.querySelector('[aria-label*="recherche" i], [title*="recherche" i], .icon-search, .search-icon, #btnOpenSearch, .header-search-btn');
+          // 2. Chercher les boutons ou liens de recherche (ex: icône loupe, bouton header)
+          var searchLinks = Array.from(document.querySelectorAll('a[href*="recherche" i], a[href*="search" i], button[aria-label*="recherche" i], button[title*="recherche" i], [class*="search" i], [class*="recherche" i]'));
+          log("🔍 Éléments recherche cliquables trouvés: " + searchLinks.length);
+          for (var k = 0; k < Math.min(searchLinks.length, 5); k++) {
+            var sl = searchLinks[k];
+            log("  🔗 #" + k + " <" + sl.tagName + "> href=" + (sl.href || '') + " class=" + (sl.className || '') + " text=" + (sl.innerText || '').trim().substring(0, 30));
+          }
+
+          var searchTrigger = document.querySelector('[aria-label*="recherche" i], [title*="recherche" i], .icon-search, .search-icon, #btnOpenSearch, .header-search-btn, a[href*="recherche" i]');
           if (searchTrigger) {
-            log("🔎 Clic sur l'icône loupe/recherche pour ouvrir la barre");
+            log("🔎 Clic sur l'élément de recherche: <" + searchTrigger.tagName + ">");
             searchTrigger.click();
             setTimeout(function() {
-              var lateInput = document.querySelector('input[type="search"], input[name*="recherche" i], input[id*="recherche" i], input[placeholder*="recherche" i], input[type="text"]');
-              if (lateInput) {
-                log("✍️ Saisie dans le champ après ouverture: " + (lateInput.id || lateInput.name));
-                fillAndSubmit(lateInput);
+              var lateInputs = Array.from(document.querySelectorAll('input[type="search"], input[name*="recherche" i], input[id*="recherche" i], input[placeholder*="recherche" i], input[type="text"]'));
+              var validLate = lateInputs.filter(function(x) {
+                var tid = (x.id || '').toLowerCase();
+                var tname = (x.name || '').toLowerCase();
+                return !tid.includes('vendor') && !tname.includes('vendor');
+              });
+              if (validLate.length > 0) {
+                log("✍️ Saisie dans le champ après ouverture: id=" + validLate[0].id);
+                fillAndSubmit(validLate[0]);
               } else {
-                log("⚠️ Aucun champ trouvé après ouverture de l'icône");
+                log("⚠️ Aucun champ valide trouvé après ouverture");
               }
-            }, 300);
+            }, 350);
             return;
           }
 
           // 3. Fallback URL
-          var host = (window.location.hostname || '').toLowerCase();
           var href = window.location.href || '';
           if (host.includes('leclercdrive.fr')) {
             var storeMatch = href.match(/(https?:\\/\\/[^\\/]+\\/magasin-[^\\/\\?#]+)/i);

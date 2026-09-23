@@ -220,6 +220,70 @@ function MainApp() {
     StorageService.saveGroceries(updated);
   };
 
+  const handleClearAllGroceries = () => {
+    setGroceries([]);
+    StorageService.saveGroceries([]);
+  };
+
+  const handleReloadGroceriesFromPlan = () => {
+    if (!currentPlan) return;
+    const compiled = AIPlannerService.compileGroceries(currentPlan);
+    setGroceries(compiled);
+    StorageService.saveGroceries(compiled);
+  };
+
+  const handleClearGroceriesMenu = () => {
+    if (groceries.length === 0) return;
+
+    if (checkedCount === 0) {
+      // Direct confirmation to empty all
+      Alert.alert(
+        t.clearAllTitle || "Vider tout le panier ?",
+        t.clearAllDesc || "Voulez-vous vraiment supprimer tous les articles de votre liste de courses ?",
+        [
+          { text: t.cancel || "Annuler", style: "cancel" },
+          {
+            text: t.confirmClear || "Oui, tout vider",
+            style: "destructive",
+            onPress: handleClearAllGroceries
+          }
+        ]
+      );
+      return;
+    }
+
+    // Has checked items: offer choices
+    Alert.alert(
+      t.groceryTitle || "Liste des Courses",
+      "Que souhaitez-vous supprimer ?",
+      [
+        {
+          text: `🗑️ ${t.clearChecked || "Articles cochés"} (${checkedCount})`,
+          onPress: handleClearCheckedGroceries
+        },
+        {
+          text: `⚠️ ${t.clearAll || "Vider tout le panier"}`,
+          style: "destructive",
+          onPress: () => {
+            Alert.alert(
+              t.clearAllTitle || "Vider tout le panier ?",
+              t.clearAllDesc || "Voulez-vous vraiment supprimer tous les articles de votre liste de courses ?",
+              [
+                { text: t.cancel || "Annuler", style: "cancel" },
+                {
+                  text: t.confirmClear || "Oui, tout vider",
+                  style: "destructive",
+                  onPress: handleClearAllGroceries
+                }
+              ]
+            );
+          }
+        },
+        { text: t.cancel || "Annuler", style: "cancel" }
+      ]
+    );
+  };
+
   const handleShareGroceries = async () => {
     const lines = [t.shareMessageTitle, ""];
     const depts = [
@@ -537,10 +601,10 @@ function MainApp() {
                 <Text style={styles.shareBtnText}>{t.shareList.split(" ")[0]}</Text>
               </TouchableOpacity>
 
-              {checkedCount > 0 && (
+              {groceries.length > 0 && (
                 <TouchableOpacity
                   style={styles.clearBtn}
-                  onPress={handleClearCheckedGroceries}
+                  onPress={handleClearGroceriesMenu}
                 >
                   <Ionicons name="trash-outline" size={18} color="#ef4444" />
                 </TouchableOpacity>
@@ -636,6 +700,15 @@ function MainApp() {
                 <Text style={styles.emptyEmoji}>🛒</Text>
                 <Text style={[styles.emptyTitle, { color: currentTheme.text }]}>{t.noGroceriesTitle}</Text>
                 <Text style={[styles.emptyDesc, { color: currentTheme.textSub }]}>{t.noGroceriesDesc}</Text>
+                {currentPlan?.days?.length > 0 && (
+                  <TouchableOpacity
+                    style={styles.reloadPlanGroceriesBtn}
+                    onPress={handleReloadGroceriesFromPlan}
+                  >
+                    <Ionicons name="refresh" size={16} color="#ffffff" />
+                    <Text style={styles.reloadPlanGroceriesBtnText}>{t.reloadFromPlan || "Recharger depuis mon planning"}</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             )}
           </ScrollView>
@@ -1416,6 +1489,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
     lineHeight: 20
+  },
+  reloadPlanGroceriesBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#0284c7",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 12,
+    marginTop: 16,
+    gap: 8
+  },
+  reloadPlanGroceriesBtnText: {
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: "700"
   },
   rtlRow: {
     flexDirection: "row-reverse"

@@ -17,6 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { WebView } from "react-native-webview";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import Constants from "expo-constants";
 import { DRIVE_STORES, DriveService } from "../services/driveService";
 import { TRANSLATIONS } from "../i18n/translations";
 import { THEMES } from "../utils/theme";
@@ -75,18 +76,36 @@ export default function DriveCartModal({
     ? DriveService.getSearchSuggestions(getRawItemName(currentItem))
     : [];
 
+  const sendServerLog = (type, text) => {
+    try {
+      const hostIp =
+        Constants.expoConfig?.hostUri?.split(":")[0] ||
+        Constants.manifest?.debuggerHost?.split(":")[0] ||
+        "10.207.54.118";
+      fetch(`http://${hostIp}:8088/log`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, text })
+      }).catch(() => {});
+    } catch {}
+  };
+
   const handleWebViewMessage = (event) => {
     try {
       const payload = JSON.parse(event.nativeEvent.data);
       if (payload.type === "drive_search_log") {
         console.log(`[Drive Web] ${payload.text}`);
+        sendServerLog("DRIVE_WEB", payload.text);
       } else if (payload.type === "log") {
         console.log(`[Drive Console] ${payload.data}`);
+        sendServerLog("WEB_CONSOLE", payload.data);
       } else if (payload.type === "error" || payload.type === "uncaught_error") {
         console.warn(`[Drive Error] ${payload.data}`);
+        sendServerLog("WEB_ERROR", payload.data);
       }
     } catch {
       console.log(`[Drive Msg] ${event.nativeEvent.data}`);
+      sendServerLog("RAW_MSG", event.nativeEvent.data);
     }
   };
 
@@ -97,7 +116,9 @@ export default function DriveCartModal({
     if (!cleanQ) return;
     const searchFallbackUrl = selectedStore.searchUrl(cleanQ);
 
-    console.log(`[PlanEat Drive] 🚀 Démarrage recherche: "${cleanQ}" sur ${selectedStore.name}`);
+    const startMsg = `🚀 Démarrage recherche: "${cleanQ}" sur ${selectedStore.name}`;
+    console.log(`[PlanEat Drive] ${startMsg}`);
+    sendServerLog("APP_START_SEARCH", startMsg);
 
     const js = `
       (function() {

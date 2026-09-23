@@ -91,6 +91,14 @@ export default function DriveCartModal({
 
     const url = navState.url || "";
     if (url) {
+      // Auto-récupération si le WebView est coincé sur une page 404
+      if (url.includes("intermarche.com/recherche") || url.includes("/404") || url.includes("page-introuvable")) {
+        console.log("[Drive AutoRecover] 404 détecté sur " + url + " -> retour accueil " + selectedStore.homeUrl);
+        sendServerLog("AUTO_RECOVER_404", "Retour accueil suite 404: " + url);
+        setCurrentUrl(selectedStore.homeUrl);
+        return;
+      }
+
       const match = url.match(/(https?:\/\/[^\/]+\/magasin-[^\/\?#]+)/i);
       if (match && match[1]) {
         storeBaseUrlRef.current = match[1];

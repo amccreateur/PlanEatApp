@@ -308,10 +308,10 @@ Format JSON attendu :
         body: JSON.stringify({
           model: activeModel,
           messages: [
-            { role: "system", content: "Tu es un chef cuisinier professionnel et pédagogue. Tu génères des recettes précises, complètes et savoureuses. Réponds uniquement en JSON valide." },
+            { role: "system", content: "Tu es un chef cuisinier créatif et nutritionniste. Tu génères des recettes originales, très variées, équilibrées et gourmandes sans aucune répétition. Réponds uniquement en JSON valide." },
             { role: "user", content: prompt }
           ],
-          temperature: 0.7,
+          temperature: 0.85,
           max_tokens: 8192,
           response_format: { type: "json_object" }
         })

@@ -160,7 +160,19 @@ export class AIPlannerService {
   }
 
   /**
-   * Générateur local avec shuffle pour garantir que les repas changent à chaque clic
+   * Mélange équitable de Fisher-Yates
+   */
+  static shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  /**
+   * Générateur local avec distribution équilibrée, zéro doublon et variété maximale
    */
   static generateLocalPlan(profile, durationWeeks = 1, servings = 2) {
     const daysCount = durationWeeks * 7;
@@ -170,53 +182,84 @@ export class AIPlannerService {
       ? profile.mealTypes
       : ["breakfast", "lunch", "snack", "dinner"];
 
-    // Mélanger aléatoirement les recettes pour renouveler à chaque clic
-    const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
-
+    // 1. Récupération et filtrage des recettes
     const availableBreakfasts = this.filterRecipes(profile, "breakfast");
-    const safeBreakfasts = availableBreakfasts.length > 0
-      ? shuffle(availableBreakfasts)
-      : shuffle(RECIPES_CATALOG.filter(r => r.mealType === "breakfast"));
+    const rawBreakfasts = availableBreakfasts.length > 0
+      ? availableBreakfasts
+      : RECIPES_CATALOG.filter(r => r.mealType === "breakfast");
+
+    const availableSnacks = this.filterRecipes(profile, "snack");
+    const rawSnacks = availableSnacks.length > 0
+      ? availableSnacks
+      : RECIPES_CATALOG.filter(r => r.mealType === "snack");
 
     const availableLunches = this.filterRecipes(profile, "lunch");
     const availableDinners = this.filterRecipes(profile, "dinner");
-    const allAvailableMains = this.filterRecipes(profile).filter(r => r.mealType === "lunch" || r.mealType === "dinner");
+    const allFilteredMains = this.filterRecipes(profile).filter(r => r.mealType === "lunch" || r.mealType === "dinner");
+    const fallbackMains = RECIPES_CATALOG.filter(r => r.mealType === "lunch" || r.mealType === "dinner");
+    const mainsCatalog = allFilteredMains.length > 0 ? allFilteredMains : fallbackMains;
 
-    const safeLunches = availableLunches.length > 0 ? shuffle(availableLunches) : shuffle(allAvailableMains);
-    const safeDinners = availableDinners.length > 0 ? shuffle(availableDinners) : shuffle(allAvailableMains);
-    const safeMainsPool = shuffle(allAvailableMains.length > 0 ? allAvailableMains : RECIPES_CATALOG.filter(r => r.mealType === "lunch" || r.mealType === "dinner"));
+    // 2. Mélanges Fisher-Yates indépendants
+    let breakfastPool = this.shuffle(rawBreakfasts);
+    let snackPool = this.shuffle(rawSnacks);
+    let lunchPool = this.shuffle(availableLunches.length > 0 ? availableLunches : mainsCatalog);
+    let dinnerPool = this.shuffle(availableDinners.length > 0 ? availableDinners : mainsCatalog);
+    let generalMainsPool = this.shuffle(mainsCatalog);
 
-    const availableSnacks = this.filterRecipes(profile, "snack");
-    const safeSnacks = availableSnacks.length > 0
-      ? shuffle(availableSnacks)
-      : shuffle(RECIPES_CATALOG.filter(r => r.mealType === "snack"));
-
+    const usedMealIds = new Set();
     const days = [];
-    let mainCursor = 0;
+
+    const getNextUniqueMeal = (preferredPool, fallbackPool) => {
+      // 1ère passe dans le pool préféré
+      for (let i = 0; i < preferredPool.length; i++) {
+        const candidate = preferredPool[i];
+        if (!usedMealIds.has(candidate.id)) {
+          usedMealIds.add(candidate.id);
+          return candidate;
+        }
+      }
+      // 2ème passe dans le pool de secours
+      for (let i = 0; i < fallbackPool.length; i++) {
+        const candidate = fallbackPool[i];
+        if (!usedMealIds.has(candidate.id)) {
+          usedMealIds.add(candidate.id);
+          return candidate;
+        }
+      }
+      // Si toutes les recettes ont été consommées (plans très longs), re-mélanger
+      const fallback = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
+      return fallback;
+    };
 
     for (let i = 0; i < daysCount; i++) {
       const weekIndex = Math.floor(i / 7) + 1;
       const dayIndexInWeek = i % 7;
       const dayKey = dayKeys[dayIndexInWeek];
 
-      const b = activeMealTypes.includes("breakfast") ? safeBreakfasts[i % safeBreakfasts.length] : null;
-      const s = activeMealTypes.includes("snack") ? safeSnacks[i % safeSnacks.length] : null;
-
-      let l = null;
-      let d = null;
-
-      if (activeMealTypes.includes("lunch")) {
-        l = safeMainsPool[mainCursor % safeMainsPool.length];
-        mainCursor++;
+      // Réinitialiser les pools petits-déj / goûters au début de chaque semaine si nécessaire
+      if (i % 7 === 0 && i > 0) {
+        breakfastPool = this.shuffle(rawBreakfasts);
+        snackPool = this.shuffle(rawSnacks);
       }
 
+      let b = null;
+      if (activeMealTypes.includes("breakfast")) {
+        b = breakfastPool[i % breakfastPool.length];
+      }
+
+      let s = null;
+      if (activeMealTypes.includes("snack")) {
+        s = snackPool[i % snackPool.length];
+      }
+
+      let l = null;
+      if (activeMealTypes.includes("lunch")) {
+        l = getNextUniqueMeal(lunchPool, generalMainsPool);
+      }
+
+      let d = null;
       if (activeMealTypes.includes("dinner")) {
-        d = safeMainsPool[mainCursor % safeMainsPool.length];
-        mainCursor++;
-        if (l && d && l.id === d.id && safeMainsPool.length > 1) {
-          d = safeMainsPool[(mainCursor + 1) % safeMainsPool.length];
-          mainCursor++;
-        }
+        d = getNextUniqueMeal(dinnerPool, generalMainsPool);
       }
 
       days.push({

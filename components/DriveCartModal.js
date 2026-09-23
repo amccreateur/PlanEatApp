@@ -135,8 +135,18 @@ export default function DriveCartModal({
           
           log("📍 URL actuelle: " + href);
           
+          function isGoodInput(el) {
+            if (!el) return false;
+            var id = (el.id || '').toLowerCase();
+            var name = (el.name || '').toLowerCase();
+            if (id.includes('vendor') || name.includes('vendor') || id.includes('cookie') || name.includes('cookie') || id.includes('trustarc') || id.includes('optanon') || id.includes('datadome')) {
+              return false;
+            }
+            return true;
+          }
+
           function fillAndSubmit(input) {
-            if (!input) return false;
+            if (!input || !isGoodInput(input)) return false;
             try {
               var inputDesc = (input.tagName || '') + '#' + (input.id || '') + '.' + (input.className || '') + ' [name=' + (input.name || '') + ']';
               log("✍️ Saisie dans le champ: " + inputDesc);
@@ -160,9 +170,13 @@ export default function DriveCartModal({
 
               // Dans une SPA Angular (m-courses.leclercdrive), chercher le bouton .recherche-loupe ou submit
               var container = input.closest('form, div, header') || document;
-              var btn = container.querySelector('.recherche-loupe, [class*="loupe"], button[type="submit"], input[type="submit"], .btn-search, .search-button, [aria-label*="recherche" i]');
-              if (!btn) {
-                btn = document.querySelector('.recherche-loupe, [class*="loupe"], button[type="submit"], button[aria-label*="recherche" i], #btnRecherche');
+              var buttons = Array.from(container.querySelectorAll('.recherche-loupe, [class*="loupe"], button[type="submit"], button, .btn-search, .search-button, [aria-label*="recherche" i]'));
+              var btn = null;
+              for (var b = 0; b < buttons.length; b++) {
+                if (isGoodInput(buttons[b])) {
+                  btn = buttons[b];
+                  break;
+                }
               }
 
               if (btn) {
@@ -178,9 +192,10 @@ export default function DriveCartModal({
             }
           }
 
-          // 1. Chercher si le champ #saisieTexte ou un input est DÉJÀ présent et actif
-          var existingSaisie = document.querySelector('#saisieTexte, input[placeholder*="Produit" i], input[placeholder*="recherche" i]');
-          if (existingSaisie) {
+          // 1. Chercher si le champ #saisieTexte ou un input est DÉJÀ présent et valide
+          var allSaisie = Array.from(document.querySelectorAll('#saisieTexte, input.champ-recherche, input[placeholder*="Produit" i], input[type="search"]'));
+          var existingSaisie = allSaisie.find(isGoodInput);
+          if (existingSaisie && existingSaisie.offsetParent !== null) {
             log("🎯 Champ #saisieTexte immédiatement disponible");
             fillAndSubmit(existingSaisie);
             return;
@@ -192,10 +207,11 @@ export default function DriveCartModal({
             log("🔎 Clic pour ouvrir la barre de recherche: <" + openTrigger.tagName + "> class=" + openTrigger.className);
             openTrigger.click();
             setTimeout(function() {
-              var openedInput = document.querySelector('#saisieTexte, input[type="search"], input[placeholder*="Produit" i], input[name*="recherche" i], input[type="text"]');
-              if (openedInput) {
-                log("✍️ Saisie dans le champ ouvert: #" + openedInput.id);
-                fillAndSubmit(openedInput);
+              var openedInputs = Array.from(document.querySelectorAll('#saisieTexte, input.champ-recherche, input[placeholder*="Produit" i], input[type="search"], input[name*="recherche" i], input[type="text"]'));
+              var validOpened = openedInputs.find(isGoodInput);
+              if (validOpened) {
+                log("✍️ Saisie dans le champ ouvert: #" + validOpened.id);
+                fillAndSubmit(validOpened);
               } else {
                 log("⚠️ Champ non trouvé après ouverture");
               }
@@ -210,10 +226,7 @@ export default function DriveCartModal({
             var inp = allInputs[i];
             var type = (inp.type || '').toLowerCase();
             if (type === 'hidden' || type === 'checkbox' || type === 'radio' || type === 'button' || type === 'submit') continue;
-            
-            var id = (inp.id || '').toLowerCase();
-            var name = (inp.name || '').toLowerCase();
-            if (id.includes('vendor') || name.includes('vendor') || id.includes('cookie') || name.includes('cookie')) continue;
+            if (!isGoodInput(inp)) continue;
 
             var isVisible = (inp.offsetParent !== null);
             candidates.push({ input: inp, score: isVisible ? 10 : 1 });

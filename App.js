@@ -214,27 +214,6 @@ function MainApp() {
     setNewCustomItem("");
   };
 
-  const handleToggleMealTypeQuick = async (mealKey) => {
-    const currentTypes = profile?.mealTypes && profile.mealTypes.length > 0
-      ? profile.mealTypes
-      : ["breakfast", "lunch", "snack", "dinner"];
-
-    let updatedTypes;
-    if (currentTypes.includes(mealKey)) {
-      if (currentTypes.length <= 1) {
-        Alert.alert("⚠️", t.minOneMealRequired || "Veuillez sélectionner au moins un repas.");
-        return;
-      }
-      updatedTypes = currentTypes.filter(m => m !== mealKey);
-    } else {
-      updatedTypes = [...currentTypes, mealKey];
-    }
-
-    const updatedProfile = { ...profile, mealTypes: updatedTypes };
-    setProfile(updatedProfile);
-    await StorageService.saveProfile(updatedProfile);
-  };
-
   const handleClearCheckedGroceries = () => {
     const updated = groceries.filter(item => !item.checked);
     setGroceries(updated);
@@ -468,50 +447,6 @@ function MainApp() {
                 </TouchableOpacity>
               ))}
             </View>
-          </View>
-
-          {/* Quick Meal Type Selector Chips */}
-          <View style={[styles.quickMealTypesBar, { borderBottomColor: currentTheme.border }]}>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={[styles.quickMealTypesContent, isRTL && styles.rtlRow]}
-            >
-              {[
-                { key: "breakfast", label: t.breakfast, emoji: "☀️", color: "#f59e0b" },
-                { key: "lunch", label: t.lunch, emoji: "🍲", color: "#10b981" },
-                { key: "snack", label: t.snack, emoji: "🍎", color: "#ec4899" },
-                { key: "dinner", label: t.dinner, emoji: "🌙", color: "#6366f1" }
-              ].map(mealItem => {
-                const isSelected = (profile?.mealTypes || ["breakfast", "lunch", "snack", "dinner"]).includes(mealItem.key);
-                return (
-                  <TouchableOpacity
-                    key={mealItem.key}
-                    style={[
-                      styles.quickMealChip,
-                      { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.border },
-                      isSelected && { borderColor: mealItem.color, backgroundColor: mealItem.color + "22" }
-                    ]}
-                    onPress={() => handleToggleMealTypeQuick(mealItem.key)}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={styles.quickMealEmoji}>{mealItem.emoji}</Text>
-                    <Text style={[
-                      styles.quickMealText,
-                      { color: currentTheme.textSub },
-                      isSelected && { color: mealItem.color, fontWeight: "700" }
-                    ]}>
-                      {mealItem.label}
-                    </Text>
-                    <Ionicons
-                      name={isSelected ? "checkmark-circle" : "ellipse-outline"}
-                      size={15}
-                      color={isSelected ? mealItem.color : currentTheme.textMuted}
-                    />
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
           </View>
 
           {/* Week Selector (si > 1 semaine) */}
@@ -1242,31 +1177,6 @@ const styles = StyleSheet.create({
   },
   weekTabBtnTextActive: {
     color: "#ffffff"
-  },
-  quickMealTypesBar: {
-    paddingVertical: 8,
-    borderBottomWidth: 1
-  },
-  quickMealTypesContent: {
-    paddingHorizontal: 16,
-    gap: 8,
-    alignItems: "center"
-  },
-  quickMealChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 18,
-    borderWidth: 1,
-    gap: 6
-  },
-  quickMealEmoji: {
-    fontSize: 14
-  },
-  quickMealText: {
-    fontSize: 12,
-    fontWeight: "600"
   },
   dayTabsWrapper: {
     paddingVertical: 6,

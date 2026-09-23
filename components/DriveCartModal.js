@@ -13,6 +13,7 @@ import {
   TextInput
 } from "react-native";
 import * as Clipboard from "expo-clipboard";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { WebView } from "react-native-webview";
 import { Ionicons } from "@expo/vector-icons";
@@ -72,6 +73,21 @@ export default function DriveCartModal({
     if (!item) return "";
     return item.name?.[lang] || item.name?.fr || item.customName || "";
   };
+
+  // Charger le magasin préféré sauvegardé
+  useEffect(() => {
+    AsyncStorage.getItem("@planeat_preferred_drive_store")
+      .then((savedStoreId) => {
+        if (savedStoreId) {
+          const store = DriveService.getStoreById(savedStoreId);
+          if (store) {
+            setSelectedStore(store);
+            setCurrentUrl(store.homeUrl);
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Sync input query with current item
   useEffect(() => {
@@ -380,6 +396,7 @@ export default function DriveCartModal({
     setSelectedStore(store);
     setCurrentUrl(store.homeUrl);
     setIsSelectingStore(true);
+    AsyncStorage.setItem("@planeat_preferred_drive_store", store.id).catch(() => {});
   };
 
   // Démarrer les courses après sélection du magasin

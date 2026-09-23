@@ -548,7 +548,7 @@ function MainApp() {
             </View>
           </View>
 
-          {/* Banner Commande Drive (Leclerc, Carrefour...) */}
+          {/* Banner Commande Drive */}
           {groceries.length > 0 && (
             <TouchableOpacity
               style={styles.driveBannerBtn}
@@ -561,13 +561,8 @@ function MainApp() {
                 end={{ x: 1, y: 0 }}
                 style={[styles.driveBannerGradient, isRTL && styles.rtlRow]}
               >
-                <View style={styles.driveBannerIconBadge}>
-                  <Ionicons name="cart" size={20} color="#ffffff" />
-                </View>
-                <View style={styles.driveBannerTextBox}>
-                  <Text style={styles.driveBannerTitle}>{t.driveOrderBtn}</Text>
-                  <Text style={styles.driveBannerSubtitle}>{t.driveOrderSubtitle}</Text>
-                </View>
+                <Ionicons name="cart" size={20} color="#ffffff" />
+                <Text style={styles.driveBannerTitle}>{t.driveOrderBtn || "Remplir mon panier Drive"}</Text>
                 <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={18} color="#ffffff" />
               </LinearGradient>
             </TouchableOpacity>
@@ -1233,40 +1228,27 @@ const styles = StyleSheet.create({
   driveBannerBtn: {
     marginHorizontal: 16,
     marginBottom: 12,
-    borderRadius: 16,
+    borderRadius: 14,
     overflow: "hidden",
-    elevation: 4,
+    elevation: 3,
     shadowColor: "#0284c7",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6
   },
   driveBannerGradient: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 12,
-    paddingHorizontal: 14,
-    gap: 12
-  },
-  driveBannerIconBadge: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  driveBannerTextBox: {
-    flex: 1
+    paddingHorizontal: 16,
+    gap: 10
   },
   driveBannerTitle: {
     color: "#ffffff",
-    fontSize: 14,
-    fontWeight: "800"
-  },
-  driveBannerSubtitle: {
-    color: "rgba(255, 255, 255, 0.8)",
-    fontSize: 11
+    fontSize: 15,
+    fontWeight: "800",
+    textAlign: "center"
   },
   addGroceryRow: {
     flexDirection: "row",

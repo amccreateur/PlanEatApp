@@ -52,7 +52,7 @@ export const TRANSLATIONS = {
     shareList: "Partager la liste",
     shareMessageTitle: "🛒 Ma liste de courses PlanEat :",
     copiedToClipboard: "Liste copiée dans le presse-papier !",
-    driveOrderBtn: "🚗 Remplir mon panier Drive",
+    driveOrderBtn: "Remplir mon panier Drive",
     driveOrderSubtitle: "E.Leclerc, Carrefour, Auchan, Intermarché...",
     
     // Grocery Departments
@@ -254,7 +254,7 @@ export const TRANSLATIONS = {
     shareList: "Share List",
     shareMessageTitle: "🛒 My PlanEat Grocery List:",
     copiedToClipboard: "List copied to clipboard!",
-    driveOrderBtn: "🚗 Fill My Online Drive Cart",
+    driveOrderBtn: "Fill My Drive Cart",
     driveOrderSubtitle: "E.Leclerc, Carrefour, Auchan, Intermarché...",
     
     // Grocery Departments
@@ -456,7 +456,7 @@ export const TRANSLATIONS = {
     shareList: "مشاركة القائمة",
     shareMessageTitle: "🛒 قائمة تسوق PlanEat الخاصة بي:",
     copiedToClipboard: "تم نسخ القائمة إلى الحافظة!",
-    driveOrderBtn: "🚗 طلب المقاضي عبر خدمة التوصيل",
+    driveOrderBtn: "ملء سلة التسوق Drive",
     driveOrderSubtitle: "E.Leclerc, Carrefour, Auchan, Intermarché...",
     
     // Grocery Departments

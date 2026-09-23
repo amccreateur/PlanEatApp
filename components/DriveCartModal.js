@@ -219,26 +219,32 @@ export default function DriveCartModal({
             }
           }
 
-          // 1. Si on est sur l'accueil du magasin avec le bloc de recherche .recherche-home
-          if (!href.includes('/recherche')) {
-            var openTrigger = document.querySelector('.recherche-home, div.recherche-home, .header-search-btn');
-            if (openTrigger) {
-              log("🔎 Clic pour ouvrir la barre de recherche accueil: <" + openTrigger.tagName + ">");
-              openTrigger.click();
-              setTimeout(function() {
-                var openedInput = document.querySelector('#saisieTexte, input.champ-recherche');
-                if (openedInput && isGoodInput(openedInput)) {
-                  log("✍️ Saisie dans le champ ouvert: #" + openedInput.id);
-                  fillAndSubmit(openedInput);
-                } else {
-                  forceRouteNavigation();
-                }
-              }, 200);
-              return;
-            }
+          // 1. Chercher si le champ de recherche est immédiatement accessible
+          var directInput = document.querySelector('#saisieTexte, input.champ-recherche, input[type="search"]');
+          if (directInput && isGoodInput(directInput)) {
+            log("🎯 Champ #saisieTexte disponible immédiatement");
+            fillAndSubmit(directInput);
+            return;
           }
 
-          // 2. Navigation par route dédiée du magasin avec rechargement garanti
+          // 2. Chercher un déclencheur pour ouvrir la recherche (accueil ou page de résultats)
+          var openTrigger = document.querySelector('.recherche-home, .recherche-loupe, span.champ-recherche, [class*="loupe"], header [class*="search"], [aria-label*="recherche" i], .header-search-btn');
+          if (openTrigger) {
+            log("🔎 Clic sur déclencheur de recherche: <" + openTrigger.tagName + "> class=" + openTrigger.className);
+            openTrigger.click();
+            setTimeout(function() {
+              var openedInput = document.querySelector('#saisieTexte, input.champ-recherche, input[type="search"]');
+              if (openedInput && isGoodInput(openedInput)) {
+                log("✍️ Saisie dans le champ ouvert: #" + (openedInput.id || openedInput.className));
+                fillAndSubmit(openedInput);
+              } else {
+                forceRouteNavigation();
+              }
+            }, 180);
+            return;
+          }
+
+          // 3. Fallback : Navigation par route dédiée du magasin
           forceRouteNavigation();
 
           function forceRouteNavigation() {
@@ -247,11 +253,8 @@ export default function DriveCartModal({
               if (storeMatch && storeMatch[1]) {
                 if (host.includes('m-courses')) {
                   var targetMobile = storeMatch[1] + '/recherche/' + encodeURIComponent(q);
-                  log("🌐 Navigation mobile Leclerc avec rechargement: " + targetMobile);
+                  log("🌐 Navigation mobile Leclerc: " + targetMobile);
                   window.location.href = targetMobile;
-                  setTimeout(function() {
-                    window.location.reload();
-                  }, 60);
                   return;
                 } else {
                   var targetDesktop = storeMatch[1] + '/recherche.aspx?TexteRecherche=' + encodeURIComponent(q);

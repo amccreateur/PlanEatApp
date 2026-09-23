@@ -24,9 +24,9 @@ export default function RecipeModal({ visible, recipe, onClose, lang = "fr", the
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [cookingMode, setCookingMode] = useState("classic");
 
-  const title = recipe.title?.[lang] || recipe.title?.fr || "Recette";
-  const classicInstructions = recipe.instructions?.[lang] || recipe.instructions?.fr || [];
-  const thermomixInstructions = recipe.thermomixInstructions?.[lang] || recipe.thermomixInstructions?.fr || recipe.thermomixInstructions || [];
+  const title = recipe?.title?.[lang] || recipe?.title?.fr || "Recette";
+  const classicInstructions = recipe?.instructions?.[lang] || recipe?.instructions?.fr || [];
+  const thermomixInstructions = recipe?.thermomixInstructions?.[lang] || recipe?.thermomixInstructions?.fr || recipe?.thermomixInstructions || [];
   const hasThermomix = Array.isArray(thermomixInstructions) && thermomixInstructions.length > 0;
   const currentInstructions = (cookingMode === "thermomix" && hasThermomix) ? thermomixInstructions : classicInstructions;
 

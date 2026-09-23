@@ -558,53 +558,87 @@ export default function FamilyProfileModal({
             </View>
 
             {/* Choix du mode IA */}
-            <View style={styles.engineRow}>
+            <View style={styles.engineContainer}>
               <TouchableOpacity
                 style={[
-                  styles.engineBtn,
+                  styles.engineCard,
                   { backgroundColor: theme.cardBgAlt, borderColor: theme.border },
-                  aiEngine === "local" && styles.engineBtnActive
+                  aiEngine === "local" && styles.engineCardActiveLocal,
+                  isRTL && styles.rtlRow
                 ]}
                 onPress={() => setAiEngine("local")}
+                activeOpacity={0.7}
               >
-                <Ionicons
-                  name="hardware-chip-outline"
-                  size={18}
-                  color={aiEngine === "local" ? "#38bdf8" : theme.textMuted}
-                />
-                <Text
-                  style={[
-                    styles.engineBtnText,
-                    { color: theme.textSub },
-                    aiEngine === "local" && styles.engineBtnTextActive
-                  ]}
-                >
-                  {t.aiEngineLocal}
-                </Text>
+                <View style={[styles.engineIconBadge, { backgroundColor: "rgba(56, 189, 248, 0.15)" }]}>
+                  <Ionicons
+                    name="hardware-chip-outline"
+                    size={20}
+                    color="#38bdf8"
+                  />
+                </View>
+                <View style={styles.engineTextBox}>
+                  <Text
+                    style={[
+                      styles.engineTitle,
+                      { color: theme.text },
+                      aiEngine === "local" && { color: "#38bdf8" },
+                      isRTL && styles.rtlText
+                    ]}
+                  >
+                    {t.aiEngineLocal || "Catalogue Local"}
+                  </Text>
+                  <Text style={[styles.engineSub, { color: theme.textSub }, isRTL && styles.rtlText]}>
+                    {t.localSub || "100% hors-ligne & instantané"}
+                  </Text>
+                </View>
+                <View style={[
+                  styles.engineRadio,
+                  { borderColor: aiEngine === "local" ? "#38bdf8" : theme.border },
+                  aiEngine === "local" && { backgroundColor: "#38bdf8" }
+                ]}>
+                  {aiEngine === "local" && <Ionicons name="checkmark" size={13} color="#0f172a" />}
+                </View>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[
-                  styles.engineBtn,
+                  styles.engineCard,
                   { backgroundColor: theme.cardBgAlt, borderColor: theme.border },
-                  aiEngine === "mistral" && styles.engineBtnActive
+                  aiEngine === "mistral" && styles.engineCardActiveMistral,
+                  isRTL && styles.rtlRow
                 ]}
                 onPress={() => setAiEngine("mistral")}
+                activeOpacity={0.7}
               >
-                <Ionicons
-                  name="cloud-outline"
-                  size={18}
-                  color={aiEngine === "mistral" ? "#a855f7" : theme.textMuted}
-                />
-                <Text
-                  style={[
-                    styles.engineBtnText,
-                    { color: theme.textSub },
-                    aiEngine === "mistral" && styles.engineBtnTextActive
-                  ]}
-                >
-                  {t.aiEngineMistral}
-                </Text>
+                <View style={[styles.engineIconBadge, { backgroundColor: "rgba(168, 85, 247, 0.15)" }]}>
+                  <Ionicons
+                    name="cloud-outline"
+                    size={20}
+                    color="#a855f7"
+                  />
+                </View>
+                <View style={styles.engineTextBox}>
+                  <Text
+                    style={[
+                      styles.engineTitle,
+                      { color: theme.text },
+                      aiEngine === "mistral" && { color: "#a855f7" },
+                      isRTL && styles.rtlText
+                    ]}
+                  >
+                    {t.aiEngineMistral || "Mistral AI"}
+                  </Text>
+                  <Text style={[styles.engineSub, { color: theme.textSub }, isRTL && styles.rtlText]}>
+                    {t.mistralSub || "Génération créative & personnalisée par IA"}
+                  </Text>
+                </View>
+                <View style={[
+                  styles.engineRadio,
+                  { borderColor: aiEngine === "mistral" ? "#a855f7" : theme.border },
+                  aiEngine === "mistral" && { backgroundColor: "#a855f7" }
+                ]}>
+                  {aiEngine === "mistral" && <Ionicons name="checkmark" size={13} color="#ffffff" />}
+                </View>
               </TouchableOpacity>
             </View>
 
@@ -1060,36 +1094,52 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     fontSize: 16
   },
-  engineRow: {
-    flexDirection: "row",
-    gap: 10,
+  engineContainer: {
+    gap: 8,
     marginBottom: 12
   },
-  engineBtn: {
-    flex: 1,
+  engineCard: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    backgroundColor: "#0f172a",
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    borderRadius: 12,
+    padding: 12,
+    borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: "#334155"
+    gap: 12
   },
-  engineBtnActive: {
-    backgroundColor: "#1e1b4b",
-    borderColor: "#a855f7"
+  engineCardActiveLocal: {
+    borderColor: "#38bdf8",
+    backgroundColor: "rgba(56, 189, 248, 0.08)"
   },
-  engineBtnText: {
-    color: "#94a3b8",
-    fontSize: 12,
-    fontWeight: "600"
+  engineCardActiveMistral: {
+    borderColor: "#a855f7",
+    backgroundColor: "rgba(168, 85, 247, 0.08)"
   },
-  engineBtnTextActive: {
-    color: "#f8fafc",
-    fontWeight: "700"
+  engineIconBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  engineTextBox: {
+    flex: 1
+  },
+  engineTitle: {
+    fontSize: 14,
+    fontWeight: "800",
+    marginBottom: 2
+  },
+  engineSub: {
+    fontSize: 11,
+    lineHeight: 15
+  },
+  engineRadio: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center"
   },
   mistralSettings: {
     marginTop: 6,

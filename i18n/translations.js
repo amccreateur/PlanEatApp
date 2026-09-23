@@ -173,6 +173,8 @@ export const TRANSLATIONS = {
     generatingWithMistral: "Génération créative avec Mistral AI...",
     mistralBadge: "⚡ Mistral AI",
     localBadge: "💾 Mode Local",
+    localSub: "Génération instantanée 100% hors-ligne",
+    mistralSub: "Génération créative & personnalisée par IA",
     
     // Fridge / Anti-Waste Mode
     fridgeTitle: "Mode Vide-Frigo",
@@ -375,6 +377,8 @@ export const TRANSLATIONS = {
     generatingWithMistral: "Generating creative plan with Mistral AI...",
     mistralBadge: "⚡ Mistral AI",
     localBadge: "💾 Local Mode",
+    localSub: "Instant 100% offline generation",
+    mistralSub: "Creative & personalized AI meal planning",
     
     // Fridge / Anti-Waste Mode
     fridgeTitle: "Fridge Cleaner",
@@ -577,6 +581,8 @@ export const TRANSLATIONS = {
     generatingWithMistral: "جارٍ التوليد الذكي باستخدام Mistral AI...",
     mistralBadge: "⚡ Mistral AI",
     localBadge: "💾 وضع محلي",
+    localSub: "توليد فوري 100% بدون إنترنت",
+    mistralSub: "توليد ذكي ومخصص عبر الذكاء الاصطناعي",
     
     // Fridge / Anti-Waste Mode
     fridgeTitle: "وضع تفريغ الثلاجة",

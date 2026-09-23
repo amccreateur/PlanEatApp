@@ -38,8 +38,24 @@ export default function FamilyProfileModal({
   const [children, setChildren] = useState(profile?.children || 0);
   const [childrenAges, setChildrenAges] = useState(profile?.childrenAges || []);
   const [diets, setDiets] = useState(profile?.diets || ["dietBalanced"]);
+  const [cuisines, setCuisines] = useState(profile?.cuisines || {
+    oriental: 2,
+    asian: 2,
+    italian: 2,
+    french: 2,
+    mexican: 1,
+    indian: 1,
+    streetfood: 1
+  });
   const [dislikedFoods, setDislikedFoods] = useState(profile?.dislikedFoods || []);
   const [newDislike, setNewDislike] = useState("");
+
+  const updateCuisineLevel = (cuisineKey, level) => {
+    setCuisines(prev => ({
+      ...prev,
+      [cuisineKey]: level
+    }));
+  };
 
   // Mistral AI Configuration State
   const [aiEngine, setAiEngine] = useState(aiConfig?.engine || "local");
@@ -51,13 +67,27 @@ export default function FamilyProfileModal({
   const dietOptions = [
     { key: "dietBalanced", label: t.dietBalanced, emoji: "🥗" },
     { key: "dietHalal", label: t.dietHalal, emoji: "🌙" },
+    { key: "dietNoPork", label: t.dietNoPork, emoji: "🥩" },
     { key: "dietVegetarian", label: t.dietVegetarian, emoji: "🌱" },
     { key: "dietVegan", label: t.dietVegan, emoji: "🥑" },
     { key: "dietGlutenFree", label: t.dietGlutenFree, emoji: "🌾" },
     { key: "dietLactoseFree", label: t.dietLactoseFree, emoji: "🥛" },
-    { key: "dietLowCarb", label: t.dietLowCarb, emoji: "⚡" },
+    { key: "dietKeto", label: t.dietKeto, emoji: "🥑" },
+    { key: "dietLowCarb", label: t.dietLowCarb, emoji: "📉" },
+    { key: "dietHighProtein", label: t.dietHighProtein, emoji: "💪" },
     { key: "dietBudget", label: t.dietBudget, emoji: "💰" },
-    { key: "dietQuick", label: t.dietQuick, emoji: "⏱️" }
+    { key: "dietQuick", label: t.dietQuick, emoji: "⏱️" },
+    { key: "dietKids", label: t.dietKids, emoji: "🧒" }
+  ];
+
+  const cuisineList = [
+    { key: "oriental", name: t.cuisineOriental, desc: t.cuisineOrientalDesc, emoji: "🇲🇦" },
+    { key: "asian", name: t.cuisineAsian, desc: t.cuisineAsianDesc, emoji: "🥢" },
+    { key: "italian", name: t.cuisineItalian, desc: t.cuisineItalianDesc, emoji: "🇮🇹" },
+    { key: "french", name: t.cuisineFrench, desc: t.cuisineFrenchDesc, emoji: "🇫🇷" },
+    { key: "mexican", name: t.cuisineMexican, desc: t.cuisineMexicanDesc, emoji: "🇲🇽" },
+    { key: "indian", name: t.cuisineIndian, desc: t.cuisineIndianDesc, emoji: "🇮🇳" },
+    { key: "streetfood", name: t.cuisineStreetFood, desc: t.cuisineStreetFoodDesc, emoji: "🍔" }
   ];
 
   const handleUpdateChildrenCount = (newCount) => {
@@ -120,6 +150,7 @@ export default function FamilyProfileModal({
       children,
       childrenAges,
       diets: diets.length > 0 ? diets : ["dietBalanced"],
+      cuisines,
       dislikedFoods
     };
     onSave(updated);
@@ -333,6 +364,69 @@ export default function FamilyProfileModal({
                       {diet.label}
                     </Text>
                   </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+
+          {/* Cuisines du Monde & Préférences Culinaires */}
+          <View style={[styles.card, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+            <View style={[styles.cardHeader, isRTL && styles.rtlRow]}>
+              <Ionicons name="restaurant-outline" size={20} color="#f97316" />
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.cardTitle, { color: theme.text }]}>{t.cuisinesTitle}</Text>
+                <Text style={[styles.cardSubtitle, { color: theme.textSub }]}>{t.cuisinesSubtitle}</Text>
+              </View>
+            </View>
+
+            <View style={styles.cuisinesList}>
+              {cuisineList.map((c) => {
+                const level = cuisines[c.key] !== undefined ? cuisines[c.key] : 1;
+                return (
+                  <View key={c.key} style={[styles.cuisineCard, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}>
+                    <View style={[styles.cuisineTopRow, isRTL && styles.rtlRow]}>
+                      <Text style={styles.cuisineEmoji}>{c.emoji}</Text>
+                      <View style={{ flex: 1 }}>
+                        <Text style={[styles.cuisineName, { color: theme.text }]}>{c.name}</Text>
+                        <Text style={[styles.cuisineDesc, { color: theme.textSub }]} numberOfLines={2}>{c.desc}</Text>
+                      </View>
+                    </View>
+
+                    {/* Curseur 4 niveaux interactif */}
+                    <View style={styles.cursorContainer}>
+                      <View style={[styles.cursorTrack, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+                        {[
+                          { val: 0, label: t.cursorLevel0, color: "#64748b" },
+                          { val: 1, label: t.cursorLevel1, color: "#0284c7" },
+                          { val: 2, label: t.cursorLevel2, color: "#f59e0b" },
+                          { val: 3, label: t.cursorLevel3, color: "#10b981" }
+                        ].map((step) => {
+                          const isSelected = level === step.val;
+                          return (
+                            <TouchableOpacity
+                              key={step.val}
+                              style={[
+                                styles.cursorStepBtn,
+                                isSelected && { backgroundColor: step.color }
+                              ]}
+                              onPress={() => updateCuisineLevel(c.key, step.val)}
+                              activeOpacity={0.7}
+                            >
+                              <Text
+                                style={[
+                                  styles.cursorStepText,
+                                  { color: theme.textSub },
+                                  isSelected && styles.cursorStepTextActive
+                                ]}
+                              >
+                                {step.label}
+                              </Text>
+                            </TouchableOpacity>
+                          );
+                        })}
+                      </View>
+                    </View>
+                  </View>
                 );
               })}
             </View>
@@ -595,6 +689,60 @@ const styles = StyleSheet.create({
     color: "#f8fafc",
     fontSize: 16,
     fontWeight: "700"
+  },
+  cardSubtitle: {
+    fontSize: 12,
+    marginTop: 2
+  },
+  cuisinesList: {
+    gap: 12
+  },
+  cuisineCard: {
+    padding: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    gap: 10
+  },
+  cuisineTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10
+  },
+  cuisineEmoji: {
+    fontSize: 24
+  },
+  cuisineName: {
+    fontSize: 14,
+    fontWeight: "700"
+  },
+  cuisineDesc: {
+    fontSize: 11,
+    marginTop: 1,
+    lineHeight: 15
+  },
+  cursorContainer: {
+    marginTop: 2
+  },
+  cursorTrack: {
+    flexDirection: "row",
+    borderRadius: 10,
+    borderWidth: 1,
+    padding: 3,
+    gap: 4
+  },
+  cursorStepBtn: {
+    flex: 1,
+    paddingVertical: 7,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 8
+  },
+  cursorStepText: {
+    fontSize: 11,
+    fontWeight: "700"
+  },
+  cursorStepTextActive: {
+    color: "#ffffff"
   },
   langRow: {
     flexDirection: "row",

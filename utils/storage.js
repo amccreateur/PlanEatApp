@@ -17,11 +17,22 @@ export const DEFAULT_AI_CONFIG = {
   mistralModel: "codestral-latest"
 };
 
+export const DEFAULT_CUISINES = {
+  oriental: 2,
+  asian: 2,
+  italian: 2,
+  french: 2,
+  mexican: 1,
+  indian: 1,
+  streetfood: 1
+};
+
 export const DEFAULT_PROFILE = {
   adults: 2,
   children: 2,
   childrenAges: [4, 8],
   diets: ["dietBalanced", "dietHalal"],
+  cuisines: DEFAULT_CUISINES,
   dislikedFoods: [],
   planDurationWeeks: 1
 };

@@ -89,6 +89,28 @@ export class MistralService {
     const diets = (profile?.diets || ["dietBalanced"]).join(", ");
     const dislikes = (profile?.dislikedFoods || []).join(", ") || "aucun";
 
+    const cuisinesMap = {
+      oriental: "Orientale & Maghrébine (Couscous, Tajines, Kefta, Pastilla, Zaalouk, Épices douces...)",
+      asian: "Asiatique & Wok (Pad Thaï, Riz sauté, Wok légumes, Teriyaki, Currys coco...)",
+      italian: "Italienne & Méditerranée (Pastas fraîches, Risotto, Pesto, Lasagnes, Tomates séchées...)",
+      french: "Française & Terroir (Gratins, Quiches, Poêlées terroir, Blanquettes, Mijotés...)",
+      mexican: "Mexicaine & Tex-Mex (Fajitas, Tacos, Guacamole, Quesadillas, Chili doux...)",
+      indian: "Indienne & Épicée (Tikka Masala, Dahl lentilles corail, Butter Chicken, Naans...)",
+      streetfood: "Street Food & Rapide Maison (Burgers gourmets maison, Wraps croustillants, Bowls...)"
+    };
+
+    const cuisineLevels = [];
+    if (profile?.cuisines) {
+      Object.entries(profile.cuisines).forEach(([key, lvl]) => {
+        const name = cuisinesMap[key] || key;
+        if (lvl === 3) cuisineLevels.push(`- ${name} : ⭐ PRIORITAIRE (Préparer un maximum de repas dans ce style)`);
+        else if (lvl === 2) cuisineLevels.push(`- ${name} : FRÉQUENT (Régulièrement au menu)`);
+        else if (lvl === 1) cuisineLevels.push(`- ${name} : MODÉRÉ (De temps en temps)`);
+        else if (lvl === 0) cuisineLevels.push(`- ${name} : ❌ EXCLU (Ne pas proposer de plats de ce style)`);
+      });
+    }
+    const cuisinesText = cuisineLevels.length > 0 ? cuisineLevels.join("\n") : "Cuisines variées et équilibrées";
+
     // Découpage en blocs de 2 jours en parallèle pour une richesse maximale de chaque recette
     const chunkSize = 2;
     const chunks = [];
@@ -103,12 +125,15 @@ export class MistralService {
     const generateChunk = async ({ startDay, endDay }) => {
       const prompt = `Tu es un Chef cuisinier étoilé et nutritionniste passionné.
 Génère un menu gourmand et équilibré pour ${endDay - startDay + 1} jours (du Jour ${startDay} au Jour ${endDay}, avec 4 repas complets par jour : breakfast, lunch, snack, dinner) pour ${adults} adulte(s) et ${children} enfant(s).
-Régimes & Préférences : ${diets}.
+Régimes & Objectifs Santé : ${diets}.
+Préférences Gastronomiques & Curseurs Culinaires :
+${cuisinesText}
 Aliments à exclure impérativement : ${dislikes}.
 Langue : ${lang}.
 
 EXIGENCES CULINAIRES DE HAUTE QUALITÉ :
-1. Titres gourmands, précis et appétissants (ex: "Saumon poêlé à l'aneth, fondue de poireaux et riz basmati").
+1. Respecte scrupuleusement les curseurs de cuisines (les gastronomies notées 'PRIORITAIRE' doivent être largement représentées, les 'EXCLU' ne doivent jamais apparaître).
+2. Titres gourmands, précis et appétissants (ex: "Tajine de poulet aux olives et citrons confits", "Pad Thaï sauté aux crevettes et cacahuètes", "Risotto crémeux aux asperges").
 2. Ingrédients complets (4 à 7 ingrédients réalistes par plat principal : protéine, féculent, légume, herbe/épice, matière grasse).
 3. Rayons autorisés ('deptProduce', 'deptMeat', 'deptDairy', 'deptBakery', 'deptPantry', 'deptSpices', 'deptFrozen', 'deptDrinks', 'deptOther').
 4. Instructions détaillées ÉTAPE PAR ÉTAPE (3 à 4 étapes précises avec découpe, temps de cuisson, puissance du feu, assaisonnement et dressage).

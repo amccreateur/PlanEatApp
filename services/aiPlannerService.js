@@ -34,9 +34,22 @@ export class AIPlannerService {
 
       // Vérifier les régimes stricts
       if (diets.includes("dietHalal") && !recipe.tags.includes("dietHalal")) return false;
+      if (diets.includes("dietNoPork") && (recipe.tags.includes("pork") || recipe.ingredients.some(i => (i.name.fr || "").toLowerCase().includes("porc") || (i.name.fr || "").toLowerCase().includes("bacon") || (i.name.fr || "").toLowerCase().includes("jambon")))) return false;
       if (diets.includes("dietVegetarian") && !recipe.tags.includes("dietVegetarian") && !recipe.tags.includes("dietVegan")) return false;
       if (diets.includes("dietVegan") && !recipe.tags.includes("dietVegan")) return false;
       if (diets.includes("dietGlutenFree") && !recipe.tags.includes("dietGlutenFree")) return false;
+      if (diets.includes("dietLactoseFree") && !recipe.tags.includes("dietLactoseFree") && !recipe.tags.includes("dietVegan")) return false;
+      if (diets.includes("dietKeto") && !recipe.tags.includes("dietLowCarb") && !recipe.tags.includes("dietKeto")) return false;
+
+      // Exclusions selon les curseurs de cuisines (niveau 0 = exclu)
+      if (profile?.cuisines) {
+        if (profile.cuisines.oriental === 0 && (recipe.tags.includes("oriental") || recipe.tags.includes("maghreb"))) return false;
+        if (profile.cuisines.asian === 0 && (recipe.tags.includes("asian") || recipe.tags.includes("wok"))) return false;
+        if (profile.cuisines.italian === 0 && recipe.tags.includes("italian")) return false;
+        if (profile.cuisines.french === 0 && recipe.tags.includes("french")) return false;
+        if (profile.cuisines.mexican === 0 && recipe.tags.includes("mexican")) return false;
+        if (profile.cuisines.indian === 0 && recipe.tags.includes("indian")) return false;
+      }
 
       // Vérifier les aliments exclus
       if (dislikes.length > 0) {

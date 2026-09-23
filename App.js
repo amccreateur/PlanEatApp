@@ -43,6 +43,7 @@ function MainApp() {
   const [profile, setProfile] = useState(DEFAULT_PROFILE);
   const [aiConfig, setAiConfig] = useState(DEFAULT_AI_CONFIG);
   const [currentPlan, setCurrentPlan] = useState(null);
+  const [selectedDurationWeeks, setSelectedDurationWeeks] = useState(1);
   const [groceries, setGroceries] = useState([]);
   const [selectedWeek, setSelectedWeek] = useState(1);
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
@@ -84,6 +85,7 @@ function MainApp() {
     const savedPlan = await StorageService.getCurrentPlan();
     if (savedPlan) {
       setCurrentPlan(savedPlan);
+      setSelectedDurationWeeks(savedPlan.durationWeeks || 1);
       const savedGroceries = await StorageService.getGroceries();
       setGroceries(savedGroceries.length > 0 ? savedGroceries : AIPlannerService.compileGroceries(savedPlan));
     } else {
@@ -130,6 +132,7 @@ function MainApp() {
         Alert.alert("⚠️ Information Mistral AI", `${error}\n\nUn planning local a été généré.`);
       }
       setCurrentPlan(plan);
+      setSelectedDurationWeeks(durationWeeks);
       setGroceries(compiledGroceries);
       setSelectedWeek(1);
       setSelectedDayIndex(0);
@@ -337,7 +340,7 @@ function MainApp() {
           <View style={[styles.plannerControls, isRTL && styles.rtlRow]}>
             <TouchableOpacity
               style={[styles.aiGenerateBtn, isGenerating && styles.btnDisabled]}
-              onPress={() => handleGeneratePlan(profile, currentPlan?.durationWeeks || 1, aiConfig, lang)}
+              onPress={() => handleGeneratePlan(profile, selectedDurationWeeks, aiConfig, lang)}
               disabled={isGenerating}
             >
               <LinearGradient
@@ -361,13 +364,13 @@ function MainApp() {
                   key={w}
                   style={[
                     styles.durationChip,
-                    { backgroundColor: (currentPlan?.durationWeeks || 1) === w ? "#0284c7" : "transparent" }
+                    { backgroundColor: selectedDurationWeeks === w ? "#0284c7" : "transparent" }
                   ]}
-                  onPress={() => handleGeneratePlan(profile, w, aiConfig, lang)}
+                  onPress={() => setSelectedDurationWeeks(w)}
                 >
                   <Text style={[
                     styles.durationChipText,
-                    { color: (currentPlan?.durationWeeks || 1) === w ? "#ffffff" : currentTheme.textSub }
+                    { color: selectedDurationWeeks === w ? "#ffffff" : currentTheme.textSub }
                   ]}>
                     {w === 1 ? t.oneWeek : w === 2 ? t.twoWeeks : t.oneMonth}
                   </Text>

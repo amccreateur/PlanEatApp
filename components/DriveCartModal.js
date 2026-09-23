@@ -193,61 +193,60 @@ export default function DriveCartModal({
           }
 
           // 1. Chercher si le champ #saisieTexte ou un input est DÉJÀ présent et valide
-          var allSaisie = Array.from(document.querySelectorAll('#saisieTexte, input.champ-recherche, input[placeholder*="Produit" i], input[type="search"]'));
-          var existingSaisie = allSaisie.find(isGoodInput);
-          if (existingSaisie && existingSaisie.offsetParent !== null) {
+          var allSaisie = Array.from(document.querySelectorAll('#saisieTexte, input.champ-recherche, input[type="search"]'));
+          var existingSaisie = allSaisie.find(function(el) {
+            return isGoodInput(el) && el.offsetParent !== null;
+          });
+          if (existingSaisie) {
             log("🎯 Champ #saisieTexte immédiatement disponible");
             fillAndSubmit(existingSaisie);
             return;
           }
 
           // 2. Si pas encore ouvert, ouvrir la recherche en cliquant sur .recherche-home ou .champ-recherche
-          var openTrigger = document.querySelector('.recherche-home, .champ-recherche, .recherche-loupe, [aria-label*="recherche" i], .icon-search, .search-icon');
+          var openTrigger = document.querySelector('.recherche-home, span.champ-recherche, .header-search-btn');
           if (openTrigger) {
             log("🔎 Clic pour ouvrir la barre de recherche: <" + openTrigger.tagName + "> class=" + openTrigger.className);
             openTrigger.click();
             setTimeout(function() {
-              var openedInputs = Array.from(document.querySelectorAll('#saisieTexte, input.champ-recherche, input[placeholder*="Produit" i], input[type="search"], input[name*="recherche" i], input[type="text"]'));
-              var validOpened = openedInputs.find(isGoodInput);
+              var openedInputs = Array.from(document.querySelectorAll('#saisieTexte, input.champ-recherche, input[type="search"], input[type="text"]'));
+              var validOpened = openedInputs.find(function(el) {
+                return isGoodInput(el);
+              });
               if (validOpened) {
                 log("✍️ Saisie dans le champ ouvert: #" + validOpened.id);
                 fillAndSubmit(validOpened);
               } else {
-                log("⚠️ Champ non trouvé après ouverture");
+                // Fallback URL immédiat sur m-courses
+                var hrefLate = window.location.href || '';
+                var mMatch = hrefLate.match(/(https?:\\/\\/[^\\/]+\\/magasin-[^\\/\\?#]+)/i);
+                if (mMatch && mMatch[1]) {
+                  var mTarget = mMatch[1] + '/recherche/' + encodeURIComponent(q);
+                  log("🌐 Navigation URL mobile Leclerc: " + mTarget);
+                  window.location.href = mTarget;
+                }
               }
-            }, 300);
+            }, 250);
             return;
           }
 
-          // 3. Fallback : tous les inputs du DOM
-          var allInputs = Array.from(document.querySelectorAll('input, textarea'));
-          var candidates = [];
-          for (var i = 0; i < allInputs.length; i++) {
-            var inp = allInputs[i];
-            var type = (inp.type || '').toLowerCase();
-            if (type === 'hidden' || type === 'checkbox' || type === 'radio' || type === 'button' || type === 'submit') continue;
-            if (!isGoodInput(inp)) continue;
-
-            var isVisible = (inp.offsetParent !== null);
-            candidates.push({ input: inp, score: isVisible ? 10 : 1 });
-          }
-
-          if (candidates.length > 0) {
-            candidates.sort(function(a, b) { return b.score - a.score; });
-            log("🎯 Fallback sur input DOM #" + candidates[0].input.id);
-            fillAndSubmit(candidates[0].input);
-            return;
-          }
-
-          // 3. Fallback URL
+          // 3. Navigation directe par route magasin (100% fiable sur mobile et desktop)
           var href = window.location.href || '';
           if (host.includes('leclercdrive.fr')) {
             var storeMatch = href.match(/(https?:\\/\\/[^\\/]+\\/magasin-[^\\/\\?#]+)/i);
             if (storeMatch && storeMatch[1]) {
-              var target = storeMatch[1] + '/recherche.aspx?TexteRecherche=' + encodeURIComponent(q);
-              log("🌐 Redirection URL magasin Leclerc: " + target);
-              window.location.href = target;
-              return;
+              // Sur le site mobile m-courses.leclercdrive.fr
+              if (host.includes('m-courses')) {
+                var targetMobile = storeMatch[1] + '/recherche/' + encodeURIComponent(q);
+                log("🌐 Navigation route mobile Leclerc: " + targetMobile);
+                window.location.href = targetMobile;
+                return;
+              } else {
+                var targetDesktop = storeMatch[1] + '/recherche.aspx?TexteRecherche=' + encodeURIComponent(q);
+                log("🌐 Navigation route desktop Leclerc: " + targetDesktop);
+                window.location.href = targetDesktop;
+                return;
+              }
             }
           }
 

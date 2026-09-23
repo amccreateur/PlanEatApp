@@ -1007,17 +1007,15 @@ const styles = StyleSheet.create({
     gap: 8
   },
   aiGenerateBtn: {
-    flex: 1,
-    borderRadius: 14,
+    borderRadius: 12,
     overflow: "hidden"
   },
   aiGradient: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    height: "100%"
+    paddingVertical: 8,
+    paddingHorizontal: 14
   },
   aiBtnText: {
     color: "#ffffff",

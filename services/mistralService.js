@@ -61,14 +61,62 @@ export class MistralService {
   }
 
   /**
-   * Nettoie et parse le JSON de façon sécurisée (supprime les virgules traînantes et markdown)
+   * Nettoie et parse le JSON de façon sécurisée (avec auto-réparation en cas de troncature)
    */
   static safeJsonParse(rawContent) {
     if (!rawContent) throw new Error("Réponse vide");
     let cleaned = rawContent.replace(/```json/gi, "").replace(/```/g, "").trim();
+
+    // Extraire uniquement le bloc JSON principal si du texte précède
+    const firstBrace = cleaned.indexOf("{");
+    const firstBracket = cleaned.indexOf("[");
+    let startIdx = -1;
+    if (firstBrace !== -1 && firstBracket !== -1) {
+      startIdx = Math.min(firstBrace, firstBracket);
+    } else if (firstBrace !== -1) {
+      startIdx = firstBrace;
+    } else if (firstBracket !== -1) {
+      startIdx = firstBracket;
+    }
+    if (startIdx > 0) {
+      cleaned = cleaned.substring(startIdx);
+    }
+
     // Nettoyer les virgules traînantes avant les fermetures d'objets ou tableaux
     cleaned = cleaned.replace(/,\s*([}\]])/g, "$1");
-    return JSON.parse(cleaned);
+
+    try {
+      return JSON.parse(cleaned);
+    } catch (primaryErr) {
+      // Tentative d'auto-réparation si la réponse a été coupée / tronquée par l'API
+      try {
+        let fixed = cleaned;
+        // Supprimer une clé ou une chaîne inachevée à la fin
+        fixed = fixed.replace(/,\s*"[^"]*"?\s*$/, "");
+        fixed = fixed.replace(/:\s*"[^"]*"?\s*$/, ': ""');
+        fixed = fixed.replace(/,\s*$/, "");
+
+        // Compter et équilibrer les accolades et crochets
+        let openBraces = (fixed.match(/\{/g) || []).length;
+        let closeBraces = (fixed.match(/\}/g) || []).length;
+        let openBrackets = (fixed.match(/\[/g) || []).length;
+        let closeBrackets = (fixed.match(/\]/g) || []).length;
+
+        while (openBrackets > closeBrackets) {
+          fixed += "]";
+          closeBrackets++;
+        }
+        while (openBraces > closeBraces) {
+          fixed += "}";
+          closeBraces++;
+        }
+
+        fixed = fixed.replace(/,\s*([}\]])/g, "$1");
+        return JSON.parse(fixed);
+      } catch (repairErr) {
+        throw new Error(`JSON Parse error: ${primaryErr.message}`);
+      }
+    }
   }
 
   /**
@@ -117,8 +165,8 @@ export class MistralService {
     if (profile?.appliances?.cookeo) activeAppliances.push("Cookeo / Multicuiseur sous pression");
     const appliancesText = activeAppliances.length > 0 ? `\nÉquipements de cuisine disponibles :\n${activeAppliances.map(a => `- ${a}`).join("\n")}` : "";
 
-    // Découpage par semaine (7 jours par bloc) pour garantir une cohérence et une variété totale
-    const chunkSize = 7;
+    // Découpage en blocs de 3 à 4 jours max pour éviter la troncature de token
+    const chunkSize = 3;
     const chunks = [];
     for (let i = 0; i < daysCount; i += chunkSize) {
       const startDay = i + 1;

@@ -158,27 +158,49 @@ export class AIPlannerService {
     const daysCount = durationWeeks * 7;
     const dayKeys = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 
-    // Mélanger aléatoirement les recettes pour renouveler à chaque génération
+    // Mélanger aléatoirement les recettes pour renouveler à chaque clic
     const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
-    const breakfasts = shuffle(this.filterRecipes(profile, "breakfast"));
-    const mains = shuffle(this.filterRecipes(profile));
-    const snacks = shuffle(this.filterRecipes(profile, "snack"));
+    const availableBreakfasts = this.filterRecipes(profile, "breakfast");
+    const safeBreakfasts = availableBreakfasts.length > 0
+      ? shuffle(availableBreakfasts)
+      : shuffle(RECIPES_CATALOG.filter(r => r.mealType === "breakfast"));
 
-    const safeBreakfasts = breakfasts.length > 0 ? breakfasts : RECIPES_CATALOG.filter(r => r.mealType === "breakfast");
-    const safeMains = mains.length > 0 ? mains : RECIPES_CATALOG.filter(r => r.mealType === "lunch" || r.mealType === "dinner");
-    const safeSnacks = snacks.length > 0 ? snacks : RECIPES_CATALOG.filter(r => r.mealType === "snack");
+    const availableLunches = this.filterRecipes(profile, "lunch");
+    const availableDinners = this.filterRecipes(profile, "dinner");
+    const allAvailableMains = this.filterRecipes(profile).filter(r => r.mealType === "lunch" || r.mealType === "dinner");
+
+    const safeLunches = availableLunches.length > 0 ? shuffle(availableLunches) : shuffle(allAvailableMains);
+    const safeDinners = availableDinners.length > 0 ? shuffle(availableDinners) : shuffle(allAvailableMains);
+    const safeMainsPool = shuffle(allAvailableMains.length > 0 ? allAvailableMains : RECIPES_CATALOG.filter(r => r.mealType === "lunch" || r.mealType === "dinner"));
+
+    const availableSnacks = this.filterRecipes(profile, "snack");
+    const safeSnacks = availableSnacks.length > 0
+      ? shuffle(availableSnacks)
+      : shuffle(RECIPES_CATALOG.filter(r => r.mealType === "snack"));
 
     const days = [];
+    let mainCursor = 0;
+
     for (let i = 0; i < daysCount; i++) {
       const weekIndex = Math.floor(i / 7) + 1;
       const dayIndexInWeek = i % 7;
       const dayKey = dayKeys[dayIndexInWeek];
 
       const b = safeBreakfasts[i % safeBreakfasts.length];
-      const l = safeMains[(i * 2) % safeMains.length];
-      const d = safeMains[(i * 2 + 1) % safeMains.length];
       const s = safeSnacks[i % safeSnacks.length];
+
+      // Sélectionner deux plats principaux strictement distincts pour le déjeuner et le dîner
+      let l = safeMainsPool[mainCursor % safeMainsPool.length];
+      mainCursor++;
+      let d = safeMainsPool[mainCursor % safeMainsPool.length];
+      mainCursor++;
+
+      // Sécurité anti-doublon le même jour
+      if (l.id === d.id && safeMainsPool.length > 1) {
+        d = safeMainsPool[(mainCursor + 1) % safeMainsPool.length];
+        mainCursor++;
+      }
 
       days.push({
         id: `day_${i + 1}`,

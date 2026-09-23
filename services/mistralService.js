@@ -117,8 +117,8 @@ export class MistralService {
     if (profile?.appliances?.cookeo) activeAppliances.push("Cookeo / Multicuiseur sous pression");
     const appliancesText = activeAppliances.length > 0 ? `\nÉquipements de cuisine disponibles :\n${activeAppliances.map(a => `- ${a}`).join("\n")}` : "";
 
-    // Découpage en blocs de 2 jours en parallèle pour une richesse maximale de chaque recette
-    const chunkSize = 2;
+    // Découpage par semaine (7 jours par bloc) pour garantir une cohérence et une variété totale
+    const chunkSize = 7;
     const chunks = [];
     for (let i = 0; i < daysCount; i += chunkSize) {
       const startDay = i + 1;
@@ -129,22 +129,26 @@ export class MistralService {
     const endpoint = this.getEndpoint(activeModel);
 
     const generateChunk = async ({ startDay, endDay }) => {
+      const count = endDay - startDay + 1;
       const prompt = `Tu es un Chef cuisinier étoilé et nutritionniste passionné.
-Génère un menu gourmand et équilibré pour ${endDay - startDay + 1} jours (du Jour ${startDay} au Jour ${endDay}, avec 4 repas complets par jour : breakfast, lunch, snack, dinner) pour ${adults} adulte(s) et ${children} enfant(s).
+Génère un menu gourmand, équilibré et SANS AUCUNE RÉPÉTITION pour ${count} jours (du Jour ${startDay} au Jour ${endDay}, avec 4 repas complets par jour : breakfast, lunch, snack, dinner) pour ${adults} adulte(s) et ${children} enfant(s).
 Régimes & Objectifs Santé : ${diets}.
 Préférences Gastronomiques & Curseurs Culinaires :
 ${cuisinesText}${appliancesText}
 Aliments à exclure impérativement : ${dislikes}.
-Langue : ${lang}.
+Langue principale : ${lang}.
 
-EXIGENCES CULINAIRES DE HAUTE QUALITÉ :
-1. Respecte scrupuleusement les curseurs de cuisines (les gastronomies notées 'PRIORITAIRE' doivent être largement représentées, les 'EXCLU' ne doivent jamais apparaître).
-2. Titres gourmands, précis et appétissants (ex: "Tajine de poulet aux olives et citrons confits", "Pad Thaï sauté aux crevettes et cacahuètes", "Risotto crémeux aux asperges").
-3. Ingrédients complets (4 à 7 ingrédients réalistes par plat principal : protéine, féculent, légume, herbe/épice, matière grasse).
-4. Rayons autorisés ('deptProduce', 'deptMeat', 'deptDairy', 'deptBakery', 'deptPantry', 'deptSpices', 'deptFrozen', 'deptDrinks', 'deptOther').
-5. Instructions détaillées ÉTAPE PAR ÉTAPE (3 à 4 étapes précises avec découpe, temps de cuisson, puissance du feu, assaisonnement et dressage).
-${profile?.appliances?.thermomix ? "6. ROBOT CUISEUR / THERMOMIX : Fournis impérativement pour chaque recette un bloc 'thermomixInstructions' (tableau d'étapes détaillées adaptées avec durées, températures ex: 100°C ou Varoma, vitesses ex: Vit. 1 / Sens Inverse 🔄)." : ""}
-7. Ajoute une astuce de chef 'chefTip' pour sublimer le plat.
+RÈGLES D'OR DE VARIÉTÉ ET DE QUALITÉ (STRICTES) :
+1. AUCUNE RÉPÉTITION : Chaque jour et chaque repas (déjeuners ET dîners) doit être 100% UNIQUE et ORIGINAL. Interdiction formelle de proposer deux fois le même plat ou la même recette sur la semaine.
+2. DIVERSITÉ DES PROTÉINES & FÉCULENTS : Varie impérativement chaque jour :
+   - Alternez entre volaille (poulet, dinde), poisson/fruits de mer (saumon, cabillaud, crevettes), légumineuses/végétarien (lentilles, pois chiches, tofu), bœuf/viande, et féculents variés (riz basmati, pâtes fraîches, quinoa, patate douce, boulgour, nouilles).
+3. Respecte scrupuleusement les curseurs de cuisines (les gastronomies notées 'PRIORITAIRE' doivent être largement représentées, les 'EXCLU' ne doivent jamais apparaître).
+4. Titres gourmands, précis et appétissants (ex: "Tajine de poulet aux citrons confits", "Saumon teriyaki sur lit de riz", "Risotto crémeux aux champignons", "Dahl de lentilles corail au coco").
+5. Ingrédients complets (4 à 7 ingrédients réalistes par plat principal : protéine, féculent, légume, herbe/épice, matière grasse).
+6. Rayons autorisés ('deptProduce', 'deptMeat', 'deptDairy', 'deptBakery', 'deptPantry', 'deptSpices', 'deptFrozen', 'deptDrinks', 'deptOther').
+7. Instructions détaillées ÉTAPE PAR ÉTAPE (3 à 4 étapes précises avec découpe, temps de cuisson, assaisonnement et dressage).
+${profile?.appliances?.thermomix ? "8. ROBOT CUISEUR / THERMOMIX : Fournis impérativement pour chaque recette un bloc 'thermomixInstructions' (tableau d'étapes détaillées adaptées avec durées, températures ex: 100°C ou Varoma, vitesses ex: Vit. 1 / Sens Inverse 🔄)." : ""}
+9. Ajoute une astuce de chef 'chefTip' personnalisée pour chaque plat.
 
 Format JSON attendu :
 {
@@ -153,115 +157,88 @@ Format JSON attendu :
       "dayIndex": ${startDay},
       "meals": {
         "breakfast": {
-          "title": { "fr": "Bowl Énergétique Avoine, Banane & Beurre de Cacahuète", "en": "Energy Oatmeal Bowl with Banana & Peanut Butter", "ar": "وعاء الشوفان والموز وزبدة الفول السوداني" },
+          "title": { "fr": "Titre Petit-Déjeuner Jour ${startDay}", "en": "Breakfast Title Day ${startDay}", "ar": "عنوان الفطور" },
           "emoji": "🥣",
           "prepTime": 8,
           "cookTime": 5,
-          "caloriesPerPerson": 380,
+          "caloriesPerPerson": 350,
           "ingredients": [
-            { "name": { "fr": "Flocons d'avoine" }, "quantity": 80, "unit": "g", "dept": "deptPantry" },
-            { "name": { "fr": "Lait d'amande ou demi-écrémé" }, "quantity": 180, "unit": "ml", "dept": "deptDairy" },
-            { "name": { "fr": "Banane" }, "quantity": 1, "unit": "pcs", "dept": "deptProduce" },
-            { "name": { "fr": "Beurre de cacahuète" }, "quantity": 20, "unit": "g", "dept": "deptPantry" },
-            { "name": { "fr": "Graines de chia" }, "quantity": 10, "unit": "g", "dept": "deptPantry" }
+            { "name": { "fr": "Ingrédient 1", "en": "Ingredient 1", "ar": "مكون 1" }, "quantity": 80, "unit": "g", "dept": "deptPantry" }
           ],
           "instructions": {
             "fr": [
-              "Faire chauffer le lait avec les flocons d'avoine à feu moyen pendant 4 à 5 min en remuant régulièrement jusqu'à obtenir une texture crémeuse.",
-              "Verser le porridge chaud dans un bol.",
-              "Couper la banane en rondelles et la disposer harmonieusement sur le dessus.",
-              "Ajouter une belle cuillère de beurre de cacahuète et saupoudrer de graines de chia avant de déguster."
+              "Étape 1 : Préparation...",
+              "Étape 2 : Cuisson...",
+              "Étape 3 : Finition..."
             ]
           },
-          "chefTip": { "fr": "Ajoutez une pointe de cannelle moulue pour rehausser naturellement la douceur sans sucre ajouté." }
+          "chefTip": { "fr": "Astuce du chef..." }
         },
         "lunch": {
-          "title": { "fr": "Filet de Poulet Mariné au Citron, Tagliatelles & Courgettes Grillées", "en": "Lemon Marinated Chicken Breast, Tagliatelle & Grilled Zucchini", "ar": "صدر دجاج متبل بالليمون مع المعكرونة والكوسا" },
+          "title": { "fr": "Titre Déjeuner Gourmand Jour ${startDay}", "en": "Lunch Title Day ${startDay}", "ar": "عنوان الغداء" },
           "emoji": "🍗",
           "prepTime": 15,
           "cookTime": 15,
           "caloriesPerPerson": 520,
           "ingredients": [
-            { "name": { "fr": "Filets de poulet" }, "quantity": 300, "unit": "g", "dept": "deptMeat" },
-            { "name": { "fr": "Tagliatelles fraîches" }, "quantity": 200, "unit": "g", "dept": "deptPantry" },
-            { "name": { "fr": "Courgettes" }, "quantity": 2, "unit": "pcs", "dept": "deptProduce" },
-            { "name": { "fr": "Citron jaune" }, "quantity": 1, "unit": "pcs", "dept": "deptProduce" },
-            { "name": { "fr": "Huile d'olive vierge" }, "quantity": 2, "unit": "c.à.s", "dept": "deptPantry" },
-            { "name": { "fr": "Gousses d'ail" }, "quantity": 1, "unit": "pcs", "dept": "deptProduce" },
-            { "name": { "fr": "Parmesan râpé" }, "quantity": 30, "unit": "g", "dept": "deptDairy" }
+            { "name": { "fr": "Protéine ou ingrédient principal" }, "quantity": 300, "unit": "g", "dept": "deptMeat" },
+            { "name": { "fr": "Féculent" }, "quantity": 200, "unit": "g", "dept": "deptPantry" },
+            { "name": { "fr": "Légume" }, "quantity": 2, "unit": "pcs", "dept": "deptProduce" },
+            { "name": { "fr": "Huile ou assaisonnement" }, "quantity": 2, "unit": "c.à.s", "dept": "deptPantry" }
           ],
           "instructions": {
             "fr": [
-              "Émincer le poulet en aiguillettes et le faire mariner 10 min avec le jus d'un demi-citron, une gousse d'ail pressée et 1 c.à.s d'huile d'olive.",
-              "Laver les courgettes et les tailler en fines demi-rondelles.",
-              "Dans une grande poêle bien chaude, faire dorer le poulet 6 à 8 min à feu vif, puis ajouter les courgettes et cuire 5 min de plus.",
-              "Faire cuire les tagliatelles 'al dente' dans de l'eau bouillante salée, les égoutter en gardant 2 c.à.s d'eau de cuisson.",
-              "Mélanger les pâtes au poulet et courgettes, lier avec l'eau de cuisson et saupoudrer de parmesan frais."
+              "Étape 1 : Préparation et découpe...",
+              "Étape 2 : Cuisson et assaisonnement...",
+              "Étape 3 : Dressage et finition..."
             ]
           },
           ${profile?.appliances?.thermomix ? `"thermomixInstructions": {
             "fr": [
-              "Mettre l'ail et un demi-citron pelé dans le bol : 5 sec / Vit. 5. Racler.",
-              "Ajouter l'huile d'olive et le poulet émincé : 5 min / 120°C / Vit. Cuillère 🔄.",
-              "Insérer le fouet, ajouter les courgettes en rondelles : 8 min / 100°C / Vit. Cuillère 🔄.",
-              "Servir sur les tagliatelles cuites à part et saupoudrer de parmesan."
+              "Étape 1 Thermomix (ex: 5 sec / Vit. 5)...",
+              "Étape 2 Thermomix (ex: 12 min / 100°C / Vit. 1 🔄)..."
             ]
           },` : ""}
-          "chefTip": { "fr": "Conservez toujours un peu d'eau de cuisson des pâtes pour émulsionner la sauce et rendre le plat ultra-onctueux." }
+          "chefTip": { "fr": "Astuce du chef..." }
         },
         "snack": {
-          "title": { "fr": "Tartine Toastée Ricotta, Miel & Éclats de Noix", "en": "Toasted Ricotta, Honey & Walnut Toast", "ar": "توست الريكوتا مع العسل والجوز" },
-          "emoji": "🍞",
+          "title": { "fr": "Titre Goûter Jour ${startDay}", "en": "Snack Title Day ${startDay}", "ar": "عنوان اللمجة" },
+          "emoji": "🍎",
           "prepTime": 5,
-          "cookTime": 3,
-          "caloriesPerPerson": 210,
+          "cookTime": 0,
+          "caloriesPerPerson": 190,
           "ingredients": [
-            { "name": { "fr": "Pain complet ou de campagne" }, "quantity": 2, "unit": "tranches", "dept": "deptBakery" },
-            { "name": { "fr": "Ricotta fraîche" }, "quantity": 60, "unit": "g", "dept": "deptDairy" },
-            { "name": { "fr": "Miel liquide" }, "quantity": 1, "unit": "c.à.c", "dept": "deptPantry" },
-            { "name": { "fr": "Noix concassées" }, "quantity": 15, "unit": "g", "dept": "deptPantry" }
+            { "name": { "fr": "Ingrédient goûter" }, "quantity": 1, "unit": "portion", "dept": "deptProduce" }
           ],
           "instructions": {
-            "fr": [
-              "Faire griller les tranches de pain au grille-pain jusqu'à ce qu'elles soient bien dorées et croustillantes.",
-              "Tartiner généreusement de ricotta fraîche.",
-              "Napper d'un filet de miel et parsemer d'éclats de noix croquants."
-            ]
+            "fr": ["Préparer et déguster frais."]
           },
-          "chefTip": { "fr": "Un tour de moulin à poivre noir sur la ricotta crée un contraste sucré-salé irrésistible." }
+          "chefTip": { "fr": "Conseil snack..." }
         },
         "dinner": {
-          "title": { "fr": "Velouté Onctueux de Potimarron au Lait de Coco & Graines Grillées", "en": "Creamy Pumpkin Coconut Soup with Toasted Seeds", "ar": "شوربة القرع الكريمية بحليب جوز الهند" },
+          "title": { "fr": "Titre Dîner Savoureux Jour ${startDay}", "en": "Dinner Title Day ${startDay}", "ar": "عنوان العشاء" },
           "emoji": "🍲",
           "prepTime": 15,
-          "cookTime": 25,
-          "caloriesPerPerson": 340,
+          "cookTime": 20,
+          "caloriesPerPerson": 420,
           "ingredients": [
-            { "name": { "fr": "Potimarron ou courge butternut" }, "quantity": 600, "unit": "g", "dept": "deptProduce" },
-            { "name": { "fr": "Lait de coco" }, "quantity": 150, "unit": "ml", "dept": "deptPantry" },
-            { "name": { "fr": "Oignon jaune" }, "quantity": 1, "unit": "pcs", "dept": "deptProduce" },
-            { "name": { "fr": "Bouillon de légumes" }, "quantity": 500, "unit": "ml", "dept": "deptPantry" },
-            { "name": { "fr": "Graines de courge" }, "quantity": 20, "unit": "g", "dept": "deptPantry" },
-            { "name": { "fr": "Huile d'olive" }, "quantity": 1, "unit": "c.à.s", "dept": "deptPantry" }
+            { "name": { "fr": "Ingrédient principal dîner" }, "quantity": 250, "unit": "g", "dept": "deptProduce" },
+            { "name": { "fr": "Accompagnement" }, "quantity": 150, "unit": "g", "dept": "deptDairy" }
           ],
           "instructions": {
             "fr": [
-              "Éplucher et émincer l'oignon. Couper le potimarron en dés réguliers (inutile d'éplucher si potimarron bio).",
-              "Dans une cocotte, faire suer l'oignon dans l'huile d'olive 3 min, puis ajouter les dés de potimarron.",
-              "Couvrir avec le bouillon de légumes chaud, porter à ébullition puis laisser mijoter 20 min à feu moyen.",
-              "Mixer finement le velouté au mixeur plongeant en incorporant le lait de coco.",
-              "Faire torréfier à sec les graines de courge dans une poêle 2 min et parsemer au moment de servir."
+              "Étape 1 : Préparation...",
+              "Étape 2 : Cuisson mijotée...",
+              "Étape 3 : Dressage..."
             ]
           },
           ${profile?.appliances?.thermomix ? `"thermomixInstructions": {
             "fr": [
-              "Mettre l'oignon coupé en 2 dans le bol : 5 sec / Vit. 5. Racler.",
-              "Ajouter l'huile d'olive : 3 min / 120°C / Vit. 1.",
-              "Ajouter les dés de potimarron et le bouillon : 20 min / 100°C / Vit. 1.",
-              "Ajouter le lait de coco : mixer 1 min / Vit. 5 à 10 progressivement en maintenant le gobelet doseur."
+              "Étape 1 Thermomix...",
+              "Étape 2 Thermomix..."
             ]
           },` : ""}
-          "chefTip": { "fr": "Une pincée de muscade ou de gingembre frais râpé sublime la saveur douce de la courge." }
+          "chefTip": { "fr": "Astuce du chef pour le dîner..." }
         }
       }
     }

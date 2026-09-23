@@ -498,19 +498,6 @@ export default function DriveCartModal({
         origError.apply(console, arguments);
         send("error", Array.prototype.slice.call(arguments).join(" "));
       };
-
-      // Empêcher les sauts sauvages vers le bas de page lors du clic/focus sur les champs d'adresse ou de recherche
-      document.addEventListener('focusin', function(e) {
-        var el = e.target;
-        if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.getAttribute('contenteditable') === 'true')) {
-          setTimeout(function() {
-            try {
-              el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
-            } catch(err) {}
-          }, 300);
-        }
-      }, true);
-
       send("log", "🌐 Page prête: " + window.location.href);
     })();
     true;
@@ -593,27 +580,9 @@ export default function DriveCartModal({
             </View>
           </View>
 
-          {/* Step 1 Store Selection Onboarding Card (affiché UNIQUEMENT lors du choix du magasin) */}
+          {/* Store Switcher Chips (compact, 1 seule ligne épurée) */}
           {isSelectingStore && (
-            <View style={styles.stepOneContainer}>
-              {/* Stepper Indicator */}
-              <View style={styles.stepperRow}>
-                <View style={styles.stepperStepActive}>
-                  <View style={styles.stepperNumCircleActive}>
-                    <Text style={styles.stepperNumActive}>1</Text>
-                  </View>
-                  <Text style={styles.stepperTextActive}>Choix du Magasin</Text>
-                </View>
-                <Ionicons name="chevron-forward" size={14} color="#64748b" />
-                <View style={styles.stepperStepInactive}>
-                  <View style={styles.stepperNumCircleInactive}>
-                    <Text style={styles.stepperNumInactive}>2</Text>
-                  </View>
-                  <Text style={styles.stepperTextInactive}>Remplissage Panier</Text>
-                </View>
-              </View>
-
-              {/* Store Switcher Chips */}
+            <View style={{ paddingTop: 6, paddingBottom: 4 }}>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -645,43 +614,15 @@ export default function DriveCartModal({
                   );
                 })}
               </ScrollView>
-
-              {/* Step 1 Highlight Card */}
-              <View style={[styles.stepOneCard, { backgroundColor: theme.cardBgAlt, borderColor: "#38bdf8" }]}>
-                <View style={styles.stepOneHeader}>
-                  <View style={styles.stepOneBadge}>
-                    <Ionicons name="location" size={12} color="#38bdf8" />
-                    <Text style={styles.stepOneBadgeText}>ÉTAPE 1 / 2</Text>
-                  </View>
-                  <Text style={[styles.stepOneTitle, { color: theme.text }]} numberOfLines={1}>
-                    Sélectionnez votre Drive {selectedStore.shortName}
-                  </Text>
-                </View>
-                
-                <Text style={[styles.stepOneSubtitle, { color: theme.textSub }]}>
-                  Indiquez votre ville ou code postal sur le site ci-dessous pour débloquer votre panier et vos prix locaux.
-                </Text>
-
-                <TouchableOpacity
-                  style={styles.stepOneActionBtn}
-                  onPress={handleStartShopping}
-                >
-                  <Ionicons name="checkmark-circle" size={15} color="#ffffff" />
-                  <Text style={styles.stepOneActionBtnText}>
-                    J'ai sélectionné mon magasin ➔
-                  </Text>
-                </TouchableOpacity>
-              </View>
             </View>
           )}
         </View>
 
-        {/* Center : WebView du Drive */}
+        {/* Center : WebView du Drive (Plein écran) */}
         <View style={styles.webContainer}>
           <WebView
             ref={webViewRef}
             source={{ uri: currentUrl }}
-            userAgent="Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
             onNavigationStateChange={handleNavigationStateChange}
             onLoadStart={() => setIsLoadingWeb(true)}
             onLoadEnd={() => setIsLoadingWeb(false)}
@@ -693,8 +634,6 @@ export default function DriveCartModal({
             thirdPartyCookiesEnabled={true}
             domStorageEnabled={true}
             javaScriptEnabled={true}
-            hideKeyboardAccessoryView={true}
-            keyboardDisplayRequiresUserAction={false}
             style={styles.webView}
           />
 
@@ -702,6 +641,27 @@ export default function DriveCartModal({
             <View style={styles.loadingOverlay}>
               <ActivityIndicator size="large" color="#10b981" />
               <Text style={styles.loadingText}>Chargement du Drive...</Text>
+            </View>
+          )}
+
+          {/* Bouton flottant discret pour commencer les courses */}
+          {isSelectingStore && (
+            <View style={styles.floatingStartBar}>
+              <TouchableOpacity
+                style={styles.floatingStartBtn}
+                onPress={handleStartShopping}
+                activeOpacity={0.85}
+              >
+                <LinearGradient
+                  colors={["#10b981", "#059669"]}
+                  style={styles.floatingStartGradient}
+                >
+                  <Ionicons name="checkmark-circle" size={18} color="#ffffff" />
+                  <Text style={styles.floatingStartBtnText}>
+                    J'ai choisi mon magasin ➔ Commencer
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
             </View>
           )}
         </View>

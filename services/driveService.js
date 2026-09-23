@@ -11,8 +11,8 @@ export const DRIVE_STORES = [
     color: "#0066c0",
     badgeColor: "#ffcc00",
     textColor: "#ffffff",
-    homeUrl: "https://m-courses.leclercdrive.fr",
-    searchUrl: (query) => `https://m-courses.leclercdrive.fr/recherche/${encodeURIComponent(query)}`,
+    homeUrl: "https://www.leclercdrive.fr",
+    searchUrl: (query) => `https://www.leclercdrive.fr/recherche.aspx?TexteRecherche=${encodeURIComponent(query)}`,
     logoEmoji: "🔵"
   },
   {

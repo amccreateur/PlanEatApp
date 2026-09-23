@@ -347,12 +347,9 @@ function MainApp() {
                 {isGenerating ? (
                   <ActivityIndicator size="small" color="#ffffff" />
                 ) : (
-                  <>
-                    <Ionicons name={aiConfig.engine === "mistral" ? "sparkles" : "flash"} size={16} color="#f8fafc" />
-                    <Text style={styles.aiBtnText}>
-                      {t.generatePlan || "Générer le menu"}
-                    </Text>
-                  </>
+                  <Text style={styles.aiBtnText}>
+                    {t.generatePlan || "Générer le menu"}
+                  </Text>
                 )}
               </LinearGradient>
             </TouchableOpacity>

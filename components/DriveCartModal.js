@@ -86,98 +86,103 @@ export default function DriveCartModal({
       (function() {
         try {
           var q = ${JSON.stringify(cleanQ)};
+          
+          function fillAndSubmit(input) {
+            if (!input) return false;
+            try {
+              input.focus();
+              var setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")?.set;
+              if (setter) {
+                setter.call(input, q);
+              } else {
+                input.value = q;
+              }
+              input.dispatchEvent(new Event('input', { bubbles: true }));
+              input.dispatchEvent(new Event('change', { bubbles: true }));
+              
+              var enterDown = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Enter', code: 'Enter', keyCode: 13, which: 13 });
+              var enterPress = new KeyboardEvent('keypress', { bubbles: true, cancelable: true, key: 'Enter', code: 'Enter', keyCode: 13, which: 13 });
+              var enterUp = new KeyboardEvent('keyup', { bubbles: true, cancelable: true, key: 'Enter', code: 'Enter', keyCode: 13, which: 13 });
+              input.dispatchEvent(enterDown);
+              input.dispatchEvent(enterPress);
+              input.dispatchEvent(enterUp);
+
+              var btn = null;
+              if (input.form) {
+                btn = input.form.querySelector('button[type="submit"], input[type="submit"], button, .btn-search, .search-button, [aria-label*="recherche" i]');
+              }
+              if (!btn) {
+                btn = document.querySelector('button[type="submit"], button[aria-label*="recherche" i], button[title*="recherche" i], .btn-search, .search-button, #btnRecherche, button.search-submit, .search-bar button, .header-search button');
+              }
+              if (btn) {
+                btn.click();
+              } else if (input.form && typeof input.form.submit === 'function') {
+                input.form.submit();
+              }
+              return true;
+            } catch(e) {
+              return false;
+            }
+          }
+
+          // 1. Chercher tous les inputs candidats dans le DOM
+          var allInputs = Array.from(document.querySelectorAll('input'));
+          var bestInput = null;
+
+          for (var i = 0; i < allInputs.length; i++) {
+            var inp = allInputs[i];
+            var type = (inp.type || '').toLowerCase();
+            if (type === 'hidden' || type === 'checkbox' || type === 'radio' || type === 'button' || type === 'submit') continue;
+            
+            var str = ((inp.id || '') + ' ' + (inp.name || '') + ' ' + (inp.placeholder || '') + ' ' + (inp.className || '') + ' ' + (inp.getAttribute('aria-label') || '')).toLowerCase();
+            if (str.includes('recherche') || str.includes('search') || str.includes('produit') || str.includes('query') || str.includes('keyword') || str.includes('txtrecherche') || str.includes('find')) {
+              bestInput = inp;
+              break;
+            }
+          }
+
+          // Si pas de mot-clé trouvé, prendre le premier input texte visible
+          if (!bestInput) {
+            for (var j = 0; j < allInputs.length; j++) {
+              var inp2 = allInputs[j];
+              var type2 = (inp2.type || '').toLowerCase();
+              if (type2 === 'text' || type2 === 'search' || type2 === '') {
+                if (inp2.offsetParent !== null) {
+                  bestInput = inp2;
+                  break;
+                }
+              }
+            }
+          }
+
+          if (bestInput) {
+            fillAndSubmit(bestInput);
+            return;
+          }
+
+          // 2. Si pas trouvé, vérifier s'il y a un déclencheur/icône de recherche à cliquer
+          var searchTrigger = document.querySelector('[aria-label*="recherche" i], [title*="recherche" i], .icon-search, .search-icon, #btnOpenSearch, .header-search-btn');
+          if (searchTrigger) {
+            searchTrigger.click();
+            setTimeout(function() {
+              var lateInput = document.querySelector('input[type="search"], input[name*="recherche" i], input[id*="recherche" i], input[placeholder*="recherche" i], input[type="text"]');
+              if (lateInput) fillAndSubmit(lateInput);
+            }, 300);
+            return;
+          }
+
+          // 3. Fallback URL
           var host = (window.location.hostname || '').toLowerCase();
           var href = window.location.href || '';
-          
-          // 1. Spécifique Leclerc Drive : redirection interne vers la recherche du magasin actif
           if (host.includes('leclercdrive.fr')) {
             var storeMatch = href.match(/(https?:\\/\\/[^\\/]+\\/magasin-[^\\/\\?#]+)/i);
             if (storeMatch && storeMatch[1]) {
               window.location.href = storeMatch[1] + '/recherche.aspx?TexteRecherche=' + encodeURIComponent(q);
               return;
             }
-            if (host.includes('-courses.')) {
-              var pathSegments = window.location.pathname.split('/').filter(Boolean);
-              if (pathSegments.length > 0 && pathSegments[0].startsWith('magasin-')) {
-                window.location.href = window.location.origin + '/' + pathSegments[0] + '/recherche.aspx?TexteRecherche=' + encodeURIComponent(q);
-                return;
-              }
-            }
           }
 
-          // 2. Chercher les champs de saisie dans le DOM
-          var selectors = [
-            'input[type="search"]',
-            'input[name*="recherche" i]',
-            'input[id*="recherche" i]',
-            'input[placeholder*="recherche" i]',
-            'input[placeholder*="produit" i]',
-            'input[aria-label*="recherche" i]',
-            '#txtRecherche',
-            '#recherche',
-            '#search-input',
-            '.search-input',
-            '.search-bar input',
-            '.header-search input',
-            'input[data-testid*="search" i]',
-            'input[name="q"]',
-            'input[name="query"]'
-          ];
-          
-          var input = null;
-          for (var i = 0; i < selectors.length; i++) {
-            var el = document.querySelector(selectors[i]);
-            if (el && el.offsetParent !== null) {
-              input = el;
-              break;
-            }
-          }
-          if (!input) {
-            for (var i = 0; i < selectors.length; i++) {
-              var el = document.querySelector(selectors[i]);
-              if (el) { input = el; break; }
-            }
-          }
-
-          if (input) {
-            input.focus();
-            var setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")?.set;
-            if (setter) {
-              setter.call(input, q);
-            } else {
-              input.value = q;
-            }
-            input.dispatchEvent(new Event('input', { bubbles: true }));
-            input.dispatchEvent(new Event('change', { bubbles: true }));
-            
-            var enterDown = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Enter', code: 'Enter', keyCode: 13, which: 13 });
-            var enterUp = new KeyboardEvent('keyup', { bubbles: true, cancelable: true, key: 'Enter', code: 'Enter', keyCode: 13, which: 13 });
-            input.dispatchEvent(enterDown);
-            input.dispatchEvent(enterUp);
-
-            var btnSelectors = [
-              'button[type="submit"]',
-              'button[aria-label*="recherche" i]',
-              'button[title*="recherche" i]',
-              '.btn-search',
-              '.search-button',
-              '#btnRecherche',
-              'button.search-submit',
-              '.search-bar button'
-            ];
-            var btn = null;
-            for (var j = 0; j < btnSelectors.length; j++) {
-              var b = document.querySelector(btnSelectors[j]);
-              if (b) { btn = b; break; }
-            }
-            if (btn) {
-              btn.click();
-            } else if (input.form) {
-              input.form.submit();
-            }
-          } else {
-            window.location.href = ${JSON.stringify(searchFallbackUrl)};
-          }
+          window.location.href = ${JSON.stringify(searchFallbackUrl)};
         } catch(e) {
           window.location.href = ${JSON.stringify(searchFallbackUrl)};
         }

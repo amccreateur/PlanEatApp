@@ -358,9 +358,27 @@ export default function DriveCartModal({
             </View>
           </View>
 
-          {/* Store Switcher Chips & Tips (affichés UNIQUEMENT lors du choix du magasin) */}
+          {/* Step 1 Store Selection Onboarding Card (affiché UNIQUEMENT lors du choix du magasin) */}
           {isSelectingStore && (
-            <>
+            <View style={styles.stepOneContainer}>
+              {/* Stepper Indicator */}
+              <View style={styles.stepperRow}>
+                <View style={styles.stepperStepActive}>
+                  <View style={styles.stepperNumCircleActive}>
+                    <Text style={styles.stepperNumActive}>1</Text>
+                  </View>
+                  <Text style={styles.stepperTextActive}>Choix du Magasin</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={14} color="#64748b" />
+                <View style={styles.stepperStepInactive}>
+                  <View style={styles.stepperNumCircleInactive}>
+                    <Text style={styles.stepperNumInactive}>2</Text>
+                  </View>
+                  <Text style={styles.stepperTextInactive}>Remplissage Panier</Text>
+                </View>
+              </View>
+
+              {/* Store Switcher Chips */}
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -393,20 +411,33 @@ export default function DriveCartModal({
                 })}
               </ScrollView>
 
-              <View style={[styles.storeTipBanner, { backgroundColor: theme.cardBgAlt }]}>
-                <Ionicons name="location-sharp" size={14} color="#38bdf8" />
-                <Text style={[styles.storeTipText, { color: theme.textSub }]}>
-                  Étape 1 : Choisissez votre magasin ci-dessous sur le site pour activer votre panier Drive.
+              {/* Step 1 Highlight Card */}
+              <View style={[styles.stepOneCard, { backgroundColor: theme.cardBgAlt, borderColor: "#38bdf8" }]}>
+                <View style={styles.stepOneHeader}>
+                  <View style={styles.stepOneBadge}>
+                    <Ionicons name="location" size={12} color="#38bdf8" />
+                    <Text style={styles.stepOneBadgeText}>ÉTAPE 1 / 2</Text>
+                  </View>
+                  <Text style={[styles.stepOneTitle, { color: theme.text }]} numberOfLines={1}>
+                    Sélectionnez votre Drive {selectedStore.shortName}
+                  </Text>
+                </View>
+                
+                <Text style={[styles.stepOneSubtitle, { color: theme.textSub }]}>
+                  Indiquez votre ville ou code postal sur le site ci-dessous pour débloquer votre panier et vos prix locaux.
                 </Text>
+
                 <TouchableOpacity
-                  style={styles.tipStartBtn}
+                  style={styles.stepOneActionBtn}
                   onPress={handleStartShopping}
                 >
-                  <Ionicons name="checkmark-circle" size={13} color="#ffffff" />
-                  <Text style={styles.tipStartBtnText}>Magasin choisi</Text>
+                  <Ionicons name="checkmark-circle" size={15} color="#ffffff" />
+                  <Text style={styles.stepOneActionBtnText}>
+                    J'ai sélectionné mon magasin ➔
+                  </Text>
                 </TouchableOpacity>
               </View>
-            </>
+            </View>
           )}
         </View>
 
@@ -754,33 +785,115 @@ const styles = StyleSheet.create({
   storeChipTextActive: {
     color: "#ffffff"
   },
-  storeTipBanner: {
+  stepOneContainer: {
+    paddingTop: 2,
+    gap: 8
+  },
+  stepperRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    marginHorizontal: 14,
-    marginTop: 6,
-    borderRadius: 8,
+    justifyContent: "center",
+    paddingHorizontal: 14,
+    gap: 10,
+    marginBottom: 2
+  },
+  stepperStepActive: {
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6
   },
-  storeTipText: {
-    flex: 1,
-    fontSize: 11,
-    fontWeight: "600"
+  stepperNumCircleActive: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: "#38bdf8",
+    alignItems: "center",
+    justifyContent: "center"
   },
-  tipStartBtn: {
+  stepperNumActive: {
+    color: "#0f172a",
+    fontSize: 11,
+    fontWeight: "900"
+  },
+  stepperTextActive: {
+    color: "#38bdf8",
+    fontSize: 12,
+    fontWeight: "800"
+  },
+  stepperStepInactive: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#10b981",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    gap: 4
+    gap: 6,
+    opacity: 0.5
   },
-  tipStartBtnText: {
+  stepperNumCircleInactive: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: "#64748b",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  stepperNumInactive: {
     color: "#ffffff",
     fontSize: 11,
+    fontWeight: "700"
+  },
+  stepperTextInactive: {
+    color: "#94a3b8",
+    fontSize: 12,
+    fontWeight: "600"
+  },
+  stepOneCard: {
+    marginHorizontal: 14,
+    padding: 10,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    gap: 6
+  },
+  stepOneHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8
+  },
+  stepOneBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(56, 189, 248, 0.15)",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    gap: 3
+  },
+  stepOneBadgeText: {
+    color: "#38bdf8",
+    fontSize: 10,
+    fontWeight: "900",
+    letterSpacing: 0.5
+  },
+  stepOneTitle: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: "800"
+  },
+  stepOneSubtitle: {
+    fontSize: 11,
+    lineHeight: 15
+  },
+  stepOneActionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#10b981",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    gap: 6,
+    marginTop: 2
+  },
+  stepOneActionBtnText: {
+    color: "#ffffff",
+    fontSize: 12,
     fontWeight: "800"
   },
   webContainer: {

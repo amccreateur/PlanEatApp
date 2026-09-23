@@ -15,6 +15,9 @@ import { TRANSLATIONS } from "../i18n/translations";
 import { THEMES } from "../utils/theme";
 
 export default function RecipeModal({ visible, recipe, onClose, lang = "fr", themeMode = "dark" }) {
+  const insets = useSafeAreaInsets();
+  const topInset = Math.max(insets.top, Platform.OS === "ios" ? 50 : (StatusBar.currentHeight || 20));
+
   const t = TRANSLATIONS[lang] || TRANSLATIONS.fr;
   const isRTL = lang === "ar";
   const theme = THEMES[themeMode] || THEMES.dark;
@@ -61,9 +64,6 @@ export default function RecipeModal({ visible, recipe, onClose, lang = "fr", the
     const s = totalSeconds % 60;
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
-
-  const insets = useSafeAreaInsets();
-  const topInset = Math.max(insets.top, Platform.OS === "ios" ? 50 : (StatusBar.currentHeight || 20));
 
   const servings = recipe?.calculatedServings || 2;
   const factor = servings / 2;

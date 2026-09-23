@@ -30,6 +30,9 @@ export default function FamilyProfileModal({
   themeMode = "dark",
   onToggleTheme
 }) {
+  const insets = useSafeAreaInsets();
+  const topInset = Math.max(insets.top, Platform.OS === "ios" ? 50 : (StatusBar.currentHeight || 20));
+
   const t = TRANSLATIONS[lang] || TRANSLATIONS.fr;
   const isRTL = lang === "ar";
   const theme = THEMES[themeMode] || THEMES.dark;
@@ -183,9 +186,6 @@ export default function FamilyProfileModal({
     Alert.alert("✅", t.profileSaved);
     onClose();
   };
-
-  const insets = useSafeAreaInsets();
-  const topInset = Math.max(insets.top, Platform.OS === "ios" ? 50 : (StatusBar.currentHeight || 20));
 
   return (
     <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose}>

@@ -1028,13 +1028,17 @@ const styles = StyleSheet.create({
   },
   durationRow: {
     flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "#1e293b",
     padding: 3,
     borderRadius: 12,
     gap: 4
   },
   durationChip: {
-    paddingHorizontal: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8
   },
@@ -1044,7 +1048,8 @@ const styles = StyleSheet.create({
   durationChipText: {
     color: "#94a3b8",
     fontSize: 11,
-    fontWeight: "700"
+    fontWeight: "700",
+    textAlign: "center"
   },
   durationChipTextActive: {
     color: "#ffffff"

@@ -236,6 +236,10 @@ export default function DriveCartModal({
 
           function submitDynamicSearch() {
             try {
+              if (${JSON.stringify(selectedStore.id)} === "intermarche") {
+                sendMsg("ℹ️ Intermarché : mot-clé copié dans le presse-papier.");
+                return false;
+              }
               sendMsg("🚀 Navigation vers les résultats de recherche...");
               var actionPath = window.location.origin ? (window.location.origin + "/recherche") : "/recherche";
               var form = document.createElement('form');
@@ -251,7 +255,9 @@ export default function DriveCartModal({
               form.submit();
               return true;
             } catch(e) {
-              window.location.href = targetUrl;
+              if (${JSON.stringify(selectedStore.id)} !== "intermarche") {
+                window.location.href = targetUrl;
+              }
               return true;
             }
           }
@@ -263,7 +269,7 @@ export default function DriveCartModal({
             var forms = document.querySelectorAll('form');
             for (var f = 0; f < forms.length; f++) {
               var formEl = forms[f];
-              var qEl = formEl.querySelector('input[name="q"], input[type="search"], input[name="TexteRecherche"], input[name="text"], input[name="query"], input.search-input, input#search-input');
+              var qEl = formEl.querySelector('input[name="q"], input[type="search"], input[name="TexteRecherche"], input[name="text"], input[name="query"], input[name="keyword"], input[name="search"], input[placeholder*="recherch" i], input[placeholder*="produit" i], input[placeholder*="article" i], input.search-input, input#search-input');
               if (qEl) {
                 try {
                   qEl.focus();
@@ -278,7 +284,7 @@ export default function DriveCartModal({
                   qEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
                   qEl.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
                   
-                  var submitBtn = formEl.querySelector('button[type="submit"], input[type="submit"], button.search-button, button.header-search__btn');
+                  var submitBtn = formEl.querySelector('button[type="submit"], input[type="submit"], button.search-button, button.header-search__btn, button[aria-label*="recherch" i]');
                   if (submitBtn) {
                     submitBtn.click();
                     sendMsg("✅ Recherche soumise via bouton de formulaire !");
@@ -295,6 +301,8 @@ export default function DriveCartModal({
             var selectors = [
               'input[type="search"]',
               'input[name="q"]',
+              'input[name="keyword"]',
+              'input[name="search"]',
               'input#search-input',
               'input.header-search-input',
               'input.search-field',
@@ -304,6 +312,7 @@ export default function DriveCartModal({
               'input[placeholder*="recherch" i]',
               'input[placeholder*="produit" i]',
               'input[placeholder*="article" i]',
+              'input[placeholder*="courses" i]',
               'input.search-input',
               'header input',
               'nav input',
@@ -325,13 +334,17 @@ export default function DriveCartModal({
                   input.dispatchEvent(new Event('change', { bubbles: true }));
                   input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
                   input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-                  sendMsg("✅ Champ de recherche rempli et Entrée envoyée !");
+                  
+                  var nearbyBtn = input.parentElement?.querySelector('button') || document.querySelector('button[aria-label*="recherch" i], button.search-button');
+                  if (nearbyBtn) nearbyBtn.click();
+
+                  sendMsg("✅ Champ de recherche rempli et validé (" + query + ") !");
                   return;
                 } catch(errInput) {}
               }
             }
 
-            // 3. Si on est sur une page produit (/p/) ou si le champ n'est pas accessible après 2 essais, déclencher la navigation directe de recherche
+            // 3. Si on est sur une page produit (/p/) ou après plusieurs essais (hors Intermarché qui est SPA pure)
             if (attempts >= 2 || window.location.pathname.includes('/p/')) {
               submitDynamicSearch();
               return;
@@ -343,7 +356,9 @@ export default function DriveCartModal({
           trySearch();
         } catch(err) {
           sendMsg("❌ Erreur globale domSearchJs: " + err.message);
-          window.location.href = targetUrl;
+          if (${JSON.stringify(selectedStore.id)} !== "intermarche") {
+            window.location.href = targetUrl;
+          }
         }
       })();
       true;

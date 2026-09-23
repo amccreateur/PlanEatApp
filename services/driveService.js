@@ -11,8 +11,8 @@ export const DRIVE_STORES = [
     color: "#0066c0",
     badgeColor: "#ffcc00",
     textColor: "#ffffff",
-    homeUrl: "https://www.e.leclerc",
-    searchUrl: (query) => `https://www.e.leclerc/recherche?q=${encodeURIComponent(query)}`,
+    homeUrl: "https://www.leclercdrive.fr",
+    searchUrl: (query) => `https://www.leclercdrive.fr/recherche.aspx?TexteRecherche=${encodeURIComponent(query)}`,
     logoEmoji: "🔵"
   },
   {
@@ -25,6 +25,17 @@ export const DRIVE_STORES = [
     homeUrl: "https://www.carrefour.fr",
     searchUrl: (query) => `https://www.carrefour.fr/r?q=${encodeURIComponent(query)}`,
     logoEmoji: "🔴"
+  },
+  {
+    id: "coursesu",
+    name: "Courses U Drive",
+    shortName: "Courses U",
+    color: "#0085ca",
+    badgeColor: "#ffffff",
+    textColor: "#ffffff",
+    homeUrl: "https://www.coursesu.com",
+    searchUrl: (query) => `https://www.coursesu.com/drive/recherche?q=${encodeURIComponent(query)}`,
+    logoEmoji: "🔷"
   },
   {
     id: "auchan",

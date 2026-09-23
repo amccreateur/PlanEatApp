@@ -381,7 +381,7 @@ function MainApp() {
 
           {/* Week Selector (si > 1 semaine) */}
           {(currentPlan?.durationWeeks || 1) > 1 && (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.weekPickerScroll}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.weekPickerScroll} contentContainerStyle={styles.weekPickerContent}>
               {Array.from({ length: currentPlan.durationWeeks }).map((_, idx) => (
                 <TouchableOpacity
                   key={idx}
@@ -1059,14 +1059,18 @@ const styles = StyleSheet.create({
   },
   weekPickerScroll: {
     paddingHorizontal: 16,
-    marginBottom: 8
+    marginBottom: 6
+  },
+  weekPickerContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6
   },
   weekTabBtn: {
     backgroundColor: "#1e293b",
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 10,
-    marginRight: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: "#334155"
   },
@@ -1076,7 +1080,7 @@ const styles = StyleSheet.create({
   },
   weekTabBtnText: {
     color: "#94a3b8",
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "700"
   },
   weekTabBtnTextActive: {

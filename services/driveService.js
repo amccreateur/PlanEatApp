@@ -56,7 +56,7 @@ export const DRIVE_STORES = [
     badgeColor: "#1e293b",
     textColor: "#ffffff",
     homeUrl: "https://www.intermarche.com/drive",
-    searchUrl: (query) => `https://www.intermarche.com/drive`,
+    searchUrl: (query) => `https://www.intermarche.com/recherche?q=${encodeURIComponent(query)}`,
     logoEmoji: "🟠"
   }
 ];

@@ -107,8 +107,8 @@ export default function DriveCartModal({
 
     const url = navState.url || "";
     if (url) {
-      // Auto-récupération si le WebView est coincé sur une page 404
-      if (url.includes("intermarche.com/recherche") || url.includes("/404") || url.includes("page-introuvable")) {
+      // Auto-récupération uniquement sur les vraies pages d'erreur 404
+      if (url.includes("/404") || url.includes("page-introuvable") || url.includes("/erreur-404")) {
         console.log("[Drive AutoRecover] 404 détecté sur " + url + " -> retour accueil " + selectedStore.homeUrl);
         sendServerLog("AUTO_RECOVER_404", "Retour accueil suite 404: " + url);
         setCurrentUrl(selectedStore.homeUrl);
@@ -186,11 +186,11 @@ export default function DriveCartModal({
         console.log(`[Drive Web] ${payload.text}`);
         sendServerLog("DRIVE_WEB", payload.text);
       } else if (payload.type === "log") {
-        console.log(`[Drive Console] ${payload.data}`);
-        sendServerLog("WEB_CONSOLE", payload.data);
+        console.log(`[Drive Console] ${payload.text || payload.data}`);
+        sendServerLog("WEB_CONSOLE", payload.text || payload.data);
       } else if (payload.type === "error" || payload.type === "uncaught_error") {
-        console.warn(`[Drive Error] ${payload.data}`);
-        sendServerLog("WEB_ERROR", payload.data);
+        console.warn(`[Drive Error] ${payload.text || payload.data}`);
+        sendServerLog("WEB_ERROR", payload.text || payload.data);
       }
     } catch {
       console.log(`[Drive Msg] ${event.nativeEvent.data}`);

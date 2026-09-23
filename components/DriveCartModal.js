@@ -217,13 +217,14 @@ export default function DriveCartModal({
       return;
     }
 
-    // Pour Courses U, Auchan, Intermarché : injection dynamique avec boucle de retry et logs
+    // Pour Courses U, Auchan, Intermarché : injection dynamique avec multi-stratégies (DOM form, input, ou soumission dynamique)
     const domSearchJs = `
       (function() {
         try {
           var query = ${JSON.stringify(cleanQ)};
+          var targetUrl = ${JSON.stringify(targetUrl)};
           var attempts = 0;
-          var maxAttempts = 12;
+          var maxAttempts = 6;
 
           function sendMsg(text) {
             try {
@@ -233,8 +234,63 @@ export default function DriveCartModal({
             } catch(e) {}
           }
 
+          function submitDynamicSearch() {
+            try {
+              sendMsg("🚀 Navigation vers les résultats de recherche...");
+              var actionPath = window.location.origin ? (window.location.origin + "/recherche") : "/recherche";
+              var form = document.createElement('form');
+              form.method = 'GET';
+              form.action = actionPath;
+              var qInput = document.createElement('input');
+              qInput.type = 'hidden';
+              qInput.name = 'q';
+              qInput.value = query;
+              form.appendChild(qInput);
+              document.body.appendChild(form);
+              form.submit();
+              return true;
+            } catch(e) {
+              window.location.href = targetUrl;
+              return true;
+            }
+          }
+
           function trySearch() {
             attempts++;
+            
+            // 1. Chercher d'abord dans tous les formulaires existants sur la page
+            var forms = document.querySelectorAll('form');
+            for (var f = 0; f < forms.length; f++) {
+              var formEl = forms[f];
+              var qEl = formEl.querySelector('input[name="q"], input[type="search"], input[name="TexteRecherche"], input[name="text"], input[name="query"], input.search-input, input#search-input');
+              if (qEl) {
+                try {
+                  qEl.focus();
+                  var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value') ? Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set : null;
+                  if (nativeSetter) {
+                    nativeSetter.call(qEl, query);
+                  } else {
+                    qEl.value = query;
+                  }
+                  qEl.dispatchEvent(new Event('input', { bubbles: true }));
+                  qEl.dispatchEvent(new Event('change', { bubbles: true }));
+                  qEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
+                  qEl.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
+                  
+                  var submitBtn = formEl.querySelector('button[type="submit"], input[type="submit"], button.search-button, button.header-search__btn');
+                  if (submitBtn) {
+                    submitBtn.click();
+                    sendMsg("✅ Recherche soumise via bouton de formulaire !");
+                    return;
+                  }
+                  formEl.submit();
+                  sendMsg("✅ Formulaire existant soumis !");
+                  return;
+                } catch(errForm) {}
+              }
+            }
+
+            // 2. Chercher un champ d'input visible ou non
             var selectors = [
               'input[type="search"]',
               'input[name="q"]',
@@ -253,68 +309,40 @@ export default function DriveCartModal({
               '[data-testid*="search" i] input'
             ];
 
-            var input = null;
             for (var i = 0; i < selectors.length; i++) {
-              var el = document.querySelector(selectors[i]);
-              if (el && el.offsetParent !== null) { // visible
-                input = el;
-                break;
+              var input = document.querySelector(selectors[i]);
+              if (input) {
+                try {
+                  input.focus();
+                  var nativeSetter2 = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value') ? Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set : null;
+                  if (nativeSetter2) {
+                    nativeSetter2.call(input, query);
+                  } else {
+                    input.value = query;
+                  }
+                  input.dispatchEvent(new Event('input', { bubbles: true }));
+                  input.dispatchEvent(new Event('change', { bubbles: true }));
+                  input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
+                  input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
+                  sendMsg("✅ Champ de recherche rempli et Entrée envoyée !");
+                  return;
+                } catch(errInput) {}
               }
             }
 
-            if (!input) {
-              // Si input non trouvé, tenter de cliquer sur l'icône loupe pour l'ouvrir
-              var searchToggle = document.querySelector('button[aria-label*="recherch" i], button.header-search-btn, .search-icon, [data-testid*="search-button"], header button svg, nav button svg');
-              if (searchToggle && attempts === 1) {
-                sendMsg("🔍 Clic sur l'icône de recherche pour ouvrir le champ...");
-                searchToggle.closest('button')?.click();
-              }
-              if (attempts < maxAttempts) {
-                setTimeout(trySearch, 250);
-              } else {
-                sendMsg("⚠️ Barre de recherche non détectée automatiquement. Le mot-clé a été copié dans le presse-papier.");
-              }
+            // 3. Si on est sur une page produit (/p/) ou si le champ n'est pas accessible après 2 essais, déclencher la navigation directe de recherche
+            if (attempts >= 2 || window.location.pathname.includes('/p/')) {
+              submitDynamicSearch();
               return;
             }
 
-            // Champ trouvé ! Remplissage et soumission
-            try {
-              input.focus();
-              var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value') ? Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set : null;
-              if (nativeSetter) {
-                nativeSetter.call(input, query);
-              } else {
-                input.value = query;
-              }
-              input.dispatchEvent(new Event('input', { bubbles: true }));
-              input.dispatchEvent(new Event('change', { bubbles: true }));
-
-              // Envoi de la touche Entrée
-              input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-              input.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-              input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-
-              var form = input.form || input.closest('form');
-              if (form) {
-                var submitBtn = form.querySelector('button[type="submit"], input[type="submit"], button.search-button, button.header-search__btn, [aria-label*="recherch" i]');
-                if (submitBtn) {
-                  submitBtn.click();
-                  sendMsg("✅ Recherche soumise via bouton de formulaire !");
-                  return;
-                }
-                form.submit();
-                sendMsg("✅ Formulaire de recherche soumis !");
-                return;
-              }
-              sendMsg("✅ Événements de recherche envoyés au champ (" + query + ") !");
-            } catch(e) {
-              sendMsg("❌ Erreur injection: " + e.message);
-            }
+            setTimeout(trySearch, 200);
           }
 
           trySearch();
         } catch(err) {
           sendMsg("❌ Erreur globale domSearchJs: " + err.message);
+          window.location.href = targetUrl;
         }
       })();
       true;

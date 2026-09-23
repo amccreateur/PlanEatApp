@@ -3899,8 +3899,1849 @@ export const RECIPES_CATALOG = [
         "اخلط برفق وقدمه بارداً."
       ]
     }
+  },
+  {
+    id: "m76",
+    mealType: "dinner",
+    title: {
+      fr: "Poulet Yassa Sénégalais au Citron & Oignons Caramélisés",
+      en: "Senegalese Yassa Chicken with Caramelized Onions & Lemon",
+      ar: "دجاج ياسا السنغالي بالليمون والبصل المكرمل"
+    },
+    emoji: "🍗",
+    prepTime: 15,
+    cookTime: 25,
+    difficulty: "easy",
+    caloriesPerPerson: 510,
+    tags: ["african", "dietBalanced", "dietHalal", "dietHighProtein"],
+    ingredients: [
+      { name: { fr: "Cuisses ou aiguillettes de poulet", en: "Chicken pieces", ar: "قطع دجاج" }, quantity: 170, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Oignons jaunes émincés", en: "Sliced yellow onions", ar: "بصل شرائح" }, quantity: 200, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Jus de 2 citrons & Moutarde de Dijon", en: "Lemon juice & mustard", ar: "عصير ليمون وخردل" }, quantity: 2, unit: "c.à.s", dept: "deptPantry" },
+      { name: { fr: "Ail, laurier & piment doux", en: "Garlic & bay leaves", ar: "ثوم وورق غار" }, quantity: 1, unit: "c.à.s", dept: "deptSpices" },
+      { name: { fr: "Riz blanc brisé ou jasmin", en: "White rice", ar: "أرز أبيض" }, quantity: 80, unit: "g", dept: "deptPantry" }
+    ],
+    instructions: {
+      fr: [
+        "Faites mariner le poulet dans le jus de citron, la moutarde et l'ail.",
+        "Faites griller le poulet 5 min à feu vif dans une cocotte puis réservez.",
+        "Faites fondre les oignons doucement 10 min jusqu'à ce qu'ils caramélisent.",
+        "Remettez le poulet avec la marinade et laissez mijoter 15 min. Servez avec du riz blanc."
+      ],
+      en: [
+        "Marinate chicken in lemon juice, mustard, and garlic.",
+        "Brown chicken in a pot for 5 mins, then set aside.",
+        "Slowly caramelize onions for 10 mins until golden and soft.",
+        "Return chicken and marinade, simmer for 15 mins. Serve over white rice."
+      ],
+      ar: [
+        "انقع الدجاج في عصير الليمون والخردل والثوم.",
+        "حمر الدجاج 5 دقائق في قدر ثم ارفعه جانباً.",
+        "كرمل البصل على نار هادئة 10 دقائق حتى يذبل ويصبح ذهبياً.",
+        "أعد الدجاج مع التتبيلة واتركه يطهى 15 دقيقة وقدمه مع الأرز."
+      ]
+    }
+  },
+  {
+    id: "m77",
+    mealType: "lunch",
+    title: {
+      fr: "Loubia Marocaine Fondante aux Haricots Blancs & Cumin",
+      en: "Moroccan White Bean Stew (Loubia) with Cumin & Paprika",
+      ar: "لوبيا مغربية مسبكة بالفاصوليا البيضاء والكمون"
+    },
+    emoji: "🍲",
+    prepTime: 10,
+    cookTime: 20,
+    difficulty: "easy",
+    caloriesPerPerson: 390,
+    tags: ["maghreb", "dietBalanced", "dietVegetarian", "dietHalal", "dietHighFiber"],
+    ingredients: [
+      { name: { fr: "Haricots blancs cuits égouttés", en: "Cooked cannellini beans", ar: "فاصوليا بيضاء مطبوخة" }, quantity: 200, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Tomates fraîches râpées & Concentré", en: "Grated tomatoes & paste", ar: "طماطم طازجة ومعجون" }, quantity: 150, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Ail haché, persil & coriandre", en: "Garlic & fresh herbs", ar: "ثوم وبقدونس وكزبرة" }, quantity: 30, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Cumin, paprika doux & huile d'olive", en: "Cumin & paprika", ar: "كمون وبابريكا وزيت زيتون" }, quantity: 1, unit: "c.à.s", dept: "deptSpices" }
+    ],
+    instructions: {
+      fr: [
+        "Dans une sauteuse, faites revenir l'ail, les tomates et les épices dans l'huile d'olive 5 min.",
+        "Ajoutez les haricots blancs et 200ml d'eau chaude.",
+        "Laissez mijoter 15 minutes à feu doux jusqu'à ce que la sauce devienne bien onctueuse.",
+        "Parsemez de coriandre fraîche et dégustez avec du pain marocain croustillant."
+      ],
+      en: [
+        "Sauté garlic, grated tomatoes, and spices in olive oil for 5 mins.",
+        "Add white beans and 200ml hot water.",
+        "Simmer gently for 15 mins until sauce is thick and rich.",
+        "Garnish with fresh cilantro and serve with crusty bread."
+      ],
+      ar: [
+        "شوح الثوم والطماطم والبهارات في زيت الزيتون 5 دقائق.",
+        "أضف الفاصوليا البيضاء وقليل من الماء الساخن.",
+        "اتركها تغلي 15 دقيقة على نار هادئة حتى تتسبك الصلصة.",
+        "زين بالكزبرة الطازجة وقدمها مع الخبز."
+      ]
+    }
+  },
+  {
+    id: "m78",
+    mealType: "lunch",
+    title: {
+      fr: "Shawarma Bowl au Poulet Mariné & Sauce Blanche à l'Ail",
+      en: "Chicken Shawarma Bowl with Garlic Sauce & Pickled Veggies",
+      ar: "شاورما باول الدجاج المتبل مع صوص الثومية والخضار"
+    },
+    emoji: "🥙",
+    prepTime: 12,
+    cookTime: 10,
+    difficulty: "easy",
+    caloriesPerPerson: 490,
+    tags: ["mediterranean", "dietBalanced", "dietHalal", "dietHighProtein", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Haut de cuisse de poulet émincé", en: "Chicken thighs sliced", ar: "شرائح دجاج شاورما" }, quantity: 160, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Épices shawarma (cardamome, cumin, paprika)", en: "Shawarma spices", ar: "بهارات شاورما" }, quantity: 1, unit: "c.à.s", dept: "deptSpices" },
+      { name: { fr: "Riz basmati au curcuma", en: "Turmeric rice", ar: "أرز بالكركم" }, quantity: 80, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Salade, tomates, concombres & sauce yaourt-ail", en: "Fresh salad & garlic sauce", ar: "سلطة وصوص ثومية" }, quantity: 80, unit: "g", dept: "deptProduce" }
+    ],
+    instructions: {
+      fr: [
+        "Faites sauter le poulet émincé à la poêle très chaude avec les épices shawarma 7 min jusqu'à ce qu'il soit bien doré.",
+        "Déposez le riz au curcuma au fond du bol.",
+        "Garnissez avec le poulet croustillant, les dés de tomates et concombres.",
+        "Nappez de sauce blanche au yaourt et à l'ail."
+      ],
+      en: [
+        "Pan-sear seasoned chicken for 7 mins over high heat until crispy and golden.",
+        "Spoon turmeric rice into a bowl.",
+        "Add seared chicken, diced tomatoes, and cucumbers.",
+        "Drizzle generously with creamy garlic yogurt sauce."
+      ],
+      ar: [
+        "شوح شرائح الدجاج مع بهارات الشاورما 7 دقائق في مقلاة ساخنة.",
+        "ضع الأرز بالكركم في قاع الوعاء.",
+        "أضف الدجاج المقرمش وقطع الطماطم والخيار.",
+        "اسكب صوص الزبادي بالثوم وقدمه فوراً."
+      ]
+    }
+  },
+  {
+    id: "m79",
+    mealType: "lunch",
+    title: {
+      fr: "Gyros Grec Maison au Poulet Grillé, Tzatziki & Pain Pita",
+      en: "Homemade Greek Chicken Gyros with Tzatziki & Warm Pita",
+      ar: "جيروس دجاج يوناني مشوي مع خبز البيتا والتزاتزيكي"
+    },
+    emoji: "🥙",
+    prepTime: 10,
+    cookTime: 10,
+    difficulty: "easy",
+    caloriesPerPerson: 510,
+    tags: ["mediterranean", "dietBalanced", "dietHalal", "dietHighProtein", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Pains pita grecs moelleux", en: "Greek pita bread", ar: "خبز بيتا يوناني" }, quantity: 1, unit: "pcs", dept: "deptBakery" },
+      { name: { fr: "Aiguillettes de poulet grillées aux herbes", en: "Herb-grilled chicken", ar: "دجاج مشوي بالأعشاب" }, quantity: 140, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Tzatziki frais (yaourt, concombre, menthe)", en: "Fresh tzatziki", ar: "صوص تزاتزيكي" }, quantity: 50, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Rondelles de tomate & oignon rouge", en: "Tomato & red onion slices", ar: "طماطم وبصل أحمر" }, quantity: 50, unit: "g", dept: "deptProduce" }
+    ],
+    instructions: {
+      fr: [
+        "Faites griller le poulet assaisonné d'origan et d'ail 6 min à la poêle.",
+        "Chauffez le pain pita 1 min au grille-pain ou à sec dans une poêle.",
+        "Tartinez généreusement de tzatziki frais.",
+        "Garnissez de poulet chaud, tranches de tomate et oignon rouge, repliez et dégustez."
+      ],
+      en: [
+        "Grill chicken seasoned with oregano and garlic for 6 mins.",
+        "Warm pita bread for 1 min.",
+        "Spread thick tzatziki over the warm pita.",
+        "Fill with grilled chicken, sliced tomatoes, and red onion, fold and enjoy."
+      ],
+      ar: [
+        "اشو الدجاج مع الأوريجانو والثوم 6 دقائق.",
+        "سخن خبز البيتا دقيقة واحدة.",
+        "ادهن الخبز بصوص التزاتزيكي.",
+        "احش بالدجاج والطماطم والبصل ولف السندويش."
+      ]
+    }
+  },
+  {
+    id: "m80",
+    mealType: "dinner",
+    title: {
+      fr: "Naan Pizza Croustillante Mozzarella, Tomates & Roquette",
+      en: "Crispy Naan Bread Pizza with Mozzarella & Fresh Arugula",
+      ar: "نان بيتزا مقرمشة بالموزاريلا والطماطم الكرزية والجرجير"
+    },
+    emoji: "🍕",
+    prepTime: 5,
+    cookTime: 10,
+    difficulty: "easy",
+    caloriesPerPerson: 450,
+    tags: ["italian", "indian", "dietBalanced", "dietVegetarian", "dietHalal", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Pain naan à l'ail ou nature", en: "Garlic or plain naan", ar: "خبز نان" }, quantity: 1, unit: "pcs", dept: "deptBakery" },
+      { name: { fr: "Coulis de tomate parfumé à l'origan", en: "Tomato sauce with oregano", ar: "صلصة طماطم بالزعتر" }, quantity: 60, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Mozzarella di bufala ou râpée", en: "Mozzarella cheese", ar: "جبن موزاريلا" }, quantity: 60, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Tomates cerises & Roquette fraîche", en: "Cherry tomatoes & arugula", ar: "طماطم كرزية وجرجير" }, quantity: 40, unit: "g", dept: "deptProduce" }
+    ],
+    instructions: {
+      fr: [
+        "Préchauffez le four à 210°C.",
+        "Tartinez le pain naan de coulis de tomate et disposez la mozzarella et les tomates cerises coupées.",
+        "Enfournez 8 à 10 minutes jusqu'à ce que le fromage soit gratiné et le naan croustillant.",
+        "Ajoutez une poignée de roquette fraîche et un filet d'huile d'olive avant de servir."
+      ],
+      en: [
+        "Preheat oven to 210°C (410°F).",
+        "Spread tomato sauce over naan, top with mozzarella and halved cherry tomatoes.",
+        "Bake for 8-10 mins until cheese is melted and naan is crunchy.",
+        "Top with fresh arugula and a drizzle of olive oil."
+      ],
+      ar: [
+        "سخن الفرن على 210 مئوية.",
+        "ادهن خبز النان بصلصة الطماطم وضع الموزاريلا والطماطم الكرزية.",
+        "اخبز 8-10 دقائق حتى يذوب الجبن ويقرمش الخبز.",
+        "زين بالجرجير الطازج وزيت الزيتون وقدمه."
+      ]
+    }
+  },
+  {
+    id: "m81",
+    mealType: "dinner",
+    title: {
+      fr: "Kefta de Thon aux Herbes & Sauce Tomate Pimentée",
+      en: "Spiced Tuna Meatballs in Rich Tomato Chili Sauce",
+      ar: "كرات كفتة التونة بالأعشاب في صلصة طماطم حارة"
+    },
+    emoji: "🐟",
+    prepTime: 12,
+    cookTime: 15,
+    difficulty: "easy",
+    caloriesPerPerson: 420,
+    tags: ["maghreb", "mediterranean", "dietBalanced", "dietHalal", "dietHighProtein"],
+    ingredients: [
+      { name: { fr: "Thon égoutté & Œuf frais", en: "Canned tuna & egg", ar: "تونة وبيض" }, quantity: 150, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Chapelure, persil plat & cumin", en: "Breadcrumbs, parsley & cumin", ar: "بقسماط وبقدونس وكمون" }, quantity: 30, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Coulis de tomate & Harissa douce", en: "Tomato sauce & mild harissa", ar: "صلصة طماطم وهريسة" }, quantity: 150, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Riz ou pommes de terre vapeur", en: "Steamed rice or potatoes", ar: "أرز أو بطاطس" }, quantity: 70, unit: "g", dept: "deptPantry" }
+    ],
+    instructions: {
+      fr: [
+        "Mélangez le thon émietté avec l'œuf, la chapelure, le persil et le cumin pour former des boulettes.",
+        "Faites dorer les boulettes de thon 4 min à la poêle.",
+        "Versez le coulis de tomate avec une pointe de harissa et laissez mijoter 10 min.",
+        "Servez chaud avec du riz ou des pommes de terre vapeur."
+      ],
+      en: [
+        "Mix flaked tuna, egg, breadcrumbs, parsley, and cumin into balls.",
+        "Pan-sear tuna meatballs for 4 mins until lightly browned.",
+        "Add tomato sauce and a hint of harissa, simmer for 10 mins.",
+        "Serve with steamed rice or boiled potatoes."
+      ],
+      ar: [
+        "اخلط التونة مع البيض والبقسماط والبقدونس والكمون وشكل كرات.",
+        "حمر كرات التونة 4 دقائق في المقلاة.",
+        "أضف صلصة الطماطم والهريسة واتركها تغلي 10 دقائق.",
+        "قدمها مع الأرز أو البطاطس المسلوقة."
+      ]
+    }
+  },
+  {
+    id: "m82",
+    mealType: "dinner",
+    title: {
+      fr: "Curry Korma Doux de Volaille aux Amandes & Riz Safrané",
+      en: "Mild Chicken Korma with Ground Almonds & Saffron Rice",
+      ar: "كورما الدجاج الهندي اللذيذ باللوز والأرز بالزعفران"
+    },
+    emoji: "🍛",
+    prepTime: 12,
+    cookTime: 18,
+    difficulty: "easy",
+    caloriesPerPerson: 530,
+    tags: ["indian", "dietBalanced", "dietHalal", "dietHighProtein"],
+    ingredients: [
+      { name: { fr: "Blancs de poulet en morceaux", en: "Chicken breast pieces", ar: "قطع صدر دجاج" }, quantity: 160, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Poudre d'amandes & Yaourt nature", en: "Almond flour & plain yogurt", ar: "بودرة لوز وزبادي" }, quantity: 50, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Lait de coco & Épices korma douces", en: "Coconut milk & korma spices", ar: "حليب جوز هند وبهارات كورما" }, quantity: 100, unit: "ml", dept: "deptPantry" },
+      { name: { fr: "Riz basmati au safran ou curcuma", en: "Saffron basmati rice", ar: "أرز بسمتي بالزعفران" }, quantity: 80, unit: "g", dept: "deptPantry" }
+    ],
+    instructions: {
+      fr: [
+        "Faites dorer le poulet 4 min dans une sauteuse huilée avec les épices korma.",
+        "Mélangez le yaourt avec la poudre d'amande et le lait de coco.",
+        "Versez dans la sauteuse et laissez mijoter 12 minutes à feu très doux.",
+        "Dégustez ce plat doux et onctueux avec le riz au safran."
+      ],
+      en: [
+        "Sear chicken in oil with korma spices for 4 mins.",
+        "Whisk yogurt with ground almonds and coconut milk.",
+        "Pour into skillet and simmer gently for 12 mins.",
+        "Serve this creamy mild curry with saffron rice."
+      ],
+      ar: [
+        "حمر الدجاج مع بهارات الكورما 4 دقائق.",
+        "اخلط الزبادي مع بودرة اللوز وحليب جوز الهند.",
+        "اسكب الخليط واتركه ينضج 12 دقيقة على نار هادئة.",
+        "قدم هذا الكاري الكريمي مع أرز الزعفران."
+      ]
+    }
+  },
+  {
+    id: "m83",
+    mealType: "lunch",
+    title: {
+      fr: "Penne au Pesto Verde Maison, Pignons de Pin & Parmesan",
+      en: "Penne Pasta with Homemade Basil Pesto & Pine Nuts",
+      ar: "بيني باستا بصلصة البيستو الخضراء والصنوبر والبارميزان"
+    },
+    emoji: "🍝",
+    prepTime: 8,
+    cookTime: 10,
+    difficulty: "easy",
+    caloriesPerPerson: 490,
+    tags: ["italian", "dietBalanced", "dietVegetarian", "dietHalal", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Penne rigate de blé", en: "Penne rigate pasta", ar: "معكرونة بيني" }, quantity: 80, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Pesto de basilic frais", en: "Fresh basil pesto", ar: "صلصة بيستو الريحان" }, quantity: 40, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Pignons de pin grillés", en: "Toasted pine nuts", ar: "صنوبر محمص" }, quantity: 15, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Parmesan râpé & Tomates cerises", en: "Parmesan & cherry tomatoes", ar: "جبن بارميزان وطماطم كرزية" }, quantity: 30, unit: "g", dept: "deptDairy" }
+    ],
+    instructions: {
+      fr: [
+        "Faites cuire les penne al dente dans l'eau bouillante salée (9 min) et réservez 2 c.à.s d'eau de cuisson.",
+        "Mélangez les pâtes chaudes avec le pesto verde et l'eau de cuisson réservée pour lier la sauce.",
+        "Ajoutez les tomates cerises coupées en deux.",
+        "Saupoudrez de pignons de pin torréfiés et de copeaux de parmesan."
+      ],
+      en: [
+        "Boil penne al dente (9 mins), reserving 2 tbsp of cooking water.",
+        "Toss hot pasta with basil pesto and reserved water to emulsify.",
+        "Fold in halved cherry tomatoes.",
+        "Top with toasted pine nuts and shaved parmesan."
+      ],
+      ar: [
+        "اسلق المعكرونة 9 دقائق واحتفظ بملعقتين من ماء السلق.",
+        "اخلط المعكرونة الساخنة مع صلصة البيستو وماء السلق.",
+        "أضف الطماطم الكرزية المقطعة نصفين.",
+        "زين بالصنوبر المحمص والبارميزان."
+      ]
+    }
+  },
+  {
+    id: "m84",
+    mealType: "dinner",
+    title: {
+      fr: "Bœuf Sauté au Basilic Thaï (Pad Krapow) & Œuf au Plat",
+      en: "Thai Basil Minced Beef (Pad Krapow) with Crispy Fried Egg",
+      ar: "لحم مفروم بالريحان التايلاندي (باد كابراو) مع بيض مقلي"
+    },
+    emoji: "🍳",
+    prepTime: 8,
+    cookTime: 8,
+    difficulty: "easy",
+    caloriesPerPerson: 510,
+    tags: ["asian", "dietBalanced", "dietHalal", "dietHighProtein", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Bœuf haché 5% MG", en: "Lean minced beef", ar: "لحم مفروم قليل الدسم" }, quantity: 150, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Feuilles de basilic thaï ou classique", en: "Thai basil leaves", ar: "أوراق ريحان" }, quantity: 20, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Ail, piment doux, sauce soja et huître", en: "Garlic & soy sauce mix", ar: "ثوم وصلصة صويا" }, quantity: 2, unit: "c.à.s", dept: "deptPantry" },
+      { name: { fr: "Œuf frais au plat", en: "Fried egg", ar: "بيضة مقلية" }, quantity: 1, unit: "pcs", dept: "deptDairy" },
+      { name: { fr: "Riz jasmin cuit", en: "Steamed jasmine rice", ar: "أرز الياسمين" }, quantity: 80, unit: "g", dept: "deptPantry" }
+    ],
+    instructions: {
+      fr: [
+        "Dans un wok très chaud, faites sauter l'ail et le bœuf à feu vif 4 minutes.",
+        "Ajoutez la sauce soja et les feuilles de basilic frais qui vont faner en 30 secondes.",
+        "Faites frire un œuf au plat avec le bord croustillant et le jaune coulant.",
+        "Dressez le bœuf au basilic sur le riz jasmin et posez l'œuf au plat sur le dessus."
+      ],
+      en: [
+        "Stir-fry garlic and minced beef in a smoking hot wok for 4 mins.",
+        "Add soy sauces and fresh basil leaves, tossing for 30 secs until wilted.",
+        "Fry an egg with crispy lace edges and runny yolk.",
+        "Serve beef over steamed jasmine rice topped with the fried egg."
+      ],
+      ar: [
+        "شوح الثوم واللحم المفروم في مقلاة ووك ساخنة 4 دقائق.",
+        "أضف صلصة الصويا وأوراق الريحان وقلب 30 ثانية.",
+        "اقل بيضة حتى يقرمش طرفها ويبقى صفارها سائلاً.",
+        "قدم اللحم فوق الأرز وضع البيضة المقلية في الأعلى."
+      ]
+    }
+  },
+  {
+    id: "m85",
+    mealType: "dinner",
+    title: {
+      fr: "Poulet Fondant au Citron Vert, Coco & Coriandre Fraîche",
+      en: "Tender Coconut Lime Chicken with Fresh Cilantro",
+      ar: "دجاج متبل بحليب جوز الهند والليمون الأخضر والكزبرة"
+    },
+    emoji: "🥥",
+    prepTime: 10,
+    cookTime: 15,
+    difficulty: "easy",
+    caloriesPerPerson: 480,
+    tags: ["asian", "dietBalanced", "dietHalal", "dietHighProtein"],
+    ingredients: [
+      { name: { fr: "Aiguillettes de poulet", en: "Chicken strips", ar: "شرائح دجاج" }, quantity: 160, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Lait de coco", en: "Coconut milk", ar: "حليب جوز الهند" }, quantity: 120, unit: "ml", dept: "deptPantry" },
+      { name: { fr: "Jus et zeste de citron vert", en: "Lime juice & zest", ar: "عصير وبرش ليمون أخضر" }, quantity: 1, unit: "pcs", dept: "deptProduce" },
+      { name: { fr: "Courgette en demi-lunes & coriandre", en: "Zucchini & cilantro", ar: "كوسة وكزبرة" }, quantity: 100, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Riz blanc ou thaï", en: "White rice", ar: "أرز أبيض" }, quantity: 70, unit: "g", dept: "deptPantry" }
+    ],
+    instructions: {
+      fr: [
+        "Faites dorer le poulet 4 min dans une sauteuse avec un filet d'huile.",
+        "Ajoutez les demi-lunes de courgette et versez le lait de coco.",
+        "Laissez mijoter 10 min, puis incorporez le jus et le zeste de citron vert hors du feu.",
+        "Parsemez de coriandre fraîche et servez avec le riz chaud."
+      ],
+      en: [
+        "Brown chicken strips in oil for 4 mins.",
+        "Add zucchini slices and pour in coconut milk.",
+        "Simmer for 10 mins, then stir in lime juice and zest off heat.",
+        "Sprinkle fresh cilantro and serve with warm rice."
+      ],
+      ar: [
+        "حمر شرائح الدجاج في الزيت 4 دقائق.",
+        "أضف شرائح الكوسة واسكب حليب جوز الهند.",
+        "اتركه يطهى 10 دقائق ثم أضف عصير الليمون الأخضر وبرشه.",
+        "زين بالكزبرة الطازجة وقدمه مع الأرز الساخن."
+      ]
+    }
+  },
+  {
+    id: "m86",
+    mealType: "dinner",
+    title: {
+      fr: "Tartiflette Légère aux Pommes de Terre & Oignons Fondants",
+      en: "Lighter French Tartiflette Potato & Melting Cheese Bake",
+      ar: "تارتيفليت فرنسية خفيفة بالبطاطس والبصل والجبن الذائب"
+    },
+    emoji: "🥔",
+    prepTime: 12,
+    cookTime: 25,
+    difficulty: "easy",
+    caloriesPerPerson: 490,
+    tags: ["french", "dietBalanced", "dietVegetarian", "dietHalal"],
+    ingredients: [
+      { name: { fr: "Pommes de terre cuites à la vapeur", en: "Steamed potatoes", ar: "بطاطس مسلوقة" }, quantity: 220, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Oignons émincés caramélisés", en: "Caramelized onions", ar: "بصل مكرمل" }, quantity: 120, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Fromage à tartiflette ou reblochon", en: "Reblochon cheese", ar: "جبن ريبلوشون ذائب" }, quantity: 50, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Crème liquide légère & Salade verte", en: "Light cream & green salad", ar: "كريمة خفيفة وسلطة" }, quantity: 40, unit: "ml", dept: "deptDairy" }
+    ],
+    instructions: {
+      fr: [
+        "Faites fondre les oignons dans une poêle avec un filet d'huile 8 min.",
+        "Coupez les pommes de terre en rondelles et disposez-les dans un plat à gratin avec les oignons et la crème.",
+        "Déposez les tranches de fromage sur le dessus.",
+        "Enfournez 20 minutes à 190°C jusqu'à ce que le fromage soit gratiné et doré. Servez avec une salade verte."
+      ],
+      en: [
+        "Caramelize sliced onions in oil for 8 mins.",
+        "Slice potatoes and place in baking dish with onions and cream.",
+        "Layer cheese slices over top.",
+        "Bake for 20 mins at 190°C until bubbling and golden. Serve with green salad."
+      ],
+      ar: [
+        "كرمل البصل في المقلاة مع قليل من الزيت 8 دقائق.",
+        "قطع البطاطس شرائح وضعها في صينية مع البصل والكريمة.",
+        "ضع شرائح الجبن على السطح.",
+        "اخبز 20 دقيقة على 190 مئوية حتى يذوب الجبن ويتحمر، وقدمه مع سلطة خضراء."
+      ]
+    }
+  },
+  {
+    id: "m87",
+    mealType: "dinner",
+    title: {
+      fr: "Chili Con Carne Traditionnel au Bœuf & Haricots Rouges",
+      en: "Classic Beef Chili Con Carne with Red Kidney Beans",
+      ar: "تشيلي كون كارني تقليدي باللحم المفروم والفاصوليا الحمراء"
+    },
+    emoji: "🍲",
+    prepTime: 10,
+    cookTime: 20,
+    difficulty: "easy",
+    caloriesPerPerson: 520,
+    tags: ["mexican", "dietBalanced", "dietHalal", "dietHighProtein", "dietHighFiber"],
+    ingredients: [
+      { name: { fr: "Bœuf haché maigre", en: "Lean ground beef", ar: "لحم بقري مفروم" }, quantity: 150, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Haricots rouges égouttés & Maïs", en: "Red kidney beans & corn", ar: "فاصوليا حمراء وذرة" }, quantity: 120, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Coulis de tomate & Poivron rouge", en: "Tomato sauce & red pepper", ar: "صلصة طماطم وفلفل أحمر" }, quantity: 140, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Épices chili, cumin, origan & ail", en: "Chili spices & garlic", ar: "توابل تشيلي وثوم" }, quantity: 1, unit: "c.à.s", dept: "deptSpices" },
+      { name: { fr: "Riz blanc (accompagnement)", en: "White rice", ar: "أرز أبيض" }, quantity: 60, unit: "g", dept: "deptPantry" }
+    ],
+    instructions: {
+      fr: [
+        "Faites revenir le bœuf haché avec l'oignon et le poivron 5 min dans une cocotte.",
+        "Ajoutez les épices chili, le coulis de tomate et les haricots rouges.",
+        "Laissez mijoter 15 minutes à feu doux pour concentrer les saveurs.",
+        "Servez chaud avec du riz blanc."
+      ],
+      en: [
+        "Brown beef with onion and bell pepper for 5 mins in a pot.",
+        "Add chili spices, tomato puree, and kidney beans.",
+        "Simmer gently for 15 mins to develop rich flavors.",
+        "Serve hot over white rice."
+      ],
+      ar: [
+        "شوح اللحم مع البصل والفلفل 5 دقائق.",
+        "أضف توابل التشيلي وصلصة الطماطم والفاصوليا الحمراء.",
+        "اتركه يتسبك 15 دقيقة على نار هادئة.",
+        "قدمه ساخناً مع الأرز الأبيض."
+      ]
+    }
+  },
+  {
+    id: "m88",
+    mealType: "dinner",
+    title: {
+      fr: "Soupe Thaï Tom Kha Gai au Poulet, Coco & Citronnelle",
+      en: "Thai Coconut Chicken Soup (Tom Kha Gai) with Lemongrass",
+      ar: "شوربة توم خا غاي التايلاندية بالدجاج وحليب جوز الهند والليمون"
+    },
+    emoji: "🥣",
+    prepTime: 10,
+    cookTime: 15,
+    difficulty: "easy",
+    caloriesPerPerson: 420,
+    tags: ["asian", "dietBalanced", "dietHalal", "dietHighProtein", "dietLowCarb"],
+    ingredients: [
+      { name: { fr: "Blancs de poulet émincés", en: "Sliced chicken breast", ar: "شرائح صدر دجاج" }, quantity: 150, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Lait de coco", en: "Coconut milk", ar: "حليب جوز الهند" }, quantity: 160, unit: "ml", dept: "deptPantry" },
+      { name: { fr: "Champignons de Paris en lamelles", en: "Sliced mushrooms", ar: "فطر مقطع" }, quantity: 100, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Citronnelle, gingembre & jus de citron vert", en: "Lemongrass, ginger & lime", ar: "عشب الليمون وزنجبيل" }, quantity: 1, unit: "c.à.s", dept: "deptProduce" },
+      { name: { fr: "Coriandre fraîche", en: "Fresh cilantro", ar: "كزبرة طازجة" }, quantity: 10, unit: "g", dept: "deptProduce" }
+    ],
+    instructions: {
+      fr: [
+        "Portez à frémissement 250ml de bouillon avec le lait de coco, la citronnelle et le gingembre 5 min.",
+        "Ajoutez les lamelles de poulet et les champignons, faites cuire 8 minutes.",
+        "Terminez hors du feu avec le jus de citron vert.",
+        "Versez dans des bols chauds et parsemez de coriandre fraîche."
+      ],
+      en: [
+        "Simmer broth, coconut milk, lemongrass, and ginger for 5 mins.",
+        "Add chicken strips and mushrooms, cook for 8 mins.",
+        "Stir in fresh lime juice off heat.",
+        "Ladle into deep bowls and top with fresh cilantro."
+      ],
+      ar: [
+        "اغل المرق مع حليب جوز الهند والليمون والزنجبيل 5 دقائق.",
+        "أضف شرائح الدجاج والفطر واطه 8 دقائق.",
+        "أضف عصير الليمون الأخضر في النهاية.",
+        "اسكب في أوعية عميقة وزين بالكزبرة الطازجة."
+      ]
+    }
+  },
+  {
+    id: "m89",
+    mealType: "dinner",
+    title: {
+      fr: "Filet de Loup de Mer Poêlé & Écrasé de Pommes de Terre à l'Huile d'Olive",
+      en: "Pan-Seared Sea Bass Fillet with Olive Oil Crushed Potatoes",
+      ar: "فيليه سمك القاروص المشوي مع بطاطس مهروسة بزيت الزيتون"
+    },
+    emoji: "🐟",
+    prepTime: 10,
+    cookTime: 15,
+    difficulty: "easy",
+    caloriesPerPerson: 440,
+    tags: ["mediterranean", "french", "dietBalanced", "dietHalal", "dietHighProtein"],
+    ingredients: [
+      { name: { fr: "Filet de loup de mer ou bar", en: "Sea bass fillet", ar: "فيليه سمك قاروص" }, quantity: 160, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Pommes de terre", en: "Potatoes", ar: "بطاطس" }, quantity: 180, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Huile d'olive extra vierge & Fleur de sel", en: "Olive oil & sea salt", ar: "زيت زيتون وملح بحري" }, quantity: 1, unit: "c.à.s", dept: "deptPantry" },
+      { name: { fr: "Ciboulette & Quartier de citron", en: "Chives & lemon", ar: "ثوم معمر وليمون" }, quantity: 1, unit: "pcs", dept: "deptProduce" }
+    ],
+    instructions: {
+      fr: [
+        "Faites cuire les pommes de terre 15 min dans l'eau bouillante et écrasez-les grossièrement à la fourchette avec l'huile d'olive et la ciboulette.",
+        "Faites poêler le loup de mer 3 min côté peau jusqu'à ce qu'il soit croustillant, puis 1 min sur l'autre face.",
+        "Dressez le poisson doré sur l'écrasé de pommes de terre avec un filet de jus de citron."
+      ],
+      en: [
+        "Boil potatoes for 15 mins and crush with a fork, olive oil, and chives.",
+        "Pan-sear sea bass skin-down for 3 mins until crisp, flip for 1 min.",
+        "Plate fish over crushed potatoes and squeeze fresh lemon."
+      ],
+      ar: [
+        "اسلق البطاطس 15 دقيقة واهرسها بالشوكة مع زيت الزيتون والثوم المعمر.",
+        "اشو السمك 3 دقائق من جهة الجلد حتى يقرمش ثم دقيقة للوجه الآخر.",
+        "قدم السمك فوق البطاطس مع عصرة ليمون."
+      ]
+    }
+  },
+  {
+    id: "m90",
+    mealType: "dinner",
+    title: {
+      fr: "Tajine d'Agneau aux Pruneaux Caramélisés & Amandes Grillées",
+      en: "Moroccan Lamb Tagine with Sweet Prunes & Toasted Almonds",
+      ar: "طاجين اللحم بالبرقوق المعسل واللوز المحمص"
+    },
+    emoji: "🥘",
+    prepTime: 15,
+    cookTime: 30,
+    difficulty: "medium",
+    caloriesPerPerson: 560,
+    tags: ["maghreb", "dietBalanced", "dietHalal", "dietHighProtein"],
+    ingredients: [
+      { name: { fr: "Morceaux d'agneau tendre (épaule)", en: "Tender lamb pieces", ar: "قطع لحم غنم" }, quantity: 160, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Pruneaux dénoyautés & Miel", en: "Prunes & honey", ar: "برقوق وعسل" }, quantity: 40, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Amandes entières émondées et dorées", en: "Toasted almonds", ar: "لوز محمص" }, quantity: 20, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Gingembre, cannelle, curcuma & oignon", en: "Tagine spices & onion", ar: "زنجبيل وقرفة وكركم وبصل" }, quantity: 1, unit: "c.à.s", dept: "deptSpices" }
+    ],
+    instructions: {
+      fr: [
+        "Faites dorer l'agneau avec l'oignon et les épices dans une cocotte 5 min.",
+        "Couvrez d'eau et laissez mijoter 25 minutes à feu doux.",
+        "Dans une petite casserole, pochez les pruneaux 5 min avec une cuillère de miel et de cannelle.",
+        "Dressez le tajine d'agneau fondant couronné des pruneaux confits et des amandes croquantes."
+      ],
+      en: [
+        "Brown lamb with onion and spices in a pot for 5 mins.",
+        "Cover with water and simmer covered for 25 mins until tender.",
+        "Poach prunes with honey and cinnamon in a small pan for 5 mins.",
+        "Serve succulent lamb topped with caramelized prunes and almonds."
+      ],
+      ar: [
+        "حمر اللحم مع البصل والبهارات 5 دقائق.",
+        "أضف الماء واتركه ينضج مغطى 25 دقيقة.",
+        "عسل البرقوق مع ملعقة عسل وقرفة في قدر صغير 5 دقائق.",
+        "قدم طاجين اللحم وزينه بالبرقوق المعسل واللوز المحمص."
+      ]
+    }
+  },
+  // --- PETITS DÉJEUNERS NUTRITIFS SUPPLEMENTAIRES ---
+  {
+    id: "b13",
+    mealType: "breakfast",
+    title: {
+      fr: "Pain Perdu Brioché Léger à la Fleur d'Oranger & Cannelle",
+      en: "Light Brioche French Toast with Orange Blossom & Cinnamon",
+      ar: "فرنش توست خفيف بماء الزهر والقرفة"
+    },
+    emoji: "🍞",
+    prepTime: 5,
+    cookTime: 5,
+    difficulty: "easy",
+    caloriesPerPerson: 320,
+    tags: ["dietBalanced", "dietVegetarian", "dietHalal", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Tranches de brioche ou pain complet", en: "Brioche or bread slices", ar: "شرائح بريوش أو خبز" }, quantity: 2, unit: "tranches", dept: "deptBakery" },
+      { name: { fr: "Œuf frais & Lait", en: "Egg & milk", ar: "بيض وحليب" }, quantity: 1, unit: "pcs", dept: "deptDairy" },
+      { name: { fr: "Eau de fleur d'oranger & Cannelle", en: "Orange blossom water & cinnamon", ar: "ماء زهر وقرفة" }, quantity: 1, unit: "c.à.c", dept: "deptSpices" }
+    ],
+    instructions: {
+      fr: [
+        "Battez l'œuf avec le lait, la fleur d'oranger et la cannelle.",
+        "Imbibez les tranches de pain des deux côtés.",
+        "Faites dorer 2 min par face dans une poêle légèrement beurrée.",
+        "Servez tiède avec quelques rondelles de fruits frais."
+      ],
+      en: [
+        "Whisk egg with milk, orange blossom water, and cinnamon.",
+        "Dip bread slices on both sides.",
+        "Pan-fry for 2 mins each side in a lightly buttered pan.",
+        "Serve warm with fresh fruit slices."
+      ],
+      ar: [
+        "اخفق البيض مع الحليب وماء الزهر والقرفة.",
+        "اغمس الخبز من الجانبين.",
+        "حمر دقيقتين لكل جهة في مقلاة مدهونة بالزبدة.",
+        "قدمه دافئاً مع شرائح الفواكه الطازجة."
+      ]
+    }
+  },
+  {
+    id: "b14",
+    mealType: "breakfast",
+    title: {
+      fr: "Bowl Granola Maison aux Noix de Pécan & Myrtilles",
+      en: "Crunchy Pecan Granola Bowl with Fresh Blueberries",
+      ar: "وعاء جرانولا بيتي مقرمش مع جوز البقان والتوت الأزرق"
+    },
+    emoji: "🥣",
+    prepTime: 3,
+    cookTime: 0,
+    difficulty: "easy",
+    caloriesPerPerson: 350,
+    tags: ["dietBalanced", "dietVegetarian", "dietHalal", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Yaourt blanc ou végétal", en: "Yogurt", ar: "زبادي" }, quantity: 150, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Granola d'avoine aux noix de pécan", en: "Pecan oat granola", ar: "جرانولا الشوفان وجوز البقان" }, quantity: 40, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Myrtilles fraîches", en: "Fresh blueberries", ar: "توت أزرق طازج" }, quantity: 50, unit: "g", dept: "deptProduce" }
+    ],
+    instructions: {
+      fr: [
+        "Versez le yaourt dans un bol.",
+        "Ajoutez le granola croustillant sur une moitié.",
+        "Disposez les myrtilles fraîches sur l'autre moitié et dégustez immédiatement."
+      ],
+      en: [
+        "Spoon yogurt into a bowl.",
+        "Top one half with crunchy granola.",
+        "Add fresh blueberries on the other half and enjoy."
+      ],
+      ar: [
+        "ضع الزبادي في الوعاء.",
+        "أضف الجرانولا المقرمشة في نصف الوعاء.",
+        "ضع التوت الأزرق في النصف الآخر وتناوله فوراً."
+      ]
+    }
+  },
+  // --- SNACKS ET ENCAS SUPPLEMENTAIRES ---
+  {
+    id: "s10",
+    mealType: "snack",
+    title: {
+      fr: "Pomme Fondante au Four à la Cannelle & Éclats de Noix",
+      en: "Baked Cinnamon Apple with Toasted Walnuts",
+      ar: "تفاحة مخبوزة بالفرن بالقرفة وعين الجمل"
+    },
+    emoji: "🍎",
+    prepTime: 4,
+    cookTime: 12,
+    difficulty: "easy",
+    caloriesPerPerson: 150,
+    tags: ["dietBalanced", "dietVegetarian", "dietHalal", "dietLowCalorie"],
+    ingredients: [
+      { name: { fr: "Pomme moyenne évidée", en: "Cored medium apple", ar: "تفاحة متوسطة" }, quantity: 1, unit: "pcs", dept: "deptProduce" },
+      { name: { fr: "Cannelle moulue & Filet de miel", en: "Cinnamon & honey drizzle", ar: "قرفة وعسل" }, quantity: 1, unit: "c.à.c", dept: "deptSpices" },
+      { name: { fr: "Noix concassées", en: "Crushed walnuts", ar: "عين الجمل / جوز" }, quantity: 10, unit: "g", dept: "deptPantry" }
+    ],
+    instructions: {
+      fr: [
+        "Évidez le cœur de la pomme et déposez-la dans un petit plat à four.",
+        "Saupoudrez de cannelle, ajoutez les noix concassées et une goutte de miel au centre.",
+        "Faites cuire 12 min à 180°C jusqu'à ce que la pomme soit tendre et fondante."
+      ],
+      en: [
+        "Core apple and place in a small ovenproof dish.",
+        "Fill center with cinnamon, crushed walnuts, and a drop of honey.",
+        "Bake for 12 mins at 180°C until soft and fragrant."
+      ],
+      ar: [
+        "فرغ قلب التفاحة وضعها في صينية فرن.",
+        "احش المنتصف بالقرفة والجوز وقليل من العسل.",
+        "اخبز 12 دقيقة على 180 مئوية حتى تطرى وتصبح دافئة ولذيذة."
+      ]
+    }
+  },
+  {
+    id: "s11",
+    mealType: "snack",
+    title: {
+      fr: "Bâtonnets de Carottes Croquants & Houmous Onctueux Maison",
+      en: "Crisp Carrot Sticks with Creamy Homemade Hummus",
+      ar: "أصابع الجزر المقرمشة مع الحمص البيتي الناعم"
+    },
+    emoji: "🥕",
+    prepTime: 4,
+    cookTime: 0,
+    difficulty: "easy",
+    caloriesPerPerson: 140,
+    tags: ["dietBalanced", "dietVegetarian", "dietHalal", "dietLowCalorie", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Carottes fraîches en bâtonnets", en: "Carrot sticks", ar: "أصابع جزر" }, quantity: 150, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Houmous crémeux de pois chiches", en: "Creamy hummus", ar: "حمص متبل" }, quantity: 50, unit: "g", dept: "deptPantry" }
+    ],
+    instructions: {
+      fr: [
+        "Épluchez et coupez les carottes en bâtonnets réguliers.",
+        "Déposez le houmous dans un ramequin avec un trait d'huile d'olive et de paprika.",
+        "Dégustez pour un encas croquant, sain et riche en fibres."
+      ],
+      en: [
+        "Peel and slice carrots into sticks.",
+        "Spoon hummus into a small dish with paprika.",
+        "Dip and enjoy a healthy crunchy high-fiber snack."
+      ],
+      ar: [
+        "قشر الجزر وقطعه أصابع متساوية.",
+        "ضع الحمص في وعاء مع رشة بابريكا.",
+        "اغمس الجزر وتناوله كسناك صحي مقرمش وغني بالألياف."
+      ]
+    }
+  },
+  {
+    id: "m91",
+    mealType: "dinner",
+    title: {
+      fr: "Cannellonis Farcis Ricotta & Épinards Gratinés",
+      en: "Baked Spinach & Ricotta Stuffed Cannelloni",
+      ar: "كانيلوني محشوة بالسبانخ وجبن الريكوتا مخبوزة بالفرن"
+    },
+    emoji: "🍝",
+    prepTime: 15,
+    cookTime: 25,
+    difficulty: "easy",
+    caloriesPerPerson: 480,
+    tags: ["italian", "dietBalanced", "dietVegetarian", "dietHalal"],
+    ingredients: [
+      { name: { fr: "Tubes de cannellonis précuits", en: "Cannelloni tubes", ar: "أنابيب كانيلوني" }, quantity: 4, unit: "pcs", dept: "deptPantry" },
+      { name: { fr: "Ricotta fraîche & Épinards hachés", en: "Ricotta & chopped spinach", ar: "جبن ريكوتا وسبانخ" }, quantity: 180, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Coulis de tomate parfumé au basilic", en: "Tomato basil sauce", ar: "صلصة طماطم بالريحان" }, quantity: 150, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Mozzarella râpée", en: "Grated mozzarella", ar: "جبن موزاريلا مبشور" }, quantity: 30, unit: "g", dept: "deptDairy" }
+    ],
+    instructions: {
+      fr: [
+        "Préchauffez le four à 190°C.",
+        "Mélangez la ricotta avec les épinards, sel, poivre et muscade, puis farcissez les cannellonis.",
+        "Nappez le fond d'un plat de coulis de tomate, déposez les cannellonis et recouvrez du reste de coulis.",
+        "Saupoudrez de mozzarella et enfournez 25 minutes jusqu'à ce que le dessus soit bien gratiné."
+      ],
+      en: [
+        "Preheat oven to 190°C (375°F).",
+        "Mix ricotta, spinach, salt, pepper, and nutmeg; stuff cannelloni tubes.",
+        "Layer tomato sauce in a dish, arrange stuffed tubes, top with more sauce.",
+        "Sprinkle mozzarella and bake for 25 mins until golden and bubbly."
+      ],
+      ar: [
+        "سخن الفرن على 190 مئوية.",
+        "اخلط الريكوتا مع السبانخ والبهارات واحش أنابيب الكانيلوني.",
+        "ضع صلصة الطماطم في الصينية ورتب الكانيلوني وغطها بباقي الصلصة.",
+        "رش الموزاريلا واخبز 25 دقيقة حتى تتحمر."
+      ]
+    }
+  },
+  {
+    id: "m92",
+    mealType: "lunch",
+    title: {
+      fr: "Bowl Mexicain Végétarien Patates Douces Rôties & Avocat",
+      en: "Veggie Mexican Bowl with Roasted Sweet Potatoes & Avocado",
+      ar: "باول مكسيكي نباتي بالبطاطا الحلوة المشوية والأفوكادو"
+    },
+    emoji: "🥑",
+    prepTime: 10,
+    cookTime: 18,
+    difficulty: "easy",
+    caloriesPerPerson: 460,
+    tags: ["mexican", "dietBalanced", "dietVegetarian", "dietHalal", "dietHighFiber"],
+    ingredients: [
+      { name: { fr: "Patate douce rôtie au paprika", en: "Paprika roasted sweet potato", ar: "بطاطا حلوة مشوية" }, quantity: 150, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Haricots noirs & Maïs doux", en: "Black beans & corn", ar: "فاصوليا سوداء وذرة" }, quantity: 100, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Riz complet ou quinoa", en: "Brown rice or quinoa", ar: "أرز بني أو كينوا" }, quantity: 70, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Demi-avocat & Coriandre", en: "Avocado & cilantro", ar: "أفوكادو وكزبرة" }, quantity: 0.5, unit: "pcs", dept: "deptProduce" }
+    ],
+    instructions: {
+      fr: [
+        "Coupez la patate douce en dés, assaisonnez de paprika et huile d'olive, enfournez 18 min à 200°C.",
+        "Déposez le riz au fond du bol.",
+        "Ajoutez les dés de patate douce chaude, les haricots noirs, le maïs et les lamelles d'avocat.",
+        "Arrosez d'un filet de jus de citron vert et de coriandre fraîche."
+      ],
+      en: [
+        "Dice sweet potato, toss with oil and paprika, roast for 18 mins at 200°C.",
+        "Place brown rice in a bowl.",
+        "Top with warm sweet potatoes, black beans, corn, and avocado slices.",
+        "Drizzle with fresh lime juice and cilantro."
+      ],
+      ar: [
+        "قطع البطاطا الحلوة وتبلها واخبزها 18 دقيقة في الفرن.",
+        "ضع الأرز في الوعاء.",
+        "أضف البطاطا الحلوة الدافئة والفاصوليا والذرة وشرائح الأفوكادو.",
+        "اسكب عصير الليمون الأخضر وزين بالكزبرة."
+      ]
+    }
+  },
+  {
+    id: "m93",
+    mealType: "dinner",
+    title: {
+      fr: "Bœuf Stroganoff Crémeux aux Champignons & Tagliatelles",
+      en: "Creamy Beef Stroganoff with Sautéed Mushrooms & Tagliatelle",
+      ar: "بيف ستروجانوف كريمي باللحم البقري والفطر والباستا"
+    },
+    emoji: "🥩",
+    prepTime: 10,
+    cookTime: 12,
+    difficulty: "easy",
+    caloriesPerPerson: 530,
+    tags: ["french", "dietBalanced", "dietHalal", "dietHighProtein", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Bavette ou rumsteck de bœuf émincé", en: "Beef steak strips", ar: "شرائح لحم بقري" }, quantity: 150, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Champignons de Paris émincés", en: "Mushrooms", ar: "فطر مقطع" }, quantity: 120, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Crème fraîche épaisse & Moutarde", en: "Sour cream & mustard", ar: "كريمة حامضة وخردل" }, quantity: 40, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Tagliatelles fraîches", en: "Tagliatelle pasta", ar: "باستا تالياتيلي" }, quantity: 80, unit: "g", dept: "deptPantry" }
+    ],
+    instructions: {
+      fr: [
+        "Faites sauter les champignons et l'oignon dans une noisette de beurre 5 min.",
+        "Saisissez les lamelles de bœuf à feu vif 2 minutes sans trop les cuire.",
+        "Incorporez la crème, une pointe de moutarde et de paprika doux, chauffez 1 min.",
+        "Servez immédiatement sur un nid de tagliatelles chaudes."
+      ],
+      en: [
+        "Sauté mushrooms and onion in butter for 5 mins.",
+        "Sear beef strips over high heat for 2 mins.",
+        "Stir in cream, mustard, and paprika for 1 min.",
+        "Serve hot over a nest of freshly cooked tagliatelle."
+      ],
+      ar: [
+        "شوح الفطر والبصل في الزبدة 5 دقائق.",
+        "اشو شرائح اللحم دقيقتين على نار عالية.",
+        "اخلط الكريمة والخردل والبابريكا دقيقة واحدة.",
+        "قدمه فوراً مع الباستا الساخنة."
+      ]
+    }
+  },
+  {
+    id: "m94",
+    mealType: "lunch",
+    title: {
+      fr: "Salade César Légère au Poulet Doré & Parmesan",
+      en: "Light Chicken Caesar Salad with Crispy Croutons & Parmesan",
+      ar: "سلطة سيزر خفيفة بالدجاج المشوي والبارميزان"
+    },
+    emoji: "🥗",
+    prepTime: 10,
+    cookTime: 8,
+    difficulty: "easy",
+    caloriesPerPerson: 420,
+    tags: ["french", "dietBalanced", "dietHalal", "dietHighProtein", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Blanc de poulet grillé émincé", en: "Grilled chicken breast", ar: "صدر دجاج مشوي" }, quantity: 150, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Cœur de romaine croquant", en: "Romaine lettuce", ar: "خس روماني" }, quantity: 120, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Copeaux de parmesan & Croûtons dorés", en: "Parmesan & baked croutons", ar: "بارميزان وقطع خبز محمصة" }, quantity: 30, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Sauce césar allégée (yaourt, ail, citron)", en: "Light caesar dressing", ar: "صلصة سيزر خفيفة" }, quantity: 30, unit: "g", dept: "deptDairy" }
+    ],
+    instructions: {
+      fr: [
+        "Faites dorer le poulet 6 min à la poêle avec sel, poivre et herbes.",
+        "Coupez la salade romaine en morceaux et disposez dans un saladier.",
+        "Ajoutez le poulet tiède émincé, les croûtons et les copeaux de parmesan.",
+        "Nappez de sauce césar allégée au yaourt."
+      ],
+      en: [
+        "Pan-sear chicken for 6 mins with herbs, salt and pepper.",
+        "Chop romaine lettuce and place in a salad bowl.",
+        "Add warm sliced chicken, croutons, and parmesan shavings.",
+        "Toss with light yogurt caesar dressing."
+      ],
+      ar: [
+        "اشو الدجاج 6 دقائق مع الأعشاب والملح.",
+        "قطع الخس وضعه في صحن التقديم.",
+        "أضف شرائح الدجاج والخبز المحمص وجبن البارميزان.",
+        "اسكب صلصة السيزر الخفيفة وقدمها."
+      ]
+    }
+  },
+  {
+    id: "m95",
+    mealType: "dinner",
+    title: {
+      fr: "Curry Japonais Doux au Poulet & Carottes Fondantes",
+      en: "Mild Japanese Chicken Curry with Carrots & Rice",
+      ar: "كاري ياباني معتدل بالدجاج والجزر والأرز"
+    },
+    emoji: "🍛",
+    prepTime: 12,
+    cookTime: 20,
+    difficulty: "easy",
+    caloriesPerPerson: 510,
+    tags: ["asian", "dietBalanced", "dietHalal", "dietHighProtein"],
+    ingredients: [
+      { name: { fr: "Blancs de poulet en cubes", en: "Chicken breast cubes", ar: "مكعبات دجاج" }, quantity: 160, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Carottes et pommes de terre en morceaux", en: "Carrots & potatoes", ar: "جزر وبطاطس" }, quantity: 150, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Curry japonais doux & bouillon", en: "Japanese curry roux & broth", ar: "كاري ياباني ومرق" }, quantity: 30, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Riz rond japonais cuit", en: "Japanese steamed rice", ar: "أرز ياباني" }, quantity: 80, unit: "g", dept: "deptPantry" }
+    ],
+    instructions: {
+      fr: [
+        "Faites revenir le poulet et les légumes dans une casserole huilée 4 min.",
+        "Ajoutez 350ml d'eau et laissez mijoter 15 minutes jusqu'à ce que les carottes soient tendres.",
+        "Incorporez le curry doux et mélangez 2 min jusqu'à ce que la sauce épaississe.",
+        "Dressez le curry onctueux à côté d'un dôme de riz japonais."
+      ],
+      en: [
+        "Sauté chicken and veggies in a pot for 4 mins.",
+        "Add 350ml water, simmer for 15 mins until carrots are tender.",
+        "Stir in mild Japanese curry until thick and glossy.",
+        "Ladle next to a mound of steamed white rice."
+      ],
+      ar: [
+        "شوح الدجاج والخضار 4 دقائق في قدر.",
+        "أضف الماء واتركه ينضج 15 دقيقة حتى يطرى الجزر.",
+        "اخلط معجون الكاري وقلب دقيقتين حتى تثقل الصلصة.",
+        "قدم الكاري الدافئ بجانب الأرز الأبيض."
+      ]
+    }
+  },
+  {
+    id: "m96",
+    mealType: "dinner",
+    title: {
+      fr: "Tajine de Poisson Chermoula aux Poivrons & Pommes de Terre",
+      en: "Moroccan Chermoula Fish Tagine with Bell Peppers",
+      ar: "طاجين السمك بالشرمولة المغربية والفلفل والبطاطس"
+    },
+    emoji: "🐟",
+    prepTime: 12,
+    cookTime: 20,
+    difficulty: "easy",
+    caloriesPerPerson: 410,
+    tags: ["maghreb", "dietBalanced", "dietHalal", "dietHighProtein"],
+    ingredients: [
+      { name: { fr: "Filet de poisson blanc épais (cabillaud/merlu)", en: "White fish fillet", ar: "فيليه سمك أبيض" }, quantity: 160, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Poivron & Pomme de terre en rondelles", en: "Bell pepper & potato slices", ar: "فلفل وبطاطس شرائح" }, quantity: 150, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Chermoula (persil, coriandre, ail, cumin, paprika)", en: "Chermoula herb marinade", ar: "شرمولة مغربية بالأعشاب" }, quantity: 2, unit: "c.à.s", dept: "deptSpices" },
+      { name: { fr: "Tomate & Rondelle de citron", en: "Tomato & lemon slice", ar: "طماطم وليمون" }, quantity: 60, unit: "g", dept: "deptProduce" }
+    ],
+    instructions: {
+      fr: [
+        "Marinez le poisson dans la chermoula parfumée.",
+        "Dans une sauteuse, disposez un lit de rondelles de pommes de terre et poivrons avec un demi-verre d'eau, laissez précuire 10 min.",
+        "Déposez le poisson mariné et les rondelles de tomate sur les légumes.",
+        "Couvrez et laissez mijoter 10 min jusqu'à cuisson parfaite du poisson."
+      ],
+      en: [
+        "Coat fish in fragrant chermoula marinade.",
+        "Layer potato and pepper slices in a skillet with a splash of water, cook 10 mins.",
+        "Place marinated fish and tomato slices on top.",
+        "Cover and simmer for 10 mins until fish is flaky."
+      ],
+      ar: [
+        "تبل السمك بالشرمولة المغربية المعطرة.",
+        "ضع شرائح البطاطس والفلفل مع قليل من الماء في المقلاة واطهها 10 دقائق.",
+        "ضع السمك وشرائح الطماطم فوق الخضار.",
+        "غط المقلاة 10 دقائق حتى ينضج السمك تماماً."
+      ]
+    }
+  },
+  {
+    id: "m97",
+    mealType: "lunch",
+    title: {
+      fr: "Tortilla Espagnole Traditionnelle aux Pommes de Terre",
+      en: "Traditional Spanish Potato & Onion Omelette (Tortilla)",
+      ar: "تورتيلا بطاطس إسبانية تقليدية بالبيض والبصل"
+    },
+    emoji: "🍳",
+    prepTime: 10,
+    cookTime: 15,
+    difficulty: "easy",
+    caloriesPerPerson: 410,
+    tags: ["mediterranean", "dietBalanced", "dietVegetarian", "dietHalal"],
+    ingredients: [
+      { name: { fr: "Œufs frais", en: "Eggs", ar: "بيض" }, quantity: 3, unit: "pcs", dept: "deptDairy" },
+      { name: { fr: "Pommes de terre coupées en lamelles", en: "Thinly sliced potatoes", ar: "شرائح بطاطس رفيعة" }, quantity: 180, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Oignon émincé & Huile d'olive", en: "Sliced onion & olive oil", ar: "بصل شرائح وزيت زيتون" }, quantity: 60, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Salade verte d'accompagnement", en: "Green side salad", ar: "سلطة خضراء" }, quantity: 50, unit: "g", dept: "deptProduce" }
+    ],
+    instructions: {
+      fr: [
+        "Faites confire doucement les lamelles de pommes de terre et d'oignon dans l'huile d'olive 10 min à la poêle jusqu'à ce qu'elles soient très fondantes.",
+        "Battez les œufs avec sel et poivre, versez sur les pommes de terre.",
+        "Laissez cuire 4 min à feu doux, retournez à l'aide d'une assiette et faites dorer l'autre côté 2 min.",
+        "Dégustez tiède ou froide avec la salade verte."
+      ],
+      en: [
+        "Slow-cook sliced potatoes and onions in olive oil for 10 mins until meltingly soft.",
+        "Whisk eggs with salt and pepper, pour over potatoes in pan.",
+        "Cook for 4 mins, flip onto a plate and slide back to cook 2 mins.",
+        "Serve warm or at room temperature with green salad."
+      ],
+      ar: [
+        "اطه شرائح البطاطس والبصل في زيت الزيتون 10 دقائق حتى تطرى تماماً.",
+        "اخفق البيض مع الملح واسكبه فوق البطاطس.",
+        "اطه 4 دقائق ثم اقلب التورتيلا واطه الوجه الآخر دقيقتين.",
+        "قدمها دافئة مع السلطة الخضراء."
+      ]
+    }
+  },
+  {
+    id: "m98",
+    mealType: "dinner",
+    title: {
+      fr: "Pavé de Thon Grillé à la Plancha & Haricots Verts Aillés",
+      en: "Seared Tuna Steak with Garlic Sautéed Green Beans",
+      ar: "ستيك تونة مشوي مع فاصوليا خضراء بالثوم وزيت الزيتون"
+    },
+    emoji: "🐟",
+    prepTime: 5,
+    cookTime: 8,
+    difficulty: "easy",
+    caloriesPerPerson: 420,
+    tags: ["mediterranean", "french", "dietBalanced", "dietHalal", "dietHighProtein", "dietLowCarb", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Pavé de thon frais", en: "Fresh tuna steak", ar: "ستيك تونة طازجة" }, quantity: 160, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Haricots verts frais ou surgelés", en: "Green beans", ar: "فاصوليا خضراء" }, quantity: 200, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Gousse d'ail, persil & huile d'olive", en: "Garlic, parsley & olive oil", ar: "ثوم وبقدونس وزيت زيتون" }, quantity: 1, unit: "c.à.s", dept: "deptProduce" },
+      { name: { fr: "Graines de sésame & Citron", en: "Sesame seeds & lemon", ar: "سمسم وليمون" }, quantity: 1, unit: "c.à.c", dept: "deptSpices" }
+    ],
+    instructions: {
+      fr: [
+        "Faites cuire les haricots 5 min à l'eau bouillante et faites-les sauter 2 min à la poêle avec l'ail émincé.",
+        "Dans une poêle très chaude avec un filet d'huile, saisissez le thon 1 min 30 par face pour garder un cœur rosé et fondant.",
+        "Saupoudrez de sésame et servez avec les haricots verts et un quartier de citron."
+      ],
+      en: [
+        "Boil green beans for 5 mins and sauté in garlic for 2 mins.",
+        "Sear tuna steak in a smoking hot pan for 90 secs each side.",
+        "Sprinkle with sesame seeds and serve with garlicky beans and lemon."
+      ],
+      ar: [
+        "اسلق الفاصوليا 5 دقائق وشوحها مع الثوم دقيقتين.",
+        "اشو ستيك التونة دقيقة ونصف لكل وجه في مقلاة ساخنة جداً.",
+        "رش السمسم وقدمه مع الفاصوليا والليمون."
+      ]
+    }
+  },
+  {
+    id: "m99",
+    mealType: "lunch",
+    title: {
+      fr: "Wok de Crevettes & Nouilles Udon aux Légumes Croquants",
+      en: "Shrimp & Chewy Udon Noodle Stir-Fry with Veggies",
+      ar: "ووك الجمبري ونودلز الأودون بالخضار المقرمشة"
+    },
+    emoji: "🍤",
+    prepTime: 8,
+    cookTime: 8,
+    difficulty: "easy",
+    caloriesPerPerson: 450,
+    tags: ["asian", "dietBalanced", "dietHalal", "dietHighProtein", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Nouilles udon fraîches", en: "Fresh udon noodles", ar: "نودلز أودون" }, quantity: 180, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Crevettes décortiquées", en: "Peeled shrimp", ar: "جمبري مقشر" }, quantity: 130, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Carottes râpées, chou & pois gourmands", en: "Stir-fry veggies", ar: "خضار مشكلة مقرمشة" }, quantity: 120, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Sauce soja sucrée & Huile de sésame", en: "Soy sauce & sesame oil", ar: "صلصة صويا وزيت سمسم" }, quantity: 2, unit: "c.à.s", dept: "deptPantry" }
+    ],
+    instructions: {
+      fr: [
+        "Dans un wok chaud avec l'huile de sésame, faites sauter les crevettes 2 min puis réservez.",
+        "Faites sauter les légumes émincés 3 min à feu vif pour garder leur croquant.",
+        "Ajoutez les nouilles udon et la sauce soja, faites sauter 2 minutes.",
+        "Réincorporez les crevettes et servez bien chaud."
+      ],
+      en: [
+        "Sear shrimp in a hot wok for 2 mins, set aside.",
+        "Stir-fry crisp veggies for 3 mins.",
+        "Toss in udon noodles and soy sauce, cook for 2 mins.",
+        "Fold in shrimp and serve piping hot."
+      ],
+      ar: [
+        "شوح الجمبري دقيقتين في مقلاة ووك ساخنة وضعه جانباً.",
+        "شوح الخضار 3 دقائق على نار عالية.",
+        "أضف نودلز الأودون وصلصة الصويا واطه دقيقتين.",
+        "أعد الجمبري وقدمه ساخناً."
+      ]
+    }
+  },
+  {
+    id: "m100",
+    mealType: "dinner",
+    title: {
+      fr: "Velouté Doux de Courgettes Fondantes & Vache qui Rit",
+      en: "Silky Zucchini & Melting Cheese Cream Soup",
+      ar: "شوربة الكوسة الحريرية بالجبن الكريمي اللذيذ"
+    },
+    emoji: "🥣",
+    prepTime: 5,
+    cookTime: 15,
+    difficulty: "easy",
+    caloriesPerPerson: 240,
+    tags: ["french", "dietBalanced", "dietVegetarian", "dietHalal", "dietLowCalorie", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Courgettes fraîches non épluchées", en: "Fresh zucchinis", ar: "كوسة طازجة" }, quantity: 300, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Portions de fromage fondu (Vache qui rit/Kiri)", en: "Cream cheese portions", ar: "جبن مثلثات" }, quantity: 2, unit: "pcs", dept: "deptDairy" },
+      { name: { fr: "Bouillon de légumes", en: "Vegetable broth", ar: "مرق خضار" }, quantity: 300, unit: "ml", dept: "deptPantry" }
+    ],
+    instructions: {
+      fr: [
+        "Coupez les courgettes en rondelles et faites-les cuire 12 min dans le bouillon frémissant (ou au robot cuiseur).",
+        "Ajoutez les portions de fromage fondu.",
+        "Mixez finement jusqu'à obtenir un velouté ultra crémeux et onctueux.",
+        "Servez dans des bols avec une pincée de poivre."
+      ],
+      en: [
+        "Slice zucchinis and cook in simmering broth for 12 mins.",
+        "Add cheese portions.",
+        "Blend at high speed into an ultra-silky cream soup.",
+        "Ladle into bowls and season with pepper."
+      ],
+      ar: [
+        "قطع الكوسة شرائح واطهها في المرق 12 دقيقة.",
+        "أضف قطع الجبن الكريمي.",
+        "اخلط جيداً بالخلاط حتى تصبح كريمية وناعمة جداً.",
+        "اسكب في أوعية وقدمها دافئة."
+      ]
+    }
+  },
+  // --- PETITS DEJEUNERS SUPPLEMENTAIRES ---
+  {
+    id: "b15",
+    mealType: "breakfast",
+    title: {
+      fr: "Toast Œufs Brouillés Crémeux, Saumon Fumé & Ciboulette",
+      en: "Creamy Scrambled Egg & Smoked Salmon Brioche Toast",
+      ar: "توست البيض المخفوق الكريمي مع السلمون المدخن والشبت"
+    },
+    emoji: "🥪",
+    prepTime: 4,
+    cookTime: 4,
+    difficulty: "easy",
+    caloriesPerPerson: 360,
+    tags: ["dietBalanced", "dietHalal", "dietHighProtein", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Pain complet ou brioché grillé", en: "Toasted bread", ar: "خبز محمص" }, quantity: 1, unit: "tranches", dept: "deptBakery" },
+      { name: { fr: "Œufs frais bio", en: "Eggs", ar: "بيض" }, quantity: 2, unit: "pcs", dept: "deptDairy" },
+      { name: { fr: "Saumon fumé en lanières", en: "Smoked salmon", ar: "سلمون مدخن" }, quantity: 40, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Ciboulette fraîche & Noisette de beurre", en: "Chives & butter", ar: "ثوم معمر وزبدة" }, quantity: 1, unit: "c.à.c", dept: "deptDairy" }
+    ],
+    instructions: {
+      fr: [
+        "Faites brouiller doucement les œufs au beurre à feu très doux 3 min pour une texture très crémeuse.",
+        "Déposez les œufs brouillés sur la tranche de pain toastée.",
+        "Drappez avec les lanières de saumon fumé et parsemez de ciboulette."
+      ],
+      en: [
+        "Slowly scramble eggs in butter over low heat for 3 mins until creamy.",
+        "Spoon scrambled eggs onto toasted bread.",
+        "Top with ribbons of smoked salmon and chopped chives."
+      ],
+      ar: [
+        "اخفق البيض في الزبدة على نار هادئة 3 دقائق حتى يصبح كريمياً.",
+        "ضع البيض المخفوق فوق الخبز المحمص.",
+        "زين بشرائح السلمون المدخن والثوم المعمر."
+      ]
+    }
+  },
+  {
+    id: "b16",
+    mealType: "breakfast",
+    title: {
+      fr: "Pudding Chia au Lait de Coco & Coulis de Mangue",
+      en: "Coconut Chia Seed Pudding with Mango Puree",
+      ar: "بودينغ بذور الشيا بحليب جوز الهند وصلصة المانجو"
+    },
+    emoji: "🥥",
+    prepTime: 5,
+    cookTime: 0,
+    difficulty: "easy",
+    caloriesPerPerson: 290,
+    tags: ["dietBalanced", "dietVegetarian", "dietHalal", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Graines de chia", en: "Chia seeds", ar: "بذور الشيا" }, quantity: 25, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Lait de coco ou d'amande", en: "Coconut or almond milk", ar: "حليب جوز هند أو لوز" }, quantity: 140, unit: "ml", dept: "deptPantry" },
+      { name: { fr: "Coulis de mangue ou fruits de la passion", en: "Mango puree", ar: "صلصة مانجو" }, quantity: 40, unit: "g", dept: "deptProduce" }
+    ],
+    instructions: {
+      fr: [
+        "Mélangez les graines de chia avec le lait de coco et laissez gonfler 15 min au frais.",
+        "Nappez de coulis de mangue fraîche.",
+        "Dégustez ce pudding frais, onctueux et riche en oméga-3."
+      ],
+      en: [
+        "Mix chia seeds with coconut milk and chill for 15 mins to thicken.",
+        "Pour mango puree over top.",
+        "Enjoy a chilled omega-3 rich breakfast."
+      ],
+      ar: [
+        "اخلط بذور الشيا مع حليب جوز الهند واتركها 15 دقيقة في الثلاجة.",
+        "اسكب صلصة المانجو الطازجة في الأعلى.",
+        "تناول هذا البودينغ المنعش والغني بالأوميغا 3."
+      ]
+    }
+  },
+  // --- SNACKS SUPPLEMENTAIRES ---
+  {
+    id: "s12",
+    mealType: "snack",
+    title: {
+      fr: "Compote Maison Pomme-Poire & Amandes Effilées",
+      en: "Homemade Apple-Pear Compote with Toasted Almonds",
+      ar: "كومبوت تفاح وإجاص بيتي مع رقائق اللوز المحمص"
+    },
+    emoji: "🍐",
+    prepTime: 5,
+    cookTime: 10,
+    difficulty: "easy",
+    caloriesPerPerson: 130,
+    tags: ["dietBalanced", "dietVegetarian", "dietHalal", "dietLowCalorie"],
+    ingredients: [
+      { name: { fr: "Pomme & Poire coupées en dés", en: "Diced apple & pear", ar: "تفاح وإجاص مكعبات" }, quantity: 180, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Amandes effilées grillées", en: "Sliced toasted almonds", ar: "رقائق لوز محمص" }, quantity: 10, unit: "g", dept: "deptPantry" }
+    ],
+    instructions: {
+      fr: [
+        "Faites compoter les fruits dans une petite casserole avec 2 c.à.s d'eau 10 minutes.",
+        "Écrasez à la fourchette pour garder de la texture.",
+        "Servez tiède ou frais parsemé d'amandes effilées croquantes."
+      ],
+      en: [
+        "Simmer fruit chunks with a splash of water for 10 mins.",
+        "Mash with a fork for a rustic texture.",
+        "Serve with crunchy toasted almond slices."
+      ],
+      ar: [
+        "اطه قطع الفواكه مع قليل من الماء 10 دقائق.",
+        "اهرس بالشوكة للحصول على قوام متماسك.",
+        "قدمه دافئاً أو بارداً مع رقائق اللوز المقرمش."
+      ]
+    }
+  },
+  {
+    id: "m101",
+    mealType: "lunch",
+    title: {
+      fr: "Couscous Perlé aux Légumes Rôtis & Feta Émiettée",
+      en: "Mediterranean Pearl Couscous with Roasted Veggies & Feta",
+      ar: "كسكسي الحبات الكبيرة بالخضار المشوية وجبن الفيتا"
+    },
+    emoji: "🥗",
+    prepTime: 10,
+    cookTime: 15,
+    difficulty: "easy",
+    caloriesPerPerson: 430,
+    tags: ["mediterranean", "dietBalanced", "dietVegetarian", "dietHalal", "dietHighFiber"],
+    ingredients: [
+      { name: { fr: "Couscous perlé ou moghrabieh", en: "Pearl couscous", ar: "مغربية / كسكسي كبير" }, quantity: 80, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Courgette, poivron & tomates cerises rôties", en: "Roasted Mediterranean veggies", ar: "خضار مشوية" }, quantity: 150, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Feta grecque émiettée", en: "Crumbled feta", ar: "جبن فيتا" }, quantity: 40, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Huile d'olive, jus de citron & menthe", en: "Olive oil, lemon & mint", ar: "زيت زيتون وليمون ونعناع" }, quantity: 1, unit: "c.à.s", dept: "deptProduce" }
+    ],
+    instructions: {
+      fr: [
+        "Faites cuire le couscous perlé 10 min dans l'eau bouillante salée, puis égouttez.",
+        "Faites rôtir les dés de légumes à la poêle avec l'huile d'olive et les herbes 8 min.",
+        "Mélangez le couscous chaud avec les légumes dorés et le jus de citron.",
+        "Parsemez de feta émiettée et de feuilles de menthe fraîche."
+      ],
+      en: [
+        "Boil pearl couscous for 10 mins and drain.",
+        "Pan-roast diced veggies in olive oil with herbs for 8 mins.",
+        "Toss couscous with warm vegetables and lemon juice.",
+        "Top with crumbled feta and fresh mint."
+      ],
+      ar: [
+        "اسلق الكسكسي الكبير 10 دقائق وصفه.",
+        "اشو الخضار في المقلاة مع زيت الزيتون والأعشاب 8 دقائق.",
+        "اخلط الكسكسي مع الخضار المشوية وعصير الليمون.",
+        "زين بجبن الفيتا والنعناع الطازج."
+      ]
+    }
+  },
+  {
+    id: "m102",
+    mealType: "dinner",
+    title: {
+      fr: "Escalope de Dinde Fondante à la Crème & Champignons",
+      en: "Tender Turkey Cutlet in Creamy Mushroom Sauce",
+      ar: "شريحة ديك رومي طرية بصلصة الفطر الكريمية"
+    },
+    emoji: "🍄",
+    prepTime: 5,
+    cookTime: 12,
+    difficulty: "easy",
+    caloriesPerPerson: 460,
+    tags: ["french", "dietBalanced", "dietHalal", "dietHighProtein", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Escalope de dinde", en: "Turkey cutlet", ar: "شريحة ديك رومي" }, quantity: 160, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Champignons de Paris frais émincés", en: "Sliced mushrooms", ar: "فطر طازج" }, quantity: 120, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Crème liquide légère", en: "Light cooking cream", ar: "كريمة طبخ خفيفة" }, quantity: 40, unit: "ml", dept: "deptDairy" },
+      { name: { fr: "Riz basmati ou tagliatelles", en: "Basmati rice or pasta", ar: "أرز أو معكرونة" }, quantity: 70, unit: "g", dept: "deptPantry" }
+    ],
+    instructions: {
+      fr: [
+        "Faites dorer l'escalope 3 min par face dans une poêle avec une noisette de beurre, puis réservez.",
+        "Faites revenir les champignons émincés 4 min dans la même poêle.",
+        "Versez la crème, assaisonnez de sel, poivre et persil, et remettez l'escalope 2 min pour la napper de sauce.",
+        "Servez chaud avec du riz ou des pâtes."
+      ],
+      en: [
+        "Sear cutlet for 3 mins each side in butter, then set aside.",
+        "Sauté mushrooms in the same pan for 4 mins.",
+        "Pour cream, season with parsley, salt and pepper, return cutlet for 2 mins.",
+        "Serve hot over rice or pasta."
+      ],
+      ar: [
+        "حمر شريحة اللحم 3 دقائق لكل جهة في الزبدة ثم ارفعها جانباً.",
+        "شوح الفطر 4 دقائق في نفس المقلاة.",
+        "اسكب الكريمة وتبل بالبقدونس والملح وأعد الشريحة دقيقتين.",
+        "قدمها ساخنة مع الأرز أو الباستا."
+      ]
+    }
+  },
+  {
+    id: "m103",
+    mealType: "dinner",
+    title: {
+      fr: "Shakshuka Verte aux Épinards, Courgettes & Œufs",
+      en: "Green Shakshuka with Sautéed Spinach, Zucchini & Eggs",
+      ar: "شكشوكة خضراء بالسبانخ والكوسة والبيض وجبن الفيتا"
+    },
+    emoji: "🍳",
+    prepTime: 8,
+    cookTime: 10,
+    difficulty: "easy",
+    caloriesPerPerson: 360,
+    tags: ["mediterranean", "maghreb", "dietBalanced", "dietVegetarian", "dietHalal", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Œufs frais bio", en: "Eggs", ar: "بيض" }, quantity: 2, unit: "pcs", dept: "deptDairy" },
+      { name: { fr: "Pousses d'épinards & Courgette râpée", en: "Baby spinach & zucchini", ar: "سبانخ وكوسة مبشورة" }, quantity: 150, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Feta émiettée & Oignon vert", en: "Feta & scallions", ar: "جبن فيتا وبصل أخضر" }, quantity: 30, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Cumin, ail & huile d'olive", en: "Cumin, garlic & olive oil", ar: "كمون وثوم وزيت زيتون" }, quantity: 1, unit: "c.à.s", dept: "deptSpices" }
+    ],
+    instructions: {
+      fr: [
+        "Faites suer la courgette râpée, les épinards et l'ail dans l'huile d'olive 4 min.",
+        "Creusez deux puits dans la poêle verte et cassez-y les œufs.",
+        "Couvrez et laissez cuire 3-4 min jusqu'à ce que les blancs soient pris.",
+        "Émiettez la feta sur le dessus et dégustez avec du pain grillé."
+      ],
+      en: [
+        "Sauté grated zucchini, spinach, and garlic in olive oil for 4 mins.",
+        "Make wells in greens and crack eggs directly inside.",
+        "Cover and cook for 3-4 mins until whites set.",
+        "Scatter feta over top and serve with warm crusty bread."
+      ],
+      ar: [
+        "شوح الكوسة المبشورة والسبانخ والثوم في الزيت 4 دقائق.",
+        "اصنع فجوتين واكسر البيض بداخلهما.",
+        "غط المقلاة 3-4 دقائق حتى يتماسك بياض البيض.",
+        "رش جبن الفيتا وقدمها مع الخبز المحمص."
+      ]
+    }
+  },
+  {
+    id: "m104",
+    mealType: "lunch",
+    title: {
+      fr: "Fish Tacos Croustillants & Sauce Crémeuse Citron Vert",
+      en: "Crispy Baja Fish Tacos with Creamy Lime Slaw",
+      ar: "تاكوس السمك المقرمش مع صلصة الليمون الأخضر الكريمية"
+    },
+    emoji: "🌮",
+    prepTime: 10,
+    cookTime: 8,
+    difficulty: "easy",
+    caloriesPerPerson: 460,
+    tags: ["mexican", "dietBalanced", "dietHalal", "dietHighProtein", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Filet de cabillaud ou colin", en: "Cod fillet", ar: "فيليه سمك القد" }, quantity: 150, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Tortillas de maïs ou blé", en: "Tortillas", ar: "تورتيلا" }, quantity: 2, unit: "pcs", dept: "deptBakery" },
+      { name: { fr: "Chou rouge émincé & Coriandre", en: "Red cabbage slaw & cilantro", ar: "ملفوف أحمر وكزبرة" }, quantity: 60, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Sauce crémeuse (yaourt, citron vert, paprika)", en: "Lime yogurt crema", ar: "صلصة ليمون بالزبادي" }, quantity: 30, unit: "g", dept: "deptDairy" }
+    ],
+    instructions: {
+      fr: [
+        "Assaisonnez le poisson de paprika et faites-le dorer 3 min par face à la poêle.",
+        "Chauffez les tortillas à sec 30 secondes.",
+        "Garnissez chaque tortilla de chou croquant, de morceaux de poisson doré et de sauce crémeuse au citron vert.",
+        "Dégustez immédiatement bien chaud et croustillant."
+      ],
+      en: [
+        "Season fish with paprika and pan-sear for 3 mins each side.",
+        "Warm tortillas in a dry skillet for 30 secs.",
+        "Assemble with crisp slaw, flaky fish chunks, and lime crema.",
+        "Serve immediately with fresh lime wedges."
+      ],
+      ar: [
+        "تبل السمك بالبابريكا واقله 3 دقائق لكل جانب.",
+        "سخن التورتيلا 30 ثانية في مقلاة جافة.",
+        "احش التورتيلا بالملفوف والسمك وصلصة الليمون الكريمية.",
+        "قدم التاكوس فوراً وهو دافئ ومقرمش."
+      ]
+    }
+  },
+  {
+    id: "m105",
+    mealType: "dinner",
+    title: {
+      fr: "Risotto aux Crevettes, Safran & Zeste de Citron",
+      en: "Saffron & Shrimp Risotto with Fresh Lemon Zest",
+      ar: "ريزوتو الجمبري المعطر بالزعفران وبرش الليمون"
+    },
+    emoji: "🍤",
+    prepTime: 10,
+    cookTime: 20,
+    difficulty: "medium",
+    caloriesPerPerson: 490,
+    tags: ["italian", "dietBalanced", "dietHalal", "dietHighProtein"],
+    ingredients: [
+      { name: { fr: "Riz arborio pour risotto", en: "Arborio rice", ar: "أرز ريزوتو" }, quantity: 80, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Crevettes décortiquées", en: "Peeled shrimp", ar: "جمبري مقشر" }, quantity: 130, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Dose de safran ou curcuma & Zeste de citron", en: "Saffron & lemon zest", ar: "زعفران وبرش ليمون" }, quantity: 1, unit: "pincée", dept: "deptSpices" },
+      { name: { fr: "Parmesan râpé & Bouillon de légumes", en: "Parmesan & broth", ar: "جبن بارميزان ومرق" }, quantity: 350, unit: "ml", dept: "deptPantry" }
+    ],
+    instructions: {
+      fr: [
+        "Faites nacrer le riz dans un filet d'huile 2 min, puis ajoutez le safran.",
+        "Mouillez avec le bouillon chaud louche après louche pendant 18 min en remuant.",
+        "Faites sauter les crevettes 2 min à la poêle et ajoutez-les au risotto en fin de cuisson.",
+        "Liez hors du feu avec le parmesan et le zeste de citron frais."
+      ],
+      en: [
+        "Toast arborio rice in oil for 2 mins, stir in saffron.",
+        "Gradually add warm broth for 18 mins while stirring.",
+        "Sear shrimp for 2 mins and fold into risotto at the end.",
+        "Stir in parmesan and fresh lemon zest off heat."
+      ],
+      ar: [
+        "حمص الأرز دقيقتين في الزيت وأضف الزعفران.",
+        "أضف المرق تدريجياً مع التحريك المستمر 18 دقيقة.",
+        "شوح الجمبري دقيقتين وأضفه إلى الريزوتو في النهاية.",
+        "اخلط جبن البارميزان وبرش الليمون بعد رفعه عن النار."
+      ]
+    }
+  },
+  {
+    id: "m106",
+    mealType: "lunch",
+    title: {
+      fr: "Gnocchis Sauce Tomate Maison, Mozzarella & Basilic",
+      en: "Pan-Fried Gnocchi in Rustic Tomato Sauce with Melted Mozzarella",
+      ar: "نيوكي بصلصة الطماطم البيتي والموزاريلا الذائبة والريحان"
+    },
+    emoji: "🍅",
+    prepTime: 5,
+    cookTime: 10,
+    difficulty: "easy",
+    caloriesPerPerson: 460,
+    tags: ["italian", "dietBalanced", "dietVegetarian", "dietHalal", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Gnocchis à poêler", en: "Pan-fry gnocchi", ar: "نيوكي" }, quantity: 180, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Coulis de tomate parfumé à l'ail", en: "Garlic tomato sauce", ar: "صلصة طماطم بالثوم" }, quantity: 120, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Mozzarella en dés fondants", en: "Diced mozzarella", ar: "مكعبات موزاريلا" }, quantity: 45, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Feuilles de basilic frais", en: "Fresh basil leaves", ar: "أوراق ريحان" }, quantity: 10, unit: "g", dept: "deptProduce" }
+    ],
+    instructions: {
+      fr: [
+        "Faites dorer les gnocchis 5 min dans une poêle avec une noisette de beurre.",
+        "Versez le coulis de tomate chaud sur les gnocchis croustillants.",
+        "Ajoutez les dés de mozzarella, couvrez 2 min pour laisser le fromage fondre.",
+        "Décorez de basilic frais et servez immédiatement."
+      ],
+      en: [
+        "Pan-sear gnocchi in butter for 5 mins until crisp.",
+        "Pour warm tomato sauce over gnocchi.",
+        "Top with mozzarella cubes, cover for 2 mins to melt.",
+        "Garnish with fresh basil and serve."
+      ],
+      ar: [
+        "حمر النيوكي 5 دقائق في الزبدة حتى يقرمش.",
+        "اسكب صلصة الطماطم الدافئة فوق النيوكي.",
+        "أضف مكعبات الموزاريلا وغط المقلاة دقيقتين حتى تذوب.",
+        "زين بأوراق الريحان وقدمه فوراً."
+      ]
+    }
+  },
+  {
+    id: "m107",
+    mealType: "dinner",
+    title: {
+      fr: "Brochettes de Poulet Satay & Sauce Cacahuète Onctueuse",
+      en: "Chicken Satay Skewers with Creamy Peanut Sauce",
+      ar: "أسياخ دجاج ساتاي الآسيوية بصلصة الفول السوداني الغنية"
+    },
+    emoji: "🍢",
+    prepTime: 12,
+    cookTime: 8,
+    difficulty: "easy",
+    caloriesPerPerson: 490,
+    tags: ["asian", "dietBalanced", "dietHalal", "dietHighProtein", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Aiguillettes de poulet enfilées sur piques", en: "Chicken skewers", ar: "أسياخ دجاج" }, quantity: 160, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Beurre de cacahuète pur & Lait de coco", en: "Peanut butter & coconut milk", ar: "زبدة فول سوداني وحليب جوز هند" }, quantity: 50, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Sauce soja, curcuma & citron vert", en: "Soy sauce, turmeric & lime", ar: "صلصة صويا وكركم وليمون" }, quantity: 1, unit: "c.à.s", dept: "deptPantry" },
+      { name: { fr: "Riz jasmin cuit & Concombre frais", en: "Jasmine rice & cucumber", ar: "أرز ياسمين وخيار" }, quantity: 80, unit: "g", dept: "deptPantry" }
+    ],
+    instructions: {
+      fr: [
+        "Faites griller les brochettes de poulet au curcuma 7 min à la poêle huilée.",
+        "Dans une petite casserole, émulsionnez le beurre de cacahuète avec le lait de coco, la sauce soja et le citron vert pour faire la sauce satay.",
+        "Nappez les brochettes de sauce chaude et servez avec le riz jasmin et des rondelles de concombre frais."
+      ],
+      en: [
+        "Pan-sear turmeric chicken skewers for 7 mins.",
+        "Whisk peanut butter, coconut milk, soy sauce, and lime juice in a small pan to make satay sauce.",
+        "Drizzle sauce over skewers and serve with jasmine rice and cucumber."
+      ],
+      ar: [
+        "اشو أسياخ الدجاج المتبلة بالكركم 7 دقائق في المقلاة.",
+        "اخلط زبدة الفول السوداني مع حليب جوز الهند وصلصة الصويا والليمون لتحضير صلصة الساتاي.",
+        "اسكب الصلصة فوق الأسياخ وقدمها مع الأرز والخيار."
+      ]
+    }
+  },
+  {
+    id: "m108",
+    mealType: "dinner",
+    title: {
+      fr: "Curry Chana Masala aux Pois Chiches & Épinards",
+      en: "Indian Chana Masala Chickpea & Spinach Curry",
+      ar: "شانا ماسالا الهندية بالحمص والسبانخ والأرز البسمتي"
+    },
+    emoji: "🍛",
+    prepTime: 8,
+    cookTime: 15,
+    difficulty: "easy",
+    caloriesPerPerson: 420,
+    tags: ["indian", "dietBalanced", "dietVegetarian", "dietHalal", "dietHighFiber"],
+    ingredients: [
+      { name: { fr: "Pois chiches cuits égouttés", en: "Cooked chickpeas", ar: "حمص مسلوق" }, quantity: 180, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Pousses d'épinards fraîches", en: "Fresh baby spinach", ar: "سبانخ طازجة" }, quantity: 100, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Tomates concassées & Garam Masala", en: "Diced tomatoes & garam masala", ar: "طماطم معصورة وجارام ماسالا" }, quantity: 150, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Riz basmati (accompagnement)", en: "Basmati rice", ar: "أرز بسمتي" }, quantity: 70, unit: "g", dept: "deptPantry" }
+    ],
+    instructions: {
+      fr: [
+        "Faites revenir l'ail, le gingembre et les épices garam masala 1 min dans une sauteuse.",
+        "Ajoutez les tomates concassées et les pois chiches, laissez mijoter 10 minutes.",
+        "Incorporez les épinards qui vont fondre en 2 minutes.",
+        "Dégustez bien chaud avec le riz basmati."
+      ],
+      en: [
+        "Sauté garlic, ginger, and garam masala for 1 min.",
+        "Add tomatoes and chickpeas, simmer for 10 mins.",
+        "Stir in baby spinach for 2 mins until wilted.",
+        "Serve hot over fluffy basmati rice."
+      ],
+      ar: [
+        "شوح الثوم والزنجبيل والبهارات دقيقة واحدة في قدر.",
+        "أضف الطماطم والحمص واتركه يغلي 10 دقائق.",
+        "أضف السبانخ وقلب دقيقتين حتى تذبل.",
+        "قدمه ساخناً مع أرز البسمتي."
+      ]
+    }
+  },
+  {
+    id: "m109",
+    mealType: "dinner",
+    title: {
+      fr: "Soupe de Lentilles Corail à la Turque & Menthe Séchée",
+      en: "Turkish Red Lentil Soup (Mercimek Çorbası) with Mint Butter",
+      ar: "شوربة العدس التركية (ميرجيمك) بالنعناع المجفف والليمون"
+    },
+    emoji: "🥣",
+    prepTime: 8,
+    cookTime: 20,
+    difficulty: "easy",
+    caloriesPerPerson: 320,
+    tags: ["mediterranean", "dietBalanced", "dietVegetarian", "dietHalal", "dietHighFiber", "dietLowCalorie"],
+    ingredients: [
+      { name: { fr: "Lentilles corail rincées", en: "Red lentils", ar: "عدس أحمر" }, quantity: 80, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Carotte, oignon & pomme de terre", en: "Carrot, onion & potato", ar: "جزر وبصل وبطاطس" }, quantity: 150, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Beurre, menthe séchée & piment doux", en: "Mint-paprika butter drizzle", ar: "زبدة بالنعناع والبابريكا" }, quantity: 15, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Quartier de citron", en: "Lemon wedge", ar: "ليمون" }, quantity: 1, unit: "pcs", dept: "deptProduce" }
+    ],
+    instructions: {
+      fr: [
+        "Faites cuire les lentilles, la carotte et la pomme de terre dans 500ml de bouillon 18 minutes.",
+        "Mixez finement jusqu'à consistance soyeuse.",
+        "Faites fondre le beurre avec la menthe séchée et le piment 1 min.",
+        "Versez la soupe dans des bols, nappez de beurre parfumé et servez avec du citron."
+      ],
+      en: [
+        "Boil lentils, carrot, and potato in broth for 18 mins.",
+        "Blend until velvet smooth.",
+        "Melt butter with dried mint and mild paprika for 1 min.",
+        "Ladle into bowls, drizzle mint butter, and serve with lemon."
+      ],
+      ar: [
+        "اطه العدس والجزر والبطاطس في المرق 18 دقيقة.",
+        "اخلط جيداً بالخلاط حتى يصبح القوام ناعماً كالحرير.",
+        "ذوب الزبدة مع النعناع المجفف والبابريكا دقيقة واحدة.",
+        "اسكب الشوربة وزين بصلصة الزبدة بالنعناع وقدمها مع الليمون."
+      ]
+    }
+  },
+  {
+    id: "m110",
+    mealType: "lunch",
+    title: {
+      fr: "Filet de Colin en Croûte d'Herbes & Riz Complet",
+      en: "Herb-Crusted Pollock Fillet with Brown Rice & Lemon",
+      ar: "فيليه سمك مع طبقة أعشاب مقرمشة مع أرز بني وليمون"
+    },
+    emoji: "🐟",
+    prepTime: 8,
+    cookTime: 12,
+    difficulty: "easy",
+    caloriesPerPerson: 380,
+    tags: ["french", "dietBalanced", "dietHalal", "dietHighProtein", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Filet de colin ou cabillaud", en: "Pollock fillet", ar: "فيليه سمك" }, quantity: 160, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Chapelure, persil, thym & huile d'olive", en: "Herb crust mix", ar: "أعشاب وبقسماط وزيت" }, quantity: 25, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Riz complet cuit", en: "Cooked brown rice", ar: "أرز بني مطبوخ" }, quantity: 80, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Courgette sautée en dés", en: "Sautéed diced zucchini", ar: "كوسة مكعبات" }, quantity: 100, unit: "g", dept: "deptProduce" }
+    ],
+    instructions: {
+      fr: [
+        "Préchauffez le four à 200°C.",
+        "Déposez le filet de poisson dans un plat, recouvrez de la croûte d'herbes et chapelure.",
+        "Enfournez 12 minutes jusqu'à ce que la croûte soit bien dorée et croustillante.",
+        "Servez avec le riz complet et les dés de courgettes sautées."
+      ],
+      en: [
+        "Preheat oven to 200°C (400°F).",
+        "Place fish in baking dish and top with herb breadcrumb crust.",
+        "Bake for 12 mins until crust is golden and crunchy.",
+        "Serve alongside brown rice and sautéed zucchini."
+      ],
+      ar: [
+        "سخن الفرن على 200 مئوية.",
+        "ضع السمك في صينية وغطه بطبقة الأعشاب والبقسماط.",
+        "اخبز 12 دقيقة حتى تصبح الطبقة مقرمشة وذهبية.",
+        "قدمه مع الأرز البني والكوسة المشوحة."
+      ]
+    }
+  },
+  // --- PETITS DEJEUNERS SUPPLEMENTAIRES ---
+  {
+    id: "b17",
+    mealType: "breakfast",
+    title: {
+      fr: "Bagel Complet au Fromage Frais, Concombre & Truite Fumée",
+      en: "Whole Grain Bagel with Cream Cheese & Smoked Trout",
+      ar: "باغل الحبوب الكاملة بالجبن الكريمي وشرائح السلمون والخيار"
+    },
+    emoji: "🥯",
+    prepTime: 4,
+    cookTime: 0,
+    difficulty: "easy",
+    caloriesPerPerson: 360,
+    tags: ["dietBalanced", "dietHalal", "dietHighProtein", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Bagel complet toasté", en: "Whole wheat bagel", ar: "خبز باغل كامل" }, quantity: 1, unit: "pcs", dept: "deptBakery" },
+      { name: { fr: "Fromage frais à tartiner", en: "Cream cheese", ar: "جبن كريمي" }, quantity: 30, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Truite ou saumon fumé", en: "Smoked trout or salmon", ar: "سلمون مدخن" }, quantity: 40, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Rondelles de concombre & Aneth", en: "Cucumber & dill", ar: "خيار وشبت" }, quantity: 30, unit: "g", dept: "deptProduce" }
+    ],
+    instructions: {
+      fr: [
+        "Coupez le bagel en deux et toastez-le légèrement.",
+        "Tartinez de fromage frais.",
+        "Disposez les lanières de truite fumée, les rondelles de concombre et l'aneth frais."
+      ],
+      en: [
+        "Halve and toast the bagel.",
+        "Spread with cream cheese.",
+        "Layer smoked trout, cucumber ribbons, and fresh dill."
+      ],
+      ar: [
+        "اقطع الباغل نصفين وحمصه خفيفاً.",
+        "ادهن بالجبن الكريمي.",
+        "رتب شرائح السلمون المدخن والخيار والشبت."
+      ]
+    }
+  },
+  {
+    id: "b18",
+    mealType: "breakfast",
+    title: {
+      fr: "Pancakes Protéinés Avoine & Compote de Pommes",
+      en: "Oat Protein Pancakes with Warm Spiced Applesauce",
+      ar: "بان كيك الشوفان الغني بالبروتين مع صلصة التفاح الدافئة"
+    },
+    emoji: "🥞",
+    prepTime: 5,
+    cookTime: 6,
+    difficulty: "easy",
+    caloriesPerPerson: 330,
+    tags: ["dietBalanced", "dietVegetarian", "dietHalal", "dietHighProtein", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Flocons d'avoine mixés", en: "Ground oats", ar: "شوفان مطحون" }, quantity: 50, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Fromage blanc ou yaourt grec", en: "Greek yogurt", ar: "زبادي يوناني" }, quantity: 60, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Œufs frais", en: "Eggs", ar: "بيض" }, quantity: 2, unit: "pcs", dept: "deptDairy" },
+      { name: { fr: "Compote de pommes sans sucre ajouté", en: "Unsweetened applesauce", ar: "صلصة تفاح" }, quantity: 60, unit: "g", dept: "deptProduce" }
+    ],
+    instructions: {
+      fr: [
+        "Battez l'avoine avec le fromage blanc et les œufs.",
+        "Faites cuire des petits pancakes 2 min par face dans une poêle antiadhésive huilée.",
+        "Dégustez la pile de pancakes avec la compote de pommes tiède."
+      ],
+      en: [
+        "Whisk oats with yogurt and eggs into a batter.",
+        "Cook pancakes for 2 mins each side in a greased pan.",
+        "Stack and top with warm applesauce."
+      ],
+      ar: [
+        "اخفق الشوفان مع الزبادي والبيض.",
+        "اطه قطع البان كيك دقيقتين لكل وجه في المقلاة.",
+        "قدمها مع صلصة التفاح الدافئة."
+      ]
+    }
+  },
+  // --- SNACKS SUPPLEMENTAIRES ---
+  {
+    id: "s13",
+    mealType: "snack",
+    title: {
+      fr: "Mousse Express au Chocolat Noir Intense 70%",
+      en: "Quick 2-Ingredient Dark Chocolate Mousse",
+      ar: "موس الشوكولاتة الداكنة 70% الخفيفة والسريعة"
+    },
+    emoji: "🍫",
+    prepTime: 5,
+    cookTime: 0,
+    difficulty: "easy",
+    caloriesPerPerson: 160,
+    tags: ["dietBalanced", "dietVegetarian", "dietHalal"],
+    ingredients: [
+      { name: { fr: "Chocolat noir 70% fondu", en: "Melted 70% dark chocolate", ar: "شوكولاتة داكنة ذائبة" }, quantity: 25, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Blancs d'œufs battus en neige ferme", en: "Whipped egg whites", ar: "بياض بيض مخفوق" }, quantity: 2, unit: "pcs", dept: "deptDairy" }
+    ],
+    instructions: {
+      fr: [
+        "Montez les blancs d'œufs en neige très ferme avec une pincée de sel.",
+        "Incorporez délicatement le chocolat noir tiède à la spatule.",
+        "Placez 20 min au frais pour une mousse aérée et intensément chocolatée."
+      ],
+      en: [
+        "Whip egg whites into stiff peaks with a pinch of salt.",
+        "Gently fold in melted dark chocolate with a spatula.",
+        "Chill for 20 mins for an airy intense chocolate mousse."
+      ],
+      ar: [
+        "اخفق بياض البيض حتى يتماسك تماماً.",
+        "اخلط الشوكولاتة الذائبة برفق باستخدام ملعقة.",
+        "اتركه يبرد 20 دقيقة في الثلاجة للحصول على موس خفيف ولذيذ."
+      ]
+    }
+  },
+  {
+    id: "s14",
+    mealType: "snack",
+    title: {
+      fr: "Poignée d'Amandes & Noisettes Grillées Nature",
+      en: "Handful of Roasted Unsalted Almonds & Hazelnuts",
+      ar: "حفنة من اللوز والبندق المحمص غير المملح"
+    },
+    emoji: "🥜",
+    prepTime: 1,
+    cookTime: 0,
+    difficulty: "easy",
+    caloriesPerPerson: 170,
+    tags: ["dietBalanced", "dietVegetarian", "dietHalal", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Amandes et noisettes entières non salées", en: "Raw or roasted nuts", ar: "لوز وبندق غير مملح" }, quantity: 30, unit: "g", dept: "deptPantry" }
+    ],
+    instructions: {
+      fr: [
+        "Servez une poignée de fruits à coque grillés pour un boost sain de bons lipides et d'énergie."
+      ],
+      en: [
+        "Enjoy a handful of roasted nuts for healthy fats and clean energy."
+      ],
+      ar: [
+        "تناول حفنة من المكسرات المحمصة للحصول على طاقة ودهون صحية."
+      ]
+    }
   }
 ];
+
+
+
 
 
 

@@ -75,6 +75,21 @@ export default function DriveCartModal({
     ? DriveService.getSearchSuggestions(getRawItemName(currentItem))
     : [];
 
+  const handleWebViewMessage = (event) => {
+    try {
+      const payload = JSON.parse(event.nativeEvent.data);
+      if (payload.type === "drive_search_log") {
+        console.log(`[Drive Web] ${payload.text}`);
+      } else if (payload.type === "log") {
+        console.log(`[Drive Console] ${payload.data}`);
+      } else if (payload.type === "error" || payload.type === "uncaught_error") {
+        console.warn(`[Drive Error] ${payload.data}`);
+      }
+    } catch {
+      console.log(`[Drive Msg] ${event.nativeEvent.data}`);
+    }
+  };
+
   // Injecter la recherche directement dans la session active du magasin
   const injectSearchInStore = (query) => {
     if (!query) return;
@@ -82,14 +97,29 @@ export default function DriveCartModal({
     if (!cleanQ) return;
     const searchFallbackUrl = selectedStore.searchUrl(cleanQ);
 
+    console.log(`[PlanEat Drive] 🚀 Démarrage recherche: "${cleanQ}" sur ${selectedStore.name}`);
+
     const js = `
       (function() {
+        function log(msg) {
+          if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'drive_search_log', text: msg }));
+          }
+        }
+
         try {
           var q = ${JSON.stringify(cleanQ)};
+          var host = (window.location.hostname || '').toLowerCase();
+          var href = window.location.href || '';
+          
+          log("📍 URL actuelle: " + href);
           
           function fillAndSubmit(input) {
             if (!input) return false;
             try {
+              var inputDesc = (input.tagName || '') + '#' + (input.id || '') + '.' + (input.className || '') + ' [name=' + (input.name || '') + ']';
+              log("✍️ Saisie dans le champ: " + inputDesc);
+              
               input.focus();
               var setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")?.set;
               if (setter) {
@@ -115,20 +145,26 @@ export default function DriveCartModal({
                 btn = document.querySelector('button[type="submit"], button[aria-label*="recherche" i], button[title*="recherche" i], .btn-search, .search-button, #btnRecherche, button.search-submit, .search-bar button, .header-search button');
               }
               if (btn) {
+                log("🖱️ Clic sur bouton validation: " + (btn.tagName || '') + '.' + (btn.className || '') + ' text=' + (btn.innerText || ''));
                 btn.click();
               } else if (input.form && typeof input.form.submit === 'function') {
+                log("📤 Soumission directe du formulaire parent");
                 input.form.submit();
+              } else {
+                log("⚠️ Pas de bouton/formulaire trouvé, validation par touche Enter effectuée");
               }
               return true;
             } catch(e) {
+              log("❌ Erreur dans fillAndSubmit: " + e.message);
               return false;
             }
           }
 
           // 1. Chercher tous les inputs candidats dans le DOM
           var allInputs = Array.from(document.querySelectorAll('input'));
+          log("🔍 Total <input> détectés dans le DOM: " + allInputs.length);
+          
           var bestInput = null;
-
           for (var i = 0; i < allInputs.length; i++) {
             var inp = allInputs[i];
             var type = (inp.type || '').toLowerCase();
@@ -163,10 +199,16 @@ export default function DriveCartModal({
           // 2. Si pas trouvé, vérifier s'il y a un déclencheur/icône de recherche à cliquer
           var searchTrigger = document.querySelector('[aria-label*="recherche" i], [title*="recherche" i], .icon-search, .search-icon, #btnOpenSearch, .header-search-btn');
           if (searchTrigger) {
+            log("🔎 Clic sur l'icône loupe/recherche pour ouvrir la barre");
             searchTrigger.click();
             setTimeout(function() {
               var lateInput = document.querySelector('input[type="search"], input[name*="recherche" i], input[id*="recherche" i], input[placeholder*="recherche" i], input[type="text"]');
-              if (lateInput) fillAndSubmit(lateInput);
+              if (lateInput) {
+                log("✍️ Saisie dans le champ après ouverture: " + (lateInput.id || lateInput.name));
+                fillAndSubmit(lateInput);
+              } else {
+                log("⚠️ Aucun champ trouvé après ouverture de l'icône");
+              }
             }, 300);
             return;
           }
@@ -177,13 +219,17 @@ export default function DriveCartModal({
           if (host.includes('leclercdrive.fr')) {
             var storeMatch = href.match(/(https?:\\/\\/[^\\/]+\\/magasin-[^\\/\\?#]+)/i);
             if (storeMatch && storeMatch[1]) {
-              window.location.href = storeMatch[1] + '/recherche.aspx?TexteRecherche=' + encodeURIComponent(q);
+              var target = storeMatch[1] + '/recherche.aspx?TexteRecherche=' + encodeURIComponent(q);
+              log("🌐 Redirection URL magasin Leclerc: " + target);
+              window.location.href = target;
               return;
             }
           }
 
+          log("🌐 Redirection URL fallback générique: " + ${JSON.stringify(searchFallbackUrl)});
           window.location.href = ${JSON.stringify(searchFallbackUrl)};
         } catch(e) {
+          log("💥 Exception globale injectSearch: " + e.message);
           window.location.href = ${JSON.stringify(searchFallbackUrl)};
         }
       })();
@@ -404,6 +450,7 @@ export default function DriveCartModal({
             }}
             onLoadStart={() => setIsLoadingWeb(true)}
             onLoadEnd={() => setIsLoadingWeb(false)}
+            onMessage={handleWebViewMessage}
             originWhitelist={["*"]}
             setSupportMultipleWindows={false}
             sharedCookiesEnabled={true}

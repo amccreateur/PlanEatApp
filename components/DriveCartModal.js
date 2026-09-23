@@ -88,28 +88,45 @@ export default function DriveCartModal({
     }
 
     if (isSelectingStore && url) {
-      const isStorePage =
-        url.includes("/magasin-") ||
-        url.includes("/drive/magasin") ||
-        url.includes("m-courses.leclercdrive.fr/magasin") ||
-        (selectedStore.id === "carrefour" && (url.includes("/drive") || url.includes("/magasins") || url.includes("/r?q=") || url.includes("/p/") || url.includes("/rayon/"))) ||
-        (selectedStore.id === "coursesu" && (url.includes("/drive") || url.includes("/magasin") || url.includes("/recherche") || url.includes("/rayon/"))) ||
-        (selectedStore.id === "auchan" && (url.includes("/drive") || url.includes("/magasin") || url.includes("/recherche") || url.includes("/rayon/"))) ||
-        (selectedStore.id === "intermarche" && (url.includes("/drive") || url.includes("/magasin") || url.includes("/recherche") || url.includes("/rayon/")));
+      const cleanUrl = url.replace(/\/+$/, "").toLowerCase();
+      const isInitialHome = (
+        cleanUrl === selectedStore.homeUrl.replace(/\/+$/, "").toLowerCase() ||
+        cleanUrl === "https://www.carrefour.fr" ||
+        cleanUrl === "https://www.carrefour.fr/drive" ||
+        cleanUrl === "https://www.leclercdrive.fr" ||
+        cleanUrl === "https://m-courses.leclercdrive.fr" ||
+        cleanUrl === "https://www.coursesu.com" ||
+        cleanUrl === "https://www.coursesu.com/drive/accueil" ||
+        cleanUrl === "https://www.auchan.fr" ||
+        cleanUrl === "https://www.auchan.fr/drive" ||
+        cleanUrl === "https://www.intermarche.com" ||
+        cleanUrl === "https://www.intermarche.com/drive"
+      );
 
-      if (isStorePage) {
-        console.log("[Drive AutoStart] 🏪 Magasin détecté: " + url);
-        sendServerLog("STORE_AUTO_DETECTED", url);
-        setIsSelectingStore(false);
-        setTimeout(() => {
-          if (currentItem) {
-            const q = getCleanItemName(currentItem);
-            if (q) {
-              setSearchQuery(q);
-              injectSearchInStore(q);
+      if (!isInitialHome) {
+        const isStoreSelected =
+          url.includes("/magasin-") ||
+          url.includes("/magasins/") ||
+          url.includes("m-courses.leclercdrive.fr/magasin") ||
+          (selectedStore.id === "carrefour" && (url.includes("/magasins/") || url.includes("/drive/") || url.includes("service_point"))) ||
+          (selectedStore.id === "coursesu" && (url.includes("/magasin-") || url.includes("/courses-en-ligne/"))) ||
+          (selectedStore.id === "auchan" && (url.includes("/magasin") || url.includes("/courses/"))) ||
+          (selectedStore.id === "intermarche" && url.includes("/magasin"));
+
+        if (isStoreSelected) {
+          console.log("[Drive AutoStart] 🏪 Magasin détecté: " + url);
+          sendServerLog("STORE_AUTO_DETECTED", url);
+          setIsSelectingStore(false);
+          setTimeout(() => {
+            if (currentItem) {
+              const q = getCleanItemName(currentItem);
+              if (q) {
+                setSearchQuery(q);
+                injectSearchInStore(q);
+              }
             }
-          }
-        }, 400);
+          }, 400);
+        }
       }
     }
   };

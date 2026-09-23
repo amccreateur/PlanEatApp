@@ -91,7 +91,11 @@ export default function DriveCartModal({
       const isStorePage =
         url.includes("/magasin-") ||
         url.includes("/drive/magasin") ||
-        url.includes("m-courses.leclercdrive.fr/magasin");
+        url.includes("m-courses.leclercdrive.fr/magasin") ||
+        (selectedStore.id === "carrefour" && (url.includes("/drive") || url.includes("/magasins") || url.includes("/r?q=") || url.includes("/p/") || url.includes("/rayon/"))) ||
+        (selectedStore.id === "coursesu" && (url.includes("/drive") || url.includes("/magasin") || url.includes("/recherche") || url.includes("/rayon/"))) ||
+        (selectedStore.id === "auchan" && (url.includes("/drive") || url.includes("/magasin") || url.includes("/recherche") || url.includes("/rayon/"))) ||
+        (selectedStore.id === "intermarche" && (url.includes("/drive") || url.includes("/magasin") || url.includes("/recherche") || url.includes("/rayon/")));
 
       if (isStorePage) {
         console.log("[Drive AutoStart] 🏪 Magasin détecté: " + url);
@@ -375,8 +379,15 @@ export default function DriveCartModal({
               <View style={[styles.storeTipBanner, { backgroundColor: theme.cardBgAlt }]}>
                 <Ionicons name="sparkles" size={13} color="#38bdf8" />
                 <Text style={[styles.storeTipText, { color: theme.textSub }]}>
-                  Choisissez votre magasin sur le site. Les courses démarrent automatiquement !
+                  Choisissez votre magasin, ou démarrez directement :
                 </Text>
+                <TouchableOpacity
+                  style={styles.tipStartBtn}
+                  onPress={handleStartShopping}
+                >
+                  <Text style={styles.tipStartBtnText}>Démarrer</Text>
+                  <Ionicons name="arrow-forward" size={11} color="#ffffff" />
+                </TouchableOpacity>
               </View>
             </>
           )}
@@ -740,6 +751,20 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 11,
     fontWeight: "600"
+  },
+  tipStartBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#10b981",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    gap: 4
+  },
+  tipStartBtnText: {
+    color: "#ffffff",
+    fontSize: 11,
+    fontWeight: "800"
   },
   webContainer: {
     flex: 1,

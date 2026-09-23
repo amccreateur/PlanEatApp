@@ -916,7 +916,7 @@ export default function DriveCartModal({
             </View>
           )
         )}
-      </SafeAreaView>
+      </View>
     </Modal>
   );
 }

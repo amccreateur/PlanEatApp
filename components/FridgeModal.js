@@ -258,7 +258,7 @@ export default function FridgeModal({
             </View>
           )}
         </ScrollView>
-      </SafeAreaView>
+      </View>
     </Modal>
   );
 }

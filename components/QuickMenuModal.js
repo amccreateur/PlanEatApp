@@ -291,7 +291,7 @@ export default function QuickMenuModal({
                   </View>
                 </ScrollView>
               </View>
-            </SafeAreaView>
+            </View>
           </TouchableWithoutFeedback>
         </View>
       </TouchableWithoutFeedback>

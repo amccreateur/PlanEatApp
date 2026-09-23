@@ -196,7 +196,6 @@ export default function DriveCartModal({
               input.dispatchEvent(enterPress);
               input.dispatchEvent(enterUp);
 
-              // Dans une SPA Angular (m-courses.leclercdrive), chercher le bouton .recherche-loupe ou submit
               var container = input.closest('form, div, header') || document;
               var buttons = Array.from(container.querySelectorAll('.recherche-loupe, [class*="loupe"], button[type="submit"], button, .btn-search, .search-button, [aria-label*="recherche" i]'));
               var btn = null;
@@ -220,75 +219,80 @@ export default function DriveCartModal({
             }
           }
 
-          // 1. Chercher si un champ de recherche est DÉJÀ présent dans la page (accueil ou page de résultats)
-          var allSaisie = Array.from(document.querySelectorAll('input#saisieTexte, input.champ-recherche, input[type="search"], input[placeholder*="Produit" i], input[placeholder*="recherche" i], input[type="text"]'));
-          var activeInput = allSaisie.find(function(el) {
-            return isGoodInput(el);
-          });
-          if (activeInput) {
-            log("🎯 Champ de recherche trouvé dans la page active: #" + (activeInput.id || activeInput.className));
-            fillAndSubmit(activeInput);
-            // Si on est sur une page de résultats Angular, mettre aussi à jour l'URL pour garantir le rafraîchissement
-            if (href.includes('/recherche/')) {
-              var mMatchCurr = href.match(/(https?:\\/\\/[^\\/]+\\/magasin-[^\\/\\?#]+)/i);
-              if (mMatchCurr && mMatchCurr[1]) {
-                var newUrl = mMatchCurr[1] + '/recherche/' + encodeURIComponent(q);
-                if (href !== newUrl) {
-                  log("🔄 Forçage mise à jour route: " + newUrl);
-                  window.location.assign(newUrl);
+          // 1. Si on est sur l'accueil du magasin avec le bloc de recherche .recherche-home
+          if (!href.includes('/recherche')) {
+            var openTrigger = document.querySelector('.recherche-home, div.recherche-home, .header-search-btn');
+            if (openTrigger) {
+              log("🔎 Clic pour ouvrir la barre de recherche accueil: <" + openTrigger.tagName + ">");
+              openTrigger.click();
+              setTimeout(function() {
+                var openedInput = document.querySelector('#saisieTexte, input.champ-recherche');
+                if (openedInput && isGoodInput(openedInput)) {
+                  log("✍️ Saisie dans le champ ouvert: #" + openedInput.id);
+                  fillAndSubmit(openedInput);
+                } else {
+                  forceRouteNavigation();
                 }
-              }
-            }
-            return;
-          }
-
-          // 2. Si pas encore ouvert, ouvrir la recherche en cliquant sur .recherche-home ou .champ-recherche
-          var openTrigger = document.querySelector('.recherche-home, span.champ-recherche, .header-search-btn');
-          if (openTrigger) {
-            log("🔎 Clic pour ouvrir la barre de recherche: <" + openTrigger.tagName + "> class=" + openTrigger.className);
-            openTrigger.click();
-            setTimeout(function() {
-              var openedInputs = Array.from(document.querySelectorAll('#saisieTexte, input.champ-recherche, input[type="search"], input[type="text"]'));
-              var validOpened = openedInputs.find(function(el) {
-                return isGoodInput(el);
-              });
-              if (validOpened) {
-                log("✍️ Saisie dans le champ ouvert: #" + validOpened.id);
-                fillAndSubmit(validOpened);
-              } else {
-                var hrefLate = window.location.href || '';
-                var mMatch = hrefLate.match(/(https?:\\/\\/[^\\/]+\\/magasin-[^\\/\\?#]+)/i);
-                if (mMatch && mMatch[1]) {
-                  var mTarget = mMatch[1] + '/recherche/' + encodeURIComponent(q);
-                  log("🌐 Navigation URL mobile Leclerc: " + mTarget);
-                  window.location.assign(mTarget);
-                }
-              }
-            }, 250);
-            return;
-          }
-
-          // 3. Navigation directe par route magasin (100% fiable sur mobile et desktop)
-          var href = window.location.href || '';
-          if (host.includes('leclercdrive.fr')) {
-            var storeMatch = href.match(/(https?:\\/\\/[^\\/]+\\/magasin-[^\\/\\?#]+)/i);
-            if (storeMatch && storeMatch[1]) {
-              if (host.includes('m-courses')) {
-                var targetMobile = storeMatch[1] + '/recherche/' + encodeURIComponent(q);
-                log("🌐 Navigation route mobile Leclerc: " + targetMobile);
-                window.location.assign(targetMobile);
-                return;
-              } else {
-                var targetDesktop = storeMatch[1] + '/recherche.aspx?TexteRecherche=' + encodeURIComponent(q);
-                log("🌐 Navigation route desktop Leclerc: " + targetDesktop);
-                window.location.assign(targetDesktop);
-                return;
-              }
+              }, 200);
+              return;
             }
           }
 
-          log("🌐 Redirection URL fallback générique: " + ${JSON.stringify(searchFallbackUrl)});
-          window.location.href = ${JSON.stringify(searchFallbackUrl)};
+          // 2. Navigation par route dédiée du magasin avec rechargement garanti
+          forceRouteNavigation();
+
+          function forceRouteNavigation() {
+            if (host.includes('leclercdrive.fr')) {
+              var storeMatch = href.match(/(https?:\\/\\/[^\\/]+\\/magasin-[^\\/\\?#]+)/i);
+              if (storeMatch && storeMatch[1]) {
+                if (host.includes('m-courses')) {
+                  var targetMobile = storeMatch[1] + '/recherche/' + encodeURIComponent(q);
+                  log("🌐 Navigation mobile Leclerc avec rechargement: " + targetMobile);
+                  window.location.href = targetMobile;
+                  setTimeout(function() {
+                    window.location.reload();
+                  }, 60);
+                  return;
+                } else {
+                  var targetDesktop = storeMatch[1] + '/recherche.aspx?TexteRecherche=' + encodeURIComponent(q);
+                  log("🌐 Navigation desktop Leclerc: " + targetDesktop);
+                  window.location.href = targetDesktop;
+                  return;
+                }
+              }
+            }
+
+            if (host.includes('carrefour.fr')) {
+              var targetCarrefour = 'https://www.carrefour.fr/r?q=' + encodeURIComponent(q);
+              log("🌐 Navigation Carrefour: " + targetCarrefour);
+              window.location.href = targetCarrefour;
+              return;
+            }
+
+            if (host.includes('coursesu.com')) {
+              var targetU = 'https://www.coursesu.com/drive/recherche?q=' + encodeURIComponent(q);
+              log("🌐 Navigation Courses U: " + targetU);
+              window.location.href = targetU;
+              return;
+            }
+
+            if (host.includes('auchan.fr')) {
+              var targetAuchan = 'https://www.auchan.fr/recherche?text=' + encodeURIComponent(q);
+              log("🌐 Navigation Auchan: " + targetAuchan);
+              window.location.href = targetAuchan;
+              return;
+            }
+
+            if (host.includes('intermarche.com')) {
+              var targetInter = 'https://www.intermarche.com/recherche?q=' + encodeURIComponent(q);
+              log("🌐 Navigation Intermarché: " + targetInter);
+              window.location.href = targetInter;
+              return;
+            }
+
+            log("🌐 Redirection URL fallback générique: " + ${JSON.stringify(searchFallbackUrl)});
+            window.location.href = ${JSON.stringify(searchFallbackUrl)};
+          }
         } catch(e) {
           log("💥 Exception globale injectSearch: " + e.message);
           window.location.href = ${JSON.stringify(searchFallbackUrl)};

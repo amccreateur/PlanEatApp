@@ -49,10 +49,8 @@ export default function DriveCartModal({
   const [searchQuery, setSearchQuery] = useState("");
   const [isSelectingStore, setIsSelectingStore] = useState(true);
 
-  // Filtrer les articles non cochés en priorité
-  const uncheckedItems = groceries.filter(g => !g.checked);
-  const activeItems = uncheckedItems.length > 0 ? uncheckedItems : groceries;
-  const currentItem = activeItems[currentIndex] || activeItems[0];
+  // Utiliser la liste complète des groceries pour un indexage stable et prévisible
+  const currentItem = groceries[currentIndex] || groceries[0];
 
   const getCleanItemName = (item) => {
     if (!item) return "";
@@ -220,12 +218,10 @@ export default function DriveCartModal({
     if (!currentItem) return;
     onToggleItem(currentItem.id);
 
-    // Si d'autres articles non cochés existent, passer au suivant
-    if (currentIndex < activeItems.length - 1) {
+    if (currentIndex < groceries.length - 1) {
       const nextIndex = currentIndex + 1;
       setCurrentIndex(nextIndex);
-      // Auto-recherche du prochain article
-      const nextItem = activeItems[nextIndex];
+      const nextItem = groceries[nextIndex];
       if (nextItem) {
         const query = getCleanItemName(nextItem);
         if (query) {
@@ -238,10 +234,10 @@ export default function DriveCartModal({
 
   // Passer à l'article suivant sans cocher
   const handleSkipItem = () => {
-    if (currentIndex < activeItems.length - 1) {
+    if (currentIndex < groceries.length - 1) {
       const nextIndex = currentIndex + 1;
       setCurrentIndex(nextIndex);
-      const nextItem = activeItems[nextIndex];
+      const nextItem = groceries[nextIndex];
       if (nextItem) {
         const query = getCleanItemName(nextItem);
         if (query) {
@@ -257,7 +253,7 @@ export default function DriveCartModal({
     if (currentIndex > 0) {
       const prevIndex = currentIndex - 1;
       setCurrentIndex(prevIndex);
-      const prevItem = activeItems[prevIndex];
+      const prevItem = groceries[prevIndex];
       if (prevItem) {
         const query = getCleanItemName(prevItem);
         if (query) {
@@ -268,8 +264,8 @@ export default function DriveCartModal({
     }
   };
 
-  const progressPercent = activeItems.length > 0
-    ? Math.round(((groceries.filter(g => g.checked).length) / (groceries.length || 1)) * 100)
+  const progressPercent = groceries.length > 0
+    ? Math.round(((groceries.filter(g => g.checked).length) / groceries.length) * 100)
     : 0;
 
   return (
@@ -499,8 +495,7 @@ export default function DriveCartModal({
                           isCurrent && styles.drawerItemActive
                         ]}
                         onPress={() => {
-                          const foundIdx = activeItems.findIndex(g => g.id === item.id);
-                          if (foundIdx !== -1) setCurrentIndex(foundIdx);
+                          setCurrentIndex(idx);
                           setIsListExpanded(false);
                           const q = getCleanItemName(item);
                           if (q) {
@@ -541,7 +536,7 @@ export default function DriveCartModal({
                   <View style={styles.currentItemInfo}>
                     <View style={styles.itemBadgeRow}>
                       <Text style={styles.itemIndexBadge}>
-                        Article {currentIndex + 1} / {activeItems.length}
+                        Article {currentIndex + 1} / {groceries.length}
                       </Text>
                       {currentItem.dept ? (
                         <Text style={[styles.itemDeptBadge, { backgroundColor: theme.cardBg, color: theme.textSub }]}>
@@ -607,9 +602,9 @@ export default function DriveCartModal({
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                      style={[styles.skipBtn, { backgroundColor: theme.cardBg, borderColor: theme.border }, currentIndex >= activeItems.length - 1 && styles.btnDisabled]}
+                      style={[styles.skipBtn, { backgroundColor: theme.cardBg, borderColor: theme.border }, currentIndex >= groceries.length - 1 && styles.btnDisabled]}
                       onPress={handleSkipItem}
-                      disabled={currentIndex >= activeItems.length - 1}
+                      disabled={currentIndex >= groceries.length - 1}
                     >
                       <Ionicons name="play-forward" size={16} color={theme.textSub} />
                     </TouchableOpacity>

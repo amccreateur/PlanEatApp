@@ -121,7 +121,7 @@ export default function DriveCartModal({
           (selectedStore.id === "carrefour" && (url.includes("/magasins/") || url.includes("/drive/") || url.includes("service_point"))) ||
           (selectedStore.id === "coursesu" && (url.includes("/magasin-") || url.includes("/courses-en-ligne/"))) ||
           (selectedStore.id === "auchan" && (url.includes("/magasin") || url.includes("/courses/"))) ||
-          (selectedStore.id === "intermarche" && url.includes("/magasin"));
+          (selectedStore.id === "intermarche" && (url.includes("/magasin") || url.includes("/pdv/") || url.includes("/rayons")));
 
         if (isStoreSelected) {
           console.log("[Drive AutoStart] 🏪 Magasin détecté: " + url);

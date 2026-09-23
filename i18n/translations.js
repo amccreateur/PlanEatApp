@@ -10,7 +10,7 @@ export const TRANSLATIONS = {
     tabProfile: "Mon Foyer",
     
     // Header & Actions
-    generatePlan: "Générer avec l'IA",
+    generatePlan: "Générer le menu",
     regenerating: "Génération en cours...",
     planDuration: "Durée du planning",
     oneWeek: "1 Semaine",
@@ -170,7 +170,7 @@ export const TRANSLATIONS = {
     tabProfile: "My Household",
     
     // Header & Actions
-    generatePlan: "Generate with AI",
+    generatePlan: "Generate menu",
     regenerating: "Generating...",
     planDuration: "Plan Duration",
     oneWeek: "1 Week",

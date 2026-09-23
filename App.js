@@ -350,7 +350,7 @@ function MainApp() {
                   <>
                     <Ionicons name={aiConfig.engine === "mistral" ? "sparkles" : "flash"} size={16} color="#f8fafc" />
                     <Text style={styles.aiBtnText}>
-                      {aiConfig.engine === "mistral" ? "Mistral AI" : t.generatePlan}
+                      {t.generatePlan || "Générer le menu"}
                     </Text>
                   </>
                 )}

@@ -52,21 +52,36 @@ export const DRIVE_STORES = [
 
 export class DriveService {
   /**
-   * Nettoie le nom de l'ingrédient pour une recherche optimale dans un supermarché en ligne
+   * Nettoie et extrait les mots-clés essentiels d'un ingrédient pour les moteurs de recherche Drive
+   * Ex: "Filets de saumon frais" -> "saumon"
+   * Ex: "Gousses d'ail" -> "ail"
    * Ex: "Tomates cerises fraîches" -> "Tomates cerises"
+   * Ex: "Crème fraîche liquide" -> "Crème fraîche liquide"
+   * Ex: "Huile d'olive vierge extra" -> "Huile d'olive"
    */
   static cleanSearchQuery(rawName) {
     if (!rawName) return "";
     let cleaned = rawName.trim();
 
-    // Retirer les parenthèses de quantités résiduelles
+    // 1. Supprimer les parenthèses et leur contenu (ex: "(environ 200g)", "(bio)", "(facultatif)")
     cleaned = cleaned.replace(/\(.*?\)/g, "");
 
-    // Retirer les préfixes courants
-    cleaned = cleaned.replace(/^(gousse d'|filet de|pavé de|tranche de|boîte de|sachet de|pot de|morceau de)\s+/i, "");
+    // 2. Supprimer les préfixes de découpes, contenants et portions
+    cleaned = cleaned.replace(/^(filets?|pavés?|paves?|tranches?|morceaux?|gousses?|sachets?|boîtes?|boites?|pots?|bâtonnets?|batonnets?|branches?|feuilles?|dés?|cubes?|cuillères?|cuilleres?|pincées?|pincees?|tasses?|verres?|gouttes?|brins?|poignées?|poignees?|bottes?|bouquets?|rondelles?|lamelles?|quartiers?|morceau|tranche|filet|pave|aiguillettes?|escalopes?|blancs?|cuisses?|steaks?|côtes?|cotes?|rôtis?|rotis?)\s+(d'|d’|de\s+la\s+|de\s+l'|de\s+l’|du\s+|des\s+|de\s+)?/i, "");
 
-    // Nettoyer les espaces multiples
+    // 3. Supprimer les adjectifs qualificatifs parasites (en préservant "crème fraîche")
+    cleaned = cleaned.replace(/(?<!crème\s+)(frais|fraîche|fraiche|fraîches|fraiches)\b/gi, "");
+    cleaned = cleaned.replace(/\b(bio|biologique|surgelé|surgelée|surgelés|surgelées|en boîte|en conserve|râpé|râpée|râpés|râpées|émincé|émincée|émincés|émincées|haché|hachée|hachés|hachées|concassé|concassés|coupé|coupés|cuit|cuits|cuite|cuites|entier|entiers|nature|maison|extra|vierge\s+extra|au\s+choix|selon\s+goût|environ)\b/gi, "");
+
+    // 4. Nettoyer les ponctuations et espaces multiples
+    cleaned = cleaned.replace(/[,;:.!?]/g, " ");
     cleaned = cleaned.replace(/\s+/g, " ").trim();
+
+    // Fallback si la chaîne devient vide
+    if (!cleaned) {
+      cleaned = rawName.replace(/\(.*?\)/g, "").trim();
+    }
+
     return cleaned;
   }
 

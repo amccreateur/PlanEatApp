@@ -165,6 +165,11 @@ export class MistralService {
     if (profile?.appliances?.cookeo) activeAppliances.push("Cookeo / Multicuiseur sous pression");
     const appliancesText = activeAppliances.length > 0 ? `\nÉquipements de cuisine disponibles :\n${activeAppliances.map(a => `- ${a}`).join("\n")}` : "";
 
+    const activeMealTypes = profile?.mealTypes && profile.mealTypes.length > 0
+      ? profile.mealTypes
+      : ["breakfast", "lunch", "snack", "dinner"];
+    const mealTypesNames = activeMealTypes.join(", ");
+
     // Découpage en blocs de 3 à 4 jours max pour éviter la troncature de token
     const chunkSize = 3;
     const chunks = [];
@@ -179,7 +184,7 @@ export class MistralService {
     const generateChunk = async ({ startDay, endDay }) => {
       const count = endDay - startDay + 1;
       const prompt = `Tu es un Chef cuisinier étoilé et nutritionniste passionné.
-Génère un menu gourmand, équilibré et SANS AUCUNE RÉPÉTITION pour ${count} jours (du Jour ${startDay} au Jour ${endDay}, avec 4 repas complets par jour : breakfast, lunch, snack, dinner) pour ${adults} adulte(s) et ${children} enfant(s).
+Génère un menu gourmand, équilibré et SANS AUCUNE RÉPÉTITION pour ${count} jours (du Jour ${startDay} au Jour ${endDay}) pour les repas suivants uniquement : [${mealTypesNames}] pour ${adults} adulte(s) et ${children} enfant(s).
 Régimes & Objectifs Santé : ${diets}.
 Préférences Gastronomiques & Curseurs Culinaires :
 ${cuisinesText}${appliancesText}
@@ -187,7 +192,8 @@ Aliments à exclure impérativement : ${dislikes}.
 Langue principale : ${lang}.
 
 RÈGLES D'OR DE VARIÉTÉ ET DE QUALITÉ (STRICTES) :
-1. AUCUNE RÉPÉTITION : Chaque jour et chaque repas (déjeuners ET dîners) doit être 100% UNIQUE et ORIGINAL. Interdiction formelle de proposer deux fois le même plat ou la même recette sur la semaine.
+1. AUCUNE RÉPÉTITION : Chaque jour et chaque repas demandé doit être 100% UNIQUE et ORIGINAL.
+2. REPAS DEMANDÉS : Génère uniquement des recettes pour les types de repas suivants : ${mealTypesNames}. Les autres types de repas non demandés doivent être omis ou définis à null.
 2. DIVERSITÉ DES PROTÉINES & FÉCULENTS : Varie impérativement chaque jour :
    - Alternez entre volaille (poulet, dinde), poisson/fruits de mer (saumon, cabillaud, crevettes), légumineuses/végétarien (lentilles, pois chiches, tofu), bœuf/viande, et féculents variés (riz basmati, pâtes fraîches, quinoa, patate douce, boulgour, nouilles).
 3. Respecte scrupuleusement les curseurs de cuisines (les gastronomies notées 'PRIORITAIRE' doivent être largement représentées, les 'EXCLU' ne doivent jamais apparaître).

@@ -1,0 +1,274 @@
+=== PlanEat Drive Live Logger Started at 2026-09-23T12:05:11.889Z ===
+[14:36:06] [STORE_AUTO_DETECTED] https://m-courses.leclercdrive.fr/magasin-089301-089301-aulnay-sous-bois
+[14:36:07] [APP_START_SEARCH] 🚀 Démarrage recherche: "Pain complet" vers https://m-courses.leclercdrive.fr/magasin-089301-089301-aulnay-sous-bois/recherche/Pain%20complet
+[14:36:18] [APP_START_SEARCH] 🚀 Démarrage recherche: "Lait d'amande" vers https://m-courses.leclercdrive.fr/magasin-089301-089301-aulnay-sous-bois/recherche/Lait%20d'amande
+[14:40:29] [APP_START_SEARCH] 🚀 Démarrage recherche: "Pain complet" vers https://www.carrefour.fr/r?q=Pain%20complet
+[14:44:10] [STORE_AUTO_DETECTED] https://www.carrefour.fr/drive
+[14:44:10] [APP_START_SEARCH] 🚀 Démarrage recherche: "Pain complet" vers https://www.carrefour.fr/r?q=Pain%20complet
+[14:44:54] [STORE_AUTO_DETECTED] https://www.carrefour.fr/drive
+[14:44:54] [APP_START_SEARCH] 🚀 Démarrage recherche: "Pain complet" vers https://www.carrefour.fr/r?q=Pain%20complet
+[14:45:29] [APP_START_SEARCH] 🚀 Démarrage recherche: "Lait d'amande" vers https://www.carrefour.fr/r?q=Lait%20d'amande
+[14:48:49] [APP_START_SEARCH] 🚀 Démarrage recherche: "Pain complet" vers https://www.carrefour.fr/r?q=Pain%20complet
+[14:49:19] [APP_START_SEARCH] 🚀 Démarrage recherche: "Pain complet" vers https://www.carrefour.fr/r?q=Pain%20complet
+[14:49:24] [APP_START_SEARCH] 🚀 Démarrage recherche: "Lait d'amande" vers https://www.carrefour.fr/r?q=Lait%20d'amande
+[14:51:44] [APP_START_SEARCH] 🚀 Démarrage recherche: "Pain complet" vers https://www.carrefour.fr/r?q=Pain%20complet
+[14:54:05] [APP_START_SEARCH] 🚀 Démarrage recherche: "Pain complet" vers https://www.carrefour.fr/r?q=Pain%20complet
+[15:00:04] [APP_START_SEARCH] 🚀 Démarrage recherche: "Pain complet" vers https://www.carrefour.fr/r?q=Pain%20complet
+[15:09:45] [APP_START_SEARCH] 🚀 Démarrage recherche: "Pain complet" vers https://www.carrefour.fr/r?q=Pain%20complet
+[15:10:06] [APP_START_SEARCH] 🚀 Démarrage recherche: "Lait d'amande" vers https://www.carrefour.fr/r?q=Lait%20d'amande
+[15:11:48] [APP_START_SEARCH] 🚀 Démarrage recherche: "Lait d'amande" vers https://www.coursesu.com/drive/recherche?q=Lait%20d'amande
+[15:37:23] [APP_START_SEARCH] 🚀 Démarrage recherche: "Pain complet" vers https://www.coursesu.com/drive/recherche?q=Pain%20complet
+[15:37:42] [APP_START_SEARCH] 🚀 Démarrage recherche: "Pain complet" vers https://www.coursesu.com/drive/recherche?q=Pain%20complet
+[15:38:18] [APP_START_SEARCH] 🚀 Démarrage recherche: "Pain complet" vers https://www.coursesu.com/drive/recherche?q=Pain%20complet
+[15:39:02] [APP_START_SEARCH] 🚀 Démarrage recherche: "Pain complet" vers https://www.coursesu.com/drive/recherche?q=Pain%20complet
+[15:43:29] [APP_START_SEARCH] 🚀 Démarrage recherche: "Pain complet" (Courses U Drive) vers https://www.coursesu.com/recherche?q=Pain%20complet
+[15:43:43] [APP_START_SEARCH] 🚀 Démarrage recherche: "Lait d'amande" (Courses U Drive) vers https://www.coursesu.com/recherche?q=Lait%20d'amande
+[15:50:29] [APP_START_SEARCH] 🚀 Recherche: "Pain complet" (Courses U Drive) -> https://www.coursesu.com/recherche?q=Pain%20complet
+[15:50:30] [DRIVE_WEB] ✅ Recherche soumise via bouton de formulaire !
+[15:50:35] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:50:37] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:50:53] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:50:53] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:50:54] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:50:54] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:51:01] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:51:01] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:51:02] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:51:10] [APP_START_SEARCH] 🚀 Recherche: "Lait d'amande" (Courses U Drive) -> https://www.coursesu.com/recherche?q=Lait%20d'amande
+[15:51:10] [DRIVE_WEB] 🔍 Clic sur l'icône de recherche pour ouvrir le champ...
+[15:51:10] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:51:10] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:51:16] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:51:16] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:51:17] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:51:41] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:51:42] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:51:59] [APP_START_SEARCH] 🚀 Recherche: "Parmesan râpé" (Courses U Drive) -> https://www.coursesu.com/recherche?q=Parmesan%20r%C3%A2p%C3%A9
+[15:51:59] [DRIVE_WEB] ✅ Recherche soumise via bouton de formulaire !
+[15:52:05] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:52:05] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:52:12] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:52:12] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:52:12] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:52:34] [APP_START_SEARCH] 🚀 Recherche: "Ricotta" (Courses U Drive) -> https://www.coursesu.com/recherche?q=Ricotta
+[15:52:34] [DRIVE_WEB] 🔍 Clic sur l'icône de recherche pour ouvrir le champ...
+[15:52:34] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:52:34] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:52:38] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:52:40] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:52:40] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:52:44] [APP_START_SEARCH] 🚀 Recherche: "Lait d'amande" (Courses U Drive) -> https://www.coursesu.com/recherche?q=Lait%20d'amande
+[15:52:44] [DRIVE_WEB] 🔍 Clic sur l'icône de recherche pour ouvrir le champ...
+[15:52:45] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:52:45] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:52:50] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:52:51] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:52:55] [APP_START_SEARCH] 🚀 Recherche: "Œufs" (Courses U Drive) -> https://www.coursesu.com/recherche?q=%C5%92ufs
+[15:52:55] [DRIVE_WEB] 🔍 Clic sur l'icône de recherche pour ouvrir le champ...
+[15:52:55] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:52:55] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:53:00] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:53:00] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:53:00] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:53:47] [APP_START_SEARCH] 🚀 Recherche: "Pain complet" (Courses U Drive) -> https://www.coursesu.com/recherche?q=Pain%20complet
+[15:53:48] [DRIVE_WEB] ✅ Recherche soumise via bouton de formulaire !
+[15:53:54] [APP_START_SEARCH] 🚀 Recherche: "Pain de campagne" (Courses U Drive) -> https://www.coursesu.com/recherche?q=Pain%20de%20campagne
+[15:53:54] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:53:54] [DRIVE_WEB] ✅ Recherche soumise via bouton de formulaire !
+[15:54:02] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:54:02] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:54:08] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:54:09] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:54:11] [APP_START_SEARCH] 🚀 Recherche: "Lait d'amande" (Courses U Drive) -> https://www.coursesu.com/recherche?q=Lait%20d'amande
+[15:54:11] [DRIVE_WEB] 🔍 Clic sur l'icône de recherche pour ouvrir le champ...
+[15:54:11] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:54:11] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:54:16] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:54:17] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[15:54:18] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:23] [APP_START_SEARCH] 🚀 Recherche: "Pain complet" (Courses U Drive) -> https://www.coursesu.com/recherche?q=Pain%20complet
+[16:15:24] [DRIVE_WEB] ✅ Recherche soumise via bouton de formulaire !
+[16:15:25] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:25] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:25] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:25] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:25] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:25] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:25] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:25] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:25] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:25] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:25] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:25] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:25] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:27] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:27] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:27] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:27] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:27] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:28] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:29] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:30] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:34] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:34] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:34] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:34] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:34] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:38] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:51] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:54] [APP_START_SEARCH] 🚀 Recherche: "Lait d'amande" (Courses U Drive) -> https://www.coursesu.com/recherche?q=Lait%20d'amande
+[16:15:54] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:54] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:15:54] [DRIVE_WEB] ✅ Recherche soumise via bouton de formulaire !
+[16:15:59] [APP_START_SEARCH] 🚀 Recherche: "Parmesan râpé" (Courses U Drive) -> https://www.coursesu.com/recherche?q=Parmesan%20r%C3%A2p%C3%A9
+[16:15:59] [DRIVE_WEB] ✅ Recherche soumise via bouton de formulaire !
+[16:16:03] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:16:04] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:16:04] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:16:05] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:16:05] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:16:05] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:16:05] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:16:05] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:16:10] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:16:29] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:16:37] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:18:16] [APP_START_SEARCH] 🚀 Recherche: "Parmesan râpé" (Auchan Drive) -> https://www.auchan.fr/recherche?text=Parmesan%20r%C3%A2p%C3%A9
+[16:18:17] [DRIVE_WEB] ✅ Recherche soumise via bouton de formulaire !
+[16:18:27] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:19:11] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:19:11] [WEB_ERROR] {"type":"WEB_ERROR"}
+[16:19:11] [WEB_ERROR] {"type":"WEB_ERROR"}
+[16:19:15] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:19:43] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:19:48] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:19:48] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:19:50] [WEB_ERROR] {"type":"WEB_ERROR"}
+[16:21:16] [APP_START_SEARCH] 🚀 Recherche: "Parmesan râpé" (Intermarché Drive) -> https://www.intermarche.com/recherche?q=Parmesan%20r%C3%A2p%C3%A9
+[16:21:16] [DRIVE_WEB] 🚀 Navigation vers les résultats de recherche...
+[16:21:17] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:21:20] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:21:20] [APP_START_SEARCH] 🚀 Recherche: "Ricotta" (Intermarché Drive) -> https://www.intermarche.com/recherche?q=Ricotta
+[16:21:22] [DRIVE_WEB] 🚀 Navigation vers les résultats de recherche...
+[16:21:22] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:21:43] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:21:45] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:21:48] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:22:12] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:22:17] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:22:26] [APP_START_SEARCH] 🚀 Recherche: "Lait d'amande" (Intermarché Drive) -> https://www.intermarche.com/recherche?q=Lait%20d'amande
+[16:22:26] [DRIVE_WEB] 🚀 Navigation vers les résultats de recherche...
+[16:22:28] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:23:05] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:23:37] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:23:37] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:23:41] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:24:21] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:24:25] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:24:47] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:24:50] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:27:14] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:27:18] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:27:21] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:27:44] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:27:48] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:33:29] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:33:35] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:33:51] [APP_START_SEARCH] 🚀 Recherche: "Pain complet" (E.Leclerc Drive) -> https://www.leclercdrive.fr/recherche.aspx?TexteRecherche=Pain%20complet
+[16:33:53] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:33:57] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:34:04] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:34:34] [STORE_AUTO_DETECTED] https://m-courses.leclercdrive.fr/magasin-151401-151401-villers-bocage
+[16:34:35] [APP_START_SEARCH] 🚀 Recherche: "Pain complet" (E.Leclerc Drive) -> https://m-courses.leclercdrive.fr/magasin-151401-151401-villers-bocage/recherche/Pain%20complet
+[16:34:35] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:34:35] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:34:50] [APP_START_SEARCH] 🚀 Recherche: "Lait d'amande" (E.Leclerc Drive) -> https://m-courses.leclercdrive.fr/magasin-151401-151401-villers-bocage/recherche/Lait%20d'amande
+[16:34:50] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:34:58] [APP_START_SEARCH] 🚀 Recherche: "Parmesan râpé" (E.Leclerc Drive) -> https://m-courses.leclercdrive.fr/magasin-151401-151401-villers-bocage/recherche/Parmesan%20r%C3%A2p%C3%A9
+[16:34:59] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:35:12] [APP_START_SEARCH] 🚀 Recherche: "Ricotta" (E.Leclerc Drive) -> https://m-courses.leclercdrive.fr/magasin-151401-151401-villers-bocage/recherche/Ricotta
+[16:35:12] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:35:22] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:35:28] [APP_START_SEARCH] 🚀 Recherche: "Lait d'amande" (E.Leclerc Drive) -> https://fd16-courses.leclercdrive.fr/magasin-151401-151401-villers-bocage/recherche.aspx?TexteRecherche=Lait%20d'amande
+[16:35:29] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:35:32] [APP_START_SEARCH] 🚀 Recherche: "Œufs" (E.Leclerc Drive) -> https://m-courses.leclercdrive.fr/magasin-151401/recherche/%C5%92ufs
+[16:35:33] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:46:26] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:46:32] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:46:36] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:46:40] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:47:04] [APP_START_SEARCH] 🚀 Recherche: "Pain complet" (Intermarché Drive) -> https://www.intermarche.com/drive
+[16:47:04] [DRIVE_WEB] ℹ️ Intermarché : mot-clé copié dans le presse-papier.
+[16:47:19] [APP_START_SEARCH] 🚀 Recherche: "Lait d'amande" (Intermarché Drive) -> https://www.intermarche.com/drive
+[16:47:20] [DRIVE_WEB] ℹ️ Intermarché : mot-clé copié dans le presse-papier.
+[16:47:41] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:48:47] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:48:54] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:48:58] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:48:58] [WEB_ERROR] {"type":"WEB_ERROR"}
+[16:48:59] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:49:14] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:49:20] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:49:24] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:49:32] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:49:45] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:49:48] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:49:50] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:49:50] [WEB_ERROR] {"type":"WEB_ERROR"}
+[16:49:51] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:49:51] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:49:51] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:49:54] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:49:55] [WEB_ERROR] {"type":"WEB_ERROR"}
+[16:49:55] [WEB_ERROR] {"type":"WEB_ERROR"}
+[16:49:57] [WEB_ERROR] {"type":"WEB_ERROR"}
+[16:49:59] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:50:06] [APP_START_SEARCH] 🚀 Recherche: "Parmesan râpé" (Intermarché Drive) -> https://www.intermarche.com/drive
+[16:50:06] [DRIVE_WEB] ✅ Champ de recherche rempli et validé (Parmesan râpé) !
+[16:50:07] [AUTO_RECOVER_404] Retour accueil suite 404: https://www.intermarche.com/recherche/Parmesan%20r%C3%A2p%C3%A9
+[16:50:08] [AUTO_RECOVER_404] Retour accueil suite 404: https://www.intermarche.com/recherche/Parmesan%20r%C3%A2p%C3%A9
+[16:50:08] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:50:08] [AUTO_RECOVER_404] Retour accueil suite 404: https://www.intermarche.com/recherche/Parmesan%20r%C3%A2p%C3%A9
+[16:50:08] [AUTO_RECOVER_404] Retour accueil suite 404: https://www.intermarche.com/recherche/Parmesan%20r%C3%A2p%C3%A9
+[16:50:11] [WEB_ERROR] {"type":"WEB_ERROR"}
+[16:50:14] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:50:21] [APP_START_SEARCH] 🚀 Recherche: "Ricotta" (Intermarché Drive) -> https://www.intermarche.com/drive
+[16:50:21] [DRIVE_WEB] ✅ Champ de recherche rempli et validé (Ricotta) !
+[16:50:23] [AUTO_RECOVER_404] Retour accueil suite 404: https://www.intermarche.com/recherche/Ricotta
+[16:50:24] [AUTO_RECOVER_404] Retour accueil suite 404: https://www.intermarche.com/recherche/Ricotta
+[16:50:24] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}
+[16:50:25] [AUTO_RECOVER_404] Retour accueil suite 404: https://www.intermarche.com/recherche/Ricotta
+[16:50:25] [AUTO_RECOVER_404] Retour accueil suite 404: https://www.intermarche.com/recherche/Ricotta
+[16:50:27] [WEB_ERROR] {"type":"WEB_ERROR"}
+[16:50:29] [WEB_CONSOLE] {"type":"WEB_CONSOLE"}

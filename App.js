@@ -330,7 +330,8 @@ function MainApp() {
     ((currentDay.meals?.dinner?.prepTime || 0) + (currentDay.meals?.dinner?.cookTime || 0))
   ) : 0;
 
-  const estimatedWeeklyBudget = Math.round(householdServings * 7 * 5.5);
+  const activeMealsPerDay = (profile?.mealTypes && profile.mealTypes.length > 0) ? profile.mealTypes.length : 4;
+  const estimatedWeeklyBudget = Math.round(householdServings * 7 * (activeMealsPerDay * 1.4));
 
   // Groupement des courses par rayons
   const filteredGroceries = selectedGroceryDept === "all"
@@ -533,41 +534,49 @@ function MainApp() {
                   </View>
                 </View>
 
-                <MealCard
-                  mealType="breakfast"
-                  meal={currentDay.meals.breakfast}
-                  onPressRecipe={() => setSelectedRecipe(currentDay.meals.breakfast)}
-                  onPressSwap={() => handleSwapMeal(currentDay.id, "breakfast", currentDay.meals.breakfast)}
-                  lang={lang}
-                  theme={currentTheme}
-                />
+                {currentDay.meals?.breakfast ? (
+                  <MealCard
+                    mealType="breakfast"
+                    meal={currentDay.meals.breakfast}
+                    onPressRecipe={() => setSelectedRecipe(currentDay.meals.breakfast)}
+                    onPressSwap={() => handleSwapMeal(currentDay.id, "breakfast", currentDay.meals.breakfast)}
+                    lang={lang}
+                    theme={currentTheme}
+                  />
+                ) : null}
 
-                <MealCard
-                  mealType="lunch"
-                  meal={currentDay.meals.lunch}
-                  onPressRecipe={() => setSelectedRecipe(currentDay.meals.lunch)}
-                  onPressSwap={() => handleSwapMeal(currentDay.id, "lunch", currentDay.meals.lunch)}
-                  lang={lang}
-                  theme={currentTheme}
-                />
+                {currentDay.meals?.lunch ? (
+                  <MealCard
+                    mealType="lunch"
+                    meal={currentDay.meals.lunch}
+                    onPressRecipe={() => setSelectedRecipe(currentDay.meals.lunch)}
+                    onPressSwap={() => handleSwapMeal(currentDay.id, "lunch", currentDay.meals.lunch)}
+                    lang={lang}
+                    theme={currentTheme}
+                  />
+                ) : null}
 
-                <MealCard
-                  mealType="snack"
-                  meal={currentDay.meals.snack}
-                  onPressRecipe={() => setSelectedRecipe(currentDay.meals.snack)}
-                  onPressSwap={() => handleSwapMeal(currentDay.id, "snack", currentDay.meals.snack)}
-                  lang={lang}
-                  theme={currentTheme}
-                />
+                {currentDay.meals?.snack ? (
+                  <MealCard
+                    mealType="snack"
+                    meal={currentDay.meals.snack}
+                    onPressRecipe={() => setSelectedRecipe(currentDay.meals.snack)}
+                    onPressSwap={() => handleSwapMeal(currentDay.id, "snack", currentDay.meals.snack)}
+                    lang={lang}
+                    theme={currentTheme}
+                  />
+                ) : null}
 
-                <MealCard
-                  mealType="dinner"
-                  meal={currentDay.meals.dinner}
-                  onPressRecipe={() => setSelectedRecipe(currentDay.meals.dinner)}
-                  onPressSwap={() => handleSwapMeal(currentDay.id, "dinner", currentDay.meals.dinner)}
-                  lang={lang}
-                  theme={currentTheme}
-                />
+                {currentDay.meals?.dinner ? (
+                  <MealCard
+                    mealType="dinner"
+                    meal={currentDay.meals.dinner}
+                    onPressRecipe={() => setSelectedRecipe(currentDay.meals.dinner)}
+                    onPressSwap={() => handleSwapMeal(currentDay.id, "dinner", currentDay.meals.dinner)}
+                    lang={lang}
+                    theme={currentTheme}
+                  />
+                ) : null}
               </>
             ) : (
               <View style={styles.emptyState}>

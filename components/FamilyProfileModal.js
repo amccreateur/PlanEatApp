@@ -37,6 +37,11 @@ export default function FamilyProfileModal({
   const isRTL = lang === "ar";
   const theme = THEMES[themeMode] || THEMES.dark;
 
+  const [mealTypes, setMealTypes] = useState(
+    profile?.mealTypes && profile.mealTypes.length > 0
+      ? profile.mealTypes
+      : ["breakfast", "lunch", "snack", "dinner"]
+  );
   const [adults, setAdults] = useState(profile?.adults || 2);
   const [children, setChildren] = useState(profile?.children || 0);
   const [childrenAges, setChildrenAges] = useState(profile?.childrenAges || []);
@@ -58,6 +63,18 @@ export default function FamilyProfileModal({
   const [dislikedFoods, setDislikedFoods] = useState(profile?.dislikedFoods || []);
   const [newDislike, setNewDislike] = useState("");
 
+  const toggleMealType = (typeKey) => {
+    if (mealTypes.includes(typeKey)) {
+      if (mealTypes.length <= 1) {
+        Alert.alert("⚠️", t.minOneMealRequired || "Veuillez sélectionner au moins un repas.");
+        return;
+      }
+      setMealTypes(mealTypes.filter(m => m !== typeKey));
+    } else {
+      setMealTypes([...mealTypes, typeKey]);
+    }
+  };
+
   const updateCuisineLevel = (cuisineKey, level) => {
     setCuisines(prev => ({
       ...prev,
@@ -78,6 +95,13 @@ export default function FamilyProfileModal({
   const [mistralModel, setMistralModel] = useState(aiConfig?.mistralModel || "mistral-small-latest");
   const [isTestingKey, setIsTestingKey] = useState(false);
   const [testResult, setTestResult] = useState(null); // { success: boolean, message: string }
+
+  const mealTypeOptions = [
+    { key: "breakfast", label: t.breakfast, emoji: "☀️", color: "#f59e0b" },
+    { key: "lunch", label: t.lunch, emoji: "🍲", color: "#10b981" },
+    { key: "snack", label: t.snack, emoji: "🍎", color: "#ec4899" },
+    { key: "dinner", label: t.dinner, emoji: "🌙", color: "#6366f1" }
+  ];
 
   const dietOptions = [
     { key: "dietBalanced", label: t.dietBalanced, emoji: "🥗" },
@@ -170,6 +194,7 @@ export default function FamilyProfileModal({
       adults,
       children,
       childrenAges,
+      mealTypes: mealTypes.length > 0 ? mealTypes : ["breakfast", "lunch", "snack", "dinner"],
       diets: diets.length > 0 ? diets : ["dietBalanced"],
       cuisines,
       appliances,
@@ -374,6 +399,53 @@ export default function FamilyProfileModal({
                 </View>
               </View>
             )}
+          </View>
+
+          {/* Repas à planifier chaque jour */}
+          <View style={[styles.card, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+            <View style={[styles.cardHeader, isRTL && styles.rtlRow]}>
+              <Ionicons name="restaurant-outline" size={20} color="#f59e0b" />
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.cardTitle, { color: theme.text }]}>{t.mealsToPlan}</Text>
+                <Text style={[styles.cardSubtitle, { color: theme.textSub }]}>{t.mealsToPlanDesc}</Text>
+              </View>
+            </View>
+
+            <View style={styles.mealTypesGrid}>
+              {mealTypeOptions.map(option => {
+                const isSelected = mealTypes.includes(option.key);
+                return (
+                  <TouchableOpacity
+                    key={option.key}
+                    style={[
+                      styles.mealTypeCard,
+                      { backgroundColor: theme.cardBgAlt, borderColor: theme.border },
+                      isSelected && { borderColor: option.color, backgroundColor: option.color + "18" }
+                    ]}
+                    onPress={() => toggleMealType(option.key)}
+                    activeOpacity={0.7}
+                  >
+                    <View style={[styles.mealTypeInner, isRTL && styles.rtlRow]}>
+                      <Text style={styles.mealTypeEmoji}>{option.emoji}</Text>
+                      <View style={{ flex: 1 }}>
+                        <Text style={[
+                          styles.mealTypeLabel,
+                          { color: theme.text },
+                          isSelected && { color: option.color, fontWeight: "800" }
+                        ]}>
+                          {option.label}
+                        </Text>
+                      </View>
+                      <Ionicons
+                        name={isSelected ? "checkbox" : "square-outline"}
+                        size={22}
+                        color={isSelected ? option.color : theme.textMuted}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
           </View>
 
           {/* Régimes alimentaires */}
@@ -1221,6 +1293,28 @@ const styles = StyleSheet.create({
   modelChipTextActive: {
     color: "#f3e8ff",
     fontWeight: "700"
+  },
+  mealTypesGrid: {
+    gap: 10,
+    marginTop: 8
+  },
+  mealTypeCard: {
+    borderRadius: 14,
+    borderWidth: 1.5,
+    paddingHorizontal: 16,
+    paddingVertical: 12
+  },
+  mealTypeInner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12
+  },
+  mealTypeEmoji: {
+    fontSize: 24
+  },
+  mealTypeLabel: {
+    fontSize: 15,
+    fontWeight: "600"
   },
   rtlRow: {
     flexDirection: "row-reverse"

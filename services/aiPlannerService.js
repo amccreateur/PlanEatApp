@@ -87,13 +87,17 @@ export class AIPlannerService {
         });
 
         if (mistralResult?.days && Array.isArray(mistralResult.days)) {
+          const activeMealTypes = profile?.mealTypes && profile.mealTypes.length > 0
+            ? profile.mealTypes
+            : ["breakfast", "lunch", "snack", "dinner"];
+
           const days = mistralResult.days.map((d, i) => {
             const weekIndex = Math.floor(i / 7) + 1;
             const dayIndexInWeek = i % 7;
             const dayKey = dayKeys[dayIndexInWeek];
 
             const formatMeal = (m, type) => {
-              if (!m) return null;
+              if (!activeMealTypes.includes(type) || !m) return null;
               return {
                 id: `mistral_${type}_${i + 1}_${Date.now()}`,
                 mealType: type,
@@ -162,6 +166,10 @@ export class AIPlannerService {
     const daysCount = durationWeeks * 7;
     const dayKeys = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 
+    const activeMealTypes = profile?.mealTypes && profile.mealTypes.length > 0
+      ? profile.mealTypes
+      : ["breakfast", "lunch", "snack", "dinner"];
+
     // Mélanger aléatoirement les recettes pour renouveler à chaque clic
     const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
@@ -191,19 +199,24 @@ export class AIPlannerService {
       const dayIndexInWeek = i % 7;
       const dayKey = dayKeys[dayIndexInWeek];
 
-      const b = safeBreakfasts[i % safeBreakfasts.length];
-      const s = safeSnacks[i % safeSnacks.length];
+      const b = activeMealTypes.includes("breakfast") ? safeBreakfasts[i % safeBreakfasts.length] : null;
+      const s = activeMealTypes.includes("snack") ? safeSnacks[i % safeSnacks.length] : null;
 
-      // Sélectionner deux plats principaux strictement distincts pour le déjeuner et le dîner
-      let l = safeMainsPool[mainCursor % safeMainsPool.length];
-      mainCursor++;
-      let d = safeMainsPool[mainCursor % safeMainsPool.length];
-      mainCursor++;
+      let l = null;
+      let d = null;
 
-      // Sécurité anti-doublon le même jour
-      if (l.id === d.id && safeMainsPool.length > 1) {
-        d = safeMainsPool[(mainCursor + 1) % safeMainsPool.length];
+      if (activeMealTypes.includes("lunch")) {
+        l = safeMainsPool[mainCursor % safeMainsPool.length];
         mainCursor++;
+      }
+
+      if (activeMealTypes.includes("dinner")) {
+        d = safeMainsPool[mainCursor % safeMainsPool.length];
+        mainCursor++;
+        if (l && d && l.id === d.id && safeMainsPool.length > 1) {
+          d = safeMainsPool[(mainCursor + 1) % safeMainsPool.length];
+          mainCursor++;
+        }
       }
 
       days.push({
@@ -213,10 +226,10 @@ export class AIPlannerService {
         dayKey: dayKey,
         servings: servings,
         meals: {
-          breakfast: { ...b, calculatedServings: servings },
-          lunch: { ...l, calculatedServings: servings },
-          dinner: { ...d, calculatedServings: servings },
-          snack: { ...s, calculatedServings: servings }
+          breakfast: b ? { ...b, calculatedServings: servings } : null,
+          lunch: l ? { ...l, calculatedServings: servings } : null,
+          dinner: d ? { ...d, calculatedServings: servings } : null,
+          snack: s ? { ...s, calculatedServings: servings } : null
         }
       });
     }

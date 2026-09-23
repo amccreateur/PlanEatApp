@@ -109,6 +109,11 @@ export const TRANSLATIONS = {
     dietQuick: "Express (< 20 min)",
     dietKids: "Enfants / Kid-Friendly",
     
+    // Repas à planifier
+    mealsToPlan: "Repas à planifier chaque jour",
+    mealsToPlanDesc: "Choisissez les repas que vous souhaitez préparer :",
+    minOneMealRequired: "Veuillez sélectionner au moins un repas.",
+    
     // Cuisines du Monde & Curseurs
     cuisinesTitle: "Cuisines du Monde & Préférences",
     cuisinesSubtitle: "Ajustez le curseur d'intensité pour chaque gastronomie :",
@@ -319,6 +324,11 @@ export const TRANSLATIONS = {
     dietQuick: "Quick & Easy (< 20 min)",
     dietKids: "Kids / Kid-Friendly",
     
+    // Meals to plan
+    mealsToPlan: "Meals to Plan Daily",
+    mealsToPlanDesc: "Choose the meals you want to prepare:",
+    minOneMealRequired: "Please select at least one meal.",
+    
     // World Cuisines & Sliders
     cuisinesTitle: "World Cuisines & Preferences",
     cuisinesSubtitle: "Adjust the intensity cursor for each gastronomy:",
@@ -528,6 +538,11 @@ export const TRANSLATIONS = {
     dietBudget: "اقتصادي وموفر",
     dietQuick: "سريع (< 20 دقيقة)",
     dietKids: "مناسب للأطفال",
+    
+    // Repas à planifier AR
+    mealsToPlan: "الوجبات اليومية المراد إعدادها",
+    mealsToPlanDesc: "اختر الوجبات التي ترغب في إعدادها كل يوم :",
+    minOneMealRequired: "يرجى اختيار وجبة واحدة على الأقل.",
     
     // Cuisines & Sliders AR
     cuisinesTitle: "مطابخ العالم والتفضيلات",

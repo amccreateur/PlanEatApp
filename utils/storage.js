@@ -37,6 +37,7 @@ export const DEFAULT_PROFILE = {
   adults: 2,
   children: 2,
   childrenAges: [4, 8],
+  mealTypes: ["breakfast", "lunch", "snack", "dinner"],
   diets: ["dietBalanced", "dietHalal"],
   cuisines: DEFAULT_CUISINES,
   appliances: DEFAULT_APPLIANCES,

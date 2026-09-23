@@ -1033,6 +1033,215 @@ export const RECIPES_CATALOG = [
         "أضف الجوز المجروش وعسل النحل."
       ]
     }
+  },
+  {
+    id: "m16",
+    mealType: "dinner",
+    title: {
+      fr: "Gnocchis Poêlés Croustillants, Tomates Séchées & Mozzarella",
+      en: "Crispy Pan-Fried Gnocchi with Sun-Dried Tomatoes",
+      ar: "نيوكي مقلي مقرمش مع الطماطم المجففة والموزاريلا"
+    },
+    emoji: "🥟",
+    prepTime: 5,
+    cookTime: 8,
+    difficulty: "easy",
+    caloriesPerPerson: 460,
+    tags: ["italian", "dietBalanced", "dietVegetarian", "dietHalal", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Gnocchis à poêler", en: "Pan-fry gnocchi", ar: "نيوكي" }, quantity: 200, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Tomates séchées à l'huile", en: "Sun-dried tomatoes", ar: "طماطم مجففة" }, quantity: 40, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Bille de mozzarella", en: "Mozzarella balls", ar: "موزاريلا" }, quantity: 80, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Feuilles de basilic frais", en: "Fresh basil", ar: "ريحان طازج" }, quantity: 1, unit: "poignée", dept: "deptProduce" },
+      { name: { fr: "Huile d'olive", en: "Olive oil", ar: "زيت زيتون" }, quantity: 1, unit: "c.à.s", dept: "deptPantry" }
+    ],
+    instructions: {
+      fr: [
+        "Dans une grande poêle avec un filet d'huile d'olive, faites dorer les gnocchis à feu moyen pendant 6 à 8 min jusqu'à ce qu'ils soient bien croustillants.",
+        "Coupez les tomates séchées en lamelles et ajoutez-les aux gnocchis chauds.",
+        "Ajoutez les billes de mozzarella coupées en deux hors du feu pour qu'elles fondent doucement.",
+        "Parsemez de basilic frais et servez sans attendre."
+      ],
+      en: [
+        "Pan-fry gnocchi in olive oil over medium heat for 6-8 mins until golden and crispy.",
+        "Add sliced sun-dried tomatoes.",
+        "Remove from heat and toss in halved mozzarella balls to melt gently.",
+        "Garnish with fresh basil and serve immediately."
+      ],
+      ar: [
+        "حمر النيوكي في زيت الزيتون لمدة 6-8 دقائق حتى يصبح ذهبياً ومقرمشاً.",
+        "أضف شرائح الطماطم المجففة.",
+        "أضف كرات الموزاريلا المقطعة لتبدأ بالذوبان.",
+        "زين بالريحان الطازج وقدمه فوراً."
+      ]
+    }
+  },
+  {
+    id: "m17",
+    mealType: "lunch",
+    title: {
+      fr: "Couscous aux Légumes Fondants & Boulettes Épicées",
+      en: "Couscous with Tender Vegetables & Meatballs",
+      ar: "كسكسي بالخضار وكرات اللحم المتبلة"
+    },
+    emoji: "🍲",
+    prepTime: 15,
+    cookTime: 25,
+    difficulty: "easy",
+    caloriesPerPerson: 550,
+    tags: ["oriental", "maghreb", "dietBalanced", "dietHalal"],
+    ingredients: [
+      { name: { fr: "Semoule de couscous", en: "Couscous semolina", ar: "سميد كسكسي" }, quantity: 120, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Boulettes de bœuf ou merguez", en: "Beef meatballs", ar: "كرات لحم" }, quantity: 180, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Courgette & Carotte", en: "Zucchini & carrot", ar: "كوسة وجزر" }, quantity: 2, unit: "pcs", dept: "deptProduce" },
+      { name: { fr: "Pois chiches cuits", en: "Chickpeas", ar: "حمص" }, quantity: 80, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Ras el Hanout & Concentré de tomate", en: "Ras el Hanout & tomato paste", ar: "رأس الحانوت ومعجون طماطم" }, quantity: 1, unit: "c.à.s", dept: "deptSpices" }
+    ],
+    instructions: {
+      fr: [
+        "Coupez les carottes et courgettes en gros tronçons.",
+        "Dans une marmite, faites revenir les boulettes et les légumes avec les épices et le concentré de tomate 5 min.",
+        "Couvrez avec 500ml d'eau et laissez mijoter 20 minutes.",
+        "Préparez la semoule à l'eau bouillante et servez avec les légumes fondants et le bouillon parfumé."
+      ],
+      en: [
+        "Cut carrots and zucchinis into large pieces.",
+        "Sear meatballs and vegetables with spices and tomato paste in a pot for 5 mins.",
+        "Cover with water and simmer for 20 mins.",
+        "Steam couscous and serve topped with rich vegetable stew."
+      ],
+      ar: [
+        "قطع الجزر والكوسة إلى قطع متوسطة.",
+        "شوح كرات اللحم والخضار والبهارات ومعجون الطماطم 5 دقائق.",
+        "أضف الماء واتركه يغلي 20 دقيقة.",
+        "حضر الكسكسي واسكب فوقه الخضار والمرق العطري."
+      ]
+    }
+  },
+  {
+    id: "m18",
+    mealType: "dinner",
+    title: {
+      fr: "Saumon Laqué Teriyaki & Riz Japonais Vinaigré",
+      en: "Teriyaki Glazed Salmon with Japanese Rice",
+      ar: "سلمون ترياكي مشوي مع الأرز الياباني"
+    },
+    emoji: "🍣",
+    prepTime: 8,
+    cookTime: 12,
+    difficulty: "easy",
+    caloriesPerPerson: 520,
+    tags: ["asian", "dietBalanced", "dietHalal", "dietHighProtein"],
+    ingredients: [
+      { name: { fr: "Pavé de saumon frais", en: "Salmon fillet", ar: "فيليه سلمون" }, quantity: 150, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Riz rond japonais ou basmati", en: "Rice", ar: "أرز" }, quantity: 80, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Sauce Teriyaki ou soja sucrée", en: "Teriyaki sauce", ar: "صلصة ترياكي" }, quantity: 2, unit: "c.à.s", dept: "deptPantry" },
+      { name: { fr: "Concombre ou Edamame", en: "Cucumber or edamame", ar: "خيار أو فول صويا" }, quantity: 80, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Graines de sésame grillées", en: "Sesame seeds", ar: "سمسم" }, quantity: 1, unit: "c.à.c", dept: "deptSpices" }
+    ],
+    instructions: {
+      fr: [
+        "Faites cuire le riz dans de l'eau bouillante salée 12 min.",
+        "Dans une poêle chaude, faites dorer le saumon côté peau 4 min, puis retournez-le.",
+        "Nappez généreusement de sauce Teriyaki et laissez caraméliser 2-3 minutes à feu doux.",
+        "Servez le saumon laqué sur le riz chaud avec des rondelles de concombre frais et du sésame."
+      ],
+      en: [
+        "Cook rice for 12 mins.",
+        "Pan-sear salmon skin-down for 4 mins, then flip.",
+        "Glaze with Teriyaki sauce and simmer for 2-3 mins until sticky.",
+        "Serve glazed salmon over warm rice with cucumber slices and sesame."
+      ],
+      ar: [
+        "اطه الأرز لمدة 12 دقيقة.",
+        "اشو السلمون في مقلاة 4 دقائق لكل جانب.",
+        "اسكب صلصة الترياكي واتركه يتكرمل دقيقتين على نار هادئة.",
+        "قدم السلمون فوق الأرز مع شرائح الخيار والسمسم."
+      ]
+    }
+  },
+  {
+    id: "m19",
+    mealType: "lunch",
+    title: {
+      fr: "Quiche Fondante Épinards & Chèvre Frais",
+      en: "Spinach & Goat Cheese Crustless Quiche",
+      ar: "كيش السبانخ والجبن"
+    },
+    emoji: "🥧",
+    prepTime: 10,
+    cookTime: 25,
+    difficulty: "easy",
+    caloriesPerPerson: 430,
+    tags: ["french", "dietBalanced", "dietVegetarian", "dietHalal"],
+    ingredients: [
+      { name: { fr: "Pâte brisée ou sans pâte", en: "Shortcrust pastry", ar: "عجينة فطيرة" }, quantity: 1, unit: "pcs", dept: "deptBakery" },
+      { name: { fr: "Œufs frais", en: "Eggs", ar: "بيض" }, quantity: 3, unit: "pcs", dept: "deptDairy" },
+      { name: { fr: "Jeunes pousses d'épinards", en: "Spinach", ar: "سبانخ" }, quantity: 150, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Bûche de chèvre ou feta", en: "Goat cheese or feta", ar: "جبن ماعز" }, quantity: 80, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Crème liquide ou lait", en: "Cream or milk", ar: "كريمة سائلة" }, quantity: 100, unit: "ml", dept: "deptDairy" }
+    ],
+    instructions: {
+      fr: [
+        "Préchauffez le four à 180°C.",
+        "Battez les œufs avec la crème, sel, poivre et muscade.",
+        "Faites tomber les épinards 2 min à la poêle et disposez-les sur le fond de pâte.",
+        "Versez l'appareil à quiche, déposez les rondelles de chèvre et enfournez 25 minutes."
+      ],
+      en: [
+        "Preheat oven to 180°C (350°F).",
+        "Whisk eggs with cream, salt, pepper, and nutmeg.",
+        "Sauté spinach for 2 mins and layer over pastry base.",
+        "Pour egg mix, top with goat cheese slices and bake for 25 mins."
+      ],
+      ar: [
+        "سخن الفرن على 180 مئوية.",
+        "اخفق البيض مع الكريمة والملح والفلفل.",
+        "شوح السبانخ دقيقتين وضعها فوق العجينة.",
+        "اسكب خليط البيض ورتب قطع الجبن واخبز 25 دقيقة."
+      ]
+    }
+  },
+  {
+    id: "m20",
+    mealType: "dinner",
+    title: {
+      fr: "Pavé de Bœuf Grillé & Poêlée de Haricots Verts à l'Ail",
+      en: "Grilled Beef Steak with Garlic Green Beans",
+      ar: "ستيك لحم بقري مشوي مع فاصوليا خضراء بالثوم"
+    },
+    emoji: "🥩",
+    prepTime: 5,
+    cookTime: 10,
+    difficulty: "easy",
+    caloriesPerPerson: 470,
+    tags: ["french", "dietBalanced", "dietHalal", "dietHighProtein", "dietLowCarb", "dietQuick"],
+    ingredients: [
+      { name: { fr: "Pavé ou faux-filet de bœuf", en: "Beef steak", ar: "ستيك لحم بقري" }, quantity: 180, unit: "g", dept: "deptMeat" },
+      { name: { fr: "Haricots verts frais ou surgelés", en: "Green beans", ar: "فاصوليا خضراء" }, quantity: 200, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Gousses d'ail", en: "Garlic cloves", ar: "ثوم" }, quantity: 2, unit: "pcs", dept: "deptProduce" },
+      { name: { fr: "Beurre ou huile d'olive", en: "Butter or olive oil", ar: "زبدة أو زيت" }, quantity: 15, unit: "g", dept: "deptDairy" }
+    ],
+    instructions: {
+      fr: [
+        "Faites cuire les haricots verts 6 min dans de l'eau bouillante salée, puis égouttez.",
+        "Faites poêler les haricots 3 min avec une noisette de beurre et l'ail émincé.",
+        "Dans une poêle très chaude, faites saisir le pavé de bœuf 2 à 3 min par face selon la cuisson souhaitée.",
+        "Laissez reposer la viande 2 min et servez avec les haricots verts aillés."
+      ],
+      en: [
+        "Boil green beans for 6 mins and drain.",
+        "Sauté beans with garlic and butter for 3 mins.",
+        "Sear beef steak in a hot skillet for 2-3 mins per side.",
+        "Rest steak for 2 mins and serve with garlicky green beans."
+      ],
+      ar: [
+        "اسلق الفاصوليا الخضراء 6 دقائق ثم صفها.",
+        "شوح الفاصوليا مع الزبدة والثوم 3 دقائق.",
+        "اشو شريحة اللحم في مقلاة ساخنة 2-3 دقائق لكل جانب.",
+        "دع اللحم يرتاح دقيقتين وقدمه مع الفاصوليا."
+      ]
+    }
   }
 ];
 

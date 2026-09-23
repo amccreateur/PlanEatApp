@@ -28,8 +28,12 @@ export class AIPlannerService {
     const dislikes = (profile?.dislikedFoods || []).map(d => d.toLowerCase().trim());
 
     return RECIPES_CATALOG.filter(recipe => {
-      if (mealType && recipe.mealType !== mealType) {
-        return false;
+      if (mealType) {
+        if (mealType === "lunch" || mealType === "dinner") {
+          if (recipe.mealType !== "lunch" && recipe.mealType !== "dinner") return false;
+        } else if (recipe.mealType !== mealType) {
+          return false;
+        }
       }
 
       // Vérifier les régimes stricts

@@ -105,6 +105,55 @@ export class DriveService {
   }
 
   /**
+   * Génère des suggestions de mots-clés intelligents et d'alternatives pour un ingrédient
+   * Ex: "Lait d'amande ou demi-écrémé" -> ["Lait d'amande", "Lait demi-écrémé"]
+   * Ex: "Pain complet ou de campagne" -> ["Pain complet", "Pain de campagne"]
+   * Ex: "Pâtes complètes (penne ou fusilli)" -> ["Pâtes complètes", "penne", "fusilli"]
+   */
+  static getSearchSuggestions(rawName) {
+    if (!rawName) return [];
+    const list = [];
+    const withoutParens = rawName.replace(/\(.*?\)/g, "").trim();
+
+    if (/\s+(ou|ou\s+bien|\/)\s+/i.test(withoutParens)) {
+      const parts = withoutParens.split(/\s+(ou|ou\s+bien|\/)\s+/i);
+      const firstPart = parts[0];
+      const firstClean = this.cleanSearchQuery(firstPart);
+      if (firstClean) list.push(firstClean);
+
+      for (let i = 1; i < parts.length; i++) {
+        const p = parts[i];
+        if (!p || /^(ou|ou\s+bien|\/)$/i.test(p)) continue;
+        let partClean = this.cleanSearchQuery(p.replace(/^(de|d'|d’)\s+/i, ""));
+        if (partClean.length > 2) {
+          if (/demi-écrémé|écrémé|entier|végétal/i.test(partClean) && !/lait/i.test(partClean) && /lait/i.test(firstClean)) {
+            list.push("Lait " + partClean);
+          } else if (/campagne|complet|mie/i.test(partClean) && !/pain/i.test(partClean) && /pain/i.test(firstClean)) {
+            list.push("Pain de " + partClean);
+          } else {
+            list.push(partClean);
+          }
+        }
+      }
+    } else {
+      const primary = this.cleanSearchQuery(withoutParens);
+      if (primary) list.push(primary);
+    }
+
+    const parenMatch = rawName.match(/\((.*?)\)/);
+    if (parenMatch) {
+      const inside = parenMatch[1];
+      const subParts = inside.split(/\s*(?:ou|\/|,)\s*/i);
+      for (const sp of subParts) {
+        const c = this.cleanSearchQuery(sp);
+        if (c && c.length > 2 && !list.includes(c)) list.push(c);
+      }
+    }
+
+    return list.filter((v, i, a) => a.indexOf(v) === i).slice(0, 4);
+  }
+
+  /**
    * Retourne la liste des magasins supportés
    */
   static getStores() {

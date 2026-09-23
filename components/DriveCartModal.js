@@ -9,8 +9,10 @@ import {
   ActivityIndicator,
   Animated,
   Platform,
-  Linking
+  Linking,
+  TextInput
 } from "react-native";
+import * as Clipboard from "expo-clipboard";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { WebView } from "react-native-webview";
 import { Ionicons } from "@expo/vector-icons";
@@ -41,17 +43,13 @@ export default function DriveCartModal({
   // Index de l'ingrédient en cours d'assistance
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isListExpanded, setIsListExpanded] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isCopied, setIsCopied] = useState(false);
 
   // Filtrer les articles non cochés en priorité
   const uncheckedItems = groceries.filter(g => !g.checked);
   const activeItems = uncheckedItems.length > 0 ? uncheckedItems : groceries;
   const currentItem = activeItems[currentIndex] || activeItems[0];
-
-  // Quand le magasin change, naviguer vers son accueil
-  const handleSelectStore = (store) => {
-    setSelectedStore(store);
-    setCurrentUrl(store.homeUrl);
-  };
 
   const getCleanItemName = (item) => {
     if (!item) return "";
@@ -59,14 +57,47 @@ export default function DriveCartModal({
     return DriveService.cleanSearchQuery(rawName);
   };
 
-  // Rechercher l'article courant dans le Drive
-  const handleSearchCurrentItem = () => {
-    if (!currentItem) return;
-    const query = getCleanItemName(currentItem);
-    if (!query) return;
+  const getRawItemName = (item) => {
+    if (!item) return "";
+    return item.name?.[lang] || item.name?.fr || item.customName || "";
+  };
 
-    const targetSearchUrl = selectedStore.searchUrl(query);
+  // Sync input query with current item
+  useEffect(() => {
+    if (currentItem) {
+      setSearchQuery(getCleanItemName(currentItem));
+      setIsCopied(false);
+    }
+  }, [currentItem?.id]);
+
+  const suggestions = currentItem
+    ? DriveService.getSearchSuggestions(getRawItemName(currentItem))
+    : [];
+
+  // Quand le magasin change, naviguer vers son accueil
+  const handleSelectStore = (store) => {
+    setSelectedStore(store);
+    setCurrentUrl(store.homeUrl);
+  };
+
+  // Rechercher un mot-clé précis dans le Drive
+  const handleSearchTerm = (term) => {
+    const q = (term !== undefined ? term : searchQuery).trim();
+    if (!q) return;
+    setSearchQuery(q);
+    const targetSearchUrl = selectedStore.searchUrl(q);
     setCurrentUrl(targetSearchUrl);
+  };
+
+  // Copier le mot-clé dans le presse-papier
+  const handleCopyTerm = async (term) => {
+    const q = (term !== undefined ? term : searchQuery).trim();
+    if (!q) return;
+    try {
+      await Clipboard.setStringAsync(q);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch {}
   };
 
   // Marquer l'article comme ajouté et passer au suivant
@@ -344,16 +375,65 @@ export default function DriveCartModal({
                 ) : null}
               </View>
 
+              {/* Suggestions de mots-clés rapides (ex: Lait d'amande vs demi-écrémé) */}
+              {suggestions.length > 0 && (
+                <View style={styles.suggestionsContainer}>
+                  <Text style={[styles.suggestionsLabel, { color: theme.textMuted }]}>Suggestions :</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionsScroll}>
+                    {suggestions.map((sug, idx) => {
+                      const isActive = searchQuery.toLowerCase() === sug.toLowerCase();
+                      return (
+                        <TouchableOpacity
+                          key={idx}
+                          style={[
+                            styles.sugChip,
+                            { backgroundColor: theme.cardBg, borderColor: theme.border },
+                            isActive && styles.sugChipActive
+                          ]}
+                          onPress={() => handleSearchTerm(sug)}
+                        >
+                          <Ionicons name="sparkles" size={12} color={isActive ? "#ffffff" : "#38bdf8"} />
+                          <Text style={[styles.sugChipText, { color: theme.textSub }, isActive && styles.sugChipTextActive]}>
+                            {sug}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+              )}
+
+              {/* Barre de recherche modifiable & bouton copier */}
+              <View style={[styles.searchBarRow, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+                <Ionicons name="search" size={16} color={theme.textMuted} style={styles.searchBarIcon} />
+                <TextInput
+                  style={[styles.searchBarInput, { color: theme.text }]}
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  placeholder="Modifier la référence..."
+                  placeholderTextColor={theme.textMuted}
+                  onSubmitEditing={() => handleSearchTerm(searchQuery)}
+                  returnKeyType="search"
+                />
+                <TouchableOpacity
+                  style={styles.searchActionBtn}
+                  onPress={() => handleSearchTerm(searchQuery)}
+                >
+                  <Ionicons name="arrow-forward" size={16} color="#ffffff" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.copyActionBtn, isCopied && styles.copyActionBtnSuccess]}
+                  onPress={() => handleCopyTerm(searchQuery)}
+                >
+                  <Ionicons name={isCopied ? "checkmark" : "copy-outline"} size={15} color={isCopied ? "#10b981" : theme.textSub} />
+                  <Text style={[styles.copyActionText, { color: isCopied ? "#10b981" : theme.textSub }]}>
+                    {isCopied ? "Copié !" : "Copier"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
               {/* Action Buttons Row */}
               <View style={styles.actionButtonsRow}>
-                <TouchableOpacity
-                  style={styles.searchBtn}
-                  onPress={handleSearchCurrentItem}
-                >
-                  <Ionicons name="search" size={16} color="#ffffff" />
-                  <Text style={styles.searchBtnText}>Rechercher</Text>
-                </TouchableOpacity>
-
                 <TouchableOpacity
                   style={styles.addedBtn}
                   onPress={handleItemAdded}
@@ -612,28 +692,93 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600"
   },
+  suggestionsContainer: {
+    marginBottom: 8
+  },
+  suggestionsLabel: {
+    fontSize: 11,
+    fontWeight: "700",
+    marginBottom: 4
+  },
+  suggestionsScroll: {
+    gap: 6,
+    paddingVertical: 2
+  },
+  sugChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#0f172a",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#334155",
+    gap: 4
+  },
+  sugChipActive: {
+    backgroundColor: "#0284c7",
+    borderColor: "#38bdf8"
+  },
+  sugChipText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#94a3b8"
+  },
+  sugChipTextActive: {
+    color: "#ffffff"
+  },
+  searchBarRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#0f172a",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#334155",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    marginBottom: 10,
+    gap: 6
+  },
+  searchBarIcon: {
+    marginLeft: 2
+  },
+  searchBarInput: {
+    flex: 1,
+    fontSize: 13,
+    paddingVertical: 4,
+    color: "#f8fafc"
+  },
+  searchActionBtn: {
+    backgroundColor: "#0284c7",
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  copyActionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(56, 189, 248, 0.12)",
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 8,
+    gap: 4
+  },
+  copyActionBtnSuccess: {
+    backgroundColor: "rgba(16, 185, 129, 0.15)"
+  },
+  copyActionText: {
+    fontSize: 11,
+    fontWeight: "700"
+  },
   actionButtonsRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8
   },
-  searchBtn: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#0284c7",
-    paddingVertical: 10,
-    borderRadius: 12,
-    gap: 6
-  },
-  searchBtnText: {
-    color: "#ffffff",
-    fontSize: 13,
-    fontWeight: "800"
-  },
   addedBtn: {
-    flex: 1.3,
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

@@ -12,7 +12,7 @@ import {
   Platform,
   StatusBar
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { TRANSLATIONS } from "../i18n/translations";
 import { MistralService } from "../services/mistralService";
@@ -184,16 +184,38 @@ export default function FamilyProfileModal({
     onClose();
   };
 
+  const insets = useSafeAreaInsets();
+  const topInset = Math.max(insets.top, Platform.OS === "ios" ? 50 : (StatusBar.currentHeight || 20));
+
   return (
     <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose}>
-      <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.bg }]}>
-        {/* Header */}
-        <View style={[styles.header, { backgroundColor: theme.headerBg, borderBottomColor: theme.border }, isRTL && styles.rtlRow]}>
-          <TouchableOpacity onPress={onClose} style={[styles.closeBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, borderWidth: 1 }]}>
+      <View style={[styles.safeArea, { backgroundColor: theme.bg }]}>
+        {/* Header avec safe inset padding pour iPhone / Dynamic Island */}
+        <View style={[
+          styles.header,
+          {
+            backgroundColor: theme.headerBg,
+            borderBottomColor: theme.border,
+            paddingTop: topInset + 6,
+            paddingBottom: 14
+          },
+          isRTL && styles.rtlRow
+        ]}>
+          <TouchableOpacity
+            onPress={onClose}
+            style={[styles.closeBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, borderWidth: 1 }]}
+            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+            activeOpacity={0.7}
+          >
             <Ionicons name="close" size={24} color={theme.text} />
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: theme.text }]}>{t.profileTitle}</Text>
-          <TouchableOpacity onPress={handleSave} style={styles.saveHeaderBtn}>
+          <TouchableOpacity
+            onPress={handleSave}
+            style={styles.saveHeaderBtn}
+            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+            activeOpacity={0.8}
+          >
             <Text style={styles.saveHeaderText}>{t.saveProfile.split(" ")[0]}</Text>
           </TouchableOpacity>
         </View>
@@ -683,7 +705,7 @@ export default function FamilyProfileModal({
             <Text style={styles.mainSaveBtnText}>{t.saveProfile}</Text>
           </TouchableOpacity>
         </ScrollView>
-      </SafeAreaView>
+      </View>
     </Modal>
   );
 }
@@ -691,8 +713,7 @@ export default function FamilyProfileModal({
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#0f172a",
-    paddingTop: Platform.OS === "android" ? (StatusBar.currentHeight || 28) : 0
+    backgroundColor: "#0f172a"
   },
   header: {
     flexDirection: "row",

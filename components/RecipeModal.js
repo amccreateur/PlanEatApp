@@ -9,7 +9,7 @@ import {
   Platform,
   StatusBar
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { TRANSLATIONS } from "../i18n/translations";
 import { THEMES } from "../utils/theme";
@@ -62,15 +62,32 @@ export default function RecipeModal({ visible, recipe, onClose, lang = "fr", the
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
-  const servings = recipe.calculatedServings || 2;
+  const insets = useSafeAreaInsets();
+  const topInset = Math.max(insets.top, Platform.OS === "ios" ? 50 : (StatusBar.currentHeight || 20));
+
+  const servings = recipe?.calculatedServings || 2;
   const factor = servings / 2;
 
   return (
     <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose}>
-      <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.bg }]}>
-        {/* Header */}
-        <View style={[styles.header, { backgroundColor: theme.headerBg, borderBottomColor: theme.border }, isRTL && styles.rtlRow]}>
-          <TouchableOpacity onPress={onClose} style={[styles.closeBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, borderWidth: 1 }]}>
+      <View style={[styles.safeArea, { backgroundColor: theme.bg }]}>
+        {/* Header avec safe inset padding pour iPhone / Dynamic Island */}
+        <View style={[
+          styles.header,
+          {
+            backgroundColor: theme.headerBg,
+            borderBottomColor: theme.border,
+            paddingTop: topInset + 6,
+            paddingBottom: 14
+          },
+          isRTL && styles.rtlRow
+        ]}>
+          <TouchableOpacity
+            onPress={onClose}
+            style={[styles.closeBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, borderWidth: 1 }]}
+            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+            activeOpacity={0.7}
+          >
             <Ionicons name="close" size={26} color={theme.text} />
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: theme.text }]} numberOfLines={1}>{title}</Text>
@@ -232,7 +249,7 @@ export default function RecipeModal({ visible, recipe, onClose, lang = "fr", the
             </View>
           )}
         </ScrollView>
-      </SafeAreaView>
+      </View>
     </Modal>
   );
 }
@@ -240,8 +257,7 @@ export default function RecipeModal({ visible, recipe, onClose, lang = "fr", the
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#0f172a",
-    paddingTop: Platform.OS === "android" ? (StatusBar.currentHeight || 28) : 0
+    backgroundColor: "#0f172a"
   },
   header: {
     flexDirection: "row",

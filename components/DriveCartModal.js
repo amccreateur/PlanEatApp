@@ -48,6 +48,16 @@ export default function DriveCartModal({
   const [isAssistantCollapsed, setIsAssistantCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSelectingStore, setIsSelectingStore] = useState(true);
+  const [isCopied, setIsCopied] = useState(false);
+
+  const copyToClipboard = async (text) => {
+    if (!text) return;
+    try {
+      await Clipboard.setStringAsync(text);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch(e) {}
+  };
 
   // Utiliser la liste complète des groceries pour un indexage stable et prévisible
   const currentItem = groceries[currentIndex] || groceries[0];
@@ -182,10 +192,13 @@ export default function DriveCartModal({
     const cleanQ = query.trim();
     if (!cleanQ) return;
 
+    // Copier immédiatement dans le presse-papier pour confort utilisateur
+    Clipboard.setStringAsync(cleanQ).catch(() => {});
+
     const targetUrl = getSearchUrlForStore(cleanQ);
-    const startMsg = `🚀 Démarrage recherche: "${cleanQ}" (${selectedStore.name}) vers ${targetUrl}`;
+    const startMsg = `🚀 Recherche: "${cleanQ}" (${selectedStore.name})`;
     console.log(`[PlanEat Drive] ${startMsg}`);
-    sendServerLog("APP_START_SEARCH", startMsg);
+    sendServerLog("APP_START_SEARCH", `${startMsg} -> ${targetUrl}`);
 
     if (selectedStore.id === "leclerc" || selectedStore.id === "carrefour") {
       setCurrentUrl(targetUrl);
@@ -204,15 +217,67 @@ export default function DriveCartModal({
       return;
     }
 
-    // Pour Courses U, Auchan, Intermarché : injection dans le DOM pour préserver le magasin sélectionné
+    // Pour Courses U, Auchan, Intermarché : injection dynamique avec boucle de retry et logs
     const domSearchJs = `
       (function() {
         try {
           var query = ${JSON.stringify(cleanQ)};
-          var targetUrl = ${JSON.stringify(targetUrl)};
+          var attempts = 0;
+          var maxAttempts = 12;
 
-          function fillAndSubmit(input) {
-            if (!input) return false;
+          function sendMsg(text) {
+            try {
+              if (window.ReactNativeWebView) {
+                window.ReactNativeWebView.postMessage(JSON.stringify({ type: "drive_search_log", text: text }));
+              }
+            } catch(e) {}
+          }
+
+          function trySearch() {
+            attempts++;
+            var selectors = [
+              'input[type="search"]',
+              'input[name="q"]',
+              'input#search-input',
+              'input.header-search-input',
+              'input.search-field',
+              'input[name="TexteRecherche"]',
+              'input[name="text"]',
+              'input[name="query"]',
+              'input[placeholder*="recherch" i]',
+              'input[placeholder*="produit" i]',
+              'input[placeholder*="article" i]',
+              'input.search-input',
+              'header input',
+              'nav input',
+              '[data-testid*="search" i] input'
+            ];
+
+            var input = null;
+            for (var i = 0; i < selectors.length; i++) {
+              var el = document.querySelector(selectors[i]);
+              if (el && el.offsetParent !== null) { // visible
+                input = el;
+                break;
+              }
+            }
+
+            if (!input) {
+              // Si input non trouvé, tenter de cliquer sur l'icône loupe pour l'ouvrir
+              var searchToggle = document.querySelector('button[aria-label*="recherch" i], button.header-search-btn, .search-icon, [data-testid*="search-button"], header button svg, nav button svg');
+              if (searchToggle && attempts === 1) {
+                sendMsg("🔍 Clic sur l'icône de recherche pour ouvrir le champ...");
+                searchToggle.closest('button')?.click();
+              }
+              if (attempts < maxAttempts) {
+                setTimeout(trySearch, 250);
+              } else {
+                sendMsg("⚠️ Barre de recherche non détectée automatiquement. Le mot-clé a été copié dans le presse-papier.");
+              }
+              return;
+            }
+
+            // Champ trouvé ! Remplissage et soumission
             try {
               input.focus();
               var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value') ? Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set : null;
@@ -224,67 +289,32 @@ export default function DriveCartModal({
               input.dispatchEvent(new Event('input', { bubbles: true }));
               input.dispatchEvent(new Event('change', { bubbles: true }));
 
+              // Envoi de la touche Entrée
               input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
               input.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
               input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
 
               var form = input.form || input.closest('form');
               if (form) {
-                var submitBtn = form.querySelector('button[type="submit"], input[type="submit"], button.search-button, button.header-search__btn, [aria-label*="recherch" i], [aria-label*="search" i]');
+                var submitBtn = form.querySelector('button[type="submit"], input[type="submit"], button.search-button, button.header-search__btn, [aria-label*="recherch" i]');
                 if (submitBtn) {
                   submitBtn.click();
-                  return true;
-                }
-                form.submit();
-                return true;
-              }
-              return true;
-            } catch(e) {
-              return false;
-            }
-          }
-
-          var selectors = [
-            'input[name="q"]',
-            'input[type="search"]',
-            'input#search-input',
-            'input.header-search-input',
-            'input[name="TexteRecherche"]',
-            'input[name="text"]',
-            'input[name="query"]',
-            'input[placeholder*="recherch" i]',
-            'input[placeholder*="produit" i]',
-            'input[placeholder*="article" i]',
-            'input.search-input',
-            '[data-testid*="search" i] input'
-          ];
-
-          for (var i = 0; i < selectors.length; i++) {
-            var el = document.querySelector(selectors[i]);
-            if (el && el.offsetParent !== null) {
-              if (fillAndSubmit(el)) return;
-            }
-          }
-
-          var searchToggle = document.querySelector('button[aria-label*="recherch" i], button.header-search-btn, .search-icon, [data-testid*="search-button"]');
-          if (searchToggle) {
-            searchToggle.click();
-            setTimeout(function() {
-              for (var j = 0; j < selectors.length; j++) {
-                var elAfter = document.querySelector(selectors[j]);
-                if (elAfter) {
-                  fillAndSubmit(elAfter);
+                  sendMsg("✅ Recherche soumise via bouton de formulaire !");
                   return;
                 }
+                form.submit();
+                sendMsg("✅ Formulaire de recherche soumis !");
+                return;
               }
-              window.location.href = targetUrl;
-            }, 300);
-            return;
+              sendMsg("✅ Événements de recherche envoyés au champ (" + query + ") !");
+            } catch(e) {
+              sendMsg("❌ Erreur injection: " + e.message);
+            }
           }
 
-          window.location.href = targetUrl;
-        } catch(e) {
-          window.location.href = ${JSON.stringify(targetUrl)};
+          trySearch();
+        } catch(err) {
+          sendMsg("❌ Erreur globale domSearchJs: " + err.message);
         }
       })();
       true;
@@ -375,6 +405,32 @@ export default function DriveCartModal({
   const progressPercent = groceries.length > 0
     ? Math.round(((groceries.filter(g => g.checked).length) / groceries.length) * 100)
     : 0;
+
+  const webViewBridgeScript = `
+    (function() {
+      if (window.__planeat_bridge_ready) return;
+      window.__planeat_bridge_ready = true;
+      function send(type, text) {
+        try {
+          if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({ type: type, text: String(text) }));
+          }
+        } catch(e) {}
+      }
+      var origLog = console.log;
+      console.log = function() {
+        origLog.apply(console, arguments);
+        send("log", Array.prototype.slice.call(arguments).join(" "));
+      };
+      var origError = console.error;
+      console.error = function() {
+        origError.apply(console, arguments);
+        send("error", Array.prototype.slice.call(arguments).join(" "));
+      };
+      send("log", "🌐 Page prête: " + window.location.href);
+    })();
+    true;
+  `;
 
   return (
     <Modal
@@ -537,6 +593,7 @@ export default function DriveCartModal({
             onLoadStart={() => setIsLoadingWeb(true)}
             onLoadEnd={() => setIsLoadingWeb(false)}
             onMessage={handleWebViewMessage}
+            injectedJavaScript={webViewBridgeScript}
             originWhitelist={["*"]}
             setSupportMultipleWindows={false}
             sharedCookiesEnabled={true}
@@ -681,14 +738,29 @@ export default function DriveCartModal({
                 <View style={[styles.currentCard, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}>
                   <View style={styles.currentItemInfo}>
                     <View style={styles.itemBadgeRow}>
-                      <Text style={styles.itemIndexBadge}>
-                        Article {currentIndex + 1} / {groceries.length}
-                      </Text>
-                      {currentItem.dept ? (
-                        <Text style={[styles.itemDeptBadge, { backgroundColor: theme.cardBg, color: theme.textSub }]}>
-                          {t[currentItem.dept] || currentItem.dept}
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexWrap: "wrap", flex: 1 }}>
+                        <Text style={styles.itemIndexBadge}>
+                          Article {currentIndex + 1} / {groceries.length}
                         </Text>
-                      ) : null}
+                        {currentItem.dept ? (
+                          <Text style={[styles.itemDeptBadge, { backgroundColor: theme.cardBg, color: theme.textSub }]}>
+                            {t[currentItem.dept] || currentItem.dept}
+                          </Text>
+                        ) : null}
+                      </View>
+
+                      <TouchableOpacity
+                        style={[
+                          styles.quickCopyChip,
+                          { backgroundColor: isCopied ? "#10b981" : theme.cardBg, borderColor: isCopied ? "#10b981" : theme.border }
+                        ]}
+                        onPress={() => copyToClipboard(searchQuery || getCleanItemName(currentItem))}
+                      >
+                        <Ionicons name={isCopied ? "checkmark" : "copy-outline"} size={11} color={isCopied ? "#ffffff" : "#38bdf8"} />
+                        <Text style={[styles.quickCopyChipText, { color: isCopied ? "#ffffff" : theme.textSub }]}>
+                          {isCopied ? "Copié !" : "Copier"}
+                        </Text>
+                      </TouchableOpacity>
                     </View>
 
                     <Text style={[styles.currentItemTitle, { color: theme.text }]} numberOfLines={1}>
@@ -1259,8 +1331,22 @@ const styles = StyleSheet.create({
   itemBadgeRow: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     gap: 6,
     marginBottom: 4
+  },
+  quickCopyChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    borderWidth: 1,
+    gap: 4
+  },
+  quickCopyChipText: {
+    fontSize: 10,
+    fontWeight: "700"
   },
   itemIndexBadge: {
     color: "#38bdf8",

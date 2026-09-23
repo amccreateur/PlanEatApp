@@ -45,6 +45,7 @@ export default function DriveCartModal({
   const [isListExpanded, setIsListExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCopied, setIsCopied] = useState(false);
+  const [isSelectingStore, setIsSelectingStore] = useState(true);
 
   // Filtrer les articles non cochés en priorité
   const uncheckedItems = groceries.filter(g => !g.checked);
@@ -74,10 +75,19 @@ export default function DriveCartModal({
     ? DriveService.getSearchSuggestions(getRawItemName(currentItem))
     : [];
 
-  // Quand le magasin change, naviguer vers son accueil
+  // Quand le magasin change, naviguer vers son accueil en plein écran
   const handleSelectStore = (store) => {
     setSelectedStore(store);
     setCurrentUrl(store.homeUrl);
+    setIsSelectingStore(true);
+  };
+
+  // Démarrer les courses après sélection du magasin
+  const handleStartShopping = () => {
+    setIsSelectingStore(false);
+    if (currentItem) {
+      handleSearchTerm(getCleanItemName(currentItem));
+    }
   };
 
   // Rechercher un mot-clé précis dans le Drive
@@ -85,6 +95,7 @@ export default function DriveCartModal({
     const q = (term !== undefined ? term : searchQuery).trim();
     if (!q) return;
     setSearchQuery(q);
+    setIsSelectingStore(false);
     const targetSearchUrl = selectedStore.searchUrl(q);
     setCurrentUrl(targetSearchUrl);
   };
@@ -287,112 +298,121 @@ export default function DriveCartModal({
               <Text style={styles.loadingText}>Chargement du Drive...</Text>
             </View>
           )}
-        </View>
 
-        {/* Bottom Assistant Dock (Floating Toolbar) */}
-        <View style={[styles.bottomDock, { backgroundColor: theme.cardBg, borderTopColor: theme.border }]}>
-          {/* Progress Bar Header */}
-          <View style={styles.dockProgressRow}>
-            <View style={styles.dockProgressLeft}>
-              <Text style={[styles.dockProgressLabel, { color: theme.text }]}>
-                🛒 Progression : {groceries.filter(g => g.checked).length} / {groceries.length} articles
-              </Text>
-            </View>
-            <TouchableOpacity
-              style={styles.toggleListBtn}
-              onPress={() => setIsListExpanded(!isListExpanded)}
-            >
-              <Ionicons
-                name={isListExpanded ? "chevron-down" : "list"}
-                size={16}
-                color="#38bdf8"
-              />
-              <Text style={styles.toggleListBtnText}>
-                {isListExpanded ? "Réduire" : "Toute la liste"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Progress Bar Fill */}
-          <View style={[styles.progressBarTrack, { backgroundColor: theme.cardBgAlt }]}>
-            <View style={[styles.progressBarFill, { width: `${progressPercent}%` }]} />
-          </View>
-
-          {/* Drawer Liste Déroulante Complète */}
-          {isListExpanded && (
-            <ScrollView style={[styles.expandedListScroll, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]} showsVerticalScrollIndicator={true}>
-              {groceries.map((item, idx) => {
-                const itemName = item.name?.[lang] || item.name?.fr || item.customName;
-                const isCurrent = currentItem?.id === item.id;
-                return (
-                  <TouchableOpacity
-                    key={item.id}
-                    style={[
-                      styles.drawerItemRow,
-                      item.checked && styles.drawerItemChecked,
-                      isCurrent && styles.drawerItemActive
-                    ]}
-                    onPress={() => {
-                      const foundIdx = activeItems.findIndex(g => g.id === item.id);
-                      if (foundIdx !== -1) setCurrentIndex(foundIdx);
-                      setIsListExpanded(false);
-                      const q = getCleanItemName(item);
-                      if (q) setCurrentUrl(selectedStore.searchUrl(q));
-                    }}
-                  >
-                    <Ionicons
-                      name={item.checked ? "checkmark-circle" : "ellipse-outline"}
-                      size={18}
-                      color={item.checked ? "#10b981" : theme.textMuted}
-                    />
-                    <Text
-                      style={[
-                        styles.drawerItemName,
-                        { color: theme.text },
-                        item.checked && [styles.drawerItemNameChecked, { color: theme.textMuted }]
-                      ]}
-                      numberOfLines={1}
-                    >
-                      {itemName}
-                    </Text>
-                    {item.totalQuantity ? (
-                      <Text style={[styles.drawerItemQty, { color: theme.textSub }]}>
-                        {item.totalQuantity} {item.unit}
-                      </Text>
-                    ) : null}
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-          )}
-
-          {/* Bannière de sélection initiale du magasin */}
-          {currentUrl === selectedStore.homeUrl && (
-            <View style={[styles.onboardingBanner, { backgroundColor: theme.cardBgAlt, borderColor: "#0284c7" }]}>
-              <View style={styles.onboardingTextRow}>
-                <Text style={styles.onboardingEmoji}>📍</Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.onboardingTitle, { color: theme.text }]}>
-                    1. Choisissez votre magasin sur le site
-                  </Text>
-                  <Text style={[styles.onboardingSub, { color: theme.textSub }]}>
-                    Entrez votre code postal ci-dessus pour charger votre Drive local {selectedStore.shortName}.
-                  </Text>
-                </View>
-              </View>
+          {/* Bouton Flottant en plein écran pour valider la sélection du magasin */}
+          {isSelectingStore && (
+            <View style={styles.floatingStartBar}>
               <TouchableOpacity
-                style={styles.onboardingStartBtn}
-                onPress={() => {
-                  if (currentItem) {
-                    handleSearchTerm(getCleanItemName(currentItem));
-                  }
-                }}
+                style={styles.floatingStartBtn}
+                onPress={handleStartShopping}
+                activeOpacity={0.85}
               >
-                <Ionicons name="play-circle" size={18} color="#ffffff" />
-                <Text style={styles.onboardingStartBtnText}>Mon magasin est choisi, lancer mes courses !</Text>
+                <LinearGradient
+                  colors={["#0284c7", "#0369a1"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.floatingStartGradient}
+                >
+                  <Ionicons name="cart" size={20} color="#ffffff" />
+                  <Text style={styles.floatingStartBtnText}>
+                    Magasin sélectionné ➔ Démarrer mes courses ({groceries.length} articles)
+                  </Text>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
           )}
+        </View>
+
+        {/* Bottom Assistant Dock (affiché UNIQUEMENT pendant les courses, masqué pendant le choix du magasin) */}
+        {!isSelectingStore && (
+          <View style={[styles.bottomDock, { backgroundColor: theme.cardBg, borderTopColor: theme.border }]}>
+            {/* Progress Bar Header */}
+            <View style={styles.dockProgressRow}>
+              <View style={styles.dockProgressLeft}>
+                <Text style={[styles.dockProgressLabel, { color: theme.text }]}>
+                  🛒 Progression : {groceries.filter(g => g.checked).length} / {groceries.length} articles
+                </Text>
+              </View>
+              <View style={styles.dockProgressRightActions}>
+                <TouchableOpacity
+                  style={[styles.switchStoreSmallBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}
+                  onPress={() => {
+                    setIsSelectingStore(true);
+                    setCurrentUrl(selectedStore.homeUrl);
+                  }}
+                >
+                  <Ionicons name="storefront-outline" size={13} color="#38bdf8" />
+                  <Text style={styles.switchStoreSmallText}>Magasin</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.toggleListBtn}
+                  onPress={() => setIsListExpanded(!isListExpanded)}
+                >
+                  <Ionicons
+                    name={isListExpanded ? "chevron-down" : "list"}
+                    size={15}
+                    color="#38bdf8"
+                  />
+                  <Text style={styles.toggleListBtnText}>
+                    {isListExpanded ? "Réduire" : "Liste"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Progress Bar Fill */}
+            <View style={[styles.progressBarTrack, { backgroundColor: theme.cardBgAlt }]}>
+              <View style={[styles.progressBarFill, { width: `${progressPercent}%` }]} />
+            </View>
+
+            {/* Drawer Liste Déroulante Complète */}
+            {isListExpanded && (
+              <ScrollView style={[styles.expandedListScroll, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]} showsVerticalScrollIndicator={true}>
+                {groceries.map((item, idx) => {
+                  const itemName = item.name?.[lang] || item.name?.fr || item.customName;
+                  const isCurrent = currentItem?.id === item.id;
+                  return (
+                    <TouchableOpacity
+                      key={item.id}
+                      style={[
+                        styles.drawerItemRow,
+                        item.checked && styles.drawerItemChecked,
+                        isCurrent && styles.drawerItemActive
+                      ]}
+                      onPress={() => {
+                        const foundIdx = activeItems.findIndex(g => g.id === item.id);
+                        if (foundIdx !== -1) setCurrentIndex(foundIdx);
+                        setIsListExpanded(false);
+                        const q = getCleanItemName(item);
+                        if (q) setCurrentUrl(selectedStore.searchUrl(q));
+                      }}
+                    >
+                      <Ionicons
+                        name={item.checked ? "checkmark-circle" : "ellipse-outline"}
+                        size={18}
+                        color={item.checked ? "#10b981" : theme.textMuted}
+                      />
+                      <Text
+                        style={[
+                          styles.drawerItemName,
+                          { color: theme.text },
+                          item.checked && [styles.drawerItemNameChecked, { color: theme.textMuted }]
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {itemName}
+                      </Text>
+                      {item.totalQuantity ? (
+                        <Text style={[styles.drawerItemQty, { color: theme.textSub }]}>
+                          {item.totalQuantity} {item.unit}
+                        </Text>
+                      ) : null}
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            )}
 
           {/* Current Ingredient Card & Controls */}
           {currentItem ? (
@@ -511,6 +531,7 @@ export default function DriveCartModal({
             </View>
           )}
         </View>
+        )}
       </SafeAreaView>
     </Modal>
   );
@@ -626,6 +647,35 @@ const styles = StyleSheet.create({
   webView: {
     flex: 1
   },
+  floatingStartBar: {
+    position: "absolute",
+    bottom: 16,
+    left: 14,
+    right: 14,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 8
+  },
+  floatingStartBtn: {
+    borderRadius: 16,
+    overflow: "hidden"
+  },
+  floatingStartGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    gap: 10
+  },
+  floatingStartBtnText: {
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: "800",
+    textAlign: "center"
+  },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(15, 23, 42, 0.75)",
@@ -659,6 +709,25 @@ const styles = StyleSheet.create({
   dockProgressLabel: {
     color: "#f8fafc",
     fontSize: 13,
+    fontWeight: "700"
+  },
+  dockProgressRightActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8
+  },
+  switchStoreSmallBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    gap: 4
+  },
+  switchStoreSmallText: {
+    color: "#38bdf8",
+    fontSize: 11,
     fontWeight: "700"
   },
   toggleListBtn: {

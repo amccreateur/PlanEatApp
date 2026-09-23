@@ -939,8 +939,7 @@ const styles = StyleSheet.create({
     borderColor: "#334155",
     alignItems: "center",
     justifyContent: "center",
-    position: "relative",
-    marginRight: 12
+    position: "relative"
   },
   menuIndicatorDot: {
     position: "absolute",

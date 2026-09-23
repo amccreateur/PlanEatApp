@@ -136,6 +136,7 @@ export default function DriveCartModal({
         cleanUrl === "https://www.auchan.fr" ||
         cleanUrl === "https://www.auchan.fr/drive" ||
         cleanUrl === "https://www.intermarche.com" ||
+        cleanUrl === "https://www.intermarche.com/accueil" ||
         cleanUrl === "https://www.intermarche.com/drive"
       );
 

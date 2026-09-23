@@ -148,8 +148,8 @@ export default function DriveCartModal({
               } else {
                 input.value = q;
               }
-              input.dispatchEvent(new Event('input', { bubbles: true }));
-              input.dispatchEvent(new Event('change', { bubbles: true }));
+              input.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+              input.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
               
               var enterDown = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Enter', code: 'Enter', keyCode: 13, which: 13 });
               var enterPress = new KeyboardEvent('keypress', { bubbles: true, cancelable: true, key: 'Enter', code: 'Enter', keyCode: 13, which: 13 });
@@ -158,21 +158,18 @@ export default function DriveCartModal({
               input.dispatchEvent(enterPress);
               input.dispatchEvent(enterUp);
 
-              var btn = null;
-              if (input.form) {
-                btn = input.form.querySelector('button[type="submit"], input[type="submit"], button, .btn-search, .search-button, [aria-label*="recherche" i]');
-              }
+              // Dans une SPA Angular (m-courses.leclercdrive), chercher le bouton .recherche-loupe ou submit
+              var container = input.closest('form, div, header') || document;
+              var btn = container.querySelector('.recherche-loupe, [class*="loupe"], button[type="submit"], input[type="submit"], .btn-search, .search-button, [aria-label*="recherche" i]');
               if (!btn) {
-                btn = document.querySelector('button[type="submit"], button[aria-label*="recherche" i], button[title*="recherche" i], .btn-search, .search-button, #btnRecherche, button.search-submit, .search-bar button, .header-search button');
+                btn = document.querySelector('.recherche-loupe, [class*="loupe"], button[type="submit"], button[aria-label*="recherche" i], #btnRecherche');
               }
+
               if (btn) {
-                log("🖱️ Clic sur bouton validation: " + (btn.tagName || '') + '.' + (btn.className || '') + ' text=' + (btn.innerText || ''));
+                log("🖱️ Clic sur bouton de recherche: <" + (btn.tagName || '') + "> class=" + (btn.className || ''));
                 btn.click();
-              } else if (input.form && typeof input.form.submit === 'function') {
-                log("📤 Soumission directe du formulaire parent");
-                input.form.submit();
               } else {
-                log("⚠️ Pas de bouton/formulaire trouvé, validation par touche Enter effectuée");
+                log("⌨️ Validation Enter effectuée sur l'input");
               }
               return true;
             } catch(e) {
@@ -181,10 +178,33 @@ export default function DriveCartModal({
             }
           }
 
-          // 1. Chercher tous les inputs candidats dans le DOM (en excluant les traceurs/cookies)
+          // 1. Chercher si le champ #saisieTexte ou un input est DÉJÀ présent et actif
+          var existingSaisie = document.querySelector('#saisieTexte, input[placeholder*="Produit" i], input[placeholder*="recherche" i]');
+          if (existingSaisie) {
+            log("🎯 Champ #saisieTexte immédiatement disponible");
+            fillAndSubmit(existingSaisie);
+            return;
+          }
+
+          // 2. Si pas encore ouvert, ouvrir la recherche en cliquant sur .recherche-home ou .champ-recherche
+          var openTrigger = document.querySelector('.recherche-home, .champ-recherche, .recherche-loupe, [aria-label*="recherche" i], .icon-search, .search-icon');
+          if (openTrigger) {
+            log("🔎 Clic pour ouvrir la barre de recherche: <" + openTrigger.tagName + "> class=" + openTrigger.className);
+            openTrigger.click();
+            setTimeout(function() {
+              var openedInput = document.querySelector('#saisieTexte, input[type="search"], input[placeholder*="Produit" i], input[name*="recherche" i], input[type="text"]');
+              if (openedInput) {
+                log("✍️ Saisie dans le champ ouvert: #" + openedInput.id);
+                fillAndSubmit(openedInput);
+              } else {
+                log("⚠️ Champ non trouvé après ouverture");
+              }
+            }, 300);
+            return;
+          }
+
+          // 3. Fallback : tous les inputs du DOM
           var allInputs = Array.from(document.querySelectorAll('input, textarea'));
-          log("🔍 Total inputs détectés: " + allInputs.length);
-          
           var candidates = [];
           for (var i = 0; i < allInputs.length; i++) {
             var inp = allInputs[i];
@@ -193,59 +213,16 @@ export default function DriveCartModal({
             
             var id = (inp.id || '').toLowerCase();
             var name = (inp.name || '').toLowerCase();
-            var ph = (inp.placeholder || '').toLowerCase();
-            var cls = (inp.className || '').toLowerCase();
-            var aria = (inp.getAttribute('aria-label') || '').toLowerCase();
+            if (id.includes('vendor') || name.includes('vendor') || id.includes('cookie') || name.includes('cookie')) continue;
+
             var isVisible = (inp.offsetParent !== null);
-
-            // Exclure les scripts tiers et traceurs (ex: vendor-search-handler, trustarc, datadome)
-            if (id.includes('vendor') || name.includes('vendor') || id.includes('cookie') || name.includes('cookie') || id.includes('trustarc') || id.includes('optanon')) {
-              continue;
-            }
-
-            log("  📋 Input #" + i + " -> id=" + id + " name=" + name + " type=" + type + " ph=" + ph + " visible=" + isVisible);
-
-            var str = id + ' ' + name + ' ' + ph + ' ' + cls + ' ' + aria;
-            if (str.includes('recherche') || str.includes('search') || str.includes('produit') || str.includes('query') || str.includes('keyword') || str.includes('txtrecherche') || str.includes('find') || str.includes('article')) {
-              candidates.push({ input: inp, score: 10 + (isVisible ? 5 : 0) });
-            } else if (type === 'text' || type === 'search' || type === '') {
-              candidates.push({ input: inp, score: 1 + (isVisible ? 3 : 0) });
-            }
+            candidates.push({ input: inp, score: isVisible ? 10 : 1 });
           }
 
           if (candidates.length > 0) {
             candidates.sort(function(a, b) { return b.score - a.score; });
-            log("🎯 Meilleur champ sélectionné (score " + candidates[0].score + ")");
+            log("🎯 Fallback sur input DOM #" + candidates[0].input.id);
             fillAndSubmit(candidates[0].input);
-            return;
-          }
-
-          // 2. Chercher les boutons ou liens de recherche (ex: icône loupe, bouton header)
-          var searchLinks = Array.from(document.querySelectorAll('a[href*="recherche" i], a[href*="search" i], button[aria-label*="recherche" i], button[title*="recherche" i], [class*="search" i], [class*="recherche" i]'));
-          log("🔍 Éléments recherche cliquables trouvés: " + searchLinks.length);
-          for (var k = 0; k < Math.min(searchLinks.length, 5); k++) {
-            var sl = searchLinks[k];
-            log("  🔗 #" + k + " <" + sl.tagName + "> href=" + (sl.href || '') + " class=" + (sl.className || '') + " text=" + (sl.innerText || '').trim().substring(0, 30));
-          }
-
-          var searchTrigger = document.querySelector('[aria-label*="recherche" i], [title*="recherche" i], .icon-search, .search-icon, #btnOpenSearch, .header-search-btn, a[href*="recherche" i]');
-          if (searchTrigger) {
-            log("🔎 Clic sur l'élément de recherche: <" + searchTrigger.tagName + ">");
-            searchTrigger.click();
-            setTimeout(function() {
-              var lateInputs = Array.from(document.querySelectorAll('input[type="search"], input[name*="recherche" i], input[id*="recherche" i], input[placeholder*="recherche" i], input[type="text"]'));
-              var validLate = lateInputs.filter(function(x) {
-                var tid = (x.id || '').toLowerCase();
-                var tname = (x.name || '').toLowerCase();
-                return !tid.includes('vendor') && !tname.includes('vendor');
-              });
-              if (validLate.length > 0) {
-                log("✍️ Saisie dans le champ après ouverture: id=" + validLate[0].id);
-                fillAndSubmit(validLate[0]);
-              } else {
-                log("⚠️ Aucun champ valide trouvé après ouverture");
-              }
-            }, 350);
             return;
           }
 

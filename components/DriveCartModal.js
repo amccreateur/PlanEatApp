@@ -220,14 +220,25 @@ export default function DriveCartModal({
             }
           }
 
-          // 1. Chercher si le champ #saisieTexte ou un input est DÉJÀ présent et valide
-          var allSaisie = Array.from(document.querySelectorAll('#saisieTexte, input.champ-recherche, input[type="search"]'));
-          var existingSaisie = allSaisie.find(function(el) {
-            return isGoodInput(el) && el.offsetParent !== null;
+          // 1. Chercher si un champ de recherche est DÉJÀ présent dans la page (accueil ou page de résultats)
+          var allSaisie = Array.from(document.querySelectorAll('input#saisieTexte, input.champ-recherche, input[type="search"], input[placeholder*="Produit" i], input[placeholder*="recherche" i], input[type="text"]'));
+          var activeInput = allSaisie.find(function(el) {
+            return isGoodInput(el);
           });
-          if (existingSaisie) {
-            log("🎯 Champ #saisieTexte immédiatement disponible");
-            fillAndSubmit(existingSaisie);
+          if (activeInput) {
+            log("🎯 Champ de recherche trouvé dans la page active: #" + (activeInput.id || activeInput.className));
+            fillAndSubmit(activeInput);
+            // Si on est sur une page de résultats Angular, mettre aussi à jour l'URL pour garantir le rafraîchissement
+            if (href.includes('/recherche/')) {
+              var mMatchCurr = href.match(/(https?:\\/\\/[^\\/]+\\/magasin-[^\\/\\?#]+)/i);
+              if (mMatchCurr && mMatchCurr[1]) {
+                var newUrl = mMatchCurr[1] + '/recherche/' + encodeURIComponent(q);
+                if (href !== newUrl) {
+                  log("🔄 Forçage mise à jour route: " + newUrl);
+                  window.location.assign(newUrl);
+                }
+              }
+            }
             return;
           }
 
@@ -245,13 +256,12 @@ export default function DriveCartModal({
                 log("✍️ Saisie dans le champ ouvert: #" + validOpened.id);
                 fillAndSubmit(validOpened);
               } else {
-                // Fallback URL immédiat sur m-courses
                 var hrefLate = window.location.href || '';
                 var mMatch = hrefLate.match(/(https?:\\/\\/[^\\/]+\\/magasin-[^\\/\\?#]+)/i);
                 if (mMatch && mMatch[1]) {
                   var mTarget = mMatch[1] + '/recherche/' + encodeURIComponent(q);
                   log("🌐 Navigation URL mobile Leclerc: " + mTarget);
-                  window.location.href = mTarget;
+                  window.location.assign(mTarget);
                 }
               }
             }, 250);
@@ -263,16 +273,15 @@ export default function DriveCartModal({
           if (host.includes('leclercdrive.fr')) {
             var storeMatch = href.match(/(https?:\\/\\/[^\\/]+\\/magasin-[^\\/\\?#]+)/i);
             if (storeMatch && storeMatch[1]) {
-              // Sur le site mobile m-courses.leclercdrive.fr
               if (host.includes('m-courses')) {
                 var targetMobile = storeMatch[1] + '/recherche/' + encodeURIComponent(q);
                 log("🌐 Navigation route mobile Leclerc: " + targetMobile);
-                window.location.href = targetMobile;
+                window.location.assign(targetMobile);
                 return;
               } else {
                 var targetDesktop = storeMatch[1] + '/recherche.aspx?TexteRecherche=' + encodeURIComponent(q);
                 log("🌐 Navigation route desktop Leclerc: " + targetDesktop);
-                window.location.href = targetDesktop;
+                window.location.assign(targetDesktop);
                 return;
               }
             }

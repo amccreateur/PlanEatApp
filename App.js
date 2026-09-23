@@ -1059,7 +1059,10 @@ const styles = StyleSheet.create({
   },
   weekPickerScroll: {
     paddingHorizontal: 16,
-    marginBottom: 6
+    paddingVertical: 2,
+    marginBottom: 4,
+    flexGrow: 0,
+    maxHeight: 38
   },
   weekPickerContent: {
     flexDirection: "row",
@@ -1068,8 +1071,8 @@ const styles = StyleSheet.create({
   },
   weekTabBtn: {
     backgroundColor: "#1e293b",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#334155"
@@ -1080,7 +1083,7 @@ const styles = StyleSheet.create({
   },
   weekTabBtnText: {
     color: "#94a3b8",
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "700"
   },
   weekTabBtnTextActive: {

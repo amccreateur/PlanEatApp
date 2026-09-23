@@ -366,6 +366,34 @@ export default function DriveCartModal({
             </ScrollView>
           )}
 
+          {/* Bannière de sélection initiale du magasin */}
+          {currentUrl === selectedStore.homeUrl && (
+            <View style={[styles.onboardingBanner, { backgroundColor: theme.cardBgAlt, borderColor: "#0284c7" }]}>
+              <View style={styles.onboardingTextRow}>
+                <Text style={styles.onboardingEmoji}>📍</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.onboardingTitle, { color: theme.text }]}>
+                    1. Choisissez votre magasin sur le site
+                  </Text>
+                  <Text style={[styles.onboardingSub, { color: theme.textSub }]}>
+                    Entrez votre code postal ci-dessus pour charger votre Drive local {selectedStore.shortName}.
+                  </Text>
+                </View>
+              </View>
+              <TouchableOpacity
+                style={styles.onboardingStartBtn}
+                onPress={() => {
+                  if (currentItem) {
+                    handleSearchTerm(getCleanItemName(currentItem));
+                  }
+                }}
+              >
+                <Ionicons name="play-circle" size={18} color="#ffffff" />
+                <Text style={styles.onboardingStartBtnText}>Mon magasin est choisi, lancer mes courses !</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
           {/* Current Ingredient Card & Controls */}
           {currentItem ? (
             <View style={[styles.currentCard, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}>
@@ -691,6 +719,44 @@ const styles = StyleSheet.create({
   drawerItemQty: {
     color: "#94a3b8",
     fontSize: 11
+  },
+  onboardingBanner: {
+    padding: 12,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    marginBottom: 10,
+    gap: 10
+  },
+  onboardingTextRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10
+  },
+  onboardingEmoji: {
+    fontSize: 24
+  },
+  onboardingTitle: {
+    fontSize: 14,
+    fontWeight: "800",
+    marginBottom: 2
+  },
+  onboardingSub: {
+    fontSize: 12,
+    lineHeight: 16
+  },
+  onboardingStartBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#0284c7",
+    paddingVertical: 10,
+    borderRadius: 10,
+    gap: 8
+  },
+  onboardingStartBtnText: {
+    color: "#ffffff",
+    fontSize: 13,
+    fontWeight: "800"
   },
   currentCard: {
     backgroundColor: "#1e293b",

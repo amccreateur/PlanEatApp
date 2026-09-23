@@ -241,9 +241,10 @@ export default function DriveCartModal({
               var form = document.createElement('form');
               form.method = 'GET';
               form.action = actionPath;
+              var paramName = ${JSON.stringify(selectedStore.id === "auchan" ? "text" : "q")};
               var qInput = document.createElement('input');
               qInput.type = 'hidden';
-              qInput.name = 'q';
+              qInput.name = paramName;
               qInput.value = query;
               form.appendChild(qInput);
               document.body.appendChild(form);

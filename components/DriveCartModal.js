@@ -75,14 +75,37 @@ export default function DriveCartModal({
     ? DriveService.getSearchSuggestions(getRawItemName(currentItem))
     : [];
 
-  // Injecter la recherche directement dans le DOM du Drive actif (évite le rechargement et la perte de session)
+  // Injecter la recherche directement dans la session active du magasin
   const injectSearchInStore = (query) => {
     if (!query) return;
-    const searchFallbackUrl = selectedStore.searchUrl(query);
+    const cleanQ = query.trim();
+    if (!cleanQ) return;
+    const searchFallbackUrl = selectedStore.searchUrl(cleanQ);
+
     const js = `
       (function() {
         try {
-          var q = ${JSON.stringify(query)};
+          var q = ${JSON.stringify(cleanQ)};
+          var host = (window.location.hostname || '').toLowerCase();
+          var href = window.location.href || '';
+          
+          // 1. Spécifique Leclerc Drive : redirection interne vers la recherche du magasin actif
+          if (host.includes('leclercdrive.fr')) {
+            var storeMatch = href.match(/(https?:\\/\\/[^\\/]+\\/magasin-[^\\/\\?#]+)/i);
+            if (storeMatch && storeMatch[1]) {
+              window.location.href = storeMatch[1] + '/recherche.aspx?TexteRecherche=' + encodeURIComponent(q);
+              return;
+            }
+            if (host.includes('-courses.')) {
+              var pathSegments = window.location.pathname.split('/').filter(Boolean);
+              if (pathSegments.length > 0 && pathSegments[0].startsWith('magasin-')) {
+                window.location.href = window.location.origin + '/' + pathSegments[0] + '/recherche.aspx?TexteRecherche=' + encodeURIComponent(q);
+                return;
+              }
+            }
+          }
+
+          // 2. Chercher les champs de saisie dans le DOM
           var selectors = [
             'input[type="search"]',
             'input[name*="recherche" i]',

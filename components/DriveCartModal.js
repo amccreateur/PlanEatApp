@@ -183,26 +183,113 @@ export default function DriveCartModal({
     if (!cleanQ) return;
 
     const targetUrl = getSearchUrlForStore(cleanQ);
-    const startMsg = `🚀 Démarrage recherche: "${cleanQ}" vers ${targetUrl}`;
+    const startMsg = `🚀 Démarrage recherche: "${cleanQ}" (${selectedStore.name}) vers ${targetUrl}`;
     console.log(`[PlanEat Drive] ${startMsg}`);
     sendServerLog("APP_START_SEARCH", startMsg);
 
-    // 1. Navigation native par WebView
-    setCurrentUrl(targetUrl);
+    if (selectedStore.id === "leclerc" || selectedStore.id === "carrefour") {
+      setCurrentUrl(targetUrl);
+      const js = `
+        (function() {
+          try {
+            var target = ${JSON.stringify(targetUrl)};
+            if (window.location.href !== target) {
+              window.location.replace(target);
+            }
+          } catch(e) {}
+        })();
+        true;
+      `;
+      webViewRef.current?.injectJavaScript(js);
+      return;
+    }
 
-    // 2. Navigation immédiate dans le DOM pour réactivité maximale
-    const js = `
+    // Pour Courses U, Auchan, Intermarché : injection dans le DOM pour préserver le magasin sélectionné
+    const domSearchJs = `
       (function() {
         try {
-          var target = ${JSON.stringify(targetUrl)};
-          if (window.location.href !== target) {
-            window.location.replace(target);
+          var query = ${JSON.stringify(cleanQ)};
+          var targetUrl = ${JSON.stringify(targetUrl)};
+
+          function fillAndSubmit(input) {
+            if (!input) return false;
+            try {
+              input.focus();
+              var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value') ? Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set : null;
+              if (nativeSetter) {
+                nativeSetter.call(input, query);
+              } else {
+                input.value = query;
+              }
+              input.dispatchEvent(new Event('input', { bubbles: true }));
+              input.dispatchEvent(new Event('change', { bubbles: true }));
+
+              input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
+              input.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
+              input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
+
+              var form = input.form || input.closest('form');
+              if (form) {
+                var submitBtn = form.querySelector('button[type="submit"], input[type="submit"], button.search-button, button.header-search__btn, [aria-label*="recherch" i], [aria-label*="search" i]');
+                if (submitBtn) {
+                  submitBtn.click();
+                  return true;
+                }
+                form.submit();
+                return true;
+              }
+              return true;
+            } catch(e) {
+              return false;
+            }
           }
-        } catch(e) {}
+
+          var selectors = [
+            'input[name="q"]',
+            'input[type="search"]',
+            'input#search-input',
+            'input.header-search-input',
+            'input[name="TexteRecherche"]',
+            'input[name="text"]',
+            'input[name="query"]',
+            'input[placeholder*="recherch" i]',
+            'input[placeholder*="produit" i]',
+            'input[placeholder*="article" i]',
+            'input.search-input',
+            '[data-testid*="search" i] input'
+          ];
+
+          for (var i = 0; i < selectors.length; i++) {
+            var el = document.querySelector(selectors[i]);
+            if (el && el.offsetParent !== null) {
+              if (fillAndSubmit(el)) return;
+            }
+          }
+
+          var searchToggle = document.querySelector('button[aria-label*="recherch" i], button.header-search-btn, .search-icon, [data-testid*="search-button"]');
+          if (searchToggle) {
+            searchToggle.click();
+            setTimeout(function() {
+              for (var j = 0; j < selectors.length; j++) {
+                var elAfter = document.querySelector(selectors[j]);
+                if (elAfter) {
+                  fillAndSubmit(elAfter);
+                  return;
+                }
+              }
+              window.location.href = targetUrl;
+            }, 300);
+            return;
+          }
+
+          window.location.href = targetUrl;
+        } catch(e) {
+          window.location.href = ${JSON.stringify(targetUrl)};
+        }
       })();
       true;
     `;
-    webViewRef.current?.injectJavaScript(js);
+    webViewRef.current?.injectJavaScript(domSearchJs);
   };
 
   // Quand le magasin change, naviguer vers son accueil en plein écran

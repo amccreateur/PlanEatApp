@@ -46,3 +46,4 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`[LogServer] Listening on http://0.0.0.0:${PORT} -> saving to ${LOG_FILE}`);
 });
+

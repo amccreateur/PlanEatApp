@@ -9,7 +9,7 @@
     "splash": {
       "image": "./assets/icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0f172a"
+      "backgroundColor": "#3eb5ec"
     },
     "ios": {
       "supportsTablet": true,
@@ -20,7 +20,7 @@
       "package": "com.amccreateur.PlanEatApp",
       "versionCode": 1,
       "adaptiveIcon": {
-        "backgroundColor": "#0f172a",
+        "backgroundColor": "#3eb5ec",
         "foregroundImage": "./assets/icon.png"
       },
       "permissions": [

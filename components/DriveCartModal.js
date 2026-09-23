@@ -498,6 +498,19 @@ export default function DriveCartModal({
         origError.apply(console, arguments);
         send("error", Array.prototype.slice.call(arguments).join(" "));
       };
+
+      // Empêcher les sauts sauvages vers le bas de page lors du clic/focus sur les champs d'adresse ou de recherche
+      document.addEventListener('focusin', function(e) {
+        var el = e.target;
+        if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.getAttribute('contenteditable') === 'true')) {
+          setTimeout(function() {
+            try {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+            } catch(err) {}
+          }, 300);
+        }
+      }, true);
+
       send("log", "🌐 Page prête: " + window.location.href);
     })();
     true;
@@ -668,6 +681,7 @@ export default function DriveCartModal({
           <WebView
             ref={webViewRef}
             source={{ uri: currentUrl }}
+            userAgent="Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
             onNavigationStateChange={handleNavigationStateChange}
             onLoadStart={() => setIsLoadingWeb(true)}
             onLoadEnd={() => setIsLoadingWeb(false)}
@@ -679,6 +693,8 @@ export default function DriveCartModal({
             thirdPartyCookiesEnabled={true}
             domStorageEnabled={true}
             javaScriptEnabled={true}
+            hideKeyboardAccessoryView={true}
+            keyboardDisplayRequiresUserAction={false}
             style={styles.webView}
           />
 

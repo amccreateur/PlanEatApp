@@ -88,9 +88,6 @@ export default function QuickMenuModal({
                     <View style={styles.actionTextBox}>
                       <View style={[styles.actionTitleRow, isRTL && styles.rtlRow]}>
                         <Text style={[styles.actionTitle, { color: theme.text }]}>{t.driveOrderBtn || "Panier Drive Connecté"}</Text>
-                        <View style={[styles.newBadge, { backgroundColor: "#0066c0" }]}>
-                          <Text style={styles.newBadgeText}>Leclerc / Carrefour</Text>
-                        </View>
                       </View>
                       <Text style={[styles.actionDesc, { color: theme.textSub }]}>
                         Remplissage guidé sur votre supermarché en ligne

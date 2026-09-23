@@ -364,7 +364,7 @@ function MainApp() {
 
             {/* Durée selector */}
             <View style={[styles.durationRow, { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.border, borderWidth: 1 }]}>
-              {[1, 2, 4].map(w => (
+              {[1, 2].map(w => (
                 <TouchableOpacity
                   key={w}
                   style={[
@@ -377,7 +377,7 @@ function MainApp() {
                     styles.durationChipText,
                     { color: selectedDurationWeeks === w ? "#ffffff" : currentTheme.textSub }
                   ]}>
-                    {w === 1 ? t.oneWeek : w === 2 ? t.twoWeeks : t.oneMonth}
+                    {w === 1 ? t.oneWeek : t.twoWeeks}
                   </Text>
                 </TouchableOpacity>
               ))}

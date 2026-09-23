@@ -183,8 +183,15 @@ export class MistralService {
 
     const generateChunk = async ({ startDay, endDay }) => {
       const count = endDay - startDay + 1;
+      const chunkTheme = startDay === 1
+        ? "Variation suggérée pour ce bloc : Volailles dorées, poissons nobles, légumes méditerranéens et pâtes fraîches."
+        : startDay <= 4
+        ? "Variation suggérée pour ce bloc : Saveurs du monde (asiatique, orientale ou tex-mex), wok parfumé, riz sauté et curry doux."
+        : "Variation suggérée pour ce bloc : Plats mijotés terroir, gratins dorés, bowls vitaminés et légumineuses réconfortantes.";
+
       const prompt = `Tu es un Chef cuisinier étoilé et nutritionniste passionné.
 Génère un menu gourmand, équilibré et SANS AUCUNE RÉPÉTITION pour ${count} jours (du Jour ${startDay} au Jour ${endDay}) pour les repas suivants uniquement : [${mealTypesNames}] pour ${adults} adulte(s) et ${children} enfant(s).
+${chunkTheme}
 Régimes & Objectifs Santé : ${diets}.
 Préférences Gastronomiques & Curseurs Culinaires :
 ${cuisinesText}${appliancesText}
@@ -194,10 +201,10 @@ Langue principale : ${lang}.
 RÈGLES D'OR DE VARIÉTÉ ET DE QUALITÉ (STRICTES) :
 1. AUCUNE RÉPÉTITION : Chaque jour et chaque repas demandé doit être 100% UNIQUE et ORIGINAL.
 2. REPAS DEMANDÉS : Génère uniquement des recettes pour les types de repas suivants : ${mealTypesNames}. Les autres types de repas non demandés doivent être omis ou définis à null.
-2. DIVERSITÉ DES PROTÉINES & FÉCULENTS : Varie impérativement chaque jour :
+3. DIVERSITÉ DES PROTÉINES & FÉCULENTS : Varie impérativement chaque jour :
    - Alternez entre volaille (poulet, dinde), poisson/fruits de mer (saumon, cabillaud, crevettes), légumineuses/végétarien (lentilles, pois chiches, tofu), bœuf/viande, et féculents variés (riz basmati, pâtes fraîches, quinoa, patate douce, boulgour, nouilles).
-3. Respecte scrupuleusement les curseurs de cuisines (les gastronomies notées 'PRIORITAIRE' doivent être largement représentées, les 'EXCLU' ne doivent jamais apparaître).
-4. Titres gourmands, précis et appétissants (ex: "Tajine de poulet aux citrons confits", "Saumon teriyaki sur lit de riz", "Risotto crémeux aux champignons", "Dahl de lentilles corail au coco").
+4. Respecte scrupuleusement les curseurs de cuisines (les gastronomies notées 'PRIORITAIRE' doivent être largement représentées, les 'EXCLU' ne doivent jamais apparaître).
+5. TITRES AUTHENTIQUES & UNIQUES : Sois créatif et précis dans les intitulés des plats. Ne répète jamais le même nom de plat d'un jour à l'autre.
 5. Ingrédients complets (4 à 7 ingrédients réalistes par plat principal : protéine, féculent, légume, herbe/épice, matière grasse).
 6. Rayons autorisés ('deptProduce', 'deptMeat', 'deptDairy', 'deptBakery', 'deptPantry', 'deptSpices', 'deptFrozen', 'deptDrinks', 'deptOther').
 7. Instructions détaillées ÉTAPE PAR ÉTAPE (3 à 4 étapes précises avec découpe, temps de cuisson, assaisonnement et dressage).
@@ -331,6 +338,29 @@ Format JSON attendu :
 
     const chunkResults = await Promise.all(chunks.map(c => generateChunk(c)));
     const allDays = chunkResults.flatMap(res => res.days || []);
+
+    // Déduplication stricte des plats entre tous les jours générés
+    const seenTitles = new Set();
+    allDays.forEach((day, dIdx) => {
+      if (!day?.meals) return;
+      ["breakfast", "lunch", "snack", "dinner"].forEach(type => {
+        const meal = day.meals[type];
+        if (!meal || !meal.title) return;
+        const frTitle = typeof meal.title === "string" ? meal.title : (meal.title.fr || "");
+        const normTitle = frTitle.toLowerCase().trim();
+
+        if (seenTitles.has(normTitle)) {
+          // Doublon détecté entre deux chunks ! Rendre le plat unique
+          if (typeof meal.title === "object") {
+            const altSuffix = ["Maison", "du Chef", "Gourmand", "aux Épices"][dIdx % 4];
+            meal.title.fr = `${frTitle} (${altSuffix})`;
+          }
+        } else {
+          seenTitles.add(normTitle);
+        }
+      });
+    });
+
     return { days: allDays };
   }
 

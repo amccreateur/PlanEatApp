@@ -394,16 +394,16 @@ export default function DriveCartModal({
               </ScrollView>
 
               <View style={[styles.storeTipBanner, { backgroundColor: theme.cardBgAlt }]}>
-                <Ionicons name="sparkles" size={13} color="#38bdf8" />
+                <Ionicons name="location-sharp" size={14} color="#38bdf8" />
                 <Text style={[styles.storeTipText, { color: theme.textSub }]}>
-                  Choisissez votre magasin, ou démarrez directement :
+                  Étape 1 : Choisissez votre magasin ci-dessous sur le site pour activer votre panier Drive.
                 </Text>
                 <TouchableOpacity
                   style={styles.tipStartBtn}
                   onPress={handleStartShopping}
                 >
-                  <Text style={styles.tipStartBtnText}>Démarrer</Text>
-                  <Ionicons name="arrow-forward" size={11} color="#ffffff" />
+                  <Ionicons name="checkmark-circle" size={13} color="#ffffff" />
+                  <Text style={styles.tipStartBtnText}>Magasin choisi</Text>
                 </TouchableOpacity>
               </View>
             </>

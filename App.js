@@ -1017,12 +1017,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 10,
     paddingHorizontal: 12,
-    gap: 6
+    height: "100%"
   },
   aiBtnText: {
     color: "#ffffff",
     fontWeight: "800",
-    fontSize: 13
+    fontSize: 13,
+    textAlign: "center"
   },
   btnDisabled: {
     opacity: 0.6

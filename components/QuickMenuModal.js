@@ -6,9 +6,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  Platform
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { TRANSLATIONS } from "../i18n/translations";
@@ -28,6 +29,8 @@ export default function QuickMenuModal({
   themeMode = "dark",
   onToggleTheme
 }) {
+  const insets = useSafeAreaInsets();
+  const topInset = Math.max(insets.top, Platform.OS === "ios" ? 54 : 20);
   const t = TRANSLATIONS[lang] || TRANSLATIONS.fr;
   const isRTL = lang === "ar";
   const theme = THEMES[themeMode] || THEMES.dark;
@@ -42,10 +45,10 @@ export default function QuickMenuModal({
       onRequestClose={onClose}
     >
       <TouchableWithoutFeedback onPress={onClose}>
-        <View style={[styles.modalOverlay, { backgroundColor: theme.modalOverlay }]}>
+        <View style={[styles.modalOverlay, { backgroundColor: theme.modalOverlay, paddingTop: topInset + 8 }]}>
           <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
-            <SafeAreaView edges={["top", "bottom"]} style={styles.modalContainer}>
-              <View style={[styles.modalCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+            <View style={styles.modalContainer}>
+              <View style={[styles.modalCard, { backgroundColor: theme.cardBg, borderColor: theme.border, maxHeight: "92%" }]}>
                 {/* Header with Title and Close button */}
                 <View style={[styles.headerRow, { borderBottomColor: theme.border }, isRTL && styles.rtlRow]}>
                   <View style={[styles.headerTitleBox, isRTL && styles.rtlRow]}>
@@ -57,7 +60,11 @@ export default function QuickMenuModal({
                       <Text style={[styles.headerSubtitle, { color: theme.textSub }]}>PlanEat Smart Menu</Text>
                     </View>
                   </View>
-                  <TouchableOpacity style={[styles.closeBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, borderWidth: 1 }]} onPress={onClose}>
+                  <TouchableOpacity
+                    hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+                    style={[styles.closeBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, borderWidth: 1 }]}
+                    onPress={onClose}
+                  >
                     <Ionicons name="close" size={20} color={theme.textSub} />
                   </TouchableOpacity>
                 </View>

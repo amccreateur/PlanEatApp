@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { WebView } from "react-native-webview";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -31,6 +31,8 @@ export default function DriveCartModal({
   lang = "fr",
   themeMode = "dark"
 }) {
+  const insets = useSafeAreaInsets();
+  const topInset = Math.max(insets.top, Platform.OS === "ios" ? 50 : 20);
   const t = TRANSLATIONS[lang] || TRANSLATIONS.fr;
   const isRTL = lang === "ar";
   const theme = THEMES[themeMode] || THEMES.dark;
@@ -508,9 +510,9 @@ export default function DriveCartModal({
       transparent={false}
       onRequestClose={onClose}
     >
-      <SafeAreaView style={[styles.safeContainer, { backgroundColor: theme.bg }]} edges={["top", "bottom"]}>
+      <View style={[styles.safeContainer, { backgroundColor: theme.bg }]}>
         {/* Top Header avec sélecteur de Drive et navigation */}
-        <View style={[styles.header, { backgroundColor: theme.headerBg, borderBottomColor: theme.border }]}>
+        <View style={[styles.header, { backgroundColor: theme.headerBg, borderBottomColor: theme.border, paddingTop: topInset + 6 }]}>
           <View style={styles.headerTopRow}>
             <View style={styles.brandTitleBox}>
               <Text style={styles.brandEmoji}>{selectedStore.logoEmoji}</Text>
@@ -535,6 +537,7 @@ export default function DriveCartModal({
 
             <View style={styles.navControls}>
               <TouchableOpacity
+                hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
                 style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }, !canGoBack && styles.btnDisabled]}
                 disabled={!canGoBack}
                 onPress={() => webViewRef.current?.goBack()}
@@ -543,6 +546,7 @@ export default function DriveCartModal({
               </TouchableOpacity>
 
               <TouchableOpacity
+                hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
                 style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }, !canGoForward && styles.btnDisabled]}
                 disabled={!canGoForward}
                 onPress={() => webViewRef.current?.goForward()}
@@ -551,6 +555,7 @@ export default function DriveCartModal({
               </TouchableOpacity>
 
               <TouchableOpacity
+                hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
                 style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }]}
                 onPress={() => webViewRef.current?.reload()}
               >
@@ -558,13 +563,18 @@ export default function DriveCartModal({
               </TouchableOpacity>
 
               <TouchableOpacity
+                hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
                 style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }]}
                 onPress={() => Linking.openURL(currentUrl)}
               >
                 <Ionicons name="open-outline" size={16} color={theme.text} />
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+              <TouchableOpacity
+                hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+                style={styles.closeBtn}
+                onPress={onClose}
+              >
                 <Ionicons name="close" size={20} color="#ffffff" />
               </TouchableOpacity>
             </View>

@@ -8,9 +8,10 @@ import {
   ScrollView,
   TextInput,
   ActivityIndicator,
-  Alert
+  Alert,
+  Platform
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { TRANSLATIONS } from "../i18n/translations";
@@ -27,6 +28,8 @@ export default function FridgeModal({
   onOpenRecipe,
   themeMode = "dark"
 }) {
+  const insets = useSafeAreaInsets();
+  const topInset = Math.max(insets.top, Platform.OS === "ios" ? 50 : 20);
   const t = TRANSLATIONS[lang] || TRANSLATIONS.fr;
   const isRTL = lang === "ar";
   const theme = THEMES[themeMode] || THEMES.dark;
@@ -89,10 +92,14 @@ export default function FridgeModal({
 
   return (
     <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose}>
-      <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.bg }]} edges={["top", "left", "right"]}>
+      <View style={[styles.safeArea, { backgroundColor: theme.bg }]}>
         {/* Header */}
-        <View style={[styles.header, { backgroundColor: theme.headerBg, borderBottomColor: theme.border }, isRTL && styles.rtlRow]}>
-          <TouchableOpacity onPress={onClose} style={[styles.closeBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, borderWidth: 1 }]}>
+        <View style={[styles.header, { backgroundColor: theme.headerBg, borderBottomColor: theme.border, paddingTop: topInset + 6 }, isRTL && styles.rtlRow]}>
+          <TouchableOpacity
+            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+            onPress={onClose}
+            style={[styles.closeBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, borderWidth: 1 }]}
+          >
             <Ionicons name="close" size={24} color={theme.text} />
           </TouchableOpacity>
           <View style={styles.headerTitleBox}>

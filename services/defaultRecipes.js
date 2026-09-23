@@ -162,6 +162,23 @@ export const RECIPES_CATALOG = [
         "اقل الخضار وقطع الدجاج المتبلة في مقلاة لمدة 8-10 دقائق.",
         "قدم الدجاج المشوي مع الأرز الدافئ."
       ]
+    },
+    thermomixInstructions: {
+      fr: [
+        "Mettre 1000g d'eau dans le bol. Insérer le panier de cuisson avec le riz : 20 min / Varoma / Vit. 2.",
+        "Disposer le poulet mariné et les courgettes dans le plateau du Varoma par-dessus.",
+        "À la sonnerie, retirer le Varoma, égoutter le riz et servir chaud."
+      ],
+      en: [
+        "Add 1000g water to the bowl. Insert simmering basket with rice: 20 min / Varoma / Speed 2.",
+        "Place marinated chicken and sliced zucchini in the Varoma tray on top.",
+        "Serve juicy steamed chicken and zucchini over hot fluffy rice."
+      ],
+      ar: [
+        "ضع 1000 غرام ماء في الوعاء وسلة الأرز : 20 دقيقة / فاروما / سرعة 2.",
+        "ضع الدجاج المتبل والكوسة في صينية الفاروما بالأعلى.",
+        "قدم الدجاج الطري مع الأرز البسمتي الساخن."
+      ]
     }
   },
   {
@@ -204,6 +221,23 @@ export const RECIPES_CATALOG = [
         "رش زيت الزيتون وعصير الليمون والثوم المفروم والملح والفلفل.",
         "اخبز لمدة 15-18 دقيقة حتى ينضج السلمون تماماً."
       ]
+    },
+    thermomixInstructions: {
+      fr: [
+        "Mettre 500g d'eau dans le bol. Disposer les carottes et brocolis dans le bol du Varoma : 15 min / Varoma / Vit. 1.",
+        "Ajouter le plateau Varoma avec les pavés de saumon assaisonnés : prolonger de 10 min / Varoma / Vit. 1.",
+        "Napper le saumon et légumes d'un filet de citron et aneth frais."
+      ],
+      en: [
+        "Pour 500g water into bowl. Place broccoli and carrots in Varoma dish: 15 min / Varoma / Speed 1.",
+        "Insert Varoma tray with salmon fillets: steam 10 min / Varoma / Speed 1.",
+        "Serve steamed tender salmon with fresh dill and lemon."
+      ],
+      ar: [
+        "ضع 500 غرام ماء في الوعاء. ضع الخضار في الفاروما : 15 دقيقة / فاروما / سرعة 1.",
+        "أضف صينية الفاروما مع السلمون : اطه 10 دقائق إضافية / فاروما / سرعة 1.",
+        "قدم السلمون المطهو على البخار مع الليمون والشبت."
+      ]
     }
   },
   {
@@ -245,6 +279,26 @@ export const RECIPES_CATALOG = [
         "أضف الثوم والكمون والبابريكا وصلصة الطماطم واتركها تغلي 5 دقائق.",
         "اصنع فتحات صغيرة في الصلصة واكسر البيض فيها.",
         "غط المقلاة واتركها 4-5 دقائق حتى ينضج بياض البيض ويبقى الصفار سائلاً."
+      ]
+    },
+    thermomixInstructions: {
+      fr: [
+        "Mettre l'oignon, l'ail et le poivron dans le bol : hacher 5 sec / Vit. 5. Racler les parois.",
+        "Ajouter l'huile d'olive : rissoler 4 min / 120°C / Vit. 1 🔄.",
+        "Ajouter les tomates, le cumin et le paprika : cuire 10 min / 100°C / Vit. Cuillère 🔄.",
+        "Verser la sauce chaude dans un plat ou poêle et y casser les œufs 3 min pour garder le jaune coulant."
+      ],
+      en: [
+        "Add onion, garlic and bell pepper: chop 5 sec / Speed 5. Scrape down.",
+        "Add olive oil: sauté 4 min / 120°C / Speed 1 🔄.",
+        "Add tomatoes, cumin, paprika: cook 10 min / 100°C / Spoon Speed 🔄.",
+        "Transfer hot sauce to skillet and crack eggs on top for 3 mins."
+      ],
+      ar: [
+        "ضع البصل والثوم والفلفل في الوعاء : افرم 5 ثوانٍ / سرعة 5.",
+        "أضف زيت الزيتون : شوح 4 دقائق / 120 مئوية / سرعة 1 🔄.",
+        "أضف الطماطم والبهارات : اطه 10 دقائق / 100 مئوية / سرعة ملعقة 🔄.",
+        "اسكب الصلصة في مقلاة واكسر البيض فوقها لمدة 3 دقائق."
       ]
     }
   },

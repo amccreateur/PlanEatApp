@@ -22,6 +22,13 @@ export default function RecipeModal({ visible, recipe, onClose, lang = "fr", the
   const [checkedIngredients, setCheckedIngredients] = useState({});
   const [timerSeconds, setTimerSeconds] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [cookingMode, setCookingMode] = useState("classic");
+
+  const title = recipe.title?.[lang] || recipe.title?.fr || "Recette";
+  const classicInstructions = recipe.instructions?.[lang] || recipe.instructions?.fr || [];
+  const thermomixInstructions = recipe.thermomixInstructions?.[lang] || recipe.thermomixInstructions?.fr || recipe.thermomixInstructions || [];
+  const hasThermomix = Array.isArray(thermomixInstructions) && thermomixInstructions.length > 0;
+  const currentInstructions = (cookingMode === "thermomix" && hasThermomix) ? thermomixInstructions : classicInstructions;
 
   useEffect(() => {
     let interval = null;
@@ -55,8 +62,6 @@ export default function RecipeModal({ visible, recipe, onClose, lang = "fr", the
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
-  const title = recipe.title?.[lang] || recipe.title?.fr || "Recette";
-  const instructions = recipe.instructions?.[lang] || recipe.instructions?.fr || [];
   const servings = recipe.calculatedServings || 2;
   const factor = servings / 2;
 
@@ -93,6 +98,12 @@ export default function RecipeModal({ visible, recipe, onClose, lang = "fr", the
                 <Ionicons name="flame-outline" size={16} color="#f59e0b" />
                 <Text style={[styles.badgeText, { color: theme.textSub }]}>{recipe.caloriesPerPerson || 400} kcal</Text>
               </View>
+
+              {hasThermomix && (
+                <View style={[styles.badge, { backgroundColor: "#064e3b", borderColor: "#10b981", borderWidth: 1 }]}>
+                  <Text style={[styles.badgeText, { color: "#34d399", fontWeight: "700" }]}>{t.thermomixBadge || "🤖 Thermomix"}</Text>
+                </View>
+              )}
             </View>
           </View>
 
@@ -159,21 +170,51 @@ export default function RecipeModal({ visible, recipe, onClose, lang = "fr", the
 
           {/* Instructions */}
           <View style={[styles.sectionCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-            <View style={[styles.sectionHeader, isRTL && styles.rtlRow]}>
-              <Ionicons name="restaurant-outline" size={20} color="#38bdf8" />
-              <Text style={[styles.sectionTitle, { color: theme.text }, isRTL && styles.rtlText]}>{t.instructions}</Text>
+            <View style={[styles.sectionHeader, isRTL && styles.rtlRow, { justifyContent: "space-between" }]}>
+              <View style={[styles.sectionHeaderLeft, isRTL && styles.rtlRow]}>
+                <Ionicons name={cookingMode === "thermomix" ? "hardware-chip-outline" : "restaurant-outline"} size={20} color={cookingMode === "thermomix" ? "#10b981" : "#38bdf8"} />
+                <Text style={[styles.sectionTitle, { color: theme.text }, isRTL && styles.rtlText]}>{t.instructions}</Text>
+              </View>
+
+              {/* Toggle Mode Classique / Thermomix si disponible */}
+              {hasThermomix && (
+                <View style={[styles.modeToggleContainer, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}>
+                  <TouchableOpacity
+                    style={[styles.modeToggleBtn, cookingMode === "classic" && styles.modeToggleBtnActive]}
+                    onPress={() => setCookingMode("classic")}
+                  >
+                    <Text style={[styles.modeToggleText, cookingMode === "classic" && styles.modeToggleTextActive]}>
+                      🍳 {t.traditionalMode || "Classique"}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.modeToggleBtn, cookingMode === "thermomix" && styles.modeToggleBtnThermomixActive]}
+                    onPress={() => setCookingMode("thermomix")}
+                  >
+                    <Text style={[styles.modeToggleText, cookingMode === "thermomix" && styles.modeToggleTextActive]}>
+                      🤖 Thermomix
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
 
-            {instructions.map((stepText, idx) => (
-              <View key={idx} style={[styles.stepItem, isRTL && styles.rtlRow]}>
-                <View style={styles.stepNumberBadge}>
-                  <Text style={styles.stepNumber}>{idx + 1}</Text>
+            {currentInstructions.map((stepText, idx) => {
+              const isThermomixStep = cookingMode === "thermomix";
+              return (
+                <View key={idx} style={[styles.stepItem, isRTL && styles.rtlRow]}>
+                  <View style={[
+                    styles.stepNumberBadge,
+                    isThermomixStep && { backgroundColor: "#10b981" }
+                  ]}>
+                    <Text style={styles.stepNumber}>{idx + 1}</Text>
+                  </View>
+                  <View style={styles.stepContent}>
+                    <Text style={[styles.stepText, { color: theme.textSub }, isRTL && styles.rtlText]}>{stepText}</Text>
+                  </View>
                 </View>
-                <View style={styles.stepContent}>
-                  <Text style={[styles.stepText, { color: theme.textSub }, isRTL && styles.rtlText]}>{stepText}</Text>
-                </View>
-              </View>
-            ))}
+              );
+            })}
           </View>
 
           {/* Astuce du Chef (Chef Tip) */}
@@ -312,6 +353,39 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
     marginBottom: 14
+  },
+  sectionHeaderLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8
+  },
+  modeToggleContainer: {
+    flexDirection: "row",
+    backgroundColor: "#0f172a",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#334155",
+    padding: 2,
+    gap: 2
+  },
+  modeToggleBtn: {
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 8
+  },
+  modeToggleBtnActive: {
+    backgroundColor: "#0284c7"
+  },
+  modeToggleBtnThermomixActive: {
+    backgroundColor: "#10b981"
+  },
+  modeToggleText: {
+    color: "#94a3b8",
+    fontSize: 11,
+    fontWeight: "700"
+  },
+  modeToggleTextActive: {
+    color: "#ffffff"
   },
   sectionTitle: {
     color: "#f8fafc",

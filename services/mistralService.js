@@ -111,6 +111,12 @@ export class MistralService {
     }
     const cuisinesText = cuisineLevels.length > 0 ? cuisineLevels.join("\n") : "Cuisines variées et équilibrées";
 
+    const activeAppliances = [];
+    if (profile?.appliances?.thermomix) activeAppliances.push("Thermomix / Robot Cuiseur (fournir impérativement 'thermomixInstructions' avec durée, température en °C/Varoma, vitesse, sens inverse 🔄)");
+    if (profile?.appliances?.airfryer) activeAppliances.push("Airfryer / Friteuse sans huile");
+    if (profile?.appliances?.cookeo) activeAppliances.push("Cookeo / Multicuiseur sous pression");
+    const appliancesText = activeAppliances.length > 0 ? `\nÉquipements de cuisine disponibles :\n${activeAppliances.map(a => `- ${a}`).join("\n")}` : "";
+
     // Découpage en blocs de 2 jours en parallèle pour une richesse maximale de chaque recette
     const chunkSize = 2;
     const chunks = [];
@@ -127,17 +133,18 @@ export class MistralService {
 Génère un menu gourmand et équilibré pour ${endDay - startDay + 1} jours (du Jour ${startDay} au Jour ${endDay}, avec 4 repas complets par jour : breakfast, lunch, snack, dinner) pour ${adults} adulte(s) et ${children} enfant(s).
 Régimes & Objectifs Santé : ${diets}.
 Préférences Gastronomiques & Curseurs Culinaires :
-${cuisinesText}
+${cuisinesText}${appliancesText}
 Aliments à exclure impérativement : ${dislikes}.
 Langue : ${lang}.
 
 EXIGENCES CULINAIRES DE HAUTE QUALITÉ :
 1. Respecte scrupuleusement les curseurs de cuisines (les gastronomies notées 'PRIORITAIRE' doivent être largement représentées, les 'EXCLU' ne doivent jamais apparaître).
 2. Titres gourmands, précis et appétissants (ex: "Tajine de poulet aux olives et citrons confits", "Pad Thaï sauté aux crevettes et cacahuètes", "Risotto crémeux aux asperges").
-2. Ingrédients complets (4 à 7 ingrédients réalistes par plat principal : protéine, féculent, légume, herbe/épice, matière grasse).
-3. Rayons autorisés ('deptProduce', 'deptMeat', 'deptDairy', 'deptBakery', 'deptPantry', 'deptSpices', 'deptFrozen', 'deptDrinks', 'deptOther').
-4. Instructions détaillées ÉTAPE PAR ÉTAPE (3 à 4 étapes précises avec découpe, temps de cuisson, puissance du feu, assaisonnement et dressage).
-5. Ajoute une astuce de chef 'chefTip' pour sublimer le plat.
+3. Ingrédients complets (4 à 7 ingrédients réalistes par plat principal : protéine, féculent, légume, herbe/épice, matière grasse).
+4. Rayons autorisés ('deptProduce', 'deptMeat', 'deptDairy', 'deptBakery', 'deptPantry', 'deptSpices', 'deptFrozen', 'deptDrinks', 'deptOther').
+5. Instructions détaillées ÉTAPE PAR ÉTAPE (3 à 4 étapes précises avec découpe, temps de cuisson, puissance du feu, assaisonnement et dressage).
+${profile?.appliances?.thermomix ? "6. ROBOT CUISEUR / THERMOMIX : Fournis impérativement pour chaque recette un bloc 'thermomixInstructions' (tableau d'étapes détaillées adaptées avec durées, températures ex: 100°C ou Varoma, vitesses ex: Vit. 1 / Sens Inverse 🔄)." : ""}
+7. Ajoute une astuce de chef 'chefTip' pour sublimer le plat.
 
 Format JSON attendu :
 {
@@ -192,6 +199,14 @@ Format JSON attendu :
               "Mélanger les pâtes au poulet et courgettes, lier avec l'eau de cuisson et saupoudrer de parmesan frais."
             ]
           },
+          ${profile?.appliances?.thermomix ? `"thermomixInstructions": {
+            "fr": [
+              "Mettre l'ail et un demi-citron pelé dans le bol : 5 sec / Vit. 5. Racler.",
+              "Ajouter l'huile d'olive et le poulet émincé : 5 min / 120°C / Vit. Cuillère 🔄.",
+              "Insérer le fouet, ajouter les courgettes en rondelles : 8 min / 100°C / Vit. Cuillère 🔄.",
+              "Servir sur les tagliatelles cuites à part et saupoudrer de parmesan."
+            ]
+          },` : ""}
           "chefTip": { "fr": "Conservez toujours un peu d'eau de cuisson des pâtes pour émulsionner la sauce et rendre le plat ultra-onctueux." }
         },
         "snack": {
@@ -209,7 +224,7 @@ Format JSON attendu :
           "instructions": {
             "fr": [
               "Faire griller les tranches de pain au grille-pain jusqu'à ce qu'elles soient bien dorées et croustillantes.",
-              "Tartiner généreusement de ricotta fraîche encore fraîche.",
+              "Tartiner généreusement de ricotta fraîche.",
               "Napper d'un filet de miel et parsemer d'éclats de noix croquants."
             ]
           },
@@ -238,6 +253,14 @@ Format JSON attendu :
               "Faire torréfier à sec les graines de courge dans une poêle 2 min et parsemer au moment de servir."
             ]
           },
+          ${profile?.appliances?.thermomix ? `"thermomixInstructions": {
+            "fr": [
+              "Mettre l'oignon coupé en 2 dans le bol : 5 sec / Vit. 5. Racler.",
+              "Ajouter l'huile d'olive : 3 min / 120°C / Vit. 1.",
+              "Ajouter les dés de potimarron et le bouillon : 20 min / 100°C / Vit. 1.",
+              "Ajouter le lait de coco : mixer 1 min / Vit. 5 à 10 progressivement en maintenant le gobelet doseur."
+            ]
+          },` : ""}
           "chefTip": { "fr": "Une pincée de muscade ou de gingembre frais râpé sublime la saveur douce de la courge." }
         }
       }
@@ -298,6 +321,7 @@ Format JSON attendu :
     const diets = (profile?.diets || ["dietBalanced"]).join(", ");
     const dislikes = (profile?.dislikedFoods || []).join(", ") || "aucun";
     const currentTitle = currentMeal?.title?.fr || currentMeal?.title?.en || "le plat précédent";
+    const hasThermomix = profile?.appliances?.thermomix;
 
     const prompt = `Tu es un Chef cuisinier étoilé. Génère une NOUVELLE recette de chef détaillée et savoureuse pour le type de repas '${mealType}', originale et différente de '${currentTitle}'.
 Foyer : ${adults} adulte(s), ${children} enfant(s).
@@ -309,6 +333,7 @@ RÈGLES DE QUALITÉ :
 - Réponds UNIQUEMENT en JSON valide.
 - Inclus 4 à 7 ingrédients précis (avec nom, quantité pour 2 personnes, unité, dept parmi 'deptProduce', 'deptMeat', 'deptDairy', 'deptBakery', 'deptPantry', 'deptSpices', 'deptFrozen', 'deptDrinks', 'deptOther').
 - Instructions détaillées étape par étape (3 à 5 étapes claires avec découpe, cuisson, température et dressage).
+${hasThermomix ? "- Inclus impérativement 'thermomixInstructions' (tableau d'étapes adaptées au robot Thermomix avec durées, températures et vitesses)." : ""}
 - Ajoute une astuce du chef 'chefTip'.
 
 Format JSON attendu :
@@ -332,6 +357,13 @@ Format JSON attendu :
     "en": ["Step 1...", "Step 2...", "Step 3...", "Step 4..."],
     "ar": ["خطوة 1...", "خطوة 2...", "خطوة 3...", "خطوة 4..."]
   },
+  ${hasThermomix ? `"thermomixInstructions": {
+    "fr": [
+      "1. Étape Thermomix (ex: hacher ail et oignons : 5 sec / Vit. 5)...",
+      "2. Étape Thermomix (ex: rissoler : 3 min / 120°C / Vit. 1 🔄)...",
+      "3. Étape Thermomix (ex: cuisson : 15 min / 100°C / Vit. Cuillère 🔄)..."
+    ]
+  },` : ""}
   "chefTip": { "fr": "Conseil de chef pour réussir ce plat..." }
 }`;
 
@@ -384,6 +416,7 @@ Format JSON attendu :
     const diets = (profile?.diets || ["dietBalanced"]).join(", ");
     const dislikes = (profile?.dislikedFoods || []).join(", ") || "aucun";
     const fridgeItems = ingredients.join(", ");
+    const hasThermomix = profile?.appliances?.thermomix;
 
     const prompt = `Tu es un Chef cuisinier expert en cuisine anti-gaspillage créative pour PlanEat.
 L'utilisateur a ces ingrédients dans son réfrigérateur/placard : [${fridgeItems}].
@@ -398,6 +431,7 @@ RÈGLES STRICTES DE QUALITÉ :
 - Réponds UNIQUEMENT en JSON valide.
 - Inclus 4 à 7 ingrédients précis avec quantité pour 2 personnes et rayon.
 - Instructions détaillées étape par étape (3 à 4 étapes complètes de préparation et cuisson).
+${hasThermomix ? "- Inclus impérativement 'thermomixInstructions' (tableau d'étapes adaptées au robot Thermomix avec durées, températures et vitesses)." : ""}
 - Ajoute une astuce anti-gaspi du chef 'chefTip'.
 
 Format JSON attendu :
@@ -420,6 +454,12 @@ Format JSON attendu :
     "en": ["Step 1...", "Step 2...", "Step 3..."],
     "ar": ["خطوة 1...", "خطوة 2...", "خطوة 3..."]
   },
+  ${hasThermomix ? `"thermomixInstructions": {
+    "fr": [
+      "1. Étape Thermomix (ex: 5 sec / Vit. 5)...",
+      "2. Étape Thermomix (ex: 10 min / 100°C / Vit. 1 🔄)..."
+    ]
+  },` : ""}
   "chefTip": { "fr": "Astuce anti-gaspillage du chef..." }
 }`;
 

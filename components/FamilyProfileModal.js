@@ -47,6 +47,11 @@ export default function FamilyProfileModal({
     indian: 1,
     streetfood: 1
   });
+  const [appliances, setAppliances] = useState(profile?.appliances || {
+    thermomix: false,
+    airfryer: false,
+    cookeo: false
+  });
   const [dislikedFoods, setDislikedFoods] = useState(profile?.dislikedFoods || []);
   const [newDislike, setNewDislike] = useState("");
 
@@ -54,6 +59,13 @@ export default function FamilyProfileModal({
     setCuisines(prev => ({
       ...prev,
       [cuisineKey]: level
+    }));
+  };
+
+  const toggleAppliance = (applianceKey) => {
+    setAppliances(prev => ({
+      ...prev,
+      [applianceKey]: !prev[applianceKey]
     }));
   };
 
@@ -88,6 +100,12 @@ export default function FamilyProfileModal({
     { key: "mexican", name: t.cuisineMexican, desc: t.cuisineMexicanDesc, emoji: "🇲🇽" },
     { key: "indian", name: t.cuisineIndian, desc: t.cuisineIndianDesc, emoji: "🇮🇳" },
     { key: "streetfood", name: t.cuisineStreetFood, desc: t.cuisineStreetFoodDesc, emoji: "🍔" }
+  ];
+
+  const appliancesList = [
+    { key: "thermomix", name: t.applianceThermomix, desc: t.applianceThermomixDesc, emoji: "🤖", color: "#10b981" },
+    { key: "airfryer", name: t.applianceAirfryer, desc: t.applianceAirfryerDesc, emoji: "🌀", color: "#f59e0b" },
+    { key: "cookeo", name: t.applianceCookeo, desc: t.applianceCookeoDesc, emoji: "🥘", color: "#38bdf8" }
   ];
 
   const handleUpdateChildrenCount = (newCount) => {
@@ -151,6 +169,7 @@ export default function FamilyProfileModal({
       childrenAges,
       diets: diets.length > 0 ? diets : ["dietBalanced"],
       cuisines,
+      appliances,
       dislikedFoods
     };
     onSave(updated);
@@ -427,6 +446,50 @@ export default function FamilyProfileModal({
                       </View>
                     </View>
                   </View>
+                );
+              })}
+            </View>
+          </View>
+
+          {/* Équipements & Robots Cuiseurs */}
+          <View style={[styles.card, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+            <View style={[styles.cardHeader, isRTL && styles.rtlRow]}>
+              <Ionicons name="hardware-chip-outline" size={20} color="#10b981" />
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.cardTitle, { color: theme.text }]}>{t.appliancesTitle}</Text>
+                <Text style={[styles.cardSubtitle, { color: theme.textSub }]}>{t.appliancesSubtitle}</Text>
+              </View>
+            </View>
+
+            <View style={styles.appliancesGrid}>
+              {appliancesList.map((app) => {
+                const isSelected = !!appliances[app.key];
+                return (
+                  <TouchableOpacity
+                    key={app.key}
+                    style={[
+                      styles.applianceCard,
+                      { backgroundColor: theme.cardBgAlt, borderColor: theme.border },
+                      isSelected && { borderColor: app.color, backgroundColor: theme.isDark ? "rgba(16, 185, 129, 0.12)" : "#f0fdf4" }
+                    ]}
+                    onPress={() => toggleAppliance(app.key)}
+                    activeOpacity={0.8}
+                  >
+                    <View style={[styles.applianceTopRow, isRTL && styles.rtlRow]}>
+                      <Text style={styles.applianceEmoji}>{app.emoji}</Text>
+                      <View style={{ flex: 1 }}>
+                        <Text style={[styles.applianceName, { color: theme.text }]}>{app.name}</Text>
+                        <Text style={[styles.applianceDesc, { color: theme.textSub }]} numberOfLines={2}>{app.desc}</Text>
+                      </View>
+                      <View style={[
+                        styles.applianceCheckbox,
+                        { borderColor: isSelected ? app.color : theme.border },
+                        isSelected && { backgroundColor: app.color }
+                      ]}>
+                        {isSelected && <Ionicons name="checkmark" size={16} color="#ffffff" />}
+                      </View>
+                    </View>
+                  </TouchableOpacity>
                 );
               })}
             </View>
@@ -743,6 +806,39 @@ const styles = StyleSheet.create({
   },
   cursorStepTextActive: {
     color: "#ffffff"
+  },
+  appliancesGrid: {
+    gap: 10
+  },
+  applianceCard: {
+    padding: 12,
+    borderRadius: 14,
+    borderWidth: 1.5
+  },
+  applianceTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12
+  },
+  applianceEmoji: {
+    fontSize: 26
+  },
+  applianceName: {
+    fontSize: 14,
+    fontWeight: "700"
+  },
+  applianceDesc: {
+    fontSize: 11,
+    marginTop: 2,
+    lineHeight: 15
+  },
+  applianceCheckbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center"
   },
   langRow: {
     flexDirection: "row",

@@ -348,7 +348,12 @@ function MainApp() {
                 style={styles.aiGradient}
               >
                 {isGenerating ? (
-                  <ActivityIndicator size="small" color="#ffffff" />
+                  <View style={styles.loadingBtnRow}>
+                    <ActivityIndicator size="small" color="#ffffff" />
+                    <Text style={styles.aiBtnText}>
+                      {t.regenerating || "Génération..."}
+                    </Text>
+                  </View>
                 ) : (
                   <Text style={styles.aiBtnText}>
                     {t.generatePlan || "Générer le menu"}
@@ -1011,7 +1016,8 @@ const styles = StyleSheet.create({
   },
   aiGenerateBtn: {
     borderRadius: 12,
-    overflow: "hidden"
+    overflow: "hidden",
+    minWidth: 142
   },
   aiGradient: {
     flexDirection: "row",
@@ -1019,6 +1025,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 8,
     paddingHorizontal: 14
+  },
+  loadingBtnRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6
   },
   aiBtnText: {
     color: "#ffffff",

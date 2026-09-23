@@ -11,7 +11,7 @@ export const TRANSLATIONS = {
     
     // Header & Actions
     generatePlan: "Générer le menu",
-    regenerating: "Génération en cours...",
+    regenerating: "Génération...",
     planDuration: "Durée du planning",
     oneWeek: "1 Semaine",
     twoWeeks: "2 Semaines",

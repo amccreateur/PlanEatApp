@@ -75,6 +75,95 @@ export default function DriveCartModal({
     ? DriveService.getSearchSuggestions(getRawItemName(currentItem))
     : [];
 
+  // Injecter la recherche directement dans le DOM du Drive actif (évite le rechargement et la perte de session)
+  const injectSearchInStore = (query) => {
+    if (!query) return;
+    const searchFallbackUrl = selectedStore.searchUrl(query);
+    const js = `
+      (function() {
+        try {
+          var q = ${JSON.stringify(query)};
+          var selectors = [
+            'input[type="search"]',
+            'input[name*="recherche" i]',
+            'input[id*="recherche" i]',
+            'input[placeholder*="recherche" i]',
+            'input[placeholder*="produit" i]',
+            'input[aria-label*="recherche" i]',
+            '#txtRecherche',
+            '#recherche',
+            '#search-input',
+            '.search-input',
+            '.search-bar input',
+            '.header-search input',
+            'input[data-testid*="search" i]',
+            'input[name="q"]',
+            'input[name="query"]'
+          ];
+          
+          var input = null;
+          for (var i = 0; i < selectors.length; i++) {
+            var el = document.querySelector(selectors[i]);
+            if (el && el.offsetParent !== null) {
+              input = el;
+              break;
+            }
+          }
+          if (!input) {
+            for (var i = 0; i < selectors.length; i++) {
+              var el = document.querySelector(selectors[i]);
+              if (el) { input = el; break; }
+            }
+          }
+
+          if (input) {
+            input.focus();
+            var setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")?.set;
+            if (setter) {
+              setter.call(input, q);
+            } else {
+              input.value = q;
+            }
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+            
+            var enterDown = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Enter', code: 'Enter', keyCode: 13, which: 13 });
+            var enterUp = new KeyboardEvent('keyup', { bubbles: true, cancelable: true, key: 'Enter', code: 'Enter', keyCode: 13, which: 13 });
+            input.dispatchEvent(enterDown);
+            input.dispatchEvent(enterUp);
+
+            var btnSelectors = [
+              'button[type="submit"]',
+              'button[aria-label*="recherche" i]',
+              'button[title*="recherche" i]',
+              '.btn-search',
+              '.search-button',
+              '#btnRecherche',
+              'button.search-submit',
+              '.search-bar button'
+            ];
+            var btn = null;
+            for (var j = 0; j < btnSelectors.length; j++) {
+              var b = document.querySelector(btnSelectors[j]);
+              if (b) { btn = b; break; }
+            }
+            if (btn) {
+              btn.click();
+            } else if (input.form) {
+              input.form.submit();
+            }
+          } else {
+            window.location.href = ${JSON.stringify(searchFallbackUrl)};
+          }
+        } catch(e) {
+          window.location.href = ${JSON.stringify(searchFallbackUrl)};
+        }
+      })();
+      true;
+    `;
+    webViewRef.current?.injectJavaScript(js);
+  };
+
   // Quand le magasin change, naviguer vers son accueil en plein écran
   const handleSelectStore = (store) => {
     setSelectedStore(store);
@@ -86,7 +175,11 @@ export default function DriveCartModal({
   const handleStartShopping = () => {
     setIsSelectingStore(false);
     if (currentItem) {
-      handleSearchTerm(getCleanItemName(currentItem));
+      const q = getCleanItemName(currentItem);
+      if (q) {
+        setSearchQuery(q);
+        injectSearchInStore(q);
+      }
     }
   };
 
@@ -96,8 +189,7 @@ export default function DriveCartModal({
     if (!q) return;
     setSearchQuery(q);
     setIsSelectingStore(false);
-    const targetSearchUrl = selectedStore.searchUrl(q);
-    setCurrentUrl(targetSearchUrl);
+    injectSearchInStore(q);
   };
 
   // Copier le mot-clé dans le presse-papier
@@ -125,7 +217,8 @@ export default function DriveCartModal({
       if (nextItem) {
         const query = getCleanItemName(nextItem);
         if (query) {
-          setCurrentUrl(selectedStore.searchUrl(query));
+          setSearchQuery(query);
+          injectSearchInStore(query);
         }
       }
     }
@@ -141,7 +234,7 @@ export default function DriveCartModal({
         const query = getCleanItemName(nextItem);
         if (query) {
           setSearchQuery(query);
-          setCurrentUrl(selectedStore.searchUrl(query));
+          injectSearchInStore(query);
         }
       }
     }
@@ -157,7 +250,7 @@ export default function DriveCartModal({
         const query = getCleanItemName(prevItem);
         if (query) {
           setSearchQuery(query);
-          setCurrentUrl(selectedStore.searchUrl(query));
+          injectSearchInStore(query);
         }
       }
     }
@@ -385,7 +478,10 @@ export default function DriveCartModal({
                         if (foundIdx !== -1) setCurrentIndex(foundIdx);
                         setIsListExpanded(false);
                         const q = getCleanItemName(item);
-                        if (q) setCurrentUrl(selectedStore.searchUrl(q));
+                        if (q) {
+                          setSearchQuery(q);
+                          injectSearchInStore(q);
+                        }
                       }}
                     >
                       <Ionicons

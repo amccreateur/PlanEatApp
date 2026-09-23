@@ -12,7 +12,7 @@ export const DRIVE_STORES = [
     badgeColor: "#ffcc00",
     textColor: "#ffffff",
     homeUrl: "https://www.leclercdrive.fr",
-    searchUrl: (query) => `https://www.leclercdrive.fr/recherche.aspx?TexteRecherche=${encodeURIComponent(query)}`,
+    searchUrl: (query) => `https://www.leclercdrive.fr/recherche?q=${encodeURIComponent(query)}`,
     logoEmoji: "🔵"
   },
   {

@@ -46,7 +46,6 @@ export default function DriveCartModal({
   const [isListExpanded, setIsListExpanded] = useState(false);
   const [isAssistantCollapsed, setIsAssistantCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isCopied, setIsCopied] = useState(false);
   const [isSelectingStore, setIsSelectingStore] = useState(true);
 
   // Filtrer les articles non cochés en priorité
@@ -69,7 +68,6 @@ export default function DriveCartModal({
   useEffect(() => {
     if (currentItem) {
       setSearchQuery(getCleanItemName(currentItem));
-      setIsCopied(false);
     }
   }, [currentItem?.id]);
 
@@ -318,17 +316,6 @@ export default function DriveCartModal({
     setSearchQuery(q);
     setIsSelectingStore(false);
     injectSearchInStore(q);
-  };
-
-  // Copier le mot-clé dans le presse-papier
-  const handleCopyTerm = async (term) => {
-    const q = (term !== undefined ? term : searchQuery).trim();
-    if (!q) return;
-    try {
-      await Clipboard.setStringAsync(q);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
-    } catch {}
   };
 
   // Marquer l'article comme ajouté et passer au suivant
@@ -703,35 +690,6 @@ export default function DriveCartModal({
                       </ScrollView>
                     </View>
                   )}
-
-                  {/* Barre de recherche modifiable & bouton copier */}
-                  <View style={[styles.searchBarRow, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-                    <Ionicons name="search" size={16} color={theme.textMuted} style={styles.searchBarIcon} />
-                    <TextInput
-                      style={[styles.searchBarInput, { color: theme.text }]}
-                      value={searchQuery}
-                      onChangeText={setSearchQuery}
-                      placeholder="Modifier la référence..."
-                      placeholderTextColor={theme.textMuted}
-                      onSubmitEditing={() => handleSearchTerm(searchQuery)}
-                      returnKeyType="search"
-                    />
-                    <TouchableOpacity
-                      style={styles.searchActionBtn}
-                      onPress={() => handleSearchTerm(searchQuery)}
-                    >
-                      <Ionicons name="arrow-forward" size={16} color="#ffffff" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.copyActionBtn, isCopied && styles.copyActionBtnSuccess]}
-                      onPress={() => handleCopyTerm(searchQuery)}
-                    >
-                      <Ionicons name={isCopied ? "checkmark" : "copy-outline"} size={14} color={isCopied ? "#10b981" : theme.textSub} />
-                      <Text style={[styles.copyActionText, { color: isCopied ? "#10b981" : theme.textSub }]}>
-                        {isCopied ? "Copié" : "Copier"}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
 
                   {/* Action Buttons Row */}
                   <View style={styles.actionButtonsRow}>

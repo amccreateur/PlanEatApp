@@ -300,8 +300,7 @@ export default function FamilyProfileModal({
             <View style={styles.langRow}>
               {[
                 { code: "fr", label: "🇫🇷 Français" },
-                { code: "en", label: "🇬🇧 English" },
-                { code: "ar", label: "🇸🇦 العربية" }
+                { code: "en", label: "🇬🇧 English" }
               ].map(item => (
                 <TouchableOpacity
                   key={item.code}

@@ -373,8 +373,9 @@ function MainApp() {
   });
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.bg }]} edges={["top", "left", "right"]}>
-      <StatusBar barStyle={currentTheme.statusBar} backgroundColor={currentTheme.bg} />
+    <View style={[{ flex: 1, backgroundColor: currentTheme.bg, alignItems: "center" }]}>
+      <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.bg }]} edges={["top", "left", "right"]}>
+        <StatusBar barStyle={currentTheme.statusBar} backgroundColor={currentTheme.bg} />
 
       {/* Top Navbar */}
       <View style={[styles.topBar, { backgroundColor: currentTheme.headerBg, borderBottomColor: currentTheme.border }, isRTL && styles.rtlRow]}>
@@ -960,6 +961,7 @@ function MainApp() {
           themeMode={themeMode}
         />
       </SafeAreaView>
+    </View>
   );
 }
 
@@ -974,6 +976,8 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    maxWidth: 900,
+    width: "100%",
     backgroundColor: "#0f172a"
   },
   topBar: {

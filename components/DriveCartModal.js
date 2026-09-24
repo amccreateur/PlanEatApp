@@ -560,7 +560,7 @@ export default function DriveCartModal({
       <View style={[styles.safeContainer, { backgroundColor: theme.bg }]}>
         {/* Top Header avec sélecteur de Drive et navigation */}
         <View style={[styles.header, { backgroundColor: theme.headerBg, borderBottomColor: theme.border, paddingTop: topInset + 6 }]}>
-          <View style={styles.headerTopRow}>
+          <View style={[styles.headerTopRow, Platform.OS === "web" && styles.webCenteredRow]}>
             <View style={styles.brandTitleBox}>
               <Text style={styles.brandEmoji}>{selectedStore.logoEmoji}</Text>
               <View>
@@ -583,39 +583,43 @@ export default function DriveCartModal({
             </View>
 
             <View style={styles.navControls}>
-              <TouchableOpacity
-                hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
-                style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }, !canGoBack && styles.btnDisabled]}
-                disabled={!canGoBack}
-                onPress={() => webViewRef.current?.goBack()}
-              >
-                <Ionicons name="arrow-back" size={17} color={theme.text} />
-              </TouchableOpacity>
+              {Platform.OS !== "web" && (
+                <>
+                  <TouchableOpacity
+                    hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
+                    style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }, !canGoBack && styles.btnDisabled]}
+                    disabled={!canGoBack}
+                    onPress={() => webViewRef.current?.goBack()}
+                  >
+                    <Ionicons name="arrow-back" size={17} color={theme.text} />
+                  </TouchableOpacity>
 
-              <TouchableOpacity
-                hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
-                style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }, !canGoForward && styles.btnDisabled]}
-                disabled={!canGoForward}
-                onPress={() => webViewRef.current?.goForward()}
-              >
-                <Ionicons name="arrow-forward" size={17} color={theme.text} />
-              </TouchableOpacity>
+                  <TouchableOpacity
+                    hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
+                    style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }, !canGoForward && styles.btnDisabled]}
+                    disabled={!canGoForward}
+                    onPress={() => webViewRef.current?.goForward()}
+                  >
+                    <Ionicons name="arrow-forward" size={17} color={theme.text} />
+                  </TouchableOpacity>
 
-              <TouchableOpacity
-                hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
-                style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }]}
-                onPress={() => webViewRef.current?.reload()}
-              >
-                <Ionicons name="reload" size={15} color={theme.text} />
-              </TouchableOpacity>
+                  <TouchableOpacity
+                    hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
+                    style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }]}
+                    onPress={() => webViewRef.current?.reload()}
+                  >
+                    <Ionicons name="reload" size={15} color={theme.text} />
+                  </TouchableOpacity>
 
-              <TouchableOpacity
-                hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
-                style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }]}
-                onPress={() => Linking.openURL(currentUrl)}
-              >
-                <Ionicons name="open-outline" size={16} color={theme.text} />
-              </TouchableOpacity>
+                  <TouchableOpacity
+                    hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
+                    style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }]}
+                    onPress={() => Linking.openURL(currentUrl)}
+                  >
+                    <Ionicons name="open-outline" size={16} color={theme.text} />
+                  </TouchableOpacity>
+                </>
+              )}
 
               <TouchableOpacity
                 hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
@@ -629,7 +633,7 @@ export default function DriveCartModal({
 
           {/* Store Switcher Chips (compact, 1 seule ligne épurée) */}
           {isSelectingStore && (
-            <View style={{ paddingTop: 6, paddingBottom: 4 }}>
+            <View style={[{ paddingTop: 6, paddingBottom: 4 }, Platform.OS === "web" && styles.webCenteredRow]}>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -1794,20 +1798,25 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "800"
   },
+  webCenteredRow: {
+    maxWidth: 860,
+    width: "100%",
+    alignSelf: "center"
+  },
   webFallbackContainer: {
     flex: 1
   },
   webFallbackContent: {
-    padding: 20,
+    padding: 24,
     maxWidth: 860,
     width: "100%",
     alignSelf: "center",
-    gap: 16
+    gap: 18
   },
   webFallbackHero: {
-    borderRadius: 18,
-    padding: 20,
-    borderWidth: 1,
+    borderRadius: 20,
+    padding: 22,
+    borderWidth: 1.5,
     gap: 16
   },
   webStoreHeaderRow: {
@@ -1816,7 +1825,7 @@ const styles = StyleSheet.create({
     gap: 14
   },
   webFallbackEmoji: {
-    fontSize: 36
+    fontSize: 38
   },
   webFallbackTitle: {
     fontSize: 22,
@@ -1837,7 +1846,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingHorizontal: 22,
     borderRadius: 12,
     gap: 8
   },
@@ -1860,10 +1869,10 @@ const styles = StyleSheet.create({
     fontWeight: "700"
   },
   webCurrentItemCard: {
-    borderRadius: 18,
-    padding: 22,
+    borderRadius: 20,
+    padding: 24,
     borderWidth: 1.5,
-    gap: 12
+    gap: 14
   },
   webCurrentItemHeader: {
     flexDirection: "row",
@@ -1871,13 +1880,13 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   webItemTitle: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: "900",
-    letterSpacing: -0.3
+    letterSpacing: -0.4
   },
   webItemQty: {
     color: "#10b981",
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "700"
   },
   webPrimaryCopyNextBtn: {
@@ -1886,9 +1895,9 @@ const styles = StyleSheet.create({
     marginTop: 6,
     shadowColor: "#10b981",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 5
   },
   webPrimaryCopyGradient: {
     flexDirection: "row",
@@ -1926,10 +1935,10 @@ const styles = StyleSheet.create({
     fontWeight: "700"
   },
   webGroceriesListCard: {
-    borderRadius: 18,
-    padding: 20,
-    borderWidth: 1,
-    gap: 12
+    borderRadius: 20,
+    padding: 22,
+    borderWidth: 1.5,
+    gap: 14
   },
   webListHeaderRow: {
     flexDirection: "row",
@@ -1937,15 +1946,15 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   webGroceriesListTitle: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "800"
   },
   webGroceryRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 10,
-    paddingHorizontal: 10,
+    paddingVertical: 11,
+    paddingHorizontal: 12,
     borderBottomWidth: 1,
     gap: 10
   },
@@ -1953,7 +1962,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    gap: 10
+    gap: 12
   },
   webGroceryRowText: {
     flex: 1,

@@ -229,8 +229,12 @@ RÈGLES D'OR DE VARIÉTÉ ET DE QUALITÉ (STRICTES) :
    - Alternez entre volaille (poulet, dinde), poisson/fruits de mer (saumon, cabillaud, crevettes), légumineuses/végétarien (lentilles, pois chiches, tofu), bœuf/viande, et féculents variés (riz basmati, pâtes fraîches, quinoa, patate douce, boulgour, nouilles). Ne JAMAIS mettre de volaille, viande, poulet, saumon, thon ou avocat dans un petit-déjeuner sucré !
 5. Respecte scrupuleusement les curseurs de cuisines (les gastronomies notées 'PRIORITAIRE' doivent être largement représentées, les 'EXCLU' ne doivent jamais apparaître).
 6. TITRES AUTHENTIQUES & UNIQUES : Sois créatif et précis dans les intitulés des plats. Ne répète jamais le même nom de plat d'un jour à l'autre.
-7. Ingrédients complets (4 à 7 ingrédients réalistes par plat principal : protéine, féculent, légume, herbe/épice, matière grasse).
-8. Rayons autorisés ('deptProduce', 'deptMeat', 'deptDairy', 'deptBakery', 'deptPantry', 'deptSpices', 'deptFrozen', 'deptDrinks', 'deptOther').
+7. DOSAGES & PORTIONS ÉTALON (RÈGLE CRITIQUE) :
+   - Toutes les quantités d'ingrédients DOIVENT ÊTRE EXPRIMÉES POUR UNE BASE ÉTALON DE 2 PERSONNES (l'application applique automatiquement le coefficient d'échelle selon le nombre d'adultes et enfants).
+   - Petit-déjeuner (base 2 pers) : 2 œufs max (1 par pers) OU 1 avocat pour 2 OU 80g flocons d'avoine OU 4 tranches de pain. Doses réalistes et digestes !
+   - Déjeuner/Dîner (base 2 pers) : 250g à 300g de protéine max, 140g à 160g de féculents crus, 200g à 300g de légumes.
+   - Goûter (base 2 pers) : 2 fruits entiers ou 150g compote ou 40g fruits secs.
+8. Ingrédients complets (4 à 7 ingrédients réalistes par plat principal : protéine, féculent, légume, herbe/épice, matière grasse). Rayons autorisés ('deptProduce', 'deptMeat', 'deptDairy', 'deptBakery', 'deptPantry', 'deptSpices', 'deptFrozen', 'deptDrinks', 'deptOther').
 9. Instructions détaillées ÉTAPE PAR ÉTAPE (3 à 4 étapes précises avec découpe, temps de cuisson, assaisonnement et dressage).
 ${profile?.appliances?.thermomix ? "10. ROBOT CUISEUR / THERMOMIX : Fournis impérativement pour chaque recette un bloc 'thermomixInstructions' (tableau d'étapes détaillées adaptées avec durées, températures ex: 100°C ou Varoma, vitesses ex: Vit. 1 / Sens Inverse 🔄)." : ""}
 11. Ajoute une astuce de chef 'chefTip' personnalisée pour chaque plat.

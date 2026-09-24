@@ -105,18 +105,18 @@ export default function FamilyProfileModal({
 
   const dietOptions = [
     { key: "dietBalanced", label: t.dietBalanced, emoji: "🥗" },
-    { key: "dietHalal", label: t.dietHalal, emoji: "🌙" },
-    { key: "dietNoPork", label: t.dietNoPork, emoji: "🥩" },
     { key: "dietVegetarian", label: t.dietVegetarian, emoji: "🌱" },
     { key: "dietVegan", label: t.dietVegan, emoji: "🥑" },
     { key: "dietGlutenFree", label: t.dietGlutenFree, emoji: "🌾" },
     { key: "dietLactoseFree", label: t.dietLactoseFree, emoji: "🥛" },
-    { key: "dietKeto", label: t.dietKeto, emoji: "🥑" },
-    { key: "dietLowCarb", label: t.dietLowCarb, emoji: "📉" },
     { key: "dietHighProtein", label: t.dietHighProtein, emoji: "💪" },
-    { key: "dietBudget", label: t.dietBudget, emoji: "💰" },
     { key: "dietQuick", label: t.dietQuick, emoji: "⏱️" },
-    { key: "dietKids", label: t.dietKids, emoji: "🧒" }
+    { key: "dietKids", label: t.dietKids, emoji: "🧒" },
+    { key: "dietBudget", label: t.dietBudget, emoji: "💰" },
+    { key: "dietLowCarb", label: t.dietLowCarb, emoji: "📉" },
+    { key: "dietKeto", label: t.dietKeto, emoji: "🥑" },
+    { key: "dietNoPork", label: t.dietNoPork, emoji: "🥩" },
+    { key: "dietHalal", label: t.dietHalal, emoji: "🌙" }
   ];
 
   const cuisineList = [

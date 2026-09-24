@@ -12,6 +12,7 @@
       "backgroundColor": "#3eb5ec"
     },
     "ios": {
+      "icon": "./assets/icon.png",
       "supportsTablet": true,
       "bundleIdentifier": "com.amccreateur.PlanEatApp",
       "buildNumber": "12",
@@ -27,7 +28,7 @@
       "versionCode": 11,
       "adaptiveIcon": {
         "backgroundColor": "#3eb5ec",
-        "foregroundImage": "./assets/icon.png"
+        "foregroundImage": "./assets/android-icon-foreground.png"
       },
       "permissions": [
         "android.permission.READ_EXTERNAL_STORAGE",

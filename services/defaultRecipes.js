@@ -7125,5 +7125,404 @@ export const RECIPES_CATALOG = [
       "قدم الشوربة ساخنة مع رشة كستناء وبندق مقرمش."
     ]
   }
+},
+{
+  id: "b19",
+  mealType: "breakfast",
+  title: { fr: "Pudding de Chia au Lait de Coco & Mangue", en: "Coconut Chia Pudding with Mango" },
+  emoji: "🥭",
+  prepTime: 5,
+  cookTime: 0,
+  difficulty: "easy",
+  caloriesPerPerson: 290,
+  tags: ["dietBalanced", "dietVegetarian", "dietVegan", "dietGlutenFree", "dietLactoseFree", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Graines de chia", en: "Chia seeds" }, quantity: 40, unit: "g", dept: "deptPantry" },
+    { name: { fr: "Lait de coco ou amande", en: "Coconut or almond milk" }, quantity: 200, unit: "ml", dept: "deptDairy" },
+    { name: { fr: "Mangue mûre", en: "Ripe mango" }, quantity: 1, unit: "pièce", dept: "deptProduce" },
+    { name: { fr: "Sirop d'agave ou miel", en: "Agave syrup or honey" }, quantity: 1, unit: "c.à.s", dept: "deptSpices" },
+    { name: { fr: "Noix de coco râpée", en: "Shredded coconut" }, quantity: 10, unit: "g", dept: "deptPantry" }
+  ],
+  instructions: {
+    fr: [
+      "Mélangez les graines de chia avec le lait végétal et le sirop d'agave.",
+      "Laissez gonfler au frais 20 min (ou la veille).",
+      "Déposez les dés de mangue fraîche et saupoudrez de coco."
+    ],
+    en: [
+      "Whisk chia seeds with plant milk and agave syrup.",
+      "Chill for 20 mins until thick and creamy.",
+      "Top with diced fresh mango and shredded coconut."
+    ]
+  }
+},
+{
+  id: "b20",
+  mealType: "breakfast",
+  title: { fr: "Pain Perdu Brioché à la Cannelle & Myrtilles", en: "Brioche French Toast with Blueberries" },
+  emoji: "🍞",
+  prepTime: 5,
+  cookTime: 6,
+  difficulty: "easy",
+  caloriesPerPerson: 340,
+  tags: ["dietBalanced", "dietVegetarian", "dietKids", "dietBudget", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Tranches de brioche ou pain complet", en: "Brioche slices" }, quantity: 4, unit: "tranches", dept: "deptBakery" },
+    { name: { fr: "Œufs frais", en: "Fresh eggs" }, quantity: 2, unit: "pièces", dept: "deptDairy" },
+    { name: { fr: "Lait demi-écrémé", en: "Milk" }, quantity: 60, unit: "ml", dept: "deptDairy" },
+    { name: { fr: "Cannelle moulue", en: "Cinnamon" }, quantity: 0.5, unit: "c.à.c", dept: "deptSpices" },
+    { name: { fr: "Myrtilles fraîches", en: "Blueberries" }, quantity: 80, unit: "g", dept: "deptProduce" }
+  ],
+  instructions: {
+    fr: [
+      "Battez les œufs avec le lait et la cannelle.",
+      "Trempez les tranches de brioche 15 secondes par face.",
+      "Dorez à la poêle 2 min par côté et servez avec les myrtilles."
+    ],
+    en: [
+      "Whisk eggs with milk and cinnamon.",
+      "Dip brioche slices 15 seconds per side.",
+      "Pan-fry for 2 mins per side until golden, top with berries."
+    ]
+  }
+},
+{
+  id: "b21",
+  mealType: "breakfast",
+  title: { fr: "Granola Croustillant Chocolat & Yaourt Grec", en: "Chocolate Granola with Greek Yogurt" },
+  emoji: "🍫",
+  prepTime: 3,
+  cookTime: 0,
+  difficulty: "easy",
+  caloriesPerPerson: 320,
+  tags: ["dietBalanced", "dietVegetarian", "dietHighProtein", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Yaourt grec ou Skyr", en: "Greek yogurt" }, quantity: 250, unit: "g", dept: "deptDairy" },
+    { name: { fr: "Granola chocolat noir", en: "Dark chocolate granola" }, quantity: 60, unit: "g", dept: "deptPantry" },
+    { name: { fr: "Banane", en: "Banana" }, quantity: 1, unit: "pièce", dept: "deptProduce" }
+  ],
+  instructions: {
+    fr: [
+      "Versez le yaourt grec dans les bols.",
+      "Ajoutez le granola croustillant et les rondelles de banane."
+    ],
+    en: [
+      "Spoon yogurt into bowls.",
+      "Top with crunchy granola and banana slices."
+    ]
+  }
+},
+{
+  id: "b22",
+  mealType: "breakfast",
+  title: { fr: "Smoothie Bowl Açaï & Fruits Rouges", en: "Açaí Berry Smoothie Bowl" },
+  emoji: "🥣",
+  prepTime: 5,
+  cookTime: 0,
+  difficulty: "easy",
+  caloriesPerPerson: 280,
+  tags: ["dietBalanced", "dietVegetarian", "dietVegan", "dietGlutenFree", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Fruits rouges surgelés", en: "Frozen berries" }, quantity: 150, unit: "g", dept: "deptFrozen" },
+    { name: { fr: "Banane", en: "Banana" }, quantity: 1, unit: "pièce", dept: "deptProduce" },
+    { name: { fr: "Lait d'avoine ou amande", en: "Oat milk" }, quantity: 100, unit: "ml", dept: "deptDairy" },
+    { name: { fr: "Amandes effilées", en: "Sliced almonds" }, quantity: 15, unit: "g", dept: "deptPantry" }
+  ],
+  instructions: {
+    fr: [
+      "Mixez les fruits rouges avec la banane et le lait végétal.",
+      "Versez dans un bol et décorez d'amandes effilées."
+    ],
+    en: [
+      "Blend frozen berries with banana and oat milk.",
+      "Pour into a bowl and top with almonds."
+    ]
+  }
+},
+{
+  id: "b23",
+  mealType: "breakfast",
+  title: { fr: "Porridge Cacao, Beurre de Cacahuète & Banane", en: "Cocoa & Peanut Butter Banana Oats" },
+  emoji: "🥜",
+  prepTime: 5,
+  cookTime: 4,
+  difficulty: "easy",
+  caloriesPerPerson: 350,
+  tags: ["dietBalanced", "dietVegetarian", "dietHighProtein", "dietBudget", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Flocons d'avoine", en: "Rolled oats" }, quantity: 70, unit: "g", dept: "deptPantry" },
+    { name: { fr: "Lait ou boisson végétale", en: "Milk" }, quantity: 200, unit: "ml", dept: "deptDairy" },
+    { name: { fr: "Cacao pur non sucré", en: "Cocoa powder" }, quantity: 1, unit: "c.à.s", dept: "deptPantry" },
+    { name: { fr: "Beurre de cacahuète", en: "Peanut butter" }, quantity: 1, unit: "c.à.s", dept: "deptPantry" },
+    { name: { fr: "Banane mûre", en: "Banana" }, quantity: 1, unit: "pièce", dept: "deptProduce" }
+  ],
+  instructions: {
+    fr: [
+      "Chauffez l'avoine, le lait et le cacao 4 min à feu doux.",
+      "Versez en bol, nappez de beurre de cacahuète et rondelles de banane."
+    ],
+    en: [
+      "Cook oats, milk and cocoa for 4 mins over low heat.",
+      "Pour into bowls and top with peanut butter and banana."
+    ]
+  }
+},
+{
+  id: "b24",
+  mealType: "breakfast",
+  title: { fr: "Muesli Bircher Suisse Pomme & Noix", en: "Swiss Bircher Muesli Apple & Walnut" },
+  emoji: "🍏",
+  prepTime: 5,
+  cookTime: 0,
+  difficulty: "easy",
+  caloriesPerPerson: 300,
+  tags: ["dietBalanced", "dietVegetarian", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Flocons d'avoine", en: "Rolled oats" }, quantity: 60, unit: "g", dept: "deptPantry" },
+    { name: { fr: "Pomme", en: "Apple" }, quantity: 1, unit: "pièce", dept: "deptProduce" },
+    { name: { fr: "Yaourt nature", en: "Plain yogurt" }, quantity: 150, unit: "g", dept: "deptDairy" },
+    { name: { fr: "Noix concassées", en: "Walnuts" }, quantity: 20, unit: "g", dept: "deptPantry" }
+  ],
+  instructions: {
+    fr: [
+      "Râpez la pomme et mélangez avec l'avoine et le yaourt.",
+      "Saupoudrez de cerneaux de noix croquants."
+    ],
+    en: [
+      "Grate apple and mix with oats and yogurt.",
+      "Top with crunchy chopped walnuts."
+    ]
+  }
+},
+{
+  id: "b25",
+  mealType: "breakfast",
+  title: { fr: "Shakshuka Matinale aux Poivrons & Œufs", en: "Morning Shakshuka with Eggs" },
+  emoji: "🍳",
+  prepTime: 5,
+  cookTime: 8,
+  difficulty: "easy",
+  caloriesPerPerson: 320,
+  tags: ["dietBalanced", "dietVegetarian", "flavorSavory", "dietQuick", "dietGlutenFree"],
+  ingredients: [
+    { name: { fr: "Œufs frais", en: "Fresh eggs" }, quantity: 2, unit: "pièces", dept: "deptDairy" },
+    { name: { fr: "Coulis de tomates", en: "Tomato passata" }, quantity: 180, unit: "g", dept: "deptPantry" },
+    { name: { fr: "Poivron rouge émincé", en: "Sliced red pepper" }, quantity: 0.5, unit: "pièce", dept: "deptProduce" },
+    { name: { fr: "Cumin & Paprika", en: "Cumin & Paprika" }, quantity: 1, unit: "c.à.c", dept: "deptSpices" }
+  ],
+  instructions: {
+    fr: [
+      "Poêlez le poivron avec les épices 3 min, versez la sauce tomate.",
+      "Cassez les œufs au centre et couvrez 3-4 min jusqu'à cuisson."
+    ],
+    en: [
+      "Sauté peppers with spices 3 mins, add tomato passata.",
+      "Crack eggs into sauce and cover 3-4 mins until set."
+    ]
+  }
+},
+{
+  id: "b26",
+  mealType: "breakfast",
+  title: { fr: "Omelette Roulée au Fromage Frais & Herbes", en: "Rolled Herb & Cream Cheese Omelet" },
+  emoji: "🌿",
+  prepTime: 3,
+  cookTime: 4,
+  difficulty: "easy",
+  caloriesPerPerson: 290,
+  tags: ["dietBalanced", "dietVegetarian", "flavorSavory", "dietKeto", "dietLowCarb", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Œufs frais", en: "Eggs" }, quantity: 2, unit: "pièces", dept: "deptDairy" },
+    { name: { fr: "Fromage frais type St-Moret", en: "Cream cheese" }, quantity: 40, unit: "g", dept: "deptDairy" },
+    { name: { fr: "Ciboulette et persil frais", en: "Fresh chives" }, quantity: 2, unit: "c.à.s", dept: "deptProduce" }
+  ],
+  instructions: {
+    fr: [
+      "Battez les œufs avec les herbes, cuisez à la poêle 2 min.",
+      "Garnissez de fromage frais et roulez l'omelette."
+    ],
+    en: [
+      "Whisk eggs with herbs, cook for 2 mins in pan.",
+      "Spread cream cheese and roll gently."
+    ]
+  }
+},
+{
+  id: "b27",
+  mealType: "breakfast",
+  title: { fr: "Bagel Grillé au Saumon Fumé & Concombre", en: "Smoked Salmon & Cucumber Bagel" },
+  emoji: "🥯",
+  prepTime: 5,
+  cookTime: 2,
+  difficulty: "easy",
+  caloriesPerPerson: 360,
+  tags: ["dietBalanced", "flavorSavory", "dietHighProtein", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Mini bagels ou pain complet", en: "Bagels" }, quantity: 2, unit: "pièces", dept: "deptBakery" },
+    { name: { fr: "Saumon fumé ou truite", en: "Smoked salmon" }, quantity: 60, unit: "g", dept: "deptMeat" },
+    { name: { fr: "Fromage frais", en: "Cream cheese" }, quantity: 30, unit: "g", dept: "deptDairy" },
+    { name: { fr: "Concombre en lamelles", en: "Cucumber" }, quantity: 0.5, unit: "pièce", dept: "deptProduce" }
+  ],
+  instructions: {
+    fr: [
+      "Toastez les bagels, tartinez de fromage frais.",
+      "Ajoutez le saumon fumé et le concombre frais."
+    ],
+    en: [
+      "Toast bagels, spread cream cheese.",
+      "Top with smoked salmon and cucumber slices."
+    ]
+  }
+},
+{
+  id: "s12",
+  mealType: "snack",
+  title: { fr: "Energy Balls Dattes, Amandes & Coco", en: "Date, Almond & Coconut Energy Balls" },
+  emoji: "🥥",
+  prepTime: 5,
+  cookTime: 0,
+  difficulty: "easy",
+  caloriesPerPerson: 180,
+  tags: ["dietBalanced", "dietVegetarian", "dietVegan", "dietGlutenFree", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Dattes Medjool", en: "Pitted dates" }, quantity: 60, unit: "g", dept: "deptProduce" },
+    { name: { fr: "Poudre d'amandes", en: "Almond flour" }, quantity: 30, unit: "g", dept: "deptPantry" },
+    { name: { fr: "Noix de coco râpée", en: "Shredded coconut" }, quantity: 15, unit: "g", dept: "deptPantry" }
+  ],
+  instructions: {
+    fr: [
+      "Mixez les dattes avec la poudre d'amandes.",
+      "Formez des boules et roulez-les dans la noix de coco."
+    ],
+    en: [
+      "Blend dates with almond flour.",
+      "Roll into balls and coat with coconut."
+    ]
+  }
+},
+{
+  id: "s13",
+  mealType: "snack",
+  title: { fr: "Pommes Rôties Cannelle & Amandes", en: "Warm Baked Cinnamon Apples" },
+  emoji: "🍎",
+  prepTime: 4,
+  cookTime: 5,
+  difficulty: "easy",
+  caloriesPerPerson: 160,
+  tags: ["dietBalanced", "dietVegetarian", "dietVegan", "dietKids", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Pommes", en: "Apples" }, quantity: 2, unit: "pièces", dept: "deptProduce" },
+    { name: { fr: "Cannelle", en: "Cinnamon" }, quantity: 1, unit: "c.à.c", dept: "deptSpices" },
+    { name: { fr: "Amandes effilées", en: "Sliced almonds" }, quantity: 15, unit: "g", dept: "deptPantry" }
+  ],
+  instructions: {
+    fr: [
+      "Coupez les pommes en dés, saupoudrez de cannelle.",
+      "Chauffez 3 min au micro-ondes et parsemez d'amandes."
+    ],
+    en: [
+      "Dice apples, dust with cinnamon.",
+      "Microwave for 3 mins and top with almonds."
+    ]
+  }
+},
+{
+  id: "s14",
+  mealType: "snack",
+  title: { fr: "Cookies Express Banane, Avoine & Chocolat", en: "Banana Oat Chocolate Cookies" },
+  emoji: "🍪",
+  prepTime: 5,
+  cookTime: 12,
+  difficulty: "easy",
+  caloriesPerPerson: 190,
+  tags: ["dietBalanced", "dietVegetarian", "dietVegan", "dietKids", "dietBudget"],
+  ingredients: [
+    { name: { fr: "Banane mûre", en: "Ripe banana" }, quantity: 1, unit: "pièce", dept: "deptProduce" },
+    { name: { fr: "Flocons d'avoine", en: "Rolled oats" }, quantity: 60, unit: "g", dept: "deptPantry" },
+    { name: { fr: "Pépites de chocolat noir", en: "Chocolate chips" }, quantity: 20, unit: "g", dept: "deptPantry" }
+  ],
+  instructions: {
+    fr: [
+      "Écrasez la banane, mélangez avec l'avoine et le chocolat.",
+      "Formez des cookies et enfournez 12 min à 180°C."
+    ],
+    en: [
+      "Mash banana, mix with oats and chocolate.",
+      "Bake for 12 mins at 180°C until golden."
+    ]
+  }
+},
+{
+  id: "s15",
+  mealType: "snack",
+  title: { fr: "Bâtonnets de Carottes, Concombre & Houmous", en: "Veggie Sticks with Hummus" },
+  emoji: "🥕",
+  prepTime: 5,
+  cookTime: 0,
+  difficulty: "easy",
+  caloriesPerPerson: 170,
+  tags: ["dietBalanced", "dietVegetarian", "dietVegan", "flavorSavory", "dietQuick", "dietLowCarb"],
+  ingredients: [
+    { name: { fr: "Carottes", en: "Carrots" }, quantity: 2, unit: "pièces", dept: "deptProduce" },
+    { name: { fr: "Concombre", en: "Cucumber" }, quantity: 0.5, unit: "pièce", dept: "deptProduce" },
+    { name: { fr: "Houmous", en: "Hummus" }, quantity: 80, unit: "g", dept: "deptProduce" }
+  ],
+  instructions: {
+    fr: [
+      "Coupez les légumes en fins bâtonnets et trempez dans le houmous."
+    ],
+    en: [
+      "Slice veggies into sticks and serve with hummus."
+    ]
+  }
+},
+{
+  id: "s16",
+  mealType: "snack",
+  title: { fr: "Mini-Wrap Dinde, Fromage Frais & Mâche", en: "Turkey & Cream Cheese Mini-Wrap" },
+  emoji: "🌯",
+  prepTime: 4,
+  cookTime: 0,
+  difficulty: "easy",
+  caloriesPerPerson: 190,
+  tags: ["dietBalanced", "flavorSavory", "dietHighProtein", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Mini tortillas", en: "Tortillas" }, quantity: 2, unit: "pièces", dept: "deptBakery" },
+    { name: { fr: "Blanc de dinde", en: "Turkey breast" }, quantity: 2, unit: "tranches", dept: "deptMeat" },
+    { name: { fr: "Fromage frais", en: "Cream cheese" }, quantity: 30, unit: "g", dept: "deptDairy" },
+    { name: { fr: "Mâche fraîche", en: "Salad greens" }, quantity: 20, unit: "g", dept: "deptProduce" }
+  ],
+  instructions: {
+    fr: [
+      "Tartinez les tortillas de fromage frais, ajoutez la dinde et la mâche, roulez fermement."
+    ],
+    en: [
+      "Spread cream cheese on tortillas, add turkey and greens, roll tightly."
+    ]
+  }
+},
+{
+  id: "s17",
+  mealType: "snack",
+  title: { fr: "Crackers aux Graines, Chèvre Frais & Noix", en: "Seeded Crackers, Goat Cheese & Walnuts" },
+  emoji: "🧀",
+  prepTime: 3,
+  cookTime: 0,
+  difficulty: "easy",
+  caloriesPerPerson: 180,
+  tags: ["dietBalanced", "dietVegetarian", "flavorSavory", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Crackers aux graines", en: "Seeded crackers" }, quantity: 4, unit: "pièces", dept: "deptPantry" },
+    { name: { fr: "Fromage de chèvre frais", en: "Goat cheese" }, quantity: 40, unit: "g", dept: "deptDairy" },
+    { name: { fr: "Cerneaux de noix", en: "Walnuts" }, quantity: 15, unit: "g", dept: "deptPantry" }
+  ],
+  instructions: {
+    fr: [
+      "Tartinez les crackers de fromage de chèvre frais et déposez les cerneaux de noix."
+    ],
+    en: [
+      "Spread goat cheese over crackers and top with walnut halves."
+    ]
+  }
 }
 ];

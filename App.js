@@ -825,7 +825,7 @@ function MainApp() {
           {
             backgroundColor: currentTheme.tabBarBg,
             borderTopColor: currentTheme.border,
-            paddingBottom: Math.max(insets.bottom, Platform.OS === "android" ? 22 : 10) + 8,
+            paddingBottom: Math.max(insets.bottom, Platform.OS === "android" ? 28 : 10) + 8,
             paddingTop: 10
           },
           isRTL && styles.rtlRow

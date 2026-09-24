@@ -30,6 +30,7 @@ export default function FridgeModal({
 }) {
   const insets = useSafeAreaInsets();
   const topInset = Math.max(insets.top, Platform.OS === "ios" ? 50 : 20);
+  const bottomInset = Math.max(insets.bottom, Platform.OS === "android" ? 56 : 24);
   const t = TRANSLATIONS[lang] || TRANSLATIONS.fr;
   const isRTL = lang === "ar";
   const theme = THEMES[themeMode] || THEMES.dark;
@@ -108,7 +109,11 @@ export default function FridgeModal({
           <View style={{ width: 40 }} />
         </View>
 
-        <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomInset + 50 }]}
+          showsVerticalScrollIndicator={true}
+        >
           {/* Hero Banner */}
           <LinearGradient colors={["#0369a1", "#0284c7"]} style={styles.banner}>
             <Text style={styles.bannerEmoji}>🥬 🍳 🥕</Text>

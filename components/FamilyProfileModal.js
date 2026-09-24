@@ -33,6 +33,7 @@ export default function FamilyProfileModal({
 }) {
   const insets = useSafeAreaInsets();
   const topInset = Math.max(insets.top, Platform.OS === "ios" ? 50 : (StatusBar.currentHeight || 20));
+  const bottomInset = Math.max(insets.bottom, Platform.OS === "android" ? 56 : 24);
 
   const t = TRANSLATIONS[lang] || TRANSLATIONS.fr;
   const isRTL = lang === "ar";
@@ -254,7 +255,7 @@ export default function FamilyProfileModal({
 
   return (
     <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose}>
-      <View style={[styles.safeArea, { backgroundColor: theme.bg }]}>
+      <View style={[styles.safeArea, { backgroundColor: theme.bg, paddingBottom: Platform.OS === "android" ? 8 : 0 }]}>
         {/* Header avec safe inset padding pour iPhone / Dynamic Island */}
         <View style={[
           styles.header,
@@ -284,12 +285,16 @@ export default function FamilyProfileModal({
             activeOpacity={0.8}
           >
             <Text style={styles.saveHeaderText}>
-              {isOnboarding ? "OK" : t.saveProfile.split(" ")[0]}
+              {isOnboarding ? (t.onboardingStartBtn || "C'est parti ! 🚀") : (t.saveProfile || "Enregistrer")}
             </Text>
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomInset + 70 }]}
+          showsVerticalScrollIndicator={true}
+        >
           {/* Onboarding Welcome Hero Banner */}
           {isOnboarding && (
             <View style={[styles.onboardingHeroCard, { backgroundColor: theme.cardBg, borderColor: "#10b981" }]}>

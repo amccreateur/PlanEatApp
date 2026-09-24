@@ -14,9 +14,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { TRANSLATIONS } from "../i18n/translations";
 import { THEMES } from "../utils/theme";
 
-export default function RecipeModal({ visible, recipe, onClose, lang = "fr", themeMode = "dark" }) {
   const insets = useSafeAreaInsets();
   const topInset = Math.max(insets.top, Platform.OS === "ios" ? 50 : (StatusBar.currentHeight || 20));
+  const bottomInset = Math.max(insets.bottom, Platform.OS === "android" ? 56 : 24);
 
   const t = TRANSLATIONS[lang] || TRANSLATIONS.fr;
   const isRTL = lang === "ar";
@@ -94,7 +94,11 @@ export default function RecipeModal({ visible, recipe, onClose, lang = "fr", the
           <View style={{ width: 40 }} />
         </View>
 
-        <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomInset + 50 }]}
+          showsVerticalScrollIndicator={true}
+        >
           {/* Main Info Card */}
           <View style={[styles.heroCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
             <Text style={styles.heroEmoji}>{recipe.emoji || "🍽️"}</Text>

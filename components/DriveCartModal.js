@@ -33,6 +33,7 @@ export default function DriveCartModal({
 }) {
   const insets = useSafeAreaInsets();
   const topInset = Math.max(insets.top, Platform.OS === "ios" ? 50 : 20);
+  const bottomInset = Math.max(insets.bottom, Platform.OS === "android" ? 56 : 24);
   const t = TRANSLATIONS[lang] || TRANSLATIONS.fr;
   const isRTL = lang === "ar";
   const theme = THEMES[themeMode] || THEMES.dark;
@@ -647,7 +648,7 @@ export default function DriveCartModal({
 
           {/* Bouton flottant discret pour commencer les courses */}
           {isSelectingStore && (
-            <View style={styles.floatingStartBar}>
+            <View style={[styles.floatingStartBar, { bottom: bottomInset + 10 }]}>
               <TouchableOpacity
                 style={styles.floatingStartBtn}
                 onPress={handleStartShopping}
@@ -671,7 +672,7 @@ export default function DriveCartModal({
         {!isSelectingStore && (
           isAssistantCollapsed ? (
             /* Mode Réduit : mini-barre flottante élégante */
-            <View style={[styles.collapsedDock, { backgroundColor: theme.cardBg, borderTopColor: theme.border }]}>
+            <View style={[styles.collapsedDock, { backgroundColor: theme.cardBg, borderTopColor: theme.border, paddingBottom: bottomInset + 8 }]}>
               <TouchableOpacity
                 style={styles.collapsedLeftTouch}
                 onPress={() => setIsAssistantCollapsed(false)}
@@ -701,7 +702,7 @@ export default function DriveCartModal({
             </View>
           ) : (
             /* Mode Déplié : Carte complète avec suggestions, recherche et actions */
-            <View style={[styles.bottomDock, { backgroundColor: theme.cardBg, borderTopColor: theme.border }]}>
+            <View style={[styles.bottomDock, { backgroundColor: theme.cardBg, borderTopColor: theme.border, paddingBottom: bottomInset + 8 }]}>
               {/* Progress Bar Header */}
               <View style={styles.dockProgressRow}>
                 <View style={styles.dockProgressLeft}>

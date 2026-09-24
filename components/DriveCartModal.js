@@ -7,21 +7,24 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
-  Animated,
   Platform,
   Linking,
   TextInput
 } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import { WebView } from "react-native-webview";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import Constants from "expo-constants";
 import { DRIVE_STORES, DriveService } from "../services/driveService";
 import { TRANSLATIONS } from "../i18n/translations";
 import { THEMES } from "../utils/theme";
+
+let WebView = null;
+if (Platform.OS !== "web") {
+  WebView = require("react-native-webview").WebView;
+}
 
 export default function DriveCartModal({
   visible,
@@ -35,7 +38,6 @@ export default function DriveCartModal({
   const topInset = Math.max(insets.top, Platform.OS === "ios" ? 50 : 20);
   const bottomInset = Math.max(insets.bottom, Platform.OS === "android" ? 56 : 24);
   const t = TRANSLATIONS[lang] || TRANSLATIONS.fr;
-  const isRTL = lang === "ar";
   const theme = THEMES[themeMode] || THEMES.dark;
 
   const webViewRef = useRef(null);
@@ -46,6 +48,11 @@ export default function DriveCartModal({
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoForward, setCanGoForward] = useState(false);
 
+  // Local store URL custom configuration (for Leclerc Drive exact store links on Web & Mobile)
+  const [customStoreUrl, setCustomStoreUrl] = useState("");
+  const [isEditingStoreUrl, setIsEditingStoreUrl] = useState(false);
+  const [storeUrlInput, setStoreUrlInput] = useState("");
+
   // Index de l'ingrédient en cours d'assistance
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isListExpanded, setIsListExpanded] = useState(false);
@@ -53,62 +60,8 @@ export default function DriveCartModal({
   const [searchQuery, setSearchQuery] = useState("");
   const [isSelectingStore, setIsSelectingStore] = useState(true);
   const [isCopied, setIsCopied] = useState(false);
-  const [isListCopied, setIsListCopied] = useState(false);
+  const [copyFeedback, setCopyFeedback] = useState("");
 
-  const copyToClipboard = async (text) => {
-    if (!text) return;
-    try {
-      await Clipboard.setStringAsync(text);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
-    } catch(e) {}
-  };
-
-  const copyEntireList = async () => {
-    if (!groceries || groceries.length === 0) return;
-    const lines = [];
-    lines.push(`🛒 LISTE DE COURSES PLANEAT (${groceries.length} articles)`);
-    lines.push(`----------------------------------------`);
-    
-    const depts = {};
-    groceries.forEach(item => {
-      const d = item.dept || "deptOther";
-      if (!depts[d]) depts[d] = [];
-      depts[d].push(item);
-    });
-
-    Object.entries(depts).forEach(([deptKey, items]) => {
-      const deptTitle = t[deptKey] || deptKey;
-      lines.push(`\n📁 ${deptTitle.toUpperCase()} :`);
-      items.forEach(it => {
-        const name = it.name?.[lang] || it.name?.fr || it.customName;
-        const qty = it.totalQuantity ? ` (${it.totalQuantity} ${it.unit || ""})` : "";
-        const check = it.checked ? " [x] " : " [ ] ";
-        lines.push(`${check}${name}${qty}`);
-      });
-    });
-
-    try {
-      await Clipboard.setStringAsync(lines.join("\n"));
-      setIsListCopied(true);
-      setTimeout(() => setIsListCopied(false), 2500);
-    } catch(e) {}
-  };
-
-  const handleCopyAndNext = async (item) => {
-    const it = item || currentItem;
-    if (!it) return;
-    const q = searchQuery || getCleanItemName(it);
-    await copyToClipboard(q);
-    if (onToggleItem && it.id && !it.checked) {
-      onToggleItem(it.id);
-    }
-    if (currentIndex < groceries.length - 1) {
-      setCurrentIndex(prev => prev + 1);
-    }
-  };
-
-  // Utiliser la liste complète des groceries pour un indexage stable et prévisible
   const currentItem = groceries[currentIndex] || groceries[0];
 
   const getCleanItemName = (item) => {
@@ -122,7 +75,7 @@ export default function DriveCartModal({
     return item.name?.[lang] || item.name?.fr || item.customName || "";
   };
 
-  // Charger le magasin préféré sauvegardé
+  // Charger le magasin préféré sauvegardé et l'URL personnalisée de magasin
   useEffect(() => {
     AsyncStorage.getItem("@planeat_preferred_drive_store")
       .then((savedStoreId) => {
@@ -135,6 +88,16 @@ export default function DriveCartModal({
         }
       })
       .catch(() => {});
+
+    AsyncStorage.getItem("@planeat_custom_drive_store_url")
+      .then((savedUrl) => {
+        if (savedUrl) {
+          setCustomStoreUrl(savedUrl);
+          setStoreUrlInput(savedUrl);
+          storeBaseUrlRef.current = savedUrl;
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // Sync input query with current item
@@ -142,30 +105,134 @@ export default function DriveCartModal({
     if (currentItem) {
       setSearchQuery(getCleanItemName(currentItem));
     }
-  }, [currentItem?.id]);
+  }, [currentItem?.id, currentIndex]);
 
   const suggestions = currentItem
     ? DriveService.getSearchSuggestions(getRawItemName(currentItem))
     : [];
 
-  // Détection automatique de la sélection du magasin dans le WebView
+  const copyToClipboard = async (text, feedbackMsg = "Copié !") => {
+    if (!text) return;
+    try {
+      await Clipboard.setStringAsync(text);
+      setIsCopied(true);
+      setCopyFeedback(feedbackMsg);
+      setTimeout(() => {
+        setIsCopied(false);
+        setCopyFeedback("");
+      }, 2000);
+    } catch(e) {}
+  };
+
+  // Sauvegarder l'URL du magasin local
+  const handleSaveStoreUrl = async () => {
+    const trimmed = storeUrlInput.trim();
+    if (!trimmed) {
+      setCustomStoreUrl("");
+      await AsyncStorage.removeItem("@planeat_custom_drive_store_url");
+      setIsEditingStoreUrl(false);
+      return;
+    }
+    // Nettoyer l'URL de base du magasin Leclerc (garder https://www.leclercdrive.fr/magasin-XXXXX-nom)
+    const match = trimmed.match(/(https?:\/\/[^\/]+\/magasin-[^\/\?#]+)/i);
+    const cleanUrl = match ? match[1] : trimmed.replace(/\/+$/, "").replace(/\/recherche\.aspx.*$/i, "").replace(/\/recherche\/.*$/i, "");
+    setCustomStoreUrl(cleanUrl);
+    setStoreUrlInput(cleanUrl);
+    storeBaseUrlRef.current = cleanUrl;
+    await AsyncStorage.setItem("@planeat_custom_drive_store_url", cleanUrl);
+    setIsEditingStoreUrl(false);
+    copyToClipboard("", "✅ Magasin enregistré !");
+  };
+
+  // Obtenir le lien direct de recherche
+  const getDirectSearchUrl = (query) => {
+    const clean = (query || getCleanItemName(currentItem) || "").trim();
+    const q = encodeURIComponent(clean);
+    if (selectedStore.id === "leclerc") {
+      const base = customStoreUrl || storeBaseUrlRef.current;
+      if (base && base.includes("magasin-")) {
+        const cleanBase = base.replace(/\/+$/, "").replace(/\/recherche\.aspx.*$/i, "").replace(/\/recherche\/.*$/i, "");
+        if (cleanBase.includes("m-courses")) {
+          return `${cleanBase}/recherche/${q}`;
+        }
+        return `${cleanBase}/recherche.aspx?TexteRecherche=${q}`;
+      }
+      return `https://www.e.leclerc/recherche?q=${q}`;
+    }
+    if (selectedStore.id === "carrefour") return `https://www.carrefour.fr/r?q=${q}`;
+    if (selectedStore.id === "auchan") return `https://www.auchan.fr/recherche?text=${q}`;
+    if (selectedStore.id === "coursesu") return `https://www.coursesu.com/recherche?q=${q}`;
+    if (selectedStore.id === "intermarche") return `https://www.intermarche.com/recherche?q=${q}`;
+    return `https://www.google.com/search?q=${encodeURIComponent(selectedStore.name + " " + clean)}`;
+  };
+
+  // Ouvrir la recherche dans un nouvel onglet (Web) ou navigateur externe
+  const handleOpenSearchWeb = (query) => {
+    const targetUrl = getDirectSearchUrl(query || searchQuery);
+    const textToCopy = (query || searchQuery || getCleanItemName(currentItem)).trim();
+    if (textToCopy) {
+      copyToClipboard(textToCopy, "🔍 Mot-clé copié & Recherche ouverte !");
+    }
+    if (Platform.OS === "web") {
+      if (typeof window !== "undefined") {
+        window.open(targetUrl, "_blank", "noopener,noreferrer");
+      } else {
+        Linking.openURL(targetUrl);
+      }
+    } else {
+      Linking.openURL(targetUrl);
+    }
+  };
+
+  // Copier le mot-clé et passer automatiquement à l'article suivant (Web & Mobile)
+  const handleCopyAndNext = async () => {
+    const textToCopy = (searchQuery || getCleanItemName(currentItem)).trim();
+    if (textToCopy) {
+      await copyToClipboard(textToCopy, "📋 Copié ! Article suivant");
+    }
+    if (currentItem && !currentItem.checked) {
+      onToggleItem(currentItem.id);
+    }
+    if (currentIndex < groceries.length - 1) {
+      const nextIndex = currentIndex + 1;
+      setCurrentIndex(nextIndex);
+      const nextItem = groceries[nextIndex];
+      if (nextItem) {
+        const nextQuery = getCleanItemName(nextItem);
+        setSearchQuery(nextQuery);
+      }
+    }
+  };
+
+  // Copier toute la liste de courses
+  const handleCopyAllGroceries = async () => {
+    if (!groceries || groceries.length === 0) return;
+    const lines = groceries.map((item, idx) => {
+      const name = item.name?.[lang] || item.name?.fr || item.customName || "";
+      const qty = item.totalQuantity ? ` (${item.totalQuantity} ${item.unit || ""})`.trim() : "";
+      const status = item.checked ? "[x]" : "[ ]";
+      return `${status} ${name}${qty}`;
+    });
+    const fullText = `🛒 Liste de courses PlanEat (${selectedStore.name}) :\n` + lines.join("\n");
+    await copyToClipboard(fullText, "📄 Toute la liste a été copiée !");
+  };
+
+  // Mobile WebView Navigation & Injection
   const handleNavigationStateChange = (navState) => {
     setCanGoBack(navState.canGoBack);
     setCanGoForward(navState.canGoForward);
 
     const url = navState.url || "";
     if (url) {
-      // Auto-récupération uniquement sur les vraies pages d'erreur 404
       if (url.includes("/404") || url.includes("page-introuvable") || url.includes("/erreur-404")) {
-        console.log("[Drive AutoRecover] 404 détecté sur " + url + " -> retour accueil " + selectedStore.homeUrl);
-        sendServerLog("AUTO_RECOVER_404", "Retour accueil suite 404: " + url);
         setCurrentUrl(selectedStore.homeUrl);
         return;
       }
-
       const match = url.match(/(https?:\/\/[^\/]+\/magasin-[^\/\?#]+)/i);
       if (match && match[1]) {
         storeBaseUrlRef.current = match[1];
+        setCustomStoreUrl(match[1]);
+        AsyncStorage.setItem("@planeat_custom_drive_store_url", match[1]).catch(() => {});
       }
     }
 
@@ -197,8 +264,6 @@ export default function DriveCartModal({
           (selectedStore.id === "intermarche" && (url.includes("/magasin") || url.includes("/pdv/") || url.includes("/rayons")));
 
         if (isStoreSelected) {
-          console.log("[Drive AutoStart] 🏪 Magasin détecté: " + url);
-          sendServerLog("STORE_AUTO_DETECTED", url);
           setIsSelectingStore(false);
           setTimeout(() => {
             if (currentItem) {
@@ -214,64 +279,14 @@ export default function DriveCartModal({
     }
   };
 
-  const sendServerLog = (type, text) => {
-    try {
-      const hostIp =
-        Constants.expoConfig?.hostUri?.split(":")[0] ||
-        Constants.manifest?.debuggerHost?.split(":")[0] ||
-        "10.207.54.118";
-      fetch(`http://${hostIp}:8088/log`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, text })
-      }).catch(() => {});
-    } catch {}
-  };
-
-  const handleWebViewMessage = (event) => {
-    try {
-      const payload = JSON.parse(event.nativeEvent.data);
-      if (payload.type === "drive_search_log") {
-        console.log(`[Drive Web] ${payload.text}`);
-        sendServerLog("DRIVE_WEB", payload.text);
-      } else if (payload.type === "log") {
-        console.log(`[Drive Console] ${payload.text || payload.data}`);
-        sendServerLog("WEB_CONSOLE", payload.text || payload.data);
-      } else if (payload.type === "error" || payload.type === "uncaught_error") {
-        console.warn(`[Drive Error] ${payload.text || payload.data}`);
-        sendServerLog("WEB_ERROR", payload.text || payload.data);
-      }
-    } catch {
-      console.log(`[Drive Msg] ${event.nativeEvent.data}`);
-      sendServerLog("RAW_MSG", event.nativeEvent.data);
-    }
-  };
-
-  const getSearchUrlForStore = (cleanQ) => {
-    const base = storeBaseUrlRef.current;
-    if (selectedStore.id === "leclerc" && base) {
-      if (base.includes("m-courses")) {
-        return `${base}/recherche/${encodeURIComponent(cleanQ)}`;
-      } else {
-        return `${base}/recherche.aspx?TexteRecherche=${encodeURIComponent(cleanQ)}`;
-      }
-    }
-    return selectedStore.searchUrl(cleanQ);
-  };
-
-  // Injecter la recherche directement dans la session active du magasin
   const injectSearchInStore = (query) => {
+    if (Platform.OS === "web") return;
     if (!query) return;
     const cleanQ = query.trim();
     if (!cleanQ) return;
 
-    // Copier immédiatement dans le presse-papier pour confort utilisateur
     Clipboard.setStringAsync(cleanQ).catch(() => {});
-
-    const targetUrl = getSearchUrlForStore(cleanQ);
-    const startMsg = `🚀 Recherche: "${cleanQ}" (${selectedStore.name})`;
-    console.log(`[PlanEat Drive] ${startMsg}`);
-    sendServerLog("APP_START_SEARCH", `${startMsg} -> ${targetUrl}`);
+    const targetUrl = getDirectSearchUrl(cleanQ);
 
     if (selectedStore.id === "leclerc" || selectedStore.id === "carrefour") {
       setCurrentUrl(targetUrl);
@@ -290,55 +305,15 @@ export default function DriveCartModal({
       return;
     }
 
-    // Pour Courses U, Auchan, Intermarché : injection dynamique avec multi-stratégies (DOM form, input, ou soumission dynamique)
     const domSearchJs = `
       (function() {
         try {
           var query = ${JSON.stringify(cleanQ)};
           var targetUrl = ${JSON.stringify(targetUrl)};
           var attempts = 0;
-          var maxAttempts = 6;
-
-          function sendMsg(text) {
-            try {
-              if (window.ReactNativeWebView) {
-                window.ReactNativeWebView.postMessage(JSON.stringify({ type: "drive_search_log", text: text }));
-              }
-            } catch(e) {}
-          }
-
-          function submitDynamicSearch() {
-            try {
-              if (${JSON.stringify(selectedStore.id)} === "intermarche") {
-                sendMsg("ℹ️ Intermarché : mot-clé copié dans le presse-papier.");
-                return false;
-              }
-              sendMsg("🚀 Navigation vers les résultats de recherche...");
-              var actionPath = window.location.origin ? (window.location.origin + "/recherche") : "/recherche";
-              var form = document.createElement('form');
-              form.method = 'GET';
-              form.action = actionPath;
-              var paramName = ${JSON.stringify(selectedStore.id === "auchan" ? "text" : "q")};
-              var qInput = document.createElement('input');
-              qInput.type = 'hidden';
-              qInput.name = paramName;
-              qInput.value = query;
-              form.appendChild(qInput);
-              document.body.appendChild(form);
-              form.submit();
-              return true;
-            } catch(e) {
-              if (${JSON.stringify(selectedStore.id)} !== "intermarche") {
-                window.location.href = targetUrl;
-              }
-              return true;
-            }
-          }
 
           function trySearch() {
             attempts++;
-            
-            // 1. Chercher d'abord dans tous les formulaires existants sur la page
             var forms = document.querySelectorAll('form');
             for (var f = 0; f < forms.length; f++) {
               var formEl = forms[f];
@@ -356,40 +331,27 @@ export default function DriveCartModal({
                   qEl.dispatchEvent(new Event('change', { bubbles: true }));
                   qEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
                   qEl.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-                  
-                  var submitBtn = formEl.querySelector('button[type="submit"], input[type="submit"], button.search-button, button.header-search__btn, button[aria-label*="recherch" i]');
+                  var submitBtn = formEl.querySelector('button[type="submit"], input[type="submit"], button.search-button, button.header-search__btn');
                   if (submitBtn) {
                     submitBtn.click();
-                    sendMsg("✅ Recherche soumise via bouton de formulaire !");
                     return;
                   }
                   formEl.submit();
-                  sendMsg("✅ Formulaire existant soumis !");
                   return;
                 } catch(errForm) {}
               }
             }
 
-            // 2. Chercher un champ d'input visible ou non
             var selectors = [
               'input[type="search"]',
               'input[name="q"]',
               'input[name="keyword"]',
               'input[name="search"]',
               'input#search-input',
-              'input.header-search-input',
-              'input.search-field',
               'input[name="TexteRecherche"]',
               'input[name="text"]',
               'input[name="query"]',
-              'input[placeholder*="recherch" i]',
-              'input[placeholder*="produit" i]',
-              'input[placeholder*="article" i]',
-              'input[placeholder*="courses" i]',
-              'input.search-input',
-              'header input',
-              'nav input',
-              '[data-testid*="search" i] input'
+              'input[placeholder*="recherch" i]'
             ];
 
             for (var i = 0; i < selectors.length; i++) {
@@ -407,28 +369,23 @@ export default function DriveCartModal({
                   input.dispatchEvent(new Event('change', { bubbles: true }));
                   input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
                   input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-                  
                   var nearbyBtn = input.parentElement?.querySelector('button') || document.querySelector('button[aria-label*="recherch" i], button.search-button');
                   if (nearbyBtn) nearbyBtn.click();
-
-                  sendMsg("✅ Champ de recherche rempli et validé (" + query + ") !");
                   return;
                 } catch(errInput) {}
               }
             }
 
-            // 3. Si on est sur une page produit (/p/) ou après plusieurs essais (hors Intermarché qui est SPA pure)
-            if (attempts >= 2 || window.location.pathname.includes('/p/')) {
-              submitDynamicSearch();
+            if (attempts >= 2) {
+              if (${JSON.stringify(selectedStore.id)} !== "intermarche") {
+                window.location.href = targetUrl;
+              }
               return;
             }
-
             setTimeout(trySearch, 200);
           }
-
           trySearch();
         } catch(err) {
-          sendMsg("❌ Erreur globale domSearchJs: " + err.message);
           if (${JSON.stringify(selectedStore.id)} !== "intermarche") {
             window.location.href = targetUrl;
           }
@@ -439,16 +396,13 @@ export default function DriveCartModal({
     webViewRef.current?.injectJavaScript(domSearchJs);
   };
 
-  // Quand le magasin change, naviguer vers son accueil en plein écran
   const handleSelectStore = (store) => {
-    storeBaseUrlRef.current = "";
     setSelectedStore(store);
     setCurrentUrl(store.homeUrl);
     setIsSelectingStore(true);
     AsyncStorage.setItem("@planeat_preferred_drive_store", store.id).catch(() => {});
   };
 
-  // Démarrer les courses après sélection du magasin
   const handleStartShopping = () => {
     setIsSelectingStore(false);
     if (currentItem) {
@@ -460,16 +414,18 @@ export default function DriveCartModal({
     }
   };
 
-  // Rechercher un mot-clé précis dans le Drive
   const handleSearchTerm = (term) => {
     const q = (term !== undefined ? term : searchQuery).trim();
     if (!q) return;
     setSearchQuery(q);
-    setIsSelectingStore(false);
-    injectSearchInStore(q);
+    if (Platform.OS === "web") {
+      handleOpenSearchWeb(q);
+    } else {
+      setIsSelectingStore(false);
+      injectSearchInStore(q);
+    }
   };
 
-  // Marquer l'article comme ajouté et passer au suivant
   const handleItemAdded = () => {
     if (!currentItem) return;
     onToggleItem(currentItem.id);
@@ -482,13 +438,14 @@ export default function DriveCartModal({
         const query = getCleanItemName(nextItem);
         if (query) {
           setSearchQuery(query);
-          injectSearchInStore(query);
+          if (Platform.OS !== "web") {
+            injectSearchInStore(query);
+          }
         }
       }
     }
   };
 
-  // Passer à l'article suivant sans cocher
   const handleSkipItem = () => {
     if (currentIndex < groceries.length - 1) {
       const nextIndex = currentIndex + 1;
@@ -498,13 +455,14 @@ export default function DriveCartModal({
         const query = getCleanItemName(nextItem);
         if (query) {
           setSearchQuery(query);
-          injectSearchInStore(query);
+          if (Platform.OS !== "web") {
+            injectSearchInStore(query);
+          }
         }
       }
     }
   };
 
-  // Revenir à l'article précédent
   const handlePrevItem = () => {
     if (currentIndex > 0) {
       const prevIndex = currentIndex - 1;
@@ -514,7 +472,9 @@ export default function DriveCartModal({
         const query = getCleanItemName(prevItem);
         if (query) {
           setSearchQuery(query);
-          injectSearchInStore(query);
+          if (Platform.OS !== "web") {
+            injectSearchInStore(query);
+          }
         }
       }
     }
@@ -524,32 +484,380 @@ export default function DriveCartModal({
     ? Math.round(((groceries.filter(g => g.checked).length) / groceries.length) * 100)
     : 0;
 
-  const webViewBridgeScript = `
-    (function() {
-      if (window.__planeat_bridge_ready) return;
-      window.__planeat_bridge_ready = true;
-      function send(type, text) {
-        try {
-          if (window.ReactNativeWebView) {
-            window.ReactNativeWebView.postMessage(JSON.stringify({ type: type, text: String(text) }));
-          }
-        } catch(e) {}
-      }
-      var origLog = console.log;
-      console.log = function() {
-        origLog.apply(console, arguments);
-        send("log", Array.prototype.slice.call(arguments).join(" "));
-      };
-      var origError = console.error;
-      console.error = function() {
-        origError.apply(console, arguments);
-        send("error", Array.prototype.slice.call(arguments).join(" "));
-      };
-      send("log", "🌐 Page prête: " + window.location.href);
-    })();
-    true;
-  `;
+  // ==========================================
+  // RENDER WEB (Optimisé Ordinateur & Navigateur)
+  // ==========================================
+  if (Platform.OS === "web") {
+    return (
+      <Modal
+        visible={visible}
+        animationType="fade"
+        transparent={false}
+        onRequestClose={onClose}
+      >
+        <View style={[styles.webSafeWrapper, { backgroundColor: theme.bg }]}>
+          <View style={styles.webContentContainer}>
+            {/* Header Web */}
+            <View style={[styles.webHeader, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+              <View style={styles.webHeaderLeft}>
+                <Text style={styles.webHeaderEmoji}>{selectedStore.logoEmoji}</Text>
+                <View>
+                  <Text style={[styles.webHeaderTitle, { color: theme.text }]}>
+                    Assistant Drive • {selectedStore.name}
+                  </Text>
+                  <Text style={[styles.webHeaderSub, { color: theme.textSub }]}>
+                    {groceries.filter(g => g.checked).length} / {groceries.length} articles complétés ({progressPercent}%)
+                  </Text>
+                </View>
+              </View>
 
+              <View style={styles.webHeaderRight}>
+                <TouchableOpacity
+                  style={[styles.webActionPillBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}
+                  onPress={handleCopyAllGroceries}
+                >
+                  <Ionicons name="copy-outline" size={15} color="#38bdf8" />
+                  <Text style={[styles.webActionPillText, { color: theme.text }]}>Copier toute la liste</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.webCloseBtn}
+                  onPress={onClose}
+                >
+                  <Ionicons name="close" size={20} color="#ffffff" />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Notification flottante Copié */}
+            {copyFeedback ? (
+              <View style={styles.webToastAlert}>
+                <Ionicons name="checkmark-circle" size={16} color="#10b981" />
+                <Text style={styles.webToastAlertText}>{copyFeedback}</Text>
+              </View>
+            ) : null}
+
+            <ScrollView contentContainerStyle={styles.webScrollBody} showsVerticalScrollIndicator={false}>
+              {/* Store Switcher */}
+              <View style={[styles.webStorePickerCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+                <Text style={[styles.webSectionLabel, { color: theme.textSub }]}>CHOIX DU MAGASIN DRIVE</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.storeChipsScroll}>
+                  {DRIVE_STORES.map((store) => {
+                    const isSelected = selectedStore.id === store.id;
+                    return (
+                      <TouchableOpacity
+                        key={store.id}
+                        style={[
+                          styles.storeChip,
+                          { backgroundColor: theme.cardBgAlt, borderColor: theme.border },
+                          isSelected && { backgroundColor: store.color, borderColor: "#ffffff" }
+                        ]}
+                        onPress={() => handleSelectStore(store)}
+                      >
+                        <Text style={styles.storeChipEmoji}>{store.logoEmoji}</Text>
+                        <Text
+                          style={[
+                            styles.storeChipText,
+                            { color: theme.textSub },
+                            isSelected && styles.storeChipTextActive
+                          ]}
+                        >
+                          {store.name}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+
+                {/* Configuration Magasin Leclerc Local */}
+                {selectedStore.id === "leclerc" && (
+                  <View style={[styles.webStoreConfigBox, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}>
+                    <View style={styles.webStoreConfigHeader}>
+                      <View style={{ flex: 1 }}>
+                        <Text style={[styles.webStoreConfigTitle, { color: theme.text }]}>
+                          🏪 Votre magasin Leclerc Drive :
+                        </Text>
+                        <Text style={[styles.webStoreConfigSub, { color: customStoreUrl ? "#10b981" : "#94a3b8" }]} numberOfLines={1}>
+                          {customStoreUrl ? customStoreUrl : "Non configuré (Recherche globale E.Leclerc)"}
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        style={[styles.webEditStoreBtn, { backgroundColor: theme.cardBg }]}
+                        onPress={() => setIsEditingStoreUrl(!isEditingStoreUrl)}
+                      >
+                        <Ionicons name={isEditingStoreUrl ? "close" : "create-outline"} size={14} color="#38bdf8" />
+                        <Text style={styles.webEditStoreBtnText}>
+                          {isEditingStoreUrl ? "Fermer" : (customStoreUrl ? "Modifier" : "Configurer")}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    {isEditingStoreUrl && (
+                      <View style={styles.webStoreInputContainer}>
+                        <Text style={[styles.webStoreInputHelp, { color: theme.textSub }]}>
+                          Ouvrez votre Leclerc Drive habituel dans votre navigateur, copiez son adresse web (ex: https://www.leclercdrive.fr/magasin-XXXXX-nom/) et collez-la ici :
+                        </Text>
+                        <View style={styles.webStoreInputRow}>
+                          <TextInput
+                            style={[styles.webStoreTextInput, { backgroundColor: theme.cardBg, color: theme.text, borderColor: theme.border }]}
+                            placeholder="https://www.leclercdrive.fr/magasin-087201-bois-d-arcy/"
+                            placeholderTextColor="#64748b"
+                            value={storeUrlInput}
+                            onChangeText={setStoreUrlInput}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                          />
+                          <TouchableOpacity
+                            style={styles.webStoreSaveBtn}
+                            onPress={handleSaveStoreUrl}
+                          >
+                            <Ionicons name="checkmark" size={16} color="#ffffff" />
+                            <Text style={styles.webStoreSaveBtnText}>Enregistrer</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    )}
+                  </View>
+                )}
+              </View>
+
+              {/* Progress Bar */}
+              <View style={[styles.webProgressCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+                <View style={styles.dockProgressRow}>
+                  <Text style={[styles.dockProgressLabel, { color: theme.text }]}>
+                    🛒 Progression : {groceries.filter(g => g.checked).length} / {groceries.length} articles
+                  </Text>
+                  <Text style={[styles.dockProgressLabel, { color: "#10b981" }]}>
+                    {progressPercent}%
+                  </Text>
+                </View>
+                <View style={[styles.progressBarTrack, { backgroundColor: theme.cardBgAlt }]}>
+                  <View style={[styles.progressBarFill, { width: `${progressPercent}%` }]} />
+                </View>
+              </View>
+
+              {/* Current Item Shopping Card */}
+              {currentItem ? (
+                <View style={[styles.webMainCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+                  <View style={styles.itemBadgeRow}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <Text style={styles.itemIndexBadge}>
+                        Article {currentIndex + 1} / {groceries.length}
+                      </Text>
+                      {currentItem.dept ? (
+                        <Text style={[styles.itemDeptBadge, { backgroundColor: theme.cardBgAlt, color: theme.textSub }]}>
+                          {t[currentItem.dept] || currentItem.dept}
+                        </Text>
+                      ) : null}
+                    </View>
+
+                    <TouchableOpacity
+                      style={[
+                        styles.quickCopyChip,
+                        { backgroundColor: isCopied ? "#10b981" : theme.cardBgAlt, borderColor: isCopied ? "#10b981" : theme.border }
+                      ]}
+                      onPress={() => copyToClipboard(searchQuery || getCleanItemName(currentItem))}
+                    >
+                      <Ionicons name={isCopied ? "checkmark" : "copy-outline"} size={13} color={isCopied ? "#ffffff" : "#38bdf8"} />
+                      <Text style={[styles.quickCopyChipText, { color: isCopied ? "#ffffff" : theme.textSub }]}>
+                        {isCopied ? "Copié !" : "Copier le mot-clé"}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  <Text style={[styles.webItemTitle, { color: theme.text }]}>
+                    {currentItem.name?.[lang] || currentItem.name?.fr || currentItem.customName}
+                  </Text>
+
+                  {currentItem.totalQuantity ? (
+                    <Text style={styles.currentItemQuantity}>
+                      Quantité recette : {currentItem.totalQuantity} {currentItem.unit}
+                    </Text>
+                  ) : null}
+
+                  {/* Search Query Input */}
+                  <View style={styles.webSearchInputWrapper}>
+                    <Text style={[styles.webSearchInputLabel, { color: theme.textSub }]}>Mot-clé recherché :</Text>
+                    <View style={[styles.webSearchInputRow, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}>
+                      <Ionicons name="search" size={16} color="#94a3b8" />
+                      <TextInput
+                        style={[styles.webSearchInput, { color: theme.text }]}
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                        placeholder="Mot-clé de recherche"
+                        placeholderTextColor="#64748b"
+                      />
+                    </View>
+                  </View>
+
+                  {/* Suggestions Chips */}
+                  {suggestions.length > 0 && (
+                    <View style={styles.suggestionsContainer}>
+                      <Text style={[styles.suggestionsLabel, { color: theme.textSub }]}>Suggestions :</Text>
+                      <View style={styles.webSuggestionsWrap}>
+                        {suggestions.map((sug, idx) => {
+                          const isActive = searchQuery.toLowerCase() === sug.toLowerCase();
+                          return (
+                            <TouchableOpacity
+                              key={idx}
+                              style={[
+                                styles.sugChip,
+                                { backgroundColor: theme.cardBgAlt, borderColor: theme.border },
+                                isActive && styles.sugChipActive
+                              ]}
+                              onPress={() => handleSearchTerm(sug)}
+                            >
+                              <Ionicons name="sparkles" size={12} color={isActive ? "#ffffff" : "#38bdf8"} />
+                              <Text style={[styles.sugChipText, { color: theme.textSub }, isActive && styles.sugChipTextActive]}>
+                                {sug}
+                              </Text>
+                            </TouchableOpacity>
+                          );
+                        })}
+                      </View>
+                    </View>
+                  )}
+
+                  {/* Action Buttons Row */}
+                  <View style={styles.webActionButtonsGrid}>
+                    <TouchableOpacity
+                      style={[styles.webDirectSearchBtn, { backgroundColor: selectedStore.color }]}
+                      onPress={() => handleOpenSearchWeb(searchQuery)}
+                    >
+                      <Ionicons name="open-outline" size={18} color="#ffffff" />
+                      <Text style={styles.webDirectSearchBtnText}>
+                        Chercher sur {selectedStore.shortName} ↗
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={styles.webCopyNextBtn}
+                      onPress={handleCopyAndNext}
+                    >
+                      <Ionicons name="copy" size={17} color="#ffffff" />
+                      <Text style={styles.webCopyNextBtnText}>
+                        Copier & Suivant ➔
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* Nav Previous / Next & Checked Toggle */}
+                  <View style={styles.webNavFooterRow}>
+                    <TouchableOpacity
+                      style={[styles.webNavBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }, currentIndex === 0 && styles.btnDisabled]}
+                      onPress={handlePrevItem}
+                      disabled={currentIndex === 0}
+                    >
+                      <Ionicons name="arrow-back" size={15} color={theme.text} />
+                      <Text style={[styles.webNavBtnText, { color: theme.text }]}>Précédent</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[
+                        styles.webToggleAddedBtn,
+                        currentItem.checked ? styles.webToggleAddedBtnChecked : { backgroundColor: theme.cardBgAlt, borderColor: theme.border }
+                      ]}
+                      onPress={handleItemAdded}
+                    >
+                      <Ionicons
+                        name={currentItem.checked ? "checkmark-circle" : "ellipse-outline"}
+                        size={17}
+                        color={currentItem.checked ? "#ffffff" : "#10b981"}
+                      />
+                      <Text style={[styles.webToggleAddedBtnText, currentItem.checked && { color: "#ffffff" }]}>
+                        {currentItem.checked ? "Ajouté au panier" : "Marquer comme ajouté"}
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[styles.webNavBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }, currentIndex >= groceries.length - 1 && styles.btnDisabled]}
+                      onPress={handleSkipItem}
+                      disabled={currentIndex >= groceries.length - 1}
+                    >
+                      <Text style={[styles.webNavBtnText, { color: theme.text }]}>Suivant</Text>
+                      <Ionicons name="arrow-forward" size={15} color={theme.text} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ) : (
+                <View style={[styles.allDoneBox, { backgroundColor: theme.cardBg, borderColor: theme.border, borderRadius: 16, padding: 24 }]}>
+                  <Text style={styles.allDoneEmoji}>🎉</Text>
+                  <Text style={styles.allDoneText}>Tous vos articles sont ajoutés au panier !</Text>
+                  <TouchableOpacity style={styles.webCloseAllDoneBtn} onPress={onClose}>
+                    <Text style={styles.webCloseAllDoneBtnText}>Terminer les courses</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {/* Grocery List Overview */}
+              <View style={[styles.webListCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+                <View style={styles.webListHeaderRow}>
+                  <Text style={[styles.webSectionLabel, { color: theme.textSub, marginBottom: 0 }]}>
+                    LISTE COMPLÈTE ({groceries.length} ARTICLES)
+                  </Text>
+                  <TouchableOpacity onPress={() => setIsListExpanded(!isListExpanded)}>
+                    <Text style={{ color: "#38bdf8", fontSize: 12, fontWeight: "700" }}>
+                      {isListExpanded ? "Réduire" : "Déplier la liste"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {isListExpanded && (
+                  <View style={styles.webListItemsContainer}>
+                    {groceries.map((item, idx) => {
+                      const itemName = item.name?.[lang] || item.name?.fr || item.customName;
+                      const isCurrent = currentItem?.id === item.id;
+                      return (
+                        <TouchableOpacity
+                          key={item.id}
+                          style={[
+                            styles.drawerItemRow,
+                            item.checked && styles.drawerItemChecked,
+                            isCurrent && styles.drawerItemActive,
+                            { backgroundColor: theme.cardBgAlt, marginBottom: 4 }
+                          ]}
+                          onPress={() => {
+                            setCurrentIndex(idx);
+                            const q = getCleanItemName(item);
+                            if (q) setSearchQuery(q);
+                          }}
+                        >
+                          <Ionicons
+                            name={item.checked ? "checkmark-circle" : "ellipse-outline"}
+                            size={18}
+                            color={item.checked ? "#10b981" : theme.textMuted}
+                          />
+                          <Text
+                            style={[
+                              styles.drawerItemName,
+                              { color: theme.text },
+                              item.checked && [styles.drawerItemNameChecked, { color: theme.textMuted }]
+                            ]}
+                            numberOfLines={1}
+                          >
+                            {itemName}
+                          </Text>
+                          {item.totalQuantity ? (
+                            <Text style={[styles.drawerItemQty, { color: theme.textSub }]}>
+                              {item.totalQuantity} {item.unit}
+                            </Text>
+                          ) : null}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                )}
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
+
+  // ==========================================
+  // RENDER MOBILE (iOS / Android avec WebView)
+  // ==========================================
   return (
     <Modal
       visible={visible}
@@ -558,9 +866,9 @@ export default function DriveCartModal({
       onRequestClose={onClose}
     >
       <View style={[styles.safeContainer, { backgroundColor: theme.bg }]}>
-        {/* Top Header avec sélecteur de Drive et navigation */}
+        {/* Top Header */}
         <View style={[styles.header, { backgroundColor: theme.headerBg, borderBottomColor: theme.border, paddingTop: topInset + 6 }]}>
-          <View style={[styles.headerTopRow, Platform.OS === "web" && styles.webCenteredRow]}>
+          <View style={styles.headerTopRow}>
             <View style={styles.brandTitleBox}>
               <Text style={styles.brandEmoji}>{selectedStore.logoEmoji}</Text>
               <View>
@@ -583,43 +891,39 @@ export default function DriveCartModal({
             </View>
 
             <View style={styles.navControls}>
-              {Platform.OS !== "web" && (
-                <>
-                  <TouchableOpacity
-                    hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
-                    style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }, !canGoBack && styles.btnDisabled]}
-                    disabled={!canGoBack}
-                    onPress={() => webViewRef.current?.goBack()}
-                  >
-                    <Ionicons name="arrow-back" size={17} color={theme.text} />
-                  </TouchableOpacity>
+              <TouchableOpacity
+                hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
+                style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }, !canGoBack && styles.btnDisabled]}
+                disabled={!canGoBack}
+                onPress={() => webViewRef.current?.goBack()}
+              >
+                <Ionicons name="arrow-back" size={17} color={theme.text} />
+              </TouchableOpacity>
 
-                  <TouchableOpacity
-                    hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
-                    style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }, !canGoForward && styles.btnDisabled]}
-                    disabled={!canGoForward}
-                    onPress={() => webViewRef.current?.goForward()}
-                  >
-                    <Ionicons name="arrow-forward" size={17} color={theme.text} />
-                  </TouchableOpacity>
+              <TouchableOpacity
+                hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
+                style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }, !canGoForward && styles.btnDisabled]}
+                disabled={!canGoForward}
+                onPress={() => webViewRef.current?.goForward()}
+              >
+                <Ionicons name="arrow-forward" size={17} color={theme.text} />
+              </TouchableOpacity>
 
-                  <TouchableOpacity
-                    hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
-                    style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }]}
-                    onPress={() => webViewRef.current?.reload()}
-                  >
-                    <Ionicons name="reload" size={15} color={theme.text} />
-                  </TouchableOpacity>
+              <TouchableOpacity
+                hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
+                style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }]}
+                onPress={() => webViewRef.current?.reload()}
+              >
+                <Ionicons name="reload" size={15} color={theme.text} />
+              </TouchableOpacity>
 
-                  <TouchableOpacity
-                    hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
-                    style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }]}
-                    onPress={() => Linking.openURL(currentUrl)}
-                  >
-                    <Ionicons name="open-outline" size={16} color={theme.text} />
-                  </TouchableOpacity>
-                </>
-              )}
+              <TouchableOpacity
+                hitSlop={{ top: 12, bottom: 12, left: 6, right: 6 }}
+                style={[styles.iconNavBtn, { backgroundColor: theme.cardBgAlt }]}
+                onPress={() => Linking.openURL(currentUrl)}
+              >
+                <Ionicons name="open-outline" size={16} color={theme.text} />
+              </TouchableOpacity>
 
               <TouchableOpacity
                 hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
@@ -631,9 +935,9 @@ export default function DriveCartModal({
             </View>
           </View>
 
-          {/* Store Switcher Chips (compact, 1 seule ligne épurée) */}
+          {/* Store Switcher Chips */}
           {isSelectingStore && (
-            <View style={[{ paddingTop: 6, paddingBottom: 4 }, Platform.OS === "web" && styles.webCenteredRow]}>
+            <View style={{ paddingTop: 6, paddingBottom: 4 }}>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -669,211 +973,15 @@ export default function DriveCartModal({
           )}
         </View>
 
-        {/* Center : Sur Web, panneau d'assistance direct ultra-ergonomique */}
-        {Platform.OS === "web" ? (
-          <ScrollView
-            style={[styles.webFallbackContainer, { backgroundColor: theme.bg }]}
-            contentContainerStyle={styles.webFallbackContent}
-          >
-            {/* Top Store Action Card */}
-            <View style={[styles.webFallbackHero, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-              <View style={styles.webStoreHeaderRow}>
-                <Text style={styles.webFallbackEmoji}>{selectedStore.logoEmoji}</Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.webFallbackTitle, { color: theme.text }]}>
-                    {selectedStore.name}
-                  </Text>
-                  <Text style={[styles.webFallbackDesc, { color: theme.textSub }]}>
-                    Ouvrez votre magasin dans un onglet, puis copiez vos articles au fur et à mesure en 1 clic !
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.webTopActionButtonsRow}>
-                <TouchableOpacity
-                  style={[styles.webOpenStoreBtn, { backgroundColor: selectedStore.color }]}
-                  onPress={() => Linking.openURL(selectedStore.homeUrl)}
-                  activeOpacity={0.85}
-                >
-                  <Ionicons name="open-outline" size={18} color="#ffffff" />
-                  <Text style={styles.webOpenStoreBtnText}>
-                    1. Ouvrir {selectedStore.shortName} ➔
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[
-                    styles.webCopyEntireListBtn,
-                    { backgroundColor: isListCopied ? "#10b981" : theme.cardBgAlt, borderColor: theme.border }
-                  ]}
-                  onPress={copyEntireList}
-                  activeOpacity={0.85}
-                >
-                  <Ionicons
-                    name={isListCopied ? "checkmark-circle" : "copy-outline"}
-                    size={18}
-                    color={isListCopied ? "#ffffff" : "#38bdf8"}
-                  />
-                  <Text style={[styles.webCopyEntireListBtnText, { color: isListCopied ? "#ffffff" : theme.text }]}>
-                    {isListCopied ? "Liste copiée !" : "📋 Copier toute la liste"}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Main Interactive Item Card (Hero Workflow) */}
-            {currentItem ? (
-              <View style={[styles.webCurrentItemCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-                <View style={styles.webCurrentItemHeader}>
-                  <View style={styles.collapsedBadge}>
-                    <Text style={styles.collapsedBadgeText}>
-                      Article {currentIndex + 1} sur {groceries.length}
-                    </Text>
-                  </View>
-                  {currentItem.dept ? (
-                    <Text style={[styles.itemDeptBadge, { backgroundColor: theme.cardBgAlt, color: theme.textSub }]}>
-                      {t[currentItem.dept] || currentItem.dept}
-                    </Text>
-                  ) : null}
-                </View>
-
-                <Text style={[styles.webItemTitle, { color: theme.text }]}>
-                  {currentItem.name?.[lang] || currentItem.name?.fr || currentItem.customName}
-                </Text>
-
-                {currentItem.totalQuantity ? (
-                  <Text style={styles.webItemQty}>
-                    Quantité recette : {currentItem.totalQuantity} {currentItem.unit || ""}
-                  </Text>
-                ) : null}
-
-                {/* GIANT PRIMARY ACTION: Copier & Suivant */}
-                <TouchableOpacity
-                  style={styles.webPrimaryCopyNextBtn}
-                  onPress={() => handleCopyAndNext(currentItem)}
-                  activeOpacity={0.85}
-                >
-                  <LinearGradient
-                    colors={["#10b981", "#059669"]}
-                    style={styles.webPrimaryCopyGradient}
-                  >
-                    <Ionicons name={isCopied ? "checkmark" : "copy"} size={20} color="#ffffff" />
-                    <Text style={styles.webPrimaryCopyText}>
-                      {isCopied ? "Copié !" : `Copier "${getCleanItemName(currentItem)}" & Suivant ➔`}
-                    </Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-
-                {/* Secondary Actions */}
-                <View style={styles.webSecondaryActionsRow}>
-                  <TouchableOpacity
-                    style={[styles.skipBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }, currentIndex === 0 && styles.btnDisabled]}
-                    onPress={handlePrevItem}
-                    disabled={currentIndex === 0}
-                  >
-                    <Ionicons name="play-back" size={16} color={theme.textSub} />
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[styles.webGoogleSearchBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}
-                    onPress={() => {
-                      const q = searchQuery || getCleanItemName(currentItem);
-                      const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(selectedStore.name + " " + q)}`;
-                      Linking.openURL(googleUrl);
-                    }}
-                  >
-                    <Ionicons name="search" size={15} color="#38bdf8" />
-                    <Text style={[styles.webGoogleSearchBtnText, { color: theme.text }]}>
-                      Chercher sur Google {selectedStore.shortName} ↗
-                    </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[styles.skipBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }, currentIndex >= groceries.length - 1 && styles.btnDisabled]}
-                    onPress={handleSkipItem}
-                    disabled={currentIndex >= groceries.length - 1}
-                  >
-                    <Ionicons name="play-forward" size={16} color={theme.textSub} />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ) : (
-              <View style={styles.allDoneBox}>
-                <Text style={styles.allDoneEmoji}>🎉</Text>
-                <Text style={styles.allDoneText}>Tous vos articles sont prêts pour le panier !</Text>
-              </View>
-            )}
-
-            {/* Checklist complète interactive */}
-            <View style={[styles.webGroceriesListCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-              <View style={styles.webListHeaderRow}>
-                <Text style={[styles.webGroceriesListTitle, { color: theme.text }]}>
-                  📋 Liste complète ({groceries.filter(g => g.checked).length} / {groceries.length} cochés)
-                </Text>
-              </View>
-
-              <View style={[styles.progressBarTrack, { backgroundColor: theme.cardBgAlt }]}>
-                <View style={[styles.progressBarFill, { width: `${progressPercent}%` }]} />
-              </View>
-
-              {groceries.map((item, idx) => {
-                const itemName = item.name?.[lang] || item.name?.fr || item.customName;
-                const isCurrent = currentItem?.id === item.id;
-                return (
-                  <View
-                    key={item.id || idx}
-                    style={[
-                      styles.webGroceryRow,
-                      { borderBottomColor: theme.border },
-                      isCurrent && { backgroundColor: theme.cardBgAlt, borderRadius: 10 }
-                    ]}
-                  >
-                    <TouchableOpacity
-                      style={styles.webGroceryRowLeft}
-                      onPress={() => {
-                        setCurrentIndex(idx);
-                        if (onToggleItem) onToggleItem(item.id);
-                      }}
-                    >
-                      <Ionicons
-                        name={item.checked ? "checkbox" : "square-outline"}
-                        size={20}
-                        color={item.checked ? "#10b981" : theme.textSub}
-                      />
-                      <Text
-                        style={[
-                          styles.webGroceryRowText,
-                          { color: theme.text },
-                          item.checked && styles.webGroceryRowTextChecked
-                        ]}
-                      >
-                        {itemName} {item.totalQuantity ? `(${item.totalQuantity} ${item.unit || ""})` : ""}
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[styles.quickCopyChip, { backgroundColor: theme.cardBg, borderColor: theme.border }]}
-                      onPress={() => handleCopyAndNext(item)}
-                    >
-                      <Ionicons name="copy-outline" size={12} color="#38bdf8" />
-                      <Text style={[styles.quickCopyChipText, { color: theme.textSub }]}>Copier</Text>
-                    </TouchableOpacity>
-                  </View>
-                );
-              })}
-            </View>
-          </ScrollView>
-        ) : (
-          /* Center : WebView du Drive (Mobile uniquement) */
-          <View style={styles.webContainer}>
+        {/* Center : WebView du Drive */}
+        <View style={styles.webContainer}>
+          {WebView ? (
             <WebView
               ref={webViewRef}
               source={{ uri: currentUrl }}
               onNavigationStateChange={handleNavigationStateChange}
               onLoadStart={() => setIsLoadingWeb(true)}
               onLoadEnd={() => setIsLoadingWeb(false)}
-              onMessage={handleWebViewMessage}
-              injectedJavaScript={webViewBridgeScript}
               originWhitelist={["*"]}
               setSupportMultipleWindows={false}
               sharedCookiesEnabled={true}
@@ -882,41 +990,39 @@ export default function DriveCartModal({
               javaScriptEnabled={true}
               style={styles.webView}
             />
+          ) : null}
 
-            {isLoadingWeb && (
-              <View style={styles.loadingOverlay}>
-                <ActivityIndicator size="large" color="#10b981" />
-                <Text style={styles.loadingText}>Chargement du Drive...</Text>
-              </View>
-            )}
+          {isLoadingWeb && (
+            <View style={styles.loadingOverlay}>
+              <ActivityIndicator size="large" color="#10b981" />
+              <Text style={styles.loadingText}>Chargement du Drive...</Text>
+            </View>
+          )}
 
-            {/* Bouton flottant discret pour commencer les courses */}
-            {isSelectingStore && (
-              <View style={[styles.floatingStartBar, { bottom: bottomInset + 10 }]}>
-                <TouchableOpacity
-                  style={styles.floatingStartBtn}
-                  onPress={handleStartShopping}
-                  activeOpacity={0.85}
+          {isSelectingStore && (
+            <View style={[styles.floatingStartBar, { bottom: bottomInset + 10 }]}>
+              <TouchableOpacity
+                style={styles.floatingStartBtn}
+                onPress={handleStartShopping}
+                activeOpacity={0.85}
+              >
+                <LinearGradient
+                  colors={["#10b981", "#059669"]}
+                  style={styles.floatingStartGradient}
                 >
-                  <LinearGradient
-                    colors={["#10b981", "#059669"]}
-                    style={styles.floatingStartGradient}
-                  >
-                    <Ionicons name="checkmark-circle" size={18} color="#ffffff" />
-                    <Text style={styles.floatingStartBtnText}>
-                      J'ai choisi mon magasin ➔ Commencer
-                    </Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
-        )}
+                  <Ionicons name="checkmark-circle" size={18} color="#ffffff" />
+                  <Text style={styles.floatingStartBtnText}>
+                    J'ai choisi mon magasin ➔ Commencer
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
 
-        {/* Bottom Assistant Dock (affiché UNIQUEMENT pendant les courses sur Mobile) */}
-        {!isSelectingStore && Platform.OS !== "web" && (
+        {/* Bottom Assistant Dock */}
+        {!isSelectingStore && (
           isAssistantCollapsed ? (
-            /* Mode Réduit : mini-barre flottante élégante */
             <View style={[styles.collapsedDock, { backgroundColor: theme.cardBg, borderTopColor: theme.border, paddingBottom: bottomInset + 8 }]}>
               <TouchableOpacity
                 style={styles.collapsedLeftTouch}
@@ -946,9 +1052,7 @@ export default function DriveCartModal({
               </View>
             </View>
           ) : (
-            /* Mode Déplié : Carte complète avec suggestions, recherche et actions */
             <View style={[styles.bottomDock, { backgroundColor: theme.cardBg, borderTopColor: theme.border, paddingBottom: bottomInset + 8 }]}>
-              {/* Progress Bar Header */}
               <View style={styles.dockProgressRow}>
                 <View style={styles.dockProgressLeft}>
                   <Text style={[styles.dockProgressLabel, { color: theme.text }]}>
@@ -980,12 +1084,10 @@ export default function DriveCartModal({
                 </View>
               </View>
 
-              {/* Progress Bar Fill */}
               <View style={[styles.progressBarTrack, { backgroundColor: theme.cardBgAlt }]}>
                 <View style={[styles.progressBarFill, { width: `${progressPercent}%` }]} />
               </View>
 
-              {/* Drawer Liste Déroulante Complète */}
               {isListExpanded && (
                 <ScrollView style={[styles.expandedListScroll, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]} showsVerticalScrollIndicator={true}>
                   {groceries.map((item, idx) => {
@@ -1035,7 +1137,6 @@ export default function DriveCartModal({
                 </ScrollView>
               )}
 
-              {/* Current Ingredient Card & Controls */}
               {currentItem ? (
                 <View style={[styles.currentCard, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}>
                   <View style={styles.currentItemInfo}>
@@ -1076,7 +1177,6 @@ export default function DriveCartModal({
                     ) : null}
                   </View>
 
-                  {/* Suggestions de mots-clés rapides (ex: Lait d'amande vs demi-écrémé) */}
                   {suggestions.length > 0 && (
                     <View style={styles.suggestionsContainer}>
                       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionsScroll}>
@@ -1103,7 +1203,6 @@ export default function DriveCartModal({
                     </View>
                   )}
 
-                  {/* Action Buttons Row */}
                   <View style={styles.actionButtonsRow}>
                     <TouchableOpacity
                       style={[styles.skipBtn, { backgroundColor: theme.cardBg, borderColor: theme.border }, currentIndex === 0 && styles.btnDisabled]}
@@ -1148,6 +1247,318 @@ const styles = StyleSheet.create({
   safeContainer: {
     flex: 1,
     backgroundColor: "#0f172a"
+  },
+  webSafeWrapper: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    backgroundColor: "#0f172a"
+  },
+  webContentContainer: {
+    width: "100%",
+    maxWidth: 780,
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 24
+  },
+  webHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    marginBottom: 14
+  },
+  webHeaderLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12
+  },
+  webHeaderEmoji: {
+    fontSize: 26
+  },
+  webHeaderTitle: {
+    fontSize: 16,
+    fontWeight: "800"
+  },
+  webHeaderSub: {
+    fontSize: 12,
+    marginTop: 2
+  },
+  webHeaderRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10
+  },
+  webActionPillBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
+    borderWidth: 1,
+    gap: 6
+  },
+  webActionPillText: {
+    fontSize: 12,
+    fontWeight: "700"
+  },
+  webCloseBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#ef4444",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  webToastAlert: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(16, 185, 129, 0.15)",
+    borderColor: "#10b981",
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 10,
+    marginBottom: 12,
+    gap: 8
+  },
+  webToastAlertText: {
+    color: "#10b981",
+    fontSize: 13,
+    fontWeight: "700"
+  },
+  webScrollBody: {
+    gap: 14,
+    paddingBottom: 30
+  },
+  webStorePickerCard: {
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    gap: 10
+  },
+  webSectionLabel: {
+    fontSize: 11,
+    fontWeight: "800",
+    letterSpacing: 0.8
+  },
+  webStoreConfigBox: {
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginTop: 4,
+    gap: 8
+  },
+  webStoreConfigHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10
+  },
+  webStoreConfigTitle: {
+    fontSize: 13,
+    fontWeight: "700"
+  },
+  webStoreConfigSub: {
+    fontSize: 11,
+    marginTop: 2
+  },
+  webEditStoreBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    gap: 4
+  },
+  webEditStoreBtnText: {
+    color: "#38bdf8",
+    fontSize: 11,
+    fontWeight: "700"
+  },
+  webStoreInputContainer: {
+    marginTop: 6,
+    gap: 6
+  },
+  webStoreInputHelp: {
+    fontSize: 11,
+    lineHeight: 15
+  },
+  webStoreInputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8
+  },
+  webStoreTextInput: {
+    flex: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    fontSize: 12
+  },
+  webStoreSaveBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#10b981",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    gap: 4
+  },
+  webStoreSaveBtnText: {
+    color: "#ffffff",
+    fontSize: 12,
+    fontWeight: "700"
+  },
+  webProgressCard: {
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    gap: 8
+  },
+  webMainCard: {
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    gap: 12
+  },
+  webItemTitle: {
+    fontSize: 20,
+    fontWeight: "800"
+  },
+  webSearchInputWrapper: {
+    gap: 4
+  },
+  webSearchInputLabel: {
+    fontSize: 11,
+    fontWeight: "700"
+  },
+  webSearchInputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    gap: 8
+  },
+  webSearchInput: {
+    flex: 1,
+    fontSize: 13,
+    padding: 0
+  },
+  webSuggestionsWrap: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    marginTop: 4
+  },
+  webActionButtonsGrid: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginTop: 6
+  },
+  webDirectSearchBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    gap: 8
+  },
+  webDirectSearchBtnText: {
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: "800"
+  },
+  webCopyNextBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#0284c7",
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    gap: 8
+  },
+  webCopyNextBtnText: {
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: "800"
+  },
+  webNavFooterRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255,255,255,0.08)",
+    gap: 8
+  },
+  webNavBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    gap: 6
+  },
+  webNavBtnText: {
+    fontSize: 12,
+    fontWeight: "700"
+  },
+  webToggleAddedBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    gap: 6
+  },
+  webToggleAddedBtnChecked: {
+    backgroundColor: "#10b981",
+    borderColor: "#10b981"
+  },
+  webToggleAddedBtnText: {
+    color: "#10b981",
+    fontSize: 12,
+    fontWeight: "800"
+  },
+  webCloseAllDoneBtn: {
+    backgroundColor: "#10b981",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 12,
+    marginTop: 8
+  },
+  webCloseAllDoneBtnText: {
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: "800"
+  },
+  webListCard: {
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    gap: 8
+  },
+  webListHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between"
+  },
+  webListItemsContainer: {
+    marginTop: 6
   },
   header: {
     backgroundColor: "#1e293b",
@@ -1221,7 +1632,7 @@ const styles = StyleSheet.create({
     marginLeft: 4
   },
   storeChipsScroll: {
-    paddingHorizontal: 14,
+    paddingHorizontal: 4,
     gap: 8
   },
   storeChip: {
@@ -1245,117 +1656,6 @@ const styles = StyleSheet.create({
   },
   storeChipTextActive: {
     color: "#ffffff"
-  },
-  stepOneContainer: {
-    paddingTop: 2,
-    gap: 8
-  },
-  stepperRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 14,
-    gap: 10,
-    marginBottom: 2
-  },
-  stepperStepActive: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6
-  },
-  stepperNumCircleActive: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: "#38bdf8",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  stepperNumActive: {
-    color: "#0f172a",
-    fontSize: 11,
-    fontWeight: "900"
-  },
-  stepperTextActive: {
-    color: "#38bdf8",
-    fontSize: 12,
-    fontWeight: "800"
-  },
-  stepperStepInactive: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    opacity: 0.5
-  },
-  stepperNumCircleInactive: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: "#64748b",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  stepperNumInactive: {
-    color: "#ffffff",
-    fontSize: 11,
-    fontWeight: "700"
-  },
-  stepperTextInactive: {
-    color: "#94a3b8",
-    fontSize: 12,
-    fontWeight: "600"
-  },
-  stepOneCard: {
-    marginHorizontal: 14,
-    padding: 10,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    gap: 6
-  },
-  stepOneHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8
-  },
-  stepOneBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(56, 189, 248, 0.15)",
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
-    gap: 3
-  },
-  stepOneBadgeText: {
-    color: "#38bdf8",
-    fontSize: 10,
-    fontWeight: "900",
-    letterSpacing: 0.5
-  },
-  stepOneTitle: {
-    flex: 1,
-    fontSize: 13,
-    fontWeight: "800"
-  },
-  stepOneSubtitle: {
-    fontSize: 11,
-    lineHeight: 15
-  },
-  stepOneActionBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#10b981",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    gap: 6,
-    marginTop: 2
-  },
-  stepOneActionBtnText: {
-    color: "#ffffff",
-    fontSize: 12,
-    fontWeight: "800"
   },
   webContainer: {
     flex: 1,
@@ -1506,20 +1806,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8
   },
-  switchStoreSmallBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    borderWidth: 1,
-    gap: 4
-  },
-  switchStoreSmallText: {
-    color: "#38bdf8",
-    fontSize: 11,
-    fontWeight: "700"
-  },
   toggleListBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -1581,44 +1867,6 @@ const styles = StyleSheet.create({
   drawerItemQty: {
     color: "#94a3b8",
     fontSize: 11
-  },
-  onboardingBanner: {
-    padding: 12,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    marginBottom: 10,
-    gap: 10
-  },
-  onboardingTextRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10
-  },
-  onboardingEmoji: {
-    fontSize: 24
-  },
-  onboardingTitle: {
-    fontSize: 14,
-    fontWeight: "800",
-    marginBottom: 2
-  },
-  onboardingSub: {
-    fontSize: 12,
-    lineHeight: 16
-  },
-  onboardingStartBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#0284c7",
-    paddingVertical: 10,
-    borderRadius: 10,
-    gap: 8
-  },
-  onboardingStartBtnText: {
-    color: "#ffffff",
-    fontSize: 13,
-    fontWeight: "800"
   },
   currentCard: {
     backgroundColor: "#1e293b",
@@ -1710,51 +1958,6 @@ const styles = StyleSheet.create({
   sugChipTextActive: {
     color: "#ffffff"
   },
-  searchBarRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#0f172a",
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#334155",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    marginBottom: 10,
-    gap: 6
-  },
-  searchBarIcon: {
-    marginLeft: 2
-  },
-  searchBarInput: {
-    flex: 1,
-    fontSize: 13,
-    paddingVertical: 4,
-    color: "#f8fafc"
-  },
-  searchActionBtn: {
-    backgroundColor: "#0284c7",
-    width: 28,
-    height: 28,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  copyActionBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(56, 189, 248, 0.12)",
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: 8,
-    gap: 4
-  },
-  copyActionBtnSuccess: {
-    backgroundColor: "rgba(16, 185, 129, 0.15)"
-  },
-  copyActionText: {
-    fontSize: 11,
-    fontWeight: "700"
-  },
   actionButtonsRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -1797,181 +2000,5 @@ const styles = StyleSheet.create({
     color: "#10b981",
     fontSize: 15,
     fontWeight: "800"
-  },
-  webCenteredRow: {
-    maxWidth: 860,
-    width: "100%",
-    alignSelf: "center"
-  },
-  webFallbackContainer: {
-    flex: 1
-  },
-  webFallbackContent: {
-    padding: 24,
-    maxWidth: 860,
-    width: "100%",
-    alignSelf: "center",
-    gap: 18
-  },
-  webFallbackHero: {
-    borderRadius: 20,
-    padding: 22,
-    borderWidth: 1.5,
-    gap: 16
-  },
-  webStoreHeaderRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14
-  },
-  webFallbackEmoji: {
-    fontSize: 38
-  },
-  webFallbackTitle: {
-    fontSize: 22,
-    fontWeight: "800",
-    marginBottom: 4
-  },
-  webFallbackDesc: {
-    fontSize: 13,
-    lineHeight: 18
-  },
-  webTopActionButtonsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    flexWrap: "wrap"
-  },
-  webOpenStoreBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 22,
-    borderRadius: 12,
-    gap: 8
-  },
-  webOpenStoreBtnText: {
-    color: "#ffffff",
-    fontSize: 14,
-    fontWeight: "800"
-  },
-  webCopyEntireListBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    borderWidth: 1,
-    gap: 8
-  },
-  webCopyEntireListBtnText: {
-    fontSize: 14,
-    fontWeight: "700"
-  },
-  webCurrentItemCard: {
-    borderRadius: 20,
-    padding: 24,
-    borderWidth: 1.5,
-    gap: 14
-  },
-  webCurrentItemHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center"
-  },
-  webItemTitle: {
-    fontSize: 26,
-    fontWeight: "900",
-    letterSpacing: -0.4
-  },
-  webItemQty: {
-    color: "#10b981",
-    fontSize: 16,
-    fontWeight: "700"
-  },
-  webPrimaryCopyNextBtn: {
-    borderRadius: 14,
-    overflow: "hidden",
-    marginTop: 6,
-    shadowColor: "#10b981",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 10,
-    elevation: 5
-  },
-  webPrimaryCopyGradient: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    gap: 10
-  },
-  webPrimaryCopyText: {
-    color: "#ffffff",
-    fontSize: 16,
-    fontWeight: "900",
-    textAlign: "center"
-  },
-  webSecondaryActionsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    marginTop: 4
-  },
-  webGoogleSearchBtn: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 11,
-    paddingHorizontal: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    gap: 6
-  },
-  webGoogleSearchBtnText: {
-    fontSize: 13,
-    fontWeight: "700"
-  },
-  webGroceriesListCard: {
-    borderRadius: 20,
-    padding: 22,
-    borderWidth: 1.5,
-    gap: 14
-  },
-  webListHeaderRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center"
-  },
-  webGroceriesListTitle: {
-    fontSize: 17,
-    fontWeight: "800"
-  },
-  webGroceryRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 11,
-    paddingHorizontal: 12,
-    borderBottomWidth: 1,
-    gap: 10
-  },
-  webGroceryRowLeft: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12
-  },
-  webGroceryRowText: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: "600"
-  },
-  webGroceryRowTextChecked: {
-    textDecorationLine: "line-through",
-    opacity: 0.45
   }
 });
-

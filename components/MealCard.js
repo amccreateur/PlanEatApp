@@ -37,7 +37,7 @@ export default function MealCard({
       <View style={[styles.cardHeader, isRTL && styles.rtlRow]}>
         <View style={[styles.typeBadge, { backgroundColor: meta.color + "20" }]}>
           <Ionicons name={meta.icon} size={14} color={meta.color} />
-          <Text style={[styles.typeLabel, { color: meta.color }]}>{meta.label}</Text>
+          <Text style={[styles.typeLabel, { color: meta.color }]} maxFontSizeMultiplier={1.2}>{meta.label}</Text>
         </View>
 
         <TouchableOpacity
@@ -46,7 +46,7 @@ export default function MealCard({
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
           <Ionicons name="shuffle" size={16} color={currentTheme.textSub} />
-          <Text style={[styles.swapText, { color: currentTheme.textSub }]}>
+          <Text style={[styles.swapText, { color: currentTheme.textSub }]} maxFontSizeMultiplier={1.2}>
             {t.swapMeal.split(" ")[0]}
           </Text>
         </TouchableOpacity>
@@ -59,23 +59,27 @@ export default function MealCard({
       >
         <Text style={styles.emoji}>{meal.emoji || "🍽️"}</Text>
         <View style={styles.info}>
-          <Text style={[
-            styles.title,
-            { color: currentTheme.text },
-            isRTL && styles.rtlText
-          ]}>
+          <Text
+            style={[
+              styles.title,
+              { color: currentTheme.text },
+              isRTL && styles.rtlText
+            ]}
+            maxFontSizeMultiplier={1.2}
+            numberOfLines={2}
+          >
             {title}
           </Text>
           <View style={[styles.metaRow, isRTL && styles.rtlRow]}>
-            <Text style={[styles.metaText, { color: currentTheme.textSub }]}>
+            <Text style={[styles.metaText, { color: currentTheme.textSub }]} maxFontSizeMultiplier={1.2}>
               ⏱️ {meal.prepTime + meal.cookTime} {t.minutes}
             </Text>
             <Text style={[styles.metaDot, { color: currentTheme.textMuted }]}>•</Text>
-            <Text style={[styles.metaText, { color: currentTheme.textSub }]}>
+            <Text style={[styles.metaText, { color: currentTheme.textSub }]} maxFontSizeMultiplier={1.2}>
               🔥 {meal.caloriesPerPerson || 380} kcal
             </Text>
             <Text style={[styles.metaDot, { color: currentTheme.textMuted }]}>•</Text>
-            <Text style={[styles.metaText, { color: currentTheme.textSub }]}>
+            <Text style={[styles.metaText, { color: currentTheme.textSub }]} maxFontSizeMultiplier={1.2}>
               👥 {servings} {t.servingsShort}
             </Text>
           </View>
@@ -148,6 +152,7 @@ const styles = StyleSheet.create({
   metaRow: {
     flexDirection: "row",
     alignItems: "center",
+    flexWrap: "wrap",
     gap: 6
   },
   metaText: {

@@ -30,15 +30,19 @@ export default function GroceryItemRow({ item, onToggle, lang = "fr", theme = "d
           item.checked && styles.checkedText,
           isRTL && styles.rtlText
         ]}
+        maxFontSizeMultiplier={1.2}
       >
         {name}
       </Text>
       {item.totalQuantity ? (
-        <Text style={[
-          styles.qty,
-          { color: currentTheme.isDark ? "#38bdf8" : "#0284c7" },
-          item.checked && styles.checkedQty
-        ]}>
+        <Text
+          style={[
+            styles.qty,
+            { color: currentTheme.isDark ? "#38bdf8" : "#0284c7" },
+            item.checked && styles.checkedQty
+          ]}
+          maxFontSizeMultiplier={1.2}
+        >
           {item.totalQuantity} {item.unit}
         </Text>
       ) : null}

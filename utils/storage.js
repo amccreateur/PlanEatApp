@@ -38,6 +38,8 @@ export const DEFAULT_PROFILE = {
   children: 2,
   childrenAges: [4, 8],
   mealTypes: ["breakfast", "lunch", "snack", "dinner"],
+  breakfastFlavor: "both", // 'both' | 'sweet' | 'savory'
+  snackFlavor: "both", // 'both' | 'sweet' | 'savory'
   diets: [],
   cuisines: DEFAULT_CUISINES,
   appliances: DEFAULT_APPLIANCES,

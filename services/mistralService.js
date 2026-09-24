@@ -170,6 +170,21 @@ export class MistralService {
       : ["breakfast", "lunch", "snack", "dinner"];
     const mealTypesNames = activeMealTypes.join(", ");
 
+    const breakfastFlavor = profile?.breakfastFlavor || "both";
+    const snackFlavor = profile?.snackFlavor || "both";
+    const flavorRules = [];
+    if (activeMealTypes.includes("breakfast")) {
+      if (breakfastFlavor === "sweet") flavorRules.push("- PETIT-DÉJEUNER : Impérativement 100% SUCRÉ (pancakes, fruits, porridge, granola, tartines miel/confiture, muesli, yaourts...).");
+      else if (breakfastFlavor === "savory") flavorRules.push("- PETIT-DÉJEUNER : Impérativement 100% SALÉ (œufs brouillés/pochés, toast avocat, omelettes herbes/fromage, saumon/truite, fromage frais...).");
+      else flavorRules.push("- PETIT-DÉJEUNER : Mixte et varié (alterner jours sucrés et jours salés selon les jours).");
+    }
+    if (activeMealTypes.includes("snack")) {
+      if (snackFlavor === "sweet") flavorRules.push("- GOÛTER / COLLATION : Impérativement 100% SUCRÉ (fruits frais, compotes, muffins légers, oléagineux, yaourts coulis...).");
+      else if (snackFlavor === "savory") flavorRules.push("- GOÛTER / COLLATION : Impérativement 100% SALÉ (bâtonnets légumes & tzatziki/houmous, mini wrap, crackers fromage...).");
+      else flavorRules.push("- GOÛTER / COLLATION : Mixte et varié (alterner sucré et salé).");
+    }
+    const flavorRulesText = flavorRules.length > 0 ? `\nPréférences de Saveurs :\n${flavorRules.join("\n")}` : "";
+
     // Découpage en blocs de 3 à 4 jours max pour éviter la troncature de token
     const chunkSize = 3;
     const chunks = [];
@@ -194,22 +209,23 @@ Génère un menu gourmand, équilibré et SANS AUCUNE RÉPÉTITION pour ${count}
 ${chunkTheme}
 Régimes & Objectifs Santé : ${diets}.
 Préférences Gastronomiques & Curseurs Culinaires :
-${cuisinesText}${appliancesText}
+${cuisinesText}${appliancesText}${flavorRulesText}
 Aliments à exclure impérativement : ${dislikes}.
 Langue principale : ${lang}.
 
 RÈGLES D'OR DE VARIÉTÉ ET DE QUALITÉ (STRICTES) :
 1. AUCUNE RÉPÉTITION : Chaque jour et chaque repas demandé doit être 100% UNIQUE et ORIGINAL.
 2. REPAS DEMANDÉS : Génère uniquement des recettes pour les types de repas suivants : ${mealTypesNames}. Les autres types de repas non demandés doivent être omis ou définis à null.
-3. DIVERSITÉ DES PROTÉINES & FÉCULENTS : Varie impérativement chaque jour :
+3. SAVEURS RESPECTÉES : Respecte scrupuleusement les choix Sucré / Salé / Mixte demandés pour le petit-déjeuner et le goûter.
+4. DIVERSITÉ DES PROTÉINES & FÉCULENTS : Varie impérativement chaque jour :
    - Alternez entre volaille (poulet, dinde), poisson/fruits de mer (saumon, cabillaud, crevettes), légumineuses/végétarien (lentilles, pois chiches, tofu), bœuf/viande, et féculents variés (riz basmati, pâtes fraîches, quinoa, patate douce, boulgour, nouilles).
-4. Respecte scrupuleusement les curseurs de cuisines (les gastronomies notées 'PRIORITAIRE' doivent être largement représentées, les 'EXCLU' ne doivent jamais apparaître).
-5. TITRES AUTHENTIQUES & UNIQUES : Sois créatif et précis dans les intitulés des plats. Ne répète jamais le même nom de plat d'un jour à l'autre.
-5. Ingrédients complets (4 à 7 ingrédients réalistes par plat principal : protéine, féculent, légume, herbe/épice, matière grasse).
-6. Rayons autorisés ('deptProduce', 'deptMeat', 'deptDairy', 'deptBakery', 'deptPantry', 'deptSpices', 'deptFrozen', 'deptDrinks', 'deptOther').
-7. Instructions détaillées ÉTAPE PAR ÉTAPE (3 à 4 étapes précises avec découpe, temps de cuisson, assaisonnement et dressage).
-${profile?.appliances?.thermomix ? "8. ROBOT CUISEUR / THERMOMIX : Fournis impérativement pour chaque recette un bloc 'thermomixInstructions' (tableau d'étapes détaillées adaptées avec durées, températures ex: 100°C ou Varoma, vitesses ex: Vit. 1 / Sens Inverse 🔄)." : ""}
-9. Ajoute une astuce de chef 'chefTip' personnalisée pour chaque plat.
+5. Respecte scrupuleusement les curseurs de cuisines (les gastronomies notées 'PRIORITAIRE' doivent être largement représentées, les 'EXCLU' ne doivent jamais apparaître).
+6. TITRES AUTHENTIQUES & UNIQUES : Sois créatif et précis dans les intitulés des plats. Ne répète jamais le même nom de plat d'un jour à l'autre.
+7. Ingrédients complets (4 à 7 ingrédients réalistes par plat principal : protéine, féculent, légume, herbe/épice, matière grasse).
+8. Rayons autorisés ('deptProduce', 'deptMeat', 'deptDairy', 'deptBakery', 'deptPantry', 'deptSpices', 'deptFrozen', 'deptDrinks', 'deptOther').
+9. Instructions détaillées ÉTAPE PAR ÉTAPE (3 à 4 étapes précises avec découpe, temps de cuisson, assaisonnement et dressage).
+${profile?.appliances?.thermomix ? "10. ROBOT CUISEUR / THERMOMIX : Fournis impérativement pour chaque recette un bloc 'thermomixInstructions' (tableau d'étapes détaillées adaptées avec durées, températures ex: 100°C ou Varoma, vitesses ex: Vit. 1 / Sens Inverse 🔄)." : ""}
+11. Ajoute une astuce de chef 'chefTip' personnalisée pour chaque plat.
 
 Format JSON attendu :
 {
@@ -384,9 +400,20 @@ Format JSON attendu :
     const currentTitle = currentMeal?.title?.fr || currentMeal?.title?.en || "le plat précédent";
     const hasThermomix = profile?.appliances?.thermomix;
 
+    const breakfastFlavor = profile?.breakfastFlavor || "both";
+    const snackFlavor = profile?.snackFlavor || "both";
+    let flavorInstruction = "";
+    if (mealType === "breakfast") {
+      if (breakfastFlavor === "sweet") flavorInstruction = "\nConsigne de saveur : La recette de petit-déjeuner DOIT IMPÉRATIVEMENT ÊTRE SUCRÉE (fruits, porridge, pancakes, yaourt, tartines...).";
+      else if (breakfastFlavor === "savory") flavorInstruction = "\nConsigne de saveur : La recette de petit-déjeuner DOIT IMPÉRATIVEMENT ÊTRE SALÉE (œufs, avocat, omelette, fromage frais, toasts...).";
+    } else if (mealType === "snack") {
+      if (snackFlavor === "sweet") flavorInstruction = "\nConsigne de saveur : La recette de goûter DOIT IMPÉRATIVEMENT ÊTRE SUCRÉE (fruits, compotes, muffins, oléagineux...).";
+      else if (snackFlavor === "savory") flavorInstruction = "\nConsigne de saveur : La recette de goûter DOIT IMPÉRATIVEMENT ÊTRE SALÉE (crudités & sauce, mini-wrap, houmous, crackers fromage...).";
+    }
+
     const prompt = `Tu es un Chef cuisinier étoilé. Génère une NOUVELLE recette de chef détaillée et savoureuse pour le type de repas '${mealType}', originale et différente de '${currentTitle}'.
 Foyer : ${adults} adulte(s), ${children} enfant(s).
-Régimes : ${diets}.
+Régimes : ${diets}.${flavorInstruction}
 Exclusions : ${dislikes}.
 Langue principale : ${lang}.
 

@@ -113,6 +113,11 @@ export const TRANSLATIONS = {
     mealsToPlan: "Repas à planifier chaque jour",
     mealsToPlanDesc: "Choisissez les repas que vous souhaitez préparer :",
     minOneMealRequired: "Veuillez sélectionner au moins un repas.",
+    breakfastFlavorTitle: "Saveur du Petit-déjeuner",
+    snackFlavorTitle: "Saveur du Goûter",
+    flavorBoth: "Les deux 🔄",
+    flavorSweet: "Sucré 🍯",
+    flavorSavory: "Salé 🍳",
     
     // Cuisines du Monde & Curseurs
     cuisinesTitle: "Cuisines du Monde & Préférences",
@@ -327,6 +332,11 @@ export const TRANSLATIONS = {
     mealsToPlan: "Meals to Plan Daily",
     mealsToPlanDesc: "Choose the meals you want to prepare:",
     minOneMealRequired: "Please select at least one meal.",
+    breakfastFlavorTitle: "Breakfast Flavor",
+    snackFlavorTitle: "Snack Flavor",
+    flavorBoth: "Both 🔄",
+    flavorSweet: "Sweet 🍯",
+    flavorSavory: "Savory 🍳",
     
     // World Cuisines & Sliders
     cuisinesTitle: "World Cuisines & Preferences",

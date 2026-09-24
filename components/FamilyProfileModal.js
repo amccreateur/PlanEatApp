@@ -42,6 +42,8 @@ export default function FamilyProfileModal({
       ? profile.mealTypes
       : ["breakfast", "lunch", "snack", "dinner"]
   );
+  const [breakfastFlavor, setBreakfastFlavor] = useState(profile?.breakfastFlavor || "both");
+  const [snackFlavor, setSnackFlavor] = useState(profile?.snackFlavor || "both");
   const [adults, setAdults] = useState(profile?.adults || 2);
   const [children, setChildren] = useState(profile?.children || 0);
   const [childrenAges, setChildrenAges] = useState(profile?.childrenAges || []);
@@ -195,7 +197,9 @@ export default function FamilyProfileModal({
       children,
       childrenAges,
       mealTypes: mealTypes.length > 0 ? mealTypes : ["breakfast", "lunch", "snack", "dinner"],
-      diets: diets.length > 0 ? diets : ["dietBalanced"],
+      breakfastFlavor,
+      snackFlavor,
+      diets,
       cuisines,
       appliances,
       dislikedFoods
@@ -445,6 +449,86 @@ export default function FamilyProfileModal({
                 );
               })}
             </View>
+
+            {/* Préférences Saveur Petit-déjeuner si activé */}
+            {mealTypes.includes("breakfast") && (
+              <View style={[styles.flavorSubBox, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}>
+                <View style={styles.flavorHeaderRow}>
+                  <Text style={[styles.flavorTitleText, { color: theme.text }]}>
+                    ☀️ {t.breakfastFlavorTitle || "Saveur Petit-déjeuner"} :
+                  </Text>
+                </View>
+                <View style={styles.flavorBtnGroup}>
+                  {[
+                    { key: "both", label: t.flavorBoth || "Les deux 🔄" },
+                    { key: "sweet", label: t.flavorSweet || "Sucré 🍯" },
+                    { key: "savory", label: t.flavorSavory || "Salé 🍳" }
+                  ].map(opt => {
+                    const isAct = (breakfastFlavor || "both") === opt.key;
+                    return (
+                      <TouchableOpacity
+                        key={opt.key}
+                        style={[
+                          styles.flavorChip,
+                          { backgroundColor: theme.cardBg, borderColor: theme.border },
+                          isAct && styles.flavorChipActive
+                        ]}
+                        onPress={() => setBreakfastFlavor(opt.key)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={[
+                          styles.flavorChipText,
+                          { color: theme.textSub },
+                          isAct && styles.flavorChipTextActive
+                        ]}>
+                          {opt.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
+
+            {/* Préférences Saveur Goûter si activé */}
+            {mealTypes.includes("snack") && (
+              <View style={[styles.flavorSubBox, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}>
+                <View style={styles.flavorHeaderRow}>
+                  <Text style={[styles.flavorTitleText, { color: theme.text }]}>
+                    🍎 {t.snackFlavorTitle || "Saveur Goûter"} :
+                  </Text>
+                </View>
+                <View style={styles.flavorBtnGroup}>
+                  {[
+                    { key: "both", label: t.flavorBoth || "Les deux 🔄" },
+                    { key: "sweet", label: t.flavorSweet || "Sucré 🍯" },
+                    { key: "savory", label: t.flavorSavory || "Salé 🍳" }
+                  ].map(opt => {
+                    const isAct = (snackFlavor || "both") === opt.key;
+                    return (
+                      <TouchableOpacity
+                        key={opt.key}
+                        style={[
+                          styles.flavorChip,
+                          { backgroundColor: theme.cardBg, borderColor: theme.border },
+                          isAct && styles.flavorChipActive
+                        ]}
+                        onPress={() => setSnackFlavor(opt.key)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={[
+                          styles.flavorChipText,
+                          { color: theme.textSub },
+                          isAct && styles.flavorChipTextActive
+                        ]}>
+                          {opt.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
           </View>
 
           {/* Régimes alimentaires */}
@@ -1314,6 +1398,44 @@ const styles = StyleSheet.create({
   mealTypeLabel: {
     fontSize: 15,
     fontWeight: "600"
+  },
+  flavorSubBox: {
+    marginTop: 10,
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1
+  },
+  flavorHeaderRow: {
+    marginBottom: 8
+  },
+  flavorTitleText: {
+    fontSize: 13,
+    fontWeight: "700"
+  },
+  flavorBtnGroup: {
+    flexDirection: "row",
+    gap: 6
+  },
+  flavorChip: {
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  flavorChipActive: {
+    backgroundColor: "#0284c7",
+    borderColor: "#38bdf8"
+  },
+  flavorChipText: {
+    fontSize: 12,
+    fontWeight: "600"
+  },
+  flavorChipTextActive: {
+    color: "#ffffff",
+    fontWeight: "800"
   },
   rtlRow: {
     flexDirection: "row-reverse"

@@ -55,10 +55,35 @@ export class AIPlannerService {
         if (profile.cuisines.indian === 0 && recipe.tags.includes("indian")) return false;
       }
 
+      // Préférences de saveur (sucré / salé) pour petit-déjeuner et goûter
+      if (recipe.mealType === "breakfast" && profile?.breakfastFlavor && profile.breakfastFlavor !== "both") {
+        const text = `${recipe.title?.fr || ""} ${recipe.title?.en || ""} ${recipe.tags?.join(" ") || ""}`.toLowerCase();
+        const isSavory = (
+          recipe.tags?.includes("flavorSavory") ||
+          text.includes("œuf") || text.includes("oeuf") || text.includes("avocat") ||
+          text.includes("omelette") || text.includes("fromage") || text.includes("saumon") ||
+          text.includes("truite") || text.includes("shakshuka") || text.includes("bagel")
+        );
+        if (profile.breakfastFlavor === "sweet" && isSavory) return false;
+        if (profile.breakfastFlavor === "savory" && !isSavory) return false;
+      }
+
+      if (recipe.mealType === "snack" && profile?.snackFlavor && profile.snackFlavor !== "both") {
+        const text = `${recipe.title?.fr || ""} ${recipe.title?.en || ""} ${recipe.tags?.join(" ") || ""}`.toLowerCase();
+        const isSavory = (
+          recipe.tags?.includes("flavorSavory") ||
+          text.includes("tzatziki") || text.includes("houmous") || text.includes("concombre") ||
+          text.includes("carotte") || text.includes("fromage") || text.includes("crackers") ||
+          text.includes("wrap")
+        );
+        if (profile.snackFlavor === "sweet" && isSavory) return false;
+        if (profile.snackFlavor === "savory" && !isSavory) return false;
+      }
+
       // Vérifier les aliments exclus
       if (dislikes.length > 0) {
         const hasDisliked = recipe.ingredients.some(ing => {
-          const names = [ing.name.fr, ing.name.en, ing.name.ar].join(" ").toLowerCase();
+          const names = [ing.name.fr, ing.name.en].join(" ").toLowerCase();
           return dislikes.some(d => d && names.includes(d));
         });
         if (hasDisliked) return false;

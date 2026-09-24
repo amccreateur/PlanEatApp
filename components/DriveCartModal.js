@@ -53,6 +53,7 @@ export default function DriveCartModal({
   const [searchQuery, setSearchQuery] = useState("");
   const [isSelectingStore, setIsSelectingStore] = useState(true);
   const [isCopied, setIsCopied] = useState(false);
+  const [isListCopied, setIsListCopied] = useState(false);
 
   const copyToClipboard = async (text) => {
     if (!text) return;
@@ -61,6 +62,50 @@ export default function DriveCartModal({
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
     } catch(e) {}
+  };
+
+  const copyEntireList = async () => {
+    if (!groceries || groceries.length === 0) return;
+    const lines = [];
+    lines.push(`🛒 LISTE DE COURSES PLANEAT (${groceries.length} articles)`);
+    lines.push(`----------------------------------------`);
+    
+    const depts = {};
+    groceries.forEach(item => {
+      const d = item.dept || "deptOther";
+      if (!depts[d]) depts[d] = [];
+      depts[d].push(item);
+    });
+
+    Object.entries(depts).forEach(([deptKey, items]) => {
+      const deptTitle = t[deptKey] || deptKey;
+      lines.push(`\n📁 ${deptTitle.toUpperCase()} :`);
+      items.forEach(it => {
+        const name = it.name?.[lang] || it.name?.fr || it.customName;
+        const qty = it.totalQuantity ? ` (${it.totalQuantity} ${it.unit || ""})` : "";
+        const check = it.checked ? " [x] " : " [ ] ";
+        lines.push(`${check}${name}${qty}`);
+      });
+    });
+
+    try {
+      await Clipboard.setStringAsync(lines.join("\n"));
+      setIsListCopied(true);
+      setTimeout(() => setIsListCopied(false), 2500);
+    } catch(e) {}
+  };
+
+  const handleCopyAndNext = async (item) => {
+    const it = item || currentItem;
+    if (!it) return;
+    const q = searchQuery || getCleanItemName(it);
+    await copyToClipboard(q);
+    if (onToggleItem && it.id && !it.checked) {
+      onToggleItem(it.id);
+    }
+    if (currentIndex < groceries.length - 1) {
+      setCurrentIndex(prev => prev + 1);
+    }
   };
 
   // Utiliser la liste complète des groceries pour un indexage stable et prévisible
@@ -620,39 +665,65 @@ export default function DriveCartModal({
           )}
         </View>
 
-        {/* Center : Sur Web, panneau d'assistance direct avec ouverture en onglet séparé */}
+        {/* Center : Sur Web, panneau d'assistance direct ultra-ergonomique */}
         {Platform.OS === "web" ? (
           <ScrollView
             style={[styles.webFallbackContainer, { backgroundColor: theme.bg }]}
             contentContainerStyle={styles.webFallbackContent}
           >
+            {/* Top Store Action Card */}
             <View style={[styles.webFallbackHero, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-              <Text style={styles.webFallbackEmoji}>{selectedStore.logoEmoji}</Text>
-              <Text style={[styles.webFallbackTitle, { color: theme.text }]}>
-                Assistant Courses • {selectedStore.name}
-              </Text>
-              <Text style={[styles.webFallbackDesc, { color: theme.textSub }]}>
-                Sur ordinateur, ouvrez le site de votre Drive dans un onglet à côté pour faire vos courses en toute simplicité tout en gardant votre liste sous les yeux.
-              </Text>
+              <View style={styles.webStoreHeaderRow}>
+                <Text style={styles.webFallbackEmoji}>{selectedStore.logoEmoji}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.webFallbackTitle, { color: theme.text }]}>
+                    {selectedStore.name}
+                  </Text>
+                  <Text style={[styles.webFallbackDesc, { color: theme.textSub }]}>
+                    Ouvrez votre magasin dans un onglet, puis copiez vos articles au fur et à mesure en 1 clic !
+                  </Text>
+                </View>
+              </View>
 
-              <TouchableOpacity
-                style={[styles.webOpenStoreBtn, { backgroundColor: selectedStore.color }]}
-                onPress={() => Linking.openURL(selectedStore.homeUrl)}
-                activeOpacity={0.85}
-              >
-                <Ionicons name="open-outline" size={18} color="#ffffff" />
-                <Text style={styles.webOpenStoreBtnText}>
-                  Ouvrir {selectedStore.name} ➔
-                </Text>
-              </TouchableOpacity>
+              <View style={styles.webTopActionButtonsRow}>
+                <TouchableOpacity
+                  style={[styles.webOpenStoreBtn, { backgroundColor: selectedStore.color }]}
+                  onPress={() => Linking.openURL(selectedStore.homeUrl)}
+                  activeOpacity={0.85}
+                >
+                  <Ionicons name="open-outline" size={18} color="#ffffff" />
+                  <Text style={styles.webOpenStoreBtnText}>
+                    1. Ouvrir {selectedStore.shortName} ➔
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.webCopyEntireListBtn,
+                    { backgroundColor: isListCopied ? "#10b981" : theme.cardBgAlt, borderColor: theme.border }
+                  ]}
+                  onPress={copyEntireList}
+                  activeOpacity={0.85}
+                >
+                  <Ionicons
+                    name={isListCopied ? "checkmark-circle" : "copy-outline"}
+                    size={18}
+                    color={isListCopied ? "#ffffff" : "#38bdf8"}
+                  />
+                  <Text style={[styles.webCopyEntireListBtnText, { color: isListCopied ? "#ffffff" : theme.text }]}>
+                    {isListCopied ? "Liste copiée !" : "📋 Copier toute la liste"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
-            {currentItem && (
+            {/* Main Interactive Item Card (Hero Workflow) */}
+            {currentItem ? (
               <View style={[styles.webCurrentItemCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
                 <View style={styles.webCurrentItemHeader}>
                   <View style={styles.collapsedBadge}>
                     <Text style={styles.collapsedBadgeText}>
-                      Article {currentIndex + 1} / {groceries.length}
+                      Article {currentIndex + 1} sur {groceries.length}
                     </Text>
                   </View>
                   {currentItem.dept ? (
@@ -667,43 +738,30 @@ export default function DriveCartModal({
                 </Text>
 
                 {currentItem.totalQuantity ? (
-                  <Text style={[styles.webItemQty, { color: "#10b981" }]}>
-                    Quantité recette : {currentItem.totalQuantity} {currentItem.unit}
+                  <Text style={styles.webItemQty}>
+                    Quantité recette : {currentItem.totalQuantity} {currentItem.unit || ""}
                   </Text>
                 ) : null}
 
-                <View style={styles.webActionButtonsRow}>
-                  <TouchableOpacity
-                    style={[
-                      styles.webCopyBtn,
-                      { backgroundColor: isCopied ? "#10b981" : theme.cardBgAlt, borderColor: theme.border }
-                    ]}
-                    onPress={() => copyToClipboard(searchQuery || getCleanItemName(currentItem))}
+                {/* GIANT PRIMARY ACTION: Copier & Suivant */}
+                <TouchableOpacity
+                  style={styles.webPrimaryCopyNextBtn}
+                  onPress={() => handleCopyAndNext(currentItem)}
+                  activeOpacity={0.85}
+                >
+                  <LinearGradient
+                    colors={["#10b981", "#059669"]}
+                    style={styles.webPrimaryCopyGradient}
                   >
-                    <Ionicons name={isCopied ? "checkmark" : "copy-outline"} size={16} color={isCopied ? "#ffffff" : "#38bdf8"} />
-                    <Text style={[styles.webCopyBtnText, { color: isCopied ? "#ffffff" : theme.text }]}>
-                      {isCopied ? "Nom copié !" : "Copier le nom"}
+                    <Ionicons name={isCopied ? "checkmark" : "copy"} size={20} color="#ffffff" />
+                    <Text style={styles.webPrimaryCopyText}>
+                      {isCopied ? "Copié !" : `Copier "${getCleanItemName(currentItem)}" & Suivant ➔`}
                     </Text>
-                  </TouchableOpacity>
+                  </LinearGradient>
+                </TouchableOpacity>
 
-                  {selectedStore.searchUrl && (
-                    <TouchableOpacity
-                      style={[styles.webSearchDirectBtn, { backgroundColor: "#0284c7" }]}
-                      onPress={() => {
-                        const q = searchQuery || getCleanItemName(currentItem);
-                        copyToClipboard(q);
-                        Linking.openURL(selectedStore.searchUrl(q));
-                      }}
-                    >
-                      <Ionicons name="search" size={16} color="#ffffff" />
-                      <Text style={styles.webSearchDirectBtnText}>
-                        Rechercher sur {selectedStore.shortName} ↗
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-
-                <View style={{ flexDirection: "row", gap: 10, marginTop: 14 }}>
+                {/* Secondary Actions */}
+                <View style={styles.webSecondaryActionsRow}>
                   <TouchableOpacity
                     style={[styles.skipBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }, currentIndex === 0 && styles.btnDisabled]}
                     onPress={handlePrevItem}
@@ -713,12 +771,16 @@ export default function DriveCartModal({
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    style={styles.addedBtn}
-                    onPress={handleItemAdded}
+                    style={[styles.webGoogleSearchBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}
+                    onPress={() => {
+                      const q = searchQuery || getCleanItemName(currentItem);
+                      const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(selectedStore.name + " " + q)}`;
+                      Linking.openURL(googleUrl);
+                    }}
                   >
-                    <Ionicons name="checkmark-circle" size={18} color="#ffffff" />
-                    <Text style={styles.addedBtnText}>
-                      {currentIndex < groceries.length - 1 ? "Article suivant" : "Terminer"}
+                    <Ionicons name="search" size={15} color="#38bdf8" />
+                    <Text style={[styles.webGoogleSearchBtnText, { color: theme.text }]}>
+                      Chercher sur Google {selectedStore.shortName} ↗
                     </Text>
                   </TouchableOpacity>
 
@@ -731,49 +793,68 @@ export default function DriveCartModal({
                   </TouchableOpacity>
                 </View>
               </View>
+            ) : (
+              <View style={styles.allDoneBox}>
+                <Text style={styles.allDoneEmoji}>🎉</Text>
+                <Text style={styles.allDoneText}>Tous vos articles sont prêts pour le panier !</Text>
+              </View>
             )}
 
-            {/* Checklist rapide de tous les articles */}
+            {/* Checklist complète interactive */}
             <View style={[styles.webGroceriesListCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-              <Text style={[styles.webGroceriesListTitle, { color: theme.text }]}>
-                📋 Votre liste complète ({groceries.filter(g => g.checked).length}/{groceries.length} cochés)
-              </Text>
+              <View style={styles.webListHeaderRow}>
+                <Text style={[styles.webGroceriesListTitle, { color: theme.text }]}>
+                  📋 Liste complète ({groceries.filter(g => g.checked).length} / {groceries.length} cochés)
+                </Text>
+              </View>
+
+              <View style={[styles.progressBarTrack, { backgroundColor: theme.cardBgAlt }]}>
+                <View style={[styles.progressBarFill, { width: `${progressPercent}%` }]} />
+              </View>
+
               {groceries.map((item, idx) => {
                 const itemName = item.name?.[lang] || item.name?.fr || item.customName;
                 const isCurrent = currentItem?.id === item.id;
                 return (
-                  <TouchableOpacity
+                  <View
                     key={item.id || idx}
                     style={[
                       styles.webGroceryRow,
                       { borderBottomColor: theme.border },
-                      isCurrent && { backgroundColor: theme.cardBgAlt }
+                      isCurrent && { backgroundColor: theme.cardBgAlt, borderRadius: 10 }
                     ]}
-                    onPress={() => {
-                      setCurrentIndex(idx);
-                      if (onToggleItem) onToggleItem(item.id);
-                    }}
                   >
-                    <Ionicons
-                      name={item.checked ? "checkbox" : "square-outline"}
-                      size={20}
-                      color={item.checked ? "#10b981" : theme.textSub}
-                    />
-                    <Text
-                      style={[
-                        styles.webGroceryRowText,
-                        { color: theme.text },
-                        item.checked && styles.webGroceryRowTextChecked
-                      ]}
+                    <TouchableOpacity
+                      style={styles.webGroceryRowLeft}
+                      onPress={() => {
+                        setCurrentIndex(idx);
+                        if (onToggleItem) onToggleItem(item.id);
+                      }}
                     >
-                      {itemName} {item.totalQuantity ? `(${item.totalQuantity} ${item.unit || ""})` : ""}
-                    </Text>
-                    {isCurrent && (
-                      <View style={styles.currentBadgeSmall}>
-                        <Text style={styles.currentBadgeSmallText}>En cours</Text>
-                      </View>
-                    )}
-                  </TouchableOpacity>
+                      <Ionicons
+                        name={item.checked ? "checkbox" : "square-outline"}
+                        size={20}
+                        color={item.checked ? "#10b981" : theme.textSub}
+                      />
+                      <Text
+                        style={[
+                          styles.webGroceryRowText,
+                          { color: theme.text },
+                          item.checked && styles.webGroceryRowTextChecked
+                        ]}
+                      >
+                        {itemName} {item.totalQuantity ? `(${item.totalQuantity} ${item.unit || ""})` : ""}
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[styles.quickCopyChip, { backgroundColor: theme.cardBg, borderColor: theme.border }]}
+                      onPress={() => handleCopyAndNext(item)}
+                    >
+                      <Ionicons name="copy-outline" size={12} color="#38bdf8" />
+                      <Text style={[styles.quickCopyChipText, { color: theme.textSub }]}>Copier</Text>
+                    </TouchableOpacity>
+                  </View>
                 );
               })}
             </View>
@@ -1712,6 +1793,176 @@ const styles = StyleSheet.create({
     color: "#10b981",
     fontSize: 15,
     fontWeight: "800"
+  },
+  webFallbackContainer: {
+    flex: 1
+  },
+  webFallbackContent: {
+    padding: 20,
+    maxWidth: 860,
+    width: "100%",
+    alignSelf: "center",
+    gap: 16
+  },
+  webFallbackHero: {
+    borderRadius: 18,
+    padding: 20,
+    borderWidth: 1,
+    gap: 16
+  },
+  webStoreHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14
+  },
+  webFallbackEmoji: {
+    fontSize: 36
+  },
+  webFallbackTitle: {
+    fontSize: 22,
+    fontWeight: "800",
+    marginBottom: 4
+  },
+  webFallbackDesc: {
+    fontSize: 13,
+    lineHeight: 18
+  },
+  webTopActionButtonsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    flexWrap: "wrap"
+  },
+  webOpenStoreBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    gap: 8
+  },
+  webOpenStoreBtnText: {
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: "800"
+  },
+  webCopyEntireListBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 8
+  },
+  webCopyEntireListBtnText: {
+    fontSize: 14,
+    fontWeight: "700"
+  },
+  webCurrentItemCard: {
+    borderRadius: 18,
+    padding: 22,
+    borderWidth: 1.5,
+    gap: 12
+  },
+  webCurrentItemHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
+  },
+  webItemTitle: {
+    fontSize: 24,
+    fontWeight: "900",
+    letterSpacing: -0.3
+  },
+  webItemQty: {
+    color: "#10b981",
+    fontSize: 15,
+    fontWeight: "700"
+  },
+  webPrimaryCopyNextBtn: {
+    borderRadius: 14,
+    overflow: "hidden",
+    marginTop: 6,
+    shadowColor: "#10b981",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4
+  },
+  webPrimaryCopyGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    gap: 10
+  },
+  webPrimaryCopyText: {
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "900",
+    textAlign: "center"
+  },
+  webSecondaryActionsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginTop: 4
+  },
+  webGoogleSearchBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 11,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 6
+  },
+  webGoogleSearchBtnText: {
+    fontSize: 13,
+    fontWeight: "700"
+  },
+  webGroceriesListCard: {
+    borderRadius: 18,
+    padding: 20,
+    borderWidth: 1,
+    gap: 12
+  },
+  webListHeaderRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
+  },
+  webGroceriesListTitle: {
+    fontSize: 16,
+    fontWeight: "800"
+  },
+  webGroceryRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    gap: 10
+  },
+  webGroceryRowLeft: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10
+  },
+  webGroceryRowText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: "600"
+  },
+  webGroceryRowTextChecked: {
+    textDecorationLine: "line-through",
+    opacity: 0.45
   }
 });
 

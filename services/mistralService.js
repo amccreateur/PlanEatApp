@@ -226,7 +226,7 @@ RÈGLES D'OR DE VARIÉTÉ ET DE QUALITÉ (STRICTES) :
 2. REPAS DEMANDÉS : Génère uniquement des recettes pour les types de repas suivants : ${mealTypesNames}. Les autres types de repas non demandés doivent être omis ou définis à null.
 3. RESPECT STRICT DES SAVEURS : Applique à la lettre les consignes Sucré / Salé indiquées ci-dessus pour le petit-déjeuner et le goûter.
 4. DIVERSITÉ DES PROTÉINES & FÉCULENTS (Déjeuners & Dîners UNIQUEMENT) : Varie impérativement chaque jour pour les déjeuners et dîners :
-   - Alternez entre volaille (poulet, dinde), poisson/fruits de mer (saumon, cabillaud, crevettes), légumineuses/végétarien (lentilles, pois chiches, tofu), bœuf/viande, et féculents variés (riz basmati, pâtes fraîches, quinoa, patate douce, boulgour, nouilles). Ne JAMAIS mettre de volaille, viande ou poisson dans un petit-déjeuner sucré !
+   - Alternez entre volaille (poulet, dinde), poisson/fruits de mer (saumon, cabillaud, crevettes), légumineuses/végétarien (lentilles, pois chiches, tofu), bœuf/viande, et féculents variés (riz basmati, pâtes fraîches, quinoa, patate douce, boulgour, nouilles). Ne JAMAIS mettre de volaille, viande, poulet, saumon, thon ou avocat dans un petit-déjeuner sucré !
 5. Respecte scrupuleusement les curseurs de cuisines (les gastronomies notées 'PRIORITAIRE' doivent être largement représentées, les 'EXCLU' ne doivent jamais apparaître).
 6. TITRES AUTHENTIQUES & UNIQUES : Sois créatif et précis dans les intitulés des plats. Ne répète jamais le même nom de plat d'un jour à l'autre.
 7. Ingrédients complets (4 à 7 ingrédients réalistes par plat principal : protéine, féculent, légume, herbe/épice, matière grasse).
@@ -242,13 +242,13 @@ Format JSON attendu :
       "dayIndex": ${startDay},
       "meals": {
         "breakfast": {
-          "title": { "fr": "Titre Petit-Déjeuner Jour ${startDay}", "en": "Breakfast Title Day ${startDay}" },
-          "emoji": "🥣",
+          "title": { "fr": "${breakfastFlavor === 'sweet' ? 'Bowl Gourmand Avoine & Fruits Rouges' : breakfastFlavor === 'savory' ? 'Omelette Moelleuse aux Fines Herbes' : 'Titre Petit-Déjeuner Jour ' + startDay}", "en": "Breakfast Title Day ${startDay}" },
+          "emoji": "${breakfastFlavor === 'sweet' ? '🥣' : breakfastFlavor === 'savory' ? '🍳' : '☀️'}",
           "prepTime": 8,
           "cookTime": 5,
           "caloriesPerPerson": 350,
           "ingredients": [
-            { "name": { "fr": "Ingrédient 1", "en": "Ingredient 1" }, "quantity": 80, "unit": "g", "dept": "deptPantry" }
+            { "name": { "fr": "${breakfastFlavor === 'sweet' ? 'Flocons d avoine' : 'Oeufs frais'}", "en": "Ingredient 1" }, "quantity": 80, "unit": "g", "dept": "${breakfastFlavor === 'sweet' ? 'deptPantry' : 'deptDairy'}" }
           ],
           "instructions": {
             "fr": [
@@ -287,13 +287,13 @@ Format JSON attendu :
           "chefTip": { "fr": "Astuce du chef..." }
         },
         "snack": {
-          "title": { "fr": "Titre Goûter Jour ${startDay}", "en": "Snack Title Day ${startDay}" },
-          "emoji": "🍎",
+          "title": { "fr": "${snackFlavor === 'sweet' ? 'Compote Pomme-Cannelle & Amandes' : snackFlavor === 'savory' ? 'Bâtonnets de Carotte & Tzatziki' : 'Titre Goûter Jour ' + startDay}", "en": "Snack Title Day ${startDay}" },
+          "emoji": "${snackFlavor === 'sweet' ? '🍎' : snackFlavor === 'savory' ? '🥕' : '☕'}",
           "prepTime": 5,
           "cookTime": 0,
           "caloriesPerPerson": 190,
           "ingredients": [
-            { "name": { "fr": "Ingrédient goûter" }, "quantity": 1, "unit": "portion", "dept": "deptProduce" }
+            { "name": { "fr": "${snackFlavor === 'sweet' ? 'Pommes fraîches' : 'Carottes croquantes'}" }, "quantity": 1, "unit": "portion", "dept": "deptProduce" }
           ],
           "instructions": {
             "fr": ["Préparer et déguster frais."]
@@ -330,6 +330,13 @@ Format JSON attendu :
   ]
 }`;
 
+      const systemPrompt = `Tu es un chef cuisinier créatif et nutritionniste. Tu génères des recettes originales, très variées, équilibrées et gourmandes sans aucune répétition.
+${breakfastFlavor === "sweet" ? "ATTENTION CRITIQUE : Le petit-déjeuner DOIT ÊTRE 100% SUCRÉ (pancakes, avoine, fruits, granola, yaourt, tartines miel/confiture). INTERDICTION ABSOLUE de mettre des œufs salés, de la volaille, du poulet, de la viande, du poisson, ou de l'avocat au petit-déjeuner." : ""}
+${breakfastFlavor === "savory" ? "ATTENTION CRITIQUE : Le petit-déjeuner DOIT ÊTRE 100% SALÉ (œufs, omelette, avocat, toasts salés, fromage frais). INTERDICTION de mettre des produits sucrés." : ""}
+${snackFlavor === "sweet" ? "ATTENTION CRITIQUE : Le goûter DOIT ÊTRE 100% SUCRÉ (fruits, compote, yaourt au miel, cookies avoine)." : ""}
+${snackFlavor === "savory" ? "ATTENTION CRITIQUE : Le goûter DOIT ÊTRE 100% SALÉ (crudités, houmous, crackers fromage)." : ""}
+Réponds uniquement en JSON valide conforme au schéma demandé.`;
+
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
@@ -339,7 +346,7 @@ Format JSON attendu :
         body: JSON.stringify({
           model: activeModel,
           messages: [
-            { role: "system", content: "Tu es un chef cuisinier créatif et nutritionniste. Tu génères des recettes originales, très variées, équilibrées et gourmandes sans aucune répétition. Réponds uniquement en JSON valide." },
+            { role: "system", content: systemPrompt },
             { role: "user", content: prompt }
           ],
           temperature: 0.85,

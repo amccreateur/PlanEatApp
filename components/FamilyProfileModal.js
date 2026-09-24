@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   View,
@@ -64,6 +64,38 @@ export default function FamilyProfileModal({
   });
   const [dislikedFoods, setDislikedFoods] = useState(profile?.dislikedFoods || []);
   const [newDislike, setNewDislike] = useState("");
+
+  useEffect(() => {
+    if (visible && profile) {
+      setMealTypes(profile.mealTypes && profile.mealTypes.length > 0 ? profile.mealTypes : ["breakfast", "lunch", "snack", "dinner"]);
+      setBreakfastFlavor(profile.breakfastFlavor || "both");
+      setSnackFlavor(profile.snackFlavor || "both");
+      setAdults(profile.adults || 2);
+      setChildren(profile.children || 0);
+      setChildrenAges(profile.childrenAges || []);
+      setDiets(profile.diets || []);
+      setCuisines(profile.cuisines || {
+        french: 2,
+        italian: 2,
+        oriental: 2,
+        asian: 2,
+        mexican: 1,
+        indian: 1,
+        streetfood: 1
+      });
+      setAppliances(profile.appliances || {
+        thermomix: false,
+        airfryer: false,
+        cookeo: false
+      });
+      setDislikedFoods(profile.dislikedFoods || []);
+    }
+    if (visible && aiConfig) {
+      setAiEngine(aiConfig.engine || "mistral");
+      setMistralApiKey(aiConfig.mistralApiKey || "");
+      setMistralModel(aiConfig.mistralModel || "mistral-small-latest");
+    }
+  }, [visible, profile, aiConfig]);
 
   const toggleMealType = (typeKey) => {
     if (mealTypes.includes(typeKey)) {

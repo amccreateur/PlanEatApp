@@ -94,6 +94,100 @@ export class AIPlannerService {
   }
 
   /**
+   * Vérifie et corrige automatiquement tout repas non conforme aux règles strictes de saveurs (Sucré / Salé)
+   */
+  static sanitizeMeal(meal, type, profile, servings = 2, fallbackIndex = 0) {
+    if (!meal) return null;
+
+    // 1. Validation Petit-Déjeuner
+    if (type === "breakfast" && profile?.breakfastFlavor && profile.breakfastFlavor !== "both") {
+      const titleStr = (typeof meal.title === "string" ? meal.title : (meal.title?.fr || meal.title?.en || "")).toLowerCase();
+      const ingStr = (meal.ingredients || []).map(i => (typeof i.name === "string" ? i.name : (i.name?.fr || i.name?.en || "")).toLowerCase()).join(" ");
+      const fullText = `${titleStr} ${ingStr} ${(meal.tags || []).join(" ")}`.toLowerCase();
+
+      const hasSavoryKeywords = (
+        fullText.includes("poulet") || fullText.includes("dinde") || fullText.includes("volaille") ||
+        fullText.includes("viande") || fullText.includes("poisson") || fullText.includes("saumon") ||
+        fullText.includes("thon") || fullText.includes("crevette") || fullText.includes("avocat") ||
+        fullText.includes("benedict") || fullText.includes("bénédicte") || fullText.includes("omelette") ||
+        fullText.includes("brouillé") || fullText.includes("poché") || fullText.includes("bacon") ||
+        fullText.includes("jambon") || fullText.includes("fromage râpé") || fullText.includes("cheddar") ||
+        fullText.includes("feta") || fullText.includes("mozzarella") || fullText.includes("poivron") ||
+        fullText.includes("tomate") || fullText.includes("oignon") || fullText.includes("ail") ||
+        fullText.includes("sel & poivre") || fullText.includes("épices") || fullText.includes("shakshuka")
+      );
+
+      // Si l'utilisateur voulait du sucré et que le plat généré est salé
+      if (profile.breakfastFlavor === "sweet" && hasSavoryKeywords) {
+        const sweetCatalog = this.filterRecipes(profile, "breakfast").filter(r => {
+          const t = `${r.title?.fr || ""} ${r.title?.en || ""}`.toLowerCase();
+          return !t.includes("avocat") && !t.includes("œuf") && !t.includes("oeuf") && !t.includes("omelette");
+        });
+        const pool = sweetCatalog.length > 0 ? sweetCatalog : RECIPES_CATALOG.filter(r => r.mealType === "breakfast" && r.id !== "b2");
+        const replacement = pool[fallbackIndex % pool.length];
+        return {
+          ...replacement,
+          id: `sweet_breakfast_${Date.now()}_${fallbackIndex}`,
+          calculatedServings: servings
+        };
+      }
+
+      // Si l'utilisateur voulait du salé et que le plat généré est sucré
+      if (profile.breakfastFlavor === "savory" && !hasSavoryKeywords) {
+        const savoryCatalog = this.filterRecipes(profile, "breakfast").filter(r => {
+          const t = `${r.title?.fr || ""} ${r.title?.en || ""}`.toLowerCase();
+          return t.includes("avocat") || t.includes("œuf") || t.includes("oeuf") || t.includes("omelette");
+        });
+        const pool = savoryCatalog.length > 0 ? savoryCatalog : RECIPES_CATALOG.filter(r => r.mealType === "breakfast" && r.id === "b2");
+        const replacement = pool[fallbackIndex % pool.length];
+        return {
+          ...replacement,
+          id: `savory_breakfast_${Date.now()}_${fallbackIndex}`,
+          calculatedServings: servings
+        };
+      }
+    }
+
+    // 2. Validation Goûter
+    if (type === "snack" && profile?.snackFlavor && profile.snackFlavor !== "both") {
+      const titleStr = (typeof meal.title === "string" ? meal.title : (meal.title?.fr || meal.title?.en || "")).toLowerCase();
+      const ingStr = (meal.ingredients || []).map(i => (typeof i.name === "string" ? i.name : (i.name?.fr || i.name?.en || "")).toLowerCase()).join(" ");
+      const fullText = `${titleStr} ${ingStr}`.toLowerCase();
+
+      const hasSavoryKeywords = (
+        fullText.includes("tzatziki") || fullText.includes("houmous") || fullText.includes("hummus") ||
+        fullText.includes("concombre") || fullText.includes("carotte") || fullText.includes("fromage") ||
+        fullText.includes("crackers") || fullText.includes("wrap") || fullText.includes("avocat") ||
+        fullText.includes("sel")
+      );
+
+      if (profile.snackFlavor === "sweet" && hasSavoryKeywords) {
+        const sweetCatalog = this.filterRecipes(profile, "snack");
+        const pool = sweetCatalog.length > 0 ? sweetCatalog : RECIPES_CATALOG.filter(r => r.mealType === "snack");
+        const replacement = pool[fallbackIndex % pool.length];
+        return {
+          ...replacement,
+          id: `sweet_snack_${Date.now()}_${fallbackIndex}`,
+          calculatedServings: servings
+        };
+      }
+
+      if (profile.snackFlavor === "savory" && !hasSavoryKeywords) {
+        const savoryCatalog = this.filterRecipes(profile, "snack");
+        const pool = savoryCatalog.length > 0 ? savoryCatalog : RECIPES_CATALOG.filter(r => r.mealType === "snack");
+        const replacement = pool[fallbackIndex % pool.length];
+        return {
+          ...replacement,
+          id: `savory_snack_${Date.now()}_${fallbackIndex}`,
+          calculatedServings: servings
+        };
+      }
+    }
+
+    return meal;
+  }
+
+  /**
    * Génère un planning complet (Mistral AI ou Local déterministe avec variété)
    */
   static async generateMealPlan(profile, durationWeeks = 1, aiConfig = null, lang = "fr") {
@@ -144,6 +238,11 @@ export class AIPlannerService {
               };
             };
 
+            const rawB = formatMeal(d.meals?.breakfast, "breakfast");
+            const rawL = formatMeal(d.meals?.lunch, "lunch");
+            const rawS = formatMeal(d.meals?.snack, "snack");
+            const rawD = formatMeal(d.meals?.dinner, "dinner");
+
             return {
               id: `day_${i + 1}`,
               dayNumber: i + 1,
@@ -151,10 +250,10 @@ export class AIPlannerService {
               dayKey: dayKey,
               servings: servings,
               meals: {
-                breakfast: formatMeal(d.meals?.breakfast, "breakfast"),
-                lunch: formatMeal(d.meals?.lunch, "lunch"),
-                snack: formatMeal(d.meals?.snack, "snack"),
-                dinner: formatMeal(d.meals?.dinner, "dinner")
+                breakfast: this.sanitizeMeal(rawB, "breakfast", profile, servings, i),
+                lunch: rawL,
+                snack: this.sanitizeMeal(rawS, "snack", profile, servings, i),
+                dinner: rawD
               }
             };
           });
@@ -382,7 +481,7 @@ export class AIPlannerService {
         });
 
         if (generated) {
-          return {
+          const rawSwap = {
             id: `mistral_swap_${Date.now()}`,
             mealType: mealType,
             title: typeof generated.title === "string" ? { fr: generated.title, en: generated.title, ar: generated.title } : (generated.title || { fr: "Nouveau plat" }),
@@ -401,6 +500,7 @@ export class AIPlannerService {
             })),
             instructions: generated.instructions || { fr: ["Préparer et déguster."] }
           };
+          return this.sanitizeMeal(rawSwap, mealType, profile, servings, Math.floor(Math.random() * 5));
         }
       } catch (err) {
         console.warn("Échec du swap Mistral AI, repli sur local:", err.message);

@@ -689,11 +689,15 @@ export default function DriveCartModal({
                   {selectedStore.searchUrl && (
                     <TouchableOpacity
                       style={[styles.webSearchDirectBtn, { backgroundColor: "#0284c7" }]}
-                      onPress={() => Linking.openURL(selectedStore.searchUrl(searchQuery || getCleanItemName(currentItem)))}
+                      onPress={() => {
+                        const q = searchQuery || getCleanItemName(currentItem);
+                        copyToClipboard(q);
+                        Linking.openURL(selectedStore.searchUrl(q));
+                      }}
                     >
                       <Ionicons name="search" size={16} color="#ffffff" />
                       <Text style={styles.webSearchDirectBtnText}>
-                        Rechercher sur le Drive ↗
+                        Rechercher sur {selectedStore.shortName} ↗
                       </Text>
                     </TouchableOpacity>
                   )}
@@ -1708,144 +1712,6 @@ const styles = StyleSheet.create({
     color: "#10b981",
     fontSize: 15,
     fontWeight: "800"
-  },
-  webFallbackContainer: {
-    flex: 1
-  },
-  webFallbackContent: {
-    padding: 20,
-    maxWidth: 800,
-    width: "100%",
-    alignSelf: "center",
-    gap: 16
-  },
-  webFallbackHero: {
-    borderRadius: 16,
-    padding: 20,
-    alignItems: "center",
-    borderWidth: 1,
-    gap: 10
-  },
-  webFallbackEmoji: {
-    fontSize: 40
-  },
-  webFallbackTitle: {
-    fontSize: 20,
-    fontWeight: "800",
-    textAlign: "center"
-  },
-  webFallbackDesc: {
-    fontSize: 14,
-    textAlign: "center",
-    lineHeight: 20,
-    maxWidth: 500
-  },
-  webOpenStoreBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    gap: 8,
-    marginTop: 6
-  },
-  webOpenStoreBtnText: {
-    color: "#ffffff",
-    fontSize: 15,
-    fontWeight: "800"
-  },
-  webCurrentItemCard: {
-    borderRadius: 16,
-    padding: 18,
-    borderWidth: 1
-  },
-  webCurrentItemHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10
-  },
-  webItemTitle: {
-    fontSize: 20,
-    fontWeight: "800",
-    marginBottom: 4
-  },
-  webItemQty: {
-    fontSize: 14,
-    fontWeight: "700",
-    marginBottom: 12
-  },
-  webActionButtonsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    flexWrap: "wrap"
-  },
-  webCopyBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    gap: 6
-  },
-  webCopyBtnText: {
-    fontSize: 13,
-    fontWeight: "700"
-  },
-  webSearchDirectBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 10,
-    gap: 6
-  },
-  webSearchDirectBtnText: {
-    color: "#ffffff",
-    fontSize: 13,
-    fontWeight: "700"
-  },
-  webGroceriesListCard: {
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1
-  },
-  webGroceriesListTitle: {
-    fontSize: 16,
-    fontWeight: "800",
-    marginBottom: 12
-  },
-  webGroceryRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 8,
-    borderRadius: 8,
-    borderBottomWidth: 1,
-    gap: 10
-  },
-  webGroceryRowText: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: "600"
-  },
-  webGroceryRowTextChecked: {
-    textDecorationLine: "line-through",
-    opacity: 0.5
-  },
-  currentBadgeSmall: {
-    backgroundColor: "rgba(56, 189, 248, 0.2)",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6
-  },
-  currentBadgeSmallText: {
-    color: "#38bdf8",
-    fontSize: 11,
-    fontWeight: "700"
   }
 });
 

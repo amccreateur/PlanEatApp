@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import Constants from "expo-constants";
@@ -35,8 +35,6 @@ export default function DriveCartModal({
   themeMode = "dark"
 }) {
   const insets = useSafeAreaInsets();
-  const topInset = Math.max(insets.top, Platform.OS === "ios" ? 50 : 20);
-  const bottomInset = Math.max(insets.bottom, Platform.OS === "android" ? 56 : 24);
   const t = TRANSLATIONS[lang] || TRANSLATIONS.fr;
   const theme = THEMES[themeMode] || THEMES.dark;
 
@@ -133,7 +131,6 @@ export default function DriveCartModal({
       setIsEditingStoreUrl(false);
       return;
     }
-    // Nettoyer l'URL de base du magasin Leclerc (garder https://www.leclercdrive.fr/magasin-XXXXX-nom)
     const match = trimmed.match(/(https?:\/\/[^\/]+\/magasin-[^\/\?#]+)/i);
     const cleanUrl = match ? match[1] : trimmed.replace(/\/+$/, "").replace(/\/recherche\.aspx.*$/i, "").replace(/\/recherche\/.*$/i, "");
     setCustomStoreUrl(cleanUrl);
@@ -184,7 +181,7 @@ export default function DriveCartModal({
     }
   };
 
-  // Copier le mot-clé et passer automatiquement à l'article suivant (Web & Mobile)
+  // Copier le mot-clé et passer automatiquement à l'article suivant
   const handleCopyAndNext = async () => {
     const textToCopy = (searchQuery || getCleanItemName(currentItem)).trim();
     if (textToCopy) {
@@ -200,6 +197,9 @@ export default function DriveCartModal({
       if (nextItem) {
         const nextQuery = getCleanItemName(nextItem);
         setSearchQuery(nextQuery);
+        if (Platform.OS !== "web") {
+          injectSearchInStore(nextQuery);
+        }
       }
     }
   };
@@ -856,7 +856,7 @@ export default function DriveCartModal({
   }
 
   // ==========================================
-  // RENDER MOBILE (iOS / Android avec WebView)
+  // RENDER MOBILE (iOS / Android avec WebView & Dock Impeccable)
   // ==========================================
   return (
     <Modal
@@ -865,9 +865,9 @@ export default function DriveCartModal({
       transparent={false}
       onRequestClose={onClose}
     >
-      <View style={[styles.safeContainer, { backgroundColor: theme.bg }]}>
+      <SafeAreaView style={[styles.safeContainer, { backgroundColor: theme.bg }]} edges={["top", "bottom", "left", "right"]}>
         {/* Top Header */}
-        <View style={[styles.header, { backgroundColor: theme.headerBg, borderBottomColor: theme.border, paddingTop: topInset + 6 }]}>
+        <View style={[styles.header, { backgroundColor: theme.headerBg, borderBottomColor: theme.border }]}>
           <View style={styles.headerTopRow}>
             <View style={styles.brandTitleBox}>
               <Text style={styles.brandEmoji}>{selectedStore.logoEmoji}</Text>
@@ -937,7 +937,7 @@ export default function DriveCartModal({
 
           {/* Store Switcher Chips */}
           {isSelectingStore && (
-            <View style={{ paddingTop: 6, paddingBottom: 4 }}>
+            <View style={{ paddingTop: 4, paddingBottom: 4 }}>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -1000,7 +1000,7 @@ export default function DriveCartModal({
           )}
 
           {isSelectingStore && (
-            <View style={[styles.floatingStartBar, { bottom: bottomInset + 10 }]}>
+            <View style={styles.floatingStartBar}>
               <TouchableOpacity
                 style={styles.floatingStartBtn}
                 onPress={handleStartShopping}
@@ -1023,7 +1023,7 @@ export default function DriveCartModal({
         {/* Bottom Assistant Dock */}
         {!isSelectingStore && (
           isAssistantCollapsed ? (
-            <View style={[styles.collapsedDock, { backgroundColor: theme.cardBg, borderTopColor: theme.border, paddingBottom: bottomInset + 8 }]}>
+            <View style={[styles.collapsedDock, { backgroundColor: theme.cardBg, borderTopColor: theme.border }]}>
               <TouchableOpacity
                 style={styles.collapsedLeftTouch}
                 onPress={() => setIsAssistantCollapsed(false)}
@@ -1040,7 +1040,7 @@ export default function DriveCartModal({
               <View style={styles.collapsedRightActions}>
                 <TouchableOpacity style={styles.collapsedAddedBtn} onPress={handleItemAdded}>
                   <Ionicons name="checkmark" size={16} color="#ffffff" />
-                  <Text style={styles.collapsedAddedText}>Ajouté</Text>
+                  <Text style={styles.collapsedAddedText}>Suivant</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -1052,7 +1052,8 @@ export default function DriveCartModal({
               </View>
             </View>
           ) : (
-            <View style={[styles.bottomDock, { backgroundColor: theme.cardBg, borderTopColor: theme.border, paddingBottom: bottomInset + 8 }]}>
+            <View style={[styles.bottomDock, { backgroundColor: theme.cardBg, borderTopColor: theme.border }]}>
+              {/* Header Dock : Progression & Actions */}
               <View style={styles.dockProgressRow}>
                 <View style={styles.dockProgressLeft}>
                   <Text style={[styles.dockProgressLabel, { color: theme.text }]}>
@@ -1084,10 +1085,12 @@ export default function DriveCartModal({
                 </View>
               </View>
 
+              {/* Progress Bar */}
               <View style={[styles.progressBarTrack, { backgroundColor: theme.cardBgAlt }]}>
                 <View style={[styles.progressBarFill, { width: `${progressPercent}%` }]} />
               </View>
 
+              {/* Drawer Liste Déroulante Complète */}
               {isListExpanded && (
                 <ScrollView style={[styles.expandedListScroll, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]} showsVerticalScrollIndicator={true}>
                   {groceries.map((item, idx) => {
@@ -1137,6 +1140,7 @@ export default function DriveCartModal({
                 </ScrollView>
               )}
 
+              {/* Card Article Actuel */}
               {currentItem ? (
                 <View style={[styles.currentCard, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}>
                   <View style={styles.currentItemInfo}>
@@ -1159,7 +1163,7 @@ export default function DriveCartModal({
                         ]}
                         onPress={() => copyToClipboard(searchQuery || getCleanItemName(currentItem))}
                       >
-                        <Ionicons name={isCopied ? "checkmark" : "copy-outline"} size={11} color={isCopied ? "#ffffff" : "#38bdf8"} />
+                        <Ionicons name={isCopied ? "checkmark" : "copy-outline"} size={12} color={isCopied ? "#ffffff" : "#38bdf8"} />
                         <Text style={[styles.quickCopyChipText, { color: isCopied ? "#ffffff" : theme.textSub }]}>
                           {isCopied ? "Copié !" : "Copier"}
                         </Text>
@@ -1177,6 +1181,7 @@ export default function DriveCartModal({
                     ) : null}
                   </View>
 
+                  {/* Suggestions Chips */}
                   {suggestions.length > 0 && (
                     <View style={styles.suggestionsContainer}>
                       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionsScroll}>
@@ -1203,6 +1208,7 @@ export default function DriveCartModal({
                     </View>
                   )}
 
+                  {/* Actions Row : Prev, Suivant & Next */}
                   <View style={styles.actionButtonsRow}>
                     <TouchableOpacity
                       style={[styles.skipBtn, { backgroundColor: theme.cardBg, borderColor: theme.border }, currentIndex === 0 && styles.btnDisabled]}
@@ -1215,6 +1221,7 @@ export default function DriveCartModal({
                     <TouchableOpacity
                       style={styles.addedBtn}
                       onPress={handleItemAdded}
+                      activeOpacity={0.85}
                     >
                       <Ionicons name="checkmark-circle" size={18} color="#ffffff" />
                       <Text style={styles.addedBtnText}>Article suivant</Text>
@@ -1238,7 +1245,7 @@ export default function DriveCartModal({
             </View>
           )
         )}
-      </View>
+      </SafeAreaView>
     </Modal>
   );
 }
@@ -1564,15 +1571,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#1e293b",
     borderBottomWidth: 1,
     borderBottomColor: "#334155",
-    paddingTop: 4,
-    paddingBottom: 8
+    paddingVertical: 6
   },
   headerTopRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 14,
-    marginBottom: 8
+    paddingHorizontal: 14
   },
   brandTitleBox: {
     flexDirection: "row",
@@ -1632,7 +1637,7 @@ const styles = StyleSheet.create({
     marginLeft: 4
   },
   storeChipsScroll: {
-    paddingHorizontal: 4,
+    paddingHorizontal: 14,
     gap: 8
   },
   storeChip: {
@@ -1710,9 +1715,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#0f172a",
     borderTopWidth: 1,
     borderTopColor: "#334155",
-    paddingHorizontal: 14,
-    paddingTop: 10,
-    paddingBottom: 10
+    paddingHorizontal: 12,
+    paddingTop: 8,
+    paddingBottom: 12
   },
   collapsedDock: {
     flexDirection: "row",
@@ -1756,8 +1761,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#10b981",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
     borderRadius: 8,
     gap: 4
   },
@@ -1767,8 +1772,8 @@ const styles = StyleSheet.create({
     fontWeight: "800"
   },
   collapsedExpandBtn: {
-    width: 30,
-    height: 30,
+    width: 32,
+    height: 32,
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center"
@@ -1790,7 +1795,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 6
+    marginBottom: 4
   },
   dockProgressLeft: {
     flexDirection: "row",
@@ -1798,7 +1803,7 @@ const styles = StyleSheet.create({
   },
   dockProgressLabel: {
     color: "#f8fafc",
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "700"
   },
   dockProgressRightActions: {
@@ -1816,14 +1821,14 @@ const styles = StyleSheet.create({
   },
   toggleListBtnText: {
     color: "#38bdf8",
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "700"
   },
   progressBarTrack: {
-    height: 4,
+    height: 3,
     backgroundColor: "#1e293b",
     borderRadius: 2,
-    marginBottom: 10,
+    marginBottom: 8,
     overflow: "hidden"
   },
   progressBarFill: {
@@ -1832,18 +1837,18 @@ const styles = StyleSheet.create({
     borderRadius: 2
   },
   expandedListScroll: {
-    maxHeight: 180,
+    maxHeight: 160,
     backgroundColor: "#1e293b",
-    borderRadius: 14,
+    borderRadius: 12,
     padding: 8,
-    marginBottom: 10,
+    marginBottom: 8,
     borderWidth: 1,
     borderColor: "#334155"
   },
   drawerItemRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 7,
+    paddingVertical: 6,
     paddingHorizontal: 8,
     borderRadius: 8,
     gap: 8
@@ -1857,7 +1862,7 @@ const styles = StyleSheet.create({
   drawerItemName: {
     flex: 1,
     color: "#f8fafc",
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "600"
   },
   drawerItemNameChecked: {
@@ -1870,20 +1875,20 @@ const styles = StyleSheet.create({
   },
   currentCard: {
     backgroundColor: "#1e293b",
-    borderRadius: 16,
-    padding: 12,
+    borderRadius: 14,
+    padding: 10,
     borderWidth: 1,
     borderColor: "#334155"
   },
   currentItemInfo: {
-    marginBottom: 10
+    marginBottom: 6
   },
   itemBadgeRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     gap: 6,
-    marginBottom: 4
+    marginBottom: 2
   },
   quickCopyChip: {
     flexDirection: "row",
@@ -1914,34 +1919,29 @@ const styles = StyleSheet.create({
   },
   currentItemTitle: {
     color: "#f8fafc",
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "800",
-    marginBottom: 2
+    marginBottom: 1
   },
   currentItemQuantity: {
     color: "#10b981",
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "600"
   },
   suggestionsContainer: {
-    marginBottom: 8
-  },
-  suggestionsLabel: {
-    fontSize: 11,
-    fontWeight: "700",
-    marginBottom: 4
+    marginBottom: 6
   },
   suggestionsScroll: {
     gap: 6,
-    paddingVertical: 2
+    paddingVertical: 1
   },
   sugChip: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#0f172a",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 7,
     borderWidth: 1,
     borderColor: "#334155",
     gap: 4
@@ -1961,15 +1961,18 @@ const styles = StyleSheet.create({
   actionButtonsRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8
+    gap: 8,
+    marginTop: 2
   },
   addedBtn: {
     flex: 1,
+    minHeight: 44,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#10b981",
     paddingVertical: 10,
+    paddingHorizontal: 12,
     borderRadius: 12,
     gap: 6
   },
@@ -1979,8 +1982,8 @@ const styles = StyleSheet.create({
     fontWeight: "800"
   },
   skipBtn: {
-    width: 38,
-    height: 38,
+    width: 44,
+    height: 44,
     borderRadius: 12,
     backgroundColor: "#0f172a",
     alignItems: "center",

@@ -14,6 +14,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { TRANSLATIONS } from "../i18n/translations";
 import { THEMES } from "../utils/theme";
 
+export default function RecipeModal({
+  visible,
+  recipe,
+  onClose,
+  lang = "fr",
+  themeMode = "dark"
+}) {
   const insets = useSafeAreaInsets();
   const topInset = Math.max(insets.top, Platform.OS === "ios" ? 50 : (StatusBar.currentHeight || 20));
   const bottomInset = Math.max(insets.bottom, Platform.OS === "android" ? 56 : 24);

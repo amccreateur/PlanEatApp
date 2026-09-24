@@ -18,10 +18,10 @@ export const DEFAULT_AI_CONFIG = {
 };
 
 export const DEFAULT_CUISINES = {
+  french: 2,
+  italian: 2,
   oriental: 2,
   asian: 2,
-  italian: 2,
-  french: 2,
   mexican: 1,
   indian: 1,
   streetfood: 1
@@ -38,7 +38,7 @@ export const DEFAULT_PROFILE = {
   children: 2,
   childrenAges: [4, 8],
   mealTypes: ["breakfast", "lunch", "snack", "dinner"],
-  diets: ["dietBalanced", "dietHalal"],
+  diets: [],
   cuisines: DEFAULT_CUISINES,
   appliances: DEFAULT_APPLIANCES,
   dislikedFoods: [],
@@ -103,7 +103,7 @@ export class StorageService {
   static async getLanguage() {
     try {
       const lang = await AsyncStorage.getItem(KEYS.LANGUAGE);
-      return lang || "fr";
+      return (lang === "ar" || !lang) ? "fr" : lang;
     } catch {
       return "fr";
     }

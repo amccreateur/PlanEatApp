@@ -45,12 +45,12 @@ export default function FamilyProfileModal({
   const [adults, setAdults] = useState(profile?.adults || 2);
   const [children, setChildren] = useState(profile?.children || 0);
   const [childrenAges, setChildrenAges] = useState(profile?.childrenAges || []);
-  const [diets, setDiets] = useState(profile?.diets || ["dietBalanced"]);
+  const [diets, setDiets] = useState(profile?.diets || []);
   const [cuisines, setCuisines] = useState(profile?.cuisines || {
+    french: 2,
+    italian: 2,
     oriental: 2,
     asian: 2,
-    italian: 2,
-    french: 2,
     mexican: 1,
     indian: 1,
     streetfood: 1
@@ -120,10 +120,10 @@ export default function FamilyProfileModal({
   ];
 
   const cuisineList = [
+    { key: "french", name: t.cuisineFrench, desc: t.cuisineFrenchDesc, emoji: "🇫🇷" },
+    { key: "italian", name: t.cuisineItalian, desc: t.cuisineItalianDesc, emoji: "🇮🇹" },
     { key: "oriental", name: t.cuisineOriental, desc: t.cuisineOrientalDesc, emoji: "🇲🇦" },
     { key: "asian", name: t.cuisineAsian, desc: t.cuisineAsianDesc, emoji: "🥢" },
-    { key: "italian", name: t.cuisineItalian, desc: t.cuisineItalianDesc, emoji: "🇮🇹" },
-    { key: "french", name: t.cuisineFrench, desc: t.cuisineFrenchDesc, emoji: "🇫🇷" },
     { key: "mexican", name: t.cuisineMexican, desc: t.cuisineMexicanDesc, emoji: "🇲🇽" },
     { key: "indian", name: t.cuisineIndian, desc: t.cuisineIndianDesc, emoji: "🇮🇳" },
     { key: "streetfood", name: t.cuisineStreetFood, desc: t.cuisineStreetFoodDesc, emoji: "🍔" }

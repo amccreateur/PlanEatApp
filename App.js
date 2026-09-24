@@ -88,9 +88,6 @@ function MainApp() {
       setSelectedDurationWeeks(savedPlan.durationWeeks || 1);
       const savedGroceries = await StorageService.getGroceries();
       setGroceries(savedGroceries.length > 0 ? savedGroceries : AIPlannerService.compileGroceries(savedPlan));
-    } else {
-      // Génération automatique initiale
-      handleGeneratePlan(savedProfile, 1, savedAiConfig, savedLang);
     }
   };
 

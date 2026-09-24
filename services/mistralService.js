@@ -134,14 +134,14 @@ export class MistralService {
     const daysCount = durationWeeks * 7;
     const adults = profile?.adults || 2;
     const children = profile?.children || 0;
-    const diets = (profile?.diets || ["dietBalanced"]).join(", ");
+    const diets = (profile?.diets || []).join(", ") || "aucun régime particulier";
     const dislikes = (profile?.dislikedFoods || []).join(", ") || "aucun";
 
     const cuisinesMap = {
+      french: "Française & Terroir (Gratins, Quiches, Poêlées terroir, Blanquettes, Mijotés...)",
+      italian: "Italienne & Méditerranée (Pastas fraîches, Risotto, Pesto, Lasagnes, Tomates séchées...)",
       oriental: "Orientale & Maghrébine (Couscous, Tajines, Kefta, Pastilla, Zaalouk, Épices douces...)",
       asian: "Asiatique & Wok (Pad Thaï, Riz sauté, Wok légumes, Teriyaki, Currys coco...)",
-      italian: "Italienne & Méditerranée (Pastas fraîches, Risotto, Pesto, Lasagnes, Tomates séchées...)",
-      french: "Française & Terroir (Gratins, Quiches, Poêlées terroir, Blanquettes, Mijotés...)",
       mexican: "Mexicaine & Tex-Mex (Fajitas, Tacos, Guacamole, Quesadillas, Chili doux...)",
       indian: "Indienne & Épicée (Tikka Masala, Dahl lentilles corail, Butter Chicken, Naans...)",
       streetfood: "Street Food & Rapide Maison (Burgers gourmets maison, Wraps croustillants, Bowls...)"
@@ -218,13 +218,13 @@ Format JSON attendu :
       "dayIndex": ${startDay},
       "meals": {
         "breakfast": {
-          "title": { "fr": "Titre Petit-Déjeuner Jour ${startDay}", "en": "Breakfast Title Day ${startDay}", "ar": "عنوان الفطور" },
+          "title": { "fr": "Titre Petit-Déjeuner Jour ${startDay}", "en": "Breakfast Title Day ${startDay}" },
           "emoji": "🥣",
           "prepTime": 8,
           "cookTime": 5,
           "caloriesPerPerson": 350,
           "ingredients": [
-            { "name": { "fr": "Ingrédient 1", "en": "Ingredient 1", "ar": "مكون 1" }, "quantity": 80, "unit": "g", "dept": "deptPantry" }
+            { "name": { "fr": "Ingrédient 1", "en": "Ingredient 1" }, "quantity": 80, "unit": "g", "dept": "deptPantry" }
           ],
           "instructions": {
             "fr": [
@@ -236,7 +236,7 @@ Format JSON attendu :
           "chefTip": { "fr": "Astuce du chef..." }
         },
         "lunch": {
-          "title": { "fr": "Titre Déjeuner Gourmand Jour ${startDay}", "en": "Lunch Title Day ${startDay}", "ar": "عنوان الغداء" },
+          "title": { "fr": "Titre Déjeuner Gourmand Jour ${startDay}", "en": "Lunch Title Day ${startDay}" },
           "emoji": "🍗",
           "prepTime": 15,
           "cookTime": 15,
@@ -263,7 +263,7 @@ Format JSON attendu :
           "chefTip": { "fr": "Astuce du chef..." }
         },
         "snack": {
-          "title": { "fr": "Titre Goûter Jour ${startDay}", "en": "Snack Title Day ${startDay}", "ar": "عنوان اللمجة" },
+          "title": { "fr": "Titre Goûter Jour ${startDay}", "en": "Snack Title Day ${startDay}" },
           "emoji": "🍎",
           "prepTime": 5,
           "cookTime": 0,
@@ -277,7 +277,7 @@ Format JSON attendu :
           "chefTip": { "fr": "Conseil snack..." }
         },
         "dinner": {
-          "title": { "fr": "Titre Dîner Savoureux Jour ${startDay}", "en": "Dinner Title Day ${startDay}", "ar": "عنوان العشاء" },
+          "title": { "fr": "Titre Dîner Savoureux Jour ${startDay}", "en": "Dinner Title Day ${startDay}" },
           "emoji": "🍲",
           "prepTime": 15,
           "cookTime": 20,
@@ -379,7 +379,7 @@ Format JSON attendu :
     const activeModel = model || DEFAULT_MISTRAL_MODEL;
     const adults = profile?.adults || 2;
     const children = profile?.children || 0;
-    const diets = (profile?.diets || ["dietBalanced"]).join(", ");
+    const diets = (profile?.diets || []).join(", ") || "aucun régime particulier";
     const dislikes = (profile?.dislikedFoods || []).join(", ") || "aucun";
     const currentTitle = currentMeal?.title?.fr || currentMeal?.title?.en || "le plat précédent";
     const hasThermomix = profile?.appliances?.thermomix;
@@ -399,14 +399,14 @@ ${hasThermomix ? "- Inclus impérativement 'thermomixInstructions' (tableau d'é
 
 Format JSON attendu :
 {
-  "title": { "fr": "Titre Gourmand FR", "en": "Gourmet Title EN", "ar": "العنوان بالعربية" },
+  "title": { "fr": "Titre Gourmand FR", "en": "Gourmet Title EN" },
   "emoji": "🍲",
   "prepTime": 15,
   "cookTime": 20,
   "difficulty": "easy",
   "caloriesPerPerson": 480,
   "ingredients": [
-    { "name": { "fr": "Ingrédient 1", "en": "Ingredient 1", "ar": "مكون 1" }, "quantity": 200, "unit": "g", "dept": "deptProduce" }
+    { "name": { "fr": "Ingrédient 1", "en": "Ingredient 1" }, "quantity": 200, "unit": "g", "dept": "deptProduce" }
   ],
   "instructions": {
     "fr": [
@@ -415,8 +415,7 @@ Format JSON attendu :
       "Étape 3 : Assaisonnement et finition...",
       "Étape 4 : Dressage et dégustation..."
     ],
-    "en": ["Step 1...", "Step 2...", "Step 3...", "Step 4..."],
-    "ar": ["خطوة 1...", "خطوة 2...", "خطوة 3...", "خطوة 4..."]
+    "en": ["Step 1...", "Step 2...", "Step 3...", "Step 4..."]
   },
   ${hasThermomix ? `"thermomixInstructions": {
     "fr": [
@@ -474,7 +473,7 @@ Format JSON attendu :
     const activeModel = model || DEFAULT_MISTRAL_MODEL;
     const adults = profile?.adults || 2;
     const children = profile?.children || 0;
-    const diets = (profile?.diets || ["dietBalanced"]).join(", ");
+    const diets = (profile?.diets || []).join(", ") || "aucun régime particulier";
     const dislikes = (profile?.dislikedFoods || []).join(", ") || "aucun";
     const fridgeItems = ingredients.join(", ");
     const hasThermomix = profile?.appliances?.thermomix;
@@ -497,14 +496,14 @@ ${hasThermomix ? "- Inclus impérativement 'thermomixInstructions' (tableau d'é
 
 Format JSON attendu :
 {
-  "title": { "fr": "Titre appétissant FR", "en": "Appetizing Title EN", "ar": "العنوان بالعربية" },
+  "title": { "fr": "Titre appétissant FR", "en": "Appetizing Title EN" },
   "emoji": "🍳",
   "prepTime": 15,
   "cookTime": 15,
   "difficulty": "easy",
   "caloriesPerPerson": 420,
   "ingredients": [
-    { "name": { "fr": "Ingrédient 1", "en": "Ingredient 1", "ar": "مكون 1" }, "quantity": 100, "unit": "g", "dept": "deptProduce" }
+    { "name": { "fr": "Ingrédient 1", "en": "Ingredient 1" }, "quantity": 100, "unit": "g", "dept": "deptProduce" }
   ],
   "instructions": {
     "fr": [
@@ -512,8 +511,7 @@ Format JSON attendu :
       "Étape 2 : Cuisson et assaisonnement...",
       "Étape 3 : Finition et dressage..."
     ],
-    "en": ["Step 1...", "Step 2...", "Step 3..."],
-    "ar": ["خطوة 1...", "خطوة 2...", "خطوة 3..."]
+    "en": ["Step 1...", "Step 2...", "Step 3..."]
   },
   ${hasThermomix ? `"thermomixInstructions": {
     "fr": [

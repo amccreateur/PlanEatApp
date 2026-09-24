@@ -241,7 +241,7 @@ export default function QuickMenuModal({
 
                   {/* Action 6 : Sélecteur de Langues */}
                   <View style={[styles.langSection, { borderTopColor: theme.border, marginTop: 12 }]}>
-                    <Text style={[styles.sectionLabel, { color: theme.textSub }]}>Langue / Language / اللغة</Text>
+                    <Text style={[styles.sectionLabel, { color: theme.textSub }]}>Langue / Language</Text>
                     <View style={[styles.langRow, isRTL && styles.rtlRow]}>
                       <TouchableOpacity
                         style={[
@@ -268,20 +268,6 @@ export default function QuickMenuModal({
                         <Text style={styles.langFlag}>🇬🇧</Text>
                         <Text style={[styles.langBtnText, { color: theme.textSub }, lang === "en" && styles.langBtnTextActive]}>
                           English
-                        </Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        style={[
-                          styles.langBtn,
-                          { backgroundColor: theme.cardBgAlt, borderColor: theme.border },
-                          lang === "ar" && styles.langBtnActive
-                        ]}
-                        onPress={() => onLanguageChange("ar")}
-                      >
-                        <Text style={styles.langFlag}>🇸🇦</Text>
-                        <Text style={[styles.langBtnText, { color: theme.textSub }, lang === "ar" && styles.langBtnTextActive]}>
-                          العربية
                         </Text>
                       </TouchableOpacity>
                     </View>

@@ -24,7 +24,7 @@ export class AIPlannerService {
    * Filtre les recettes selon les régimes et aliments exclus
    */
   static filterRecipes(profile, mealType = null) {
-    const diets = profile?.diets || ["dietBalanced"];
+    const diets = profile?.diets || [];
     const dislikes = (profile?.dislikedFoods || []).map(d => d.toLowerCase().trim());
 
     return RECIPES_CATALOG.filter(recipe => {

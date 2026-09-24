@@ -174,16 +174,24 @@ export class MistralService {
     const snackFlavor = profile?.snackFlavor || "both";
     const flavorRules = [];
     if (activeMealTypes.includes("breakfast")) {
-      if (breakfastFlavor === "sweet") flavorRules.push("- PETIT-DÉJEUNER : Impérativement 100% SUCRÉ (pancakes, fruits, porridge, granola, tartines miel/confiture, muesli, yaourts...).");
-      else if (breakfastFlavor === "savory") flavorRules.push("- PETIT-DÉJEUNER : Impérativement 100% SALÉ (œufs brouillés/pochés, toast avocat, omelettes herbes/fromage, saumon/truite, fromage frais...).");
-      else flavorRules.push("- PETIT-DÉJEUNER : Mixte et varié (alterner jours sucrés et jours salés selon les jours).");
+      if (breakfastFlavor === "sweet") {
+        flavorRules.push("🔴 RÈGLE ABSOLUE PETIT-DÉJEUNER 100% SUCRÉ : Chaque jour, le petit-déjeuner DOIT OBLIGATOIREMENT être SUCRÉ (pancakes, bowl avoine & fruits, granola au miel, yaourt grec & coulis, smoothie bowl, tartines confiture/beurre/miel, pain perdu aux fruits). INTERDICTION FORMELLE d'inclure des œufs, de la volaille, du poulet, du poisson, de la viande, du fromage salé ou de l'avocat au petit-déjeuner !");
+      } else if (breakfastFlavor === "savory") {
+        flavorRules.push("🔴 RÈGLE ABSOLUE PETIT-DÉJEUNER 100% SALÉ : Chaque jour, le petit-déjeuner DOIT OBLIGATOIREMENT être SALÉ (œufs brouillés/pochés, toast avocat & œuf, omelette aux herbes & fromage frais, bagel saumon, toasts salés). INTERDICTION FORMELLE d'inclure du sucre, miel, confiture, chocolat ou gâteaux !");
+      } else {
+        flavorRules.push("🔵 PETIT-DÉJEUNER MIXTE : Alterner jours sucrés et jours salés selon les jours.");
+      }
     }
     if (activeMealTypes.includes("snack")) {
-      if (snackFlavor === "sweet") flavorRules.push("- GOÛTER / COLLATION : Impérativement 100% SUCRÉ (fruits frais, compotes, muffins légers, oléagineux, yaourts coulis...).");
-      else if (snackFlavor === "savory") flavorRules.push("- GOÛTER / COLLATION : Impérativement 100% SALÉ (bâtonnets légumes & tzatziki/houmous, mini wrap, crackers fromage...).");
-      else flavorRules.push("- GOÛTER / COLLATION : Mixte et varié (alterner sucré et salé).");
+      if (snackFlavor === "sweet") {
+        flavorRules.push("🔴 RÈGLE ABSOLUE GOÛTER 100% SUCRÉ : Le goûter DOIT OBLIGATOIREMENT être SUCRÉ (fruits frais, compotes, yaourt au miel, cookies avoine, muffins légers, energy balls dattes/amandes). INTERDICTION de plats salés au goûter !");
+      } else if (snackFlavor === "savory") {
+        flavorRules.push("🔴 RÈGLE ABSOLUE GOÛTER 100% SALÉ : Le goûter DOIT OBLIGATOIREMENT être SALÉ (bâtonnets de carottes/concombre & houmous/tzatziki, crackers & fromage frais, mini-wrap salé). INTERDICTION de produits sucrés au goûter !");
+      } else {
+        flavorRules.push("🔵 GOÛTER MIXTE : Alterner collations sucrées et salées selon les jours.");
+      }
     }
-    const flavorRulesText = flavorRules.length > 0 ? `\nPréférences de Saveurs :\n${flavorRules.join("\n")}` : "";
+    const flavorRulesText = flavorRules.length > 0 ? `\n\nDIRECTIVES STRICTES SUR LES SAVEURS (PETIT-DÉJEUNER & GOÛTER) :\n${flavorRules.join("\n")}` : "";
 
     // Découpage en blocs de 3 à 4 jours max pour éviter la troncature de token
     const chunkSize = 3;
@@ -199,10 +207,10 @@ export class MistralService {
     const generateChunk = async ({ startDay, endDay }) => {
       const count = endDay - startDay + 1;
       const chunkTheme = startDay === 1
-        ? "Variation suggérée pour ce bloc : Volailles dorées, poissons nobles, légumes méditerranéens et pâtes fraîches."
+        ? "Variation suggérée pour les déjeuners et dîners : Volailles dorées, poissons nobles, légumes méditerranéens et pâtes fraîches."
         : startDay <= 4
-        ? "Variation suggérée pour ce bloc : Saveurs du monde (asiatique, orientale ou tex-mex), wok parfumé, riz sauté et curry doux."
-        : "Variation suggérée pour ce bloc : Plats mijotés terroir, gratins dorés, bowls vitaminés et légumineuses réconfortantes.";
+        ? "Variation suggérée pour les déjeuners et dîners : Saveurs du monde (asiatique, orientale ou tex-mex), wok parfumé, riz sauté et curry doux."
+        : "Variation suggérée pour les déjeuners et dîners : Plats mijotés terroir, gratins dorés, bowls vitaminés et légumineuses réconfortantes.";
 
       const prompt = `Tu es un Chef cuisinier étoilé et nutritionniste passionné.
 Génère un menu gourmand, équilibré et SANS AUCUNE RÉPÉTITION pour ${count} jours (du Jour ${startDay} au Jour ${endDay}) pour les repas suivants uniquement : [${mealTypesNames}] pour ${adults} adulte(s) et ${children} enfant(s).
@@ -216,9 +224,9 @@ Langue principale : ${lang}.
 RÈGLES D'OR DE VARIÉTÉ ET DE QUALITÉ (STRICTES) :
 1. AUCUNE RÉPÉTITION : Chaque jour et chaque repas demandé doit être 100% UNIQUE et ORIGINAL.
 2. REPAS DEMANDÉS : Génère uniquement des recettes pour les types de repas suivants : ${mealTypesNames}. Les autres types de repas non demandés doivent être omis ou définis à null.
-3. SAVEURS RESPECTÉES : Respecte scrupuleusement les choix Sucré / Salé / Mixte demandés pour le petit-déjeuner et le goûter.
-4. DIVERSITÉ DES PROTÉINES & FÉCULENTS : Varie impérativement chaque jour :
-   - Alternez entre volaille (poulet, dinde), poisson/fruits de mer (saumon, cabillaud, crevettes), légumineuses/végétarien (lentilles, pois chiches, tofu), bœuf/viande, et féculents variés (riz basmati, pâtes fraîches, quinoa, patate douce, boulgour, nouilles).
+3. RESPECT STRICT DES SAVEURS : Applique à la lettre les consignes Sucré / Salé indiquées ci-dessus pour le petit-déjeuner et le goûter.
+4. DIVERSITÉ DES PROTÉINES & FÉCULENTS (Déjeuners & Dîners UNIQUEMENT) : Varie impérativement chaque jour pour les déjeuners et dîners :
+   - Alternez entre volaille (poulet, dinde), poisson/fruits de mer (saumon, cabillaud, crevettes), légumineuses/végétarien (lentilles, pois chiches, tofu), bœuf/viande, et féculents variés (riz basmati, pâtes fraîches, quinoa, patate douce, boulgour, nouilles). Ne JAMAIS mettre de volaille, viande ou poisson dans un petit-déjeuner sucré !
 5. Respecte scrupuleusement les curseurs de cuisines (les gastronomies notées 'PRIORITAIRE' doivent être largement représentées, les 'EXCLU' ne doivent jamais apparaître).
 6. TITRES AUTHENTIQUES & UNIQUES : Sois créatif et précis dans les intitulés des plats. Ne répète jamais le même nom de plat d'un jour à l'autre.
 7. Ingrédients complets (4 à 7 ingrédients réalistes par plat principal : protéine, féculent, légume, herbe/épice, matière grasse).

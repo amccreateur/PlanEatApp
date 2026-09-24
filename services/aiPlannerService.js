@@ -80,6 +80,11 @@ export class AIPlannerService {
         if (profile.snackFlavor === "savory" && !isSavory) return false;
       }
 
+      // Préférence Dîner Léger
+      if (recipe.mealType === "dinner" && profile?.dinnerStyle === "light") {
+        if (recipe.caloriesPerPerson && recipe.caloriesPerPerson > 460) return false;
+      }
+
       // Vérifier les aliments exclus
       if (dislikes.length > 0) {
         const hasDisliked = recipe.ingredients.some(ing => {
@@ -184,6 +189,31 @@ export class AIPlannerService {
       }
     }
 
+    // 3. Validation Dîner Léger
+    if (type === "dinner" && profile?.dinnerStyle === "light") {
+      const titleStr = (typeof meal.title === "string" ? meal.title : (meal.title?.fr || meal.title?.en || "")).toLowerCase();
+      const ingStr = (meal.ingredients || []).map(i => (typeof i.name === "string" ? i.name : (i.name?.fr || i.name?.en || "")).toLowerCase()).join(" ");
+      const fullText = `${titleStr} ${ingStr}`.toLowerCase();
+
+      const isHeavy = (
+        meal.caloriesPerPerson > 500 ||
+        fullText.includes("burger") || fullText.includes("frite") || fullText.includes("raclette") ||
+        fullText.includes("tartiflette") || fullText.includes("fondue")
+      );
+
+      if (isHeavy) {
+        const lightCatalog = this.filterRecipes(profile, "dinner").filter(r => (r.caloriesPerPerson || 400) <= 400);
+        if (lightCatalog.length > 0) {
+          const replacement = lightCatalog[fallbackIndex % lightCatalog.length];
+          return {
+            ...replacement,
+            id: `light_dinner_${Date.now()}_${fallbackIndex}`,
+            calculatedServings: servings
+          };
+        }
+      }
+    }
+
     return meal;
   }
 
@@ -253,7 +283,7 @@ export class AIPlannerService {
                 breakfast: this.sanitizeMeal(rawB, "breakfast", profile, servings, i),
                 lunch: rawL,
                 snack: this.sanitizeMeal(rawS, "snack", profile, servings, i),
-                dinner: rawD
+                dinner: this.sanitizeMeal(rawD, "dinner", profile, servings, i)
               }
             };
           });

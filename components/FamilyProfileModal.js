@@ -44,6 +44,7 @@ export default function FamilyProfileModal({
   );
   const [breakfastFlavor, setBreakfastFlavor] = useState(profile?.breakfastFlavor || "both");
   const [snackFlavor, setSnackFlavor] = useState(profile?.snackFlavor || "both");
+  const [dinnerStyle, setDinnerStyle] = useState(profile?.dinnerStyle || "standard");
   const [adults, setAdults] = useState(profile?.adults || 2);
   const [children, setChildren] = useState(profile?.children || 0);
   const [childrenAges, setChildrenAges] = useState(profile?.childrenAges || []);
@@ -70,6 +71,7 @@ export default function FamilyProfileModal({
       setMealTypes(profile.mealTypes && profile.mealTypes.length > 0 ? profile.mealTypes : ["breakfast", "lunch", "snack", "dinner"]);
       setBreakfastFlavor(profile.breakfastFlavor || "both");
       setSnackFlavor(profile.snackFlavor || "both");
+      setDinnerStyle(profile.dinnerStyle || "standard");
       setAdults(profile.adults || 2);
       setChildren(profile.children || 0);
       setChildrenAges(profile.childrenAges || []);
@@ -231,6 +233,7 @@ export default function FamilyProfileModal({
       mealTypes: mealTypes.length > 0 ? mealTypes : ["breakfast", "lunch", "snack", "dinner"],
       breakfastFlavor,
       snackFlavor,
+      dinnerStyle,
       diets,
       cuisines,
       appliances,
@@ -546,6 +549,45 @@ export default function FamilyProfileModal({
                           isAct && styles.flavorChipActive
                         ]}
                         onPress={() => setSnackFlavor(opt.key)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={[
+                          styles.flavorChipText,
+                          { color: theme.textSub },
+                          isAct && styles.flavorChipTextActive
+                        ]}>
+                          {opt.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
+
+            {/* Style du Dîner si activé */}
+            {mealTypes.includes("dinner") && (
+              <View style={[styles.flavorSubBox, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}>
+                <View style={styles.flavorHeaderRow}>
+                  <Text style={[styles.flavorTitleText, { color: theme.text }]}>
+                    🌙 {t.dinnerStyleTitle || "Style du Dîner"} :
+                  </Text>
+                </View>
+                <View style={styles.flavorBtnGroup}>
+                  {[
+                    { key: "standard", label: t.dinnerStandard || "Équilibré 🍲" },
+                    { key: "light", label: t.dinnerLight || "Léger & Digestif 🥗" }
+                  ].map(opt => {
+                    const isAct = (dinnerStyle || "standard") === opt.key;
+                    return (
+                      <TouchableOpacity
+                        key={opt.key}
+                        style={[
+                          styles.flavorChip,
+                          { backgroundColor: theme.cardBg, borderColor: theme.border },
+                          isAct && styles.flavorChipActive
+                        ]}
+                        onPress={() => setDinnerStyle(opt.key)}
                         activeOpacity={0.7}
                       >
                         <Text style={[

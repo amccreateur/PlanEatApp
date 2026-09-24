@@ -40,6 +40,7 @@ export const DEFAULT_PROFILE = {
   mealTypes: ["breakfast", "lunch", "snack", "dinner"],
   breakfastFlavor: "both", // 'both' | 'sweet' | 'savory'
   snackFlavor: "both", // 'both' | 'sweet' | 'savory'
+  dinnerStyle: "standard", // 'standard' | 'light'
   diets: [],
   cuisines: DEFAULT_CUISINES,
   appliances: DEFAULT_APPLIANCES,

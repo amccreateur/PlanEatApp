@@ -191,7 +191,15 @@ export class MistralService {
         flavorRules.push("🔵 GOÛTER MIXTE : Alterner collations sucrées et salées selon les jours.");
       }
     }
-    const flavorRulesText = flavorRules.length > 0 ? `\n\nDIRECTIVES STRICTES SUR LES SAVEURS (PETIT-DÉJEUNER & GOÛTER) :\n${flavorRules.join("\n")}` : "";
+    const dinnerStyle = profile?.dinnerStyle || "standard";
+    if (activeMealTypes.includes("dinner")) {
+      if (dinnerStyle === "light") {
+        flavorRules.push("🔴 RÈGLE ABSOLUE DÎNER LÉGER & DIGESTIF LE SOIR : Les dîners doivent obligatoirement être légers, réconfortants et faciles à digérer (veloutés de légumes, soupes, salades tièdes composées, papillotes de poisson blanc/citron, poêlées de légumes de saison, omelettes légères aux herbes). INTERDICTION de viandes rouges grasses, de fritures, de sauces lourdes et de portions massives de féculents le soir. Calories visées : 300 à 380 kcal par personne.");
+      } else {
+        flavorRules.push("🔵 DÎNER STANDARD ÉQUILIBRÉ : Repas du soir complet et gourmand.");
+      }
+    }
+    const flavorRulesText = flavorRules.length > 0 ? `\n\nDIRECTIVES STRICTES SUR LES SAVEURS ET STYLES DE REPAS :\n${flavorRules.join("\n")}` : "";
 
     // Découpage en blocs de 3 à 4 jours max pour éviter la troncature de token
     const chunkSize = 3;
@@ -339,6 +347,7 @@ ${breakfastFlavor === "sweet" ? "ATTENTION CRITIQUE : Le petit-déjeuner DOIT Ê
 ${breakfastFlavor === "savory" ? "ATTENTION CRITIQUE : Le petit-déjeuner DOIT ÊTRE 100% SALÉ (œufs, omelette, avocat, toasts salés, fromage frais). INTERDICTION de mettre des produits sucrés." : ""}
 ${snackFlavor === "sweet" ? "ATTENTION CRITIQUE : Le goûter DOIT ÊTRE 100% SUCRÉ (fruits, compote, yaourt au miel, cookies avoine)." : ""}
 ${snackFlavor === "savory" ? "ATTENTION CRITIQUE : Le goûter DOIT ÊTRE 100% SALÉ (crudités, houmous, crackers fromage)." : ""}
+${dinnerStyle === "light" ? "ATTENTION CRITIQUE : Les dîners doivent être LÉGERS et DIGESTES (soupes, veloutés, poissons blancs, salades tièdes, légumes sautés). Jamais de viandes rouges grasses, de fritures ou de portions massives de féculents le soir. Calories visées : 300 à 380 kcal par personne." : ""}
 Réponds uniquement en JSON valide conforme au schéma demandé.`;
 
       const response = await fetch(endpoint, {
@@ -421,6 +430,7 @@ Réponds uniquement en JSON valide conforme au schéma demandé.`;
 
     const breakfastFlavor = profile?.breakfastFlavor || "both";
     const snackFlavor = profile?.snackFlavor || "both";
+    const dinnerStyle = profile?.dinnerStyle || "standard";
     let flavorInstruction = "";
     if (mealType === "breakfast") {
       if (breakfastFlavor === "sweet") flavorInstruction = "\nConsigne de saveur : La recette de petit-déjeuner DOIT IMPÉRATIVEMENT ÊTRE SUCRÉE (fruits, porridge, pancakes, yaourt, tartines...).";
@@ -428,6 +438,8 @@ Réponds uniquement en JSON valide conforme au schéma demandé.`;
     } else if (mealType === "snack") {
       if (snackFlavor === "sweet") flavorInstruction = "\nConsigne de saveur : La recette de goûter DOIT IMPÉRATIVEMENT ÊTRE SUCRÉE (fruits, compotes, muffins, oléagineux...).";
       else if (snackFlavor === "savory") flavorInstruction = "\nConsigne de saveur : La recette de goûter DOIT IMPÉRATIVEMENT ÊTRE SALÉE (crudités & sauce, mini-wrap, houmous, crackers fromage...).";
+    } else if (mealType === "dinner") {
+      if (dinnerStyle === "light") flavorInstruction = "\nConsigne de style : La recette de dîner DOIT ÊTRE TRÈS LÉGÈRE ET DIGESTE (soupe, velouté, poisson blanc/vapeur, salade gourmande, poêlée de légumes). Pas de viandes grasses ni de friture (300-380 kcal max).";
     }
 
     const prompt = `Tu es un Chef cuisinier étoilé. Génère une NOUVELLE recette de chef détaillée et savoureuse pour le type de repas '${mealType}', originale et différente de '${currentTitle}'.

@@ -115,9 +115,12 @@ export const TRANSLATIONS = {
     minOneMealRequired: "Veuillez sélectionner au moins un repas.",
     breakfastFlavorTitle: "Saveur du Petit-déjeuner",
     snackFlavorTitle: "Saveur du Goûter",
+    dinnerStyleTitle: "Style du Dîner",
     flavorBoth: "Les deux 🔄",
     flavorSweet: "Sucré 🍯",
     flavorSavory: "Salé 🍳",
+    dinnerStandard: "Équilibré 🍲",
+    dinnerLight: "Léger & Digestif 🥗",
     
     // Cuisines du Monde & Curseurs
     cuisinesTitle: "Cuisines du Monde & Préférences",
@@ -334,9 +337,12 @@ export const TRANSLATIONS = {
     minOneMealRequired: "Please select at least one meal.",
     breakfastFlavorTitle: "Breakfast Flavor",
     snackFlavorTitle: "Snack Flavor",
+    dinnerStyleTitle: "Dinner Style",
     flavorBoth: "Both 🔄",
     flavorSweet: "Sweet 🍯",
     flavorSavory: "Savory 🍳",
+    dinnerStandard: "Standard 🍲",
+    dinnerLight: "Light & Easy 🥗",
     
     // World Cuisines & Sliders
     cuisinesTitle: "World Cuisines & Preferences",

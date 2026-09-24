@@ -8,7 +8,8 @@ const KEYS = {
   LANGUAGE: "@planeat_app_language",
   DIETS: "@planeat_diets",
   AI_CONFIG: "@planeat_ai_config",
-  THEME: "@planeat_theme_mode"
+  THEME: "@planeat_theme_mode",
+  ONBOARDING: "@planeat_has_completed_onboarding"
 };
 
 export const DEFAULT_AI_CONFIG = {
@@ -159,6 +160,24 @@ export class StorageService {
   static async saveAiConfig(config) {
     try {
       await AsyncStorage.setItem(KEYS.AI_CONFIG, JSON.stringify(config));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  static async isOnboardingCompleted() {
+    try {
+      const val = await AsyncStorage.getItem(KEYS.ONBOARDING);
+      return val === "true";
+    } catch {
+      return false;
+    }
+  }
+
+  static async setOnboardingCompleted(completed = true) {
+    try {
+      await AsyncStorage.setItem(KEYS.ONBOARDING, completed ? "true" : "false");
       return true;
     } catch {
       return false;

@@ -51,6 +51,7 @@ function MainApp() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isOnboarding, setIsOnboarding] = useState(false);
   const [isFridgeModalOpen, setIsFridgeModalOpen] = useState(false);
   const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
   const [isDriveModalOpen, setIsDriveModalOpen] = useState(false);
@@ -89,6 +90,13 @@ function MainApp() {
       const savedGroceries = await StorageService.getGroceries();
       setGroceries(savedGroceries.length > 0 ? savedGroceries : AIPlannerService.compileGroceries(savedPlan));
     }
+
+    // Premier lancement : si l'onboarding n'est pas fait, ouvrir la configuration
+    const hasCompletedOnboarding = await StorageService.isOnboardingCompleted();
+    if (!hasCompletedOnboarding) {
+      setIsOnboarding(true);
+      setIsProfileModalOpen(true);
+    }
   };
 
   const handleLanguageChange = async (newLang) => {
@@ -104,6 +112,10 @@ function MainApp() {
   const handleSaveProfile = async (updatedProfile) => {
     setProfile(updatedProfile);
     await StorageService.saveProfile(updatedProfile);
+    if (isOnboarding) {
+      await StorageService.setOnboardingCompleted(true);
+      setIsOnboarding(false);
+    }
   };
 
   const handleSaveAiConfig = async (updatedConfig) => {
@@ -898,11 +910,18 @@ function MainApp() {
           aiConfig={aiConfig}
           onSave={handleSaveProfile}
           onSaveAiConfig={handleSaveAiConfig}
-          onClose={() => setIsProfileModalOpen(false)}
+          onClose={() => {
+            setIsProfileModalOpen(false);
+            if (isOnboarding) {
+              StorageService.setOnboardingCompleted(true);
+              setIsOnboarding(false);
+            }
+          }}
           lang={lang}
           onLanguageChange={handleLanguageChange}
           themeMode={themeMode}
           onToggleTheme={handleToggleTheme}
+          isOnboarding={isOnboarding}
         />
 
         <FridgeModal

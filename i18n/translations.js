@@ -90,6 +90,9 @@ export const TRANSLATIONS = {
     // Profile & Family
     profileTitle: "Configuration du Foyer",
     profileSubtitle: "Personnalisez l'IA selon vos besoins",
+    onboardingWelcomeTitle: "Bienvenue sur PlanEat ! 🥗",
+    onboardingWelcomeSubtitle: "Configurons votre foyer en 30 secondes pour des menus et des quantités 100% sur mesure.",
+    onboardingStartBtn: "C'est parti ! 🚀",
     adultsCount: "Nombre d'adultes",
     childrenCount: "Nombre d'enfants",
     childrenAges: "Âges des enfants",
@@ -312,6 +315,9 @@ export const TRANSLATIONS = {
     // Profile & Family
     profileTitle: "Household Settings",
     profileSubtitle: "Customize the AI to your family's needs",
+    onboardingWelcomeTitle: "Welcome to PlanEat! 🥗",
+    onboardingWelcomeSubtitle: "Let's set up your household in 30 seconds for 100% tailored meals and portions.",
+    onboardingStartBtn: "Get Started! 🚀",
     adultsCount: "Number of adults",
     childrenCount: "Number of children",
     childrenAges: "Children's ages",

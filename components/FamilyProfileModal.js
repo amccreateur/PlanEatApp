@@ -28,7 +28,8 @@ export default function FamilyProfileModal({
   lang,
   onLanguageChange,
   themeMode = "dark",
-  onToggleTheme
+  onToggleTheme,
+  isOnboarding = false
 }) {
   const insets = useSafeAreaInsets();
   const topInset = Math.max(insets.top, Platform.OS === "ios" ? 50 : (StatusBar.currentHeight || 20));
@@ -273,18 +274,35 @@ export default function FamilyProfileModal({
           >
             <Ionicons name="close" size={24} color={theme.text} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: theme.text }]}>{t.profileTitle}</Text>
+          <Text style={[styles.headerTitle, { color: theme.text }]}>
+            {isOnboarding ? (t.onboardingWelcomeTitle || "Bienvenue !") : t.profileTitle}
+          </Text>
           <TouchableOpacity
             onPress={handleSave}
             style={styles.saveHeaderBtn}
             hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
             activeOpacity={0.8}
           >
-            <Text style={styles.saveHeaderText}>{t.saveProfile.split(" ")[0]}</Text>
+            <Text style={styles.saveHeaderText}>
+              {isOnboarding ? "OK" : t.saveProfile.split(" ")[0]}
+            </Text>
           </TouchableOpacity>
         </View>
 
         <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+          {/* Onboarding Welcome Hero Banner */}
+          {isOnboarding && (
+            <View style={[styles.onboardingHeroCard, { backgroundColor: theme.cardBg, borderColor: "#10b981" }]}>
+              <Text style={styles.onboardingHeroEmoji}>👋🥗</Text>
+              <Text style={[styles.onboardingHeroTitle, { color: theme.text }]}>
+                {t.onboardingWelcomeTitle || "Bienvenue sur PlanEat !"}
+              </Text>
+              <Text style={[styles.onboardingHeroSubtitle, { color: theme.textSub }]}>
+                {t.onboardingWelcomeSubtitle || "Configurons votre foyer en 30 secondes pour des menus et portions 100% sur mesure."}
+              </Text>
+            </View>
+          )}
+
           {/* Theme Selector */}
           <View style={[styles.card, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
             <View style={[styles.cardHeader, isRTL && styles.rtlRow]}>
@@ -963,9 +981,18 @@ export default function FamilyProfileModal({
           </View>
 
           {/* Save Button */}
-          <TouchableOpacity style={styles.mainSaveBtn} onPress={handleSave}>
-            <Ionicons name="checkmark-circle" size={22} color="#ffffff" />
-            <Text style={styles.mainSaveBtnText}>{t.saveProfile}</Text>
+          <TouchableOpacity
+            style={[
+              styles.mainSaveBtn,
+              isOnboarding && { backgroundColor: "#10b981" }
+            ]}
+            onPress={handleSave}
+            activeOpacity={0.8}
+          >
+            <Ionicons name={isOnboarding ? "rocket-outline" : "checkmark-circle"} size={22} color="#ffffff" />
+            <Text style={styles.mainSaveBtnText}>
+              {isOnboarding ? (t.onboardingStartBtn || "C'est parti ! 🚀") : t.saveProfile}
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -977,6 +1004,34 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#0f172a"
+  },
+  onboardingHeroCard: {
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 18,
+    borderWidth: 2,
+    alignItems: "center",
+    elevation: 3,
+    shadowColor: "#10b981",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8
+  },
+  onboardingHeroEmoji: {
+    fontSize: 40,
+    marginBottom: 10
+  },
+  onboardingHeroTitle: {
+    fontSize: 20,
+    fontWeight: "800",
+    textAlign: "center",
+    marginBottom: 6
+  },
+  onboardingHeroSubtitle: {
+    fontSize: 13,
+    lineHeight: 18,
+    textAlign: "center",
+    paddingHorizontal: 8
   },
   header: {
     flexDirection: "row",

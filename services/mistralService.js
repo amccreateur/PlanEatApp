@@ -214,11 +214,18 @@ export class MistralService {
 
     const generateChunk = async ({ startDay, endDay }) => {
       const count = endDay - startDay + 1;
-      const chunkTheme = startDay === 1
-        ? "Variation suggérée pour les déjeuners et dîners : Volailles dorées, poissons nobles, légumes méditerranéens et pâtes fraîches."
-        : startDay <= 4
-        ? "Variation suggérée pour les déjeuners et dîners : Saveurs du monde (asiatique, orientale ou tex-mex), wok parfumé, riz sauté et curry doux."
-        : "Variation suggérée pour les déjeuners et dîners : Plats mijotés terroir, gratins dorés, bowls vitaminés et légumineuses réconfortantes.";
+      
+      const prioritizedCuisines = Object.entries(profile?.cuisines || {})
+        .filter(([_, lvl]) => lvl >= 2)
+        .map(([k, lvl]) => `${cuisinesMap[k] ? cuisinesMap[k].split(" (")[0] : k} (${lvl === 3 ? "Priorité Max ⭐" : "Fréquent"})`);
+
+      const streetFoodEmphasis = (profile?.cuisines?.streetfood >= 2)
+        ? "\n🍔 DIRECTIVE SPÉCIALE FAST FOOD & STREET FOOD : L'utilisateur a sélectionné Street Food / Fast Food en priorité ! Veille à proposer régulièrement des déjeuners ou dîners street food gourmets faits maison : Smash burgers au cheddar fondant, Crispy chicken burgers, Tacos français croustillants, Wraps Caesar au poulet, Paninis chauds mozzarella/pesto, Hot-dogs briochés gourmets, Club sandwiches toastés, Quesadillas dorées, Naan pizzas express, Tenders maison croustillants, Burrito bowls, Loaded fries, Kebab maison pita."
+        : "";
+
+      const chunkTheme = prioritizedCuisines.length > 0
+        ? `Cuisines favorites demandées par l'utilisateur : ${prioritizedCuisines.join(", ")}.${streetFoodEmphasis}`
+        : "Variation équilibrée et savoureuse pour les déjeuners et dîners.";
 
       const prompt = `Tu es un Chef cuisinier étoilé et nutritionniste passionné.
 Génère un menu gourmand, équilibré et SANS AUCUNE RÉPÉTITION pour ${count} jours (du Jour ${startDay} au Jour ${endDay}) pour les repas suivants uniquement : [${mealTypesNames}] pour ${adults} adulte(s) et ${children} enfant(s).

@@ -19,13 +19,13 @@ export const DEFAULT_AI_CONFIG = {
 };
 
 export const DEFAULT_CUISINES = {
-  french: 2,
-  italian: 2,
-  oriental: 2,
-  asian: 2,
-  mexican: 1,
-  indian: 1,
-  streetfood: 1
+  french: 0,
+  italian: 0,
+  oriental: 0,
+  asian: 0,
+  mexican: 0,
+  indian: 0,
+  streetfood: 0
 };
 
 export const DEFAULT_APPLIANCES = {

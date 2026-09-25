@@ -52,13 +52,13 @@ export default function FamilyProfileModal({
   const [childrenAges, setChildrenAges] = useState(profile?.childrenAges || []);
   const [diets, setDiets] = useState(profile?.diets || []);
   const [cuisines, setCuisines] = useState(profile?.cuisines || {
-    french: 2,
-    italian: 2,
-    oriental: 2,
-    asian: 2,
-    mexican: 1,
-    indian: 1,
-    streetfood: 1
+    french: 0,
+    italian: 0,
+    oriental: 0,
+    asian: 0,
+    mexican: 0,
+    indian: 0,
+    streetfood: 0
   });
   const [appliances, setAppliances] = useState(profile?.appliances || {
     thermomix: false,
@@ -79,13 +79,13 @@ export default function FamilyProfileModal({
       setChildrenAges(profile.childrenAges || []);
       setDiets(profile.diets || []);
       setCuisines(profile.cuisines || {
-        french: 2,
-        italian: 2,
-        oriental: 2,
-        asian: 2,
-        mexican: 1,
-        indian: 1,
-        streetfood: 1
+        french: 0,
+        italian: 0,
+        oriental: 0,
+        asian: 0,
+        mexican: 0,
+        indian: 0,
+        streetfood: 0
       });
       setAppliances(profile.appliances || {
         thermomix: false,

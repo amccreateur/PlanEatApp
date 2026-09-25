@@ -53,6 +53,7 @@ export class AIPlannerService {
         if (profile.cuisines.french === 0 && recipe.tags.includes("french")) return false;
         if (profile.cuisines.mexican === 0 && recipe.tags.includes("mexican")) return false;
         if (profile.cuisines.indian === 0 && recipe.tags.includes("indian")) return false;
+        if (profile.cuisines.streetfood === 0 && recipe.tags.includes("streetfood")) return false;
       }
 
       // Préférences de saveur (sucré / salé) pour petit-déjeuner et goûter
@@ -326,6 +327,44 @@ export class AIPlannerService {
   }
 
   /**
+   * Trie et mélange un pool de recettes en favorisant les cuisines préférées de l'utilisateur
+   */
+  static getWeightedPool(recipesList, userCuisines) {
+    if (!recipesList || recipesList.length === 0) return [];
+    if (!userCuisines) return this.shuffle(recipesList);
+
+    const tagMap = {
+      oriental: ["oriental", "maghreb"],
+      asian: ["asian", "wok"],
+      italian: ["italian"],
+      french: ["french"],
+      mexican: ["mexican"],
+      indian: ["indian"],
+      streetfood: ["streetfood"]
+    };
+
+    const scored = recipesList.map(recipe => {
+      let weight = 1;
+      const rTags = recipe.tags || [];
+
+      Object.entries(userCuisines).forEach(([cuisineKey, level]) => {
+        const matchTags = tagMap[cuisineKey] || [cuisineKey];
+        const matches = matchTags.some(t => rTags.includes(t));
+        if (matches) {
+          if (level === 3) weight += 15; // Favori / Prioritaire ⭐
+          else if (level === 2) weight += 6;  // Souvent
+          else if (level === 1) weight += 1;  // Un peu
+        }
+      });
+
+      return { recipe, randomScore: Math.random() * weight };
+    });
+
+    scored.sort((a, b) => b.randomScore - a.randomScore);
+    return scored.map(s => s.recipe);
+  }
+
+  /**
    * Générateur local avec distribution équilibrée, zéro doublon et variété maximale
    */
   static generateLocalPlan(profile, durationWeeks = 1, servings = 2) {
@@ -353,12 +392,13 @@ export class AIPlannerService {
     const fallbackMains = RECIPES_CATALOG.filter(r => r.mealType === "lunch" || r.mealType === "dinner");
     const mainsCatalog = allFilteredMains.length > 0 ? allFilteredMains : fallbackMains;
 
-    // 2. Mélanges Fisher-Yates indépendants
+    // 2. Mélanges pondérés selon les curseurs de cuisines
+    const userCuisines = profile?.cuisines;
     let breakfastPool = this.shuffle(rawBreakfasts);
     let snackPool = this.shuffle(rawSnacks);
-    let lunchPool = this.shuffle(availableLunches.length > 0 ? availableLunches : mainsCatalog);
-    let dinnerPool = this.shuffle(availableDinners.length > 0 ? availableDinners : mainsCatalog);
-    let generalMainsPool = this.shuffle(mainsCatalog);
+    let lunchPool = this.getWeightedPool(availableLunches.length > 0 ? availableLunches : mainsCatalog, userCuisines);
+    let dinnerPool = this.getWeightedPool(availableDinners.length > 0 ? availableDinners : mainsCatalog, userCuisines);
+    let generalMainsPool = this.getWeightedPool(mainsCatalog, userCuisines);
 
     const usedMealIds = new Set();
     const days = [];

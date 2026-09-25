@@ -7524,5 +7524,568 @@ export const RECIPES_CATALOG = [
       "Spread goat cheese over crackers and top with walnut halves."
     ]
   }
+},
+{
+  id: "sf1",
+  mealType: "lunch",
+  title: {
+    fr: "Smash Burger Maison au Cheddar Affiné & Oignons Caramélisés",
+    en: "Homemade Smash Burger with Aged Cheddar & Caramelized Onions",
+    ar: "سماش برجر منزلي بالجبن الشيدر والبصل المكرمل"
+  },
+  emoji: "🍔",
+  prepTime: 10,
+  cookTime: 10,
+  difficulty: "easy",
+  caloriesPerPerson: 520,
+  tags: ["streetfood", "dietBalanced", "dietHalal", "dietQuick", "dietHighProtein"],
+  ingredients: [
+    { name: { fr: "Pains burger briochés", en: "Brioche burger buns", ar: "خبز برجر بريوش" }, quantity: 2, unit: "pièces", dept: "deptBakery" },
+    { name: { fr: "Steaks hachés de bœuf pur", en: "Ground beef patties", ar: "لحم بقر مفروم" }, quantity: 250, unit: "g", dept: "deptMeat" },
+    { name: { fr: "Tranches de cheddar affiné", en: "Aged cheddar slices", ar: "جبن شيدر" }, quantity: 2, unit: "tranches", dept: "deptDairy" },
+    { name: { fr: "Oignons jaunes & Beurre", en: "Onion & butter", ar: "بصل وزبدة" }, quantity: 1, unit: "pièce", dept: "deptProduce" },
+    { name: { fr: "Sauce burger maison (mayo, ketchup, cornichon)", en: "Burger sauce", ar: "صلصة برجر" }, quantity: 2, unit: "c.à.s", dept: "deptSpices" }
+  ],
+  instructions: {
+    fr: [
+      "Émincez l'oignon et faites-le caraméliser 6 min à la poêle avec une noisette de beurre.",
+      "Formez 2 boules de bœuf, déposez-les dans une poêle très chaude et écrasez-les très fort (smash) avec une spatule.",
+      "Cuisez 2 min, retournez, déposez le cheddar pour qu'il fonde sur la viande.",
+      "Toastez les pains, étalez la sauce, ajoutez le steak au cheddar et les oignons fondants."
+    ],
+    en: [
+      "Slice and caramelize onion in a pan with butter for 6 mins.",
+      "Smash beef balls in a smoking hot pan with a spatula.",
+      "Flip after 2 mins and melt cheddar on top.",
+      "Toast buns, spread sauce, add cheesy patty and caramelized onions."
+    ]
+  }
+},
+{
+  id: "sf2",
+  mealType: "lunch",
+  title: {
+    fr: "Crispy Chicken Burger & Sauce Mayo-Moutarde Douce",
+    en: "Crispy Chicken Burger with Sweet Mustard Mayo",
+    ar: "برجر الدجاج المقرمش بصلصة المايونيز والخردل"
+  },
+  emoji: "🍔",
+  prepTime: 10,
+  cookTime: 10,
+  difficulty: "easy",
+  caloriesPerPerson: 490,
+  tags: ["streetfood", "dietBalanced", "dietHalal", "dietQuick", "dietHighProtein"],
+  ingredients: [
+    { name: { fr: "Pains burger", en: "Burger buns", ar: "خبز برجر" }, quantity: 2, unit: "pièces", dept: "deptBakery" },
+    { name: { fr: "Filets de poulet", en: "Chicken cutlets", ar: "صدور دجاج" }, quantity: 250, unit: "g", dept: "deptMeat" },
+    { name: { fr: "Chapelure ou corn-flakes écrasés", en: "Breadcrumbs or cornflakes", ar: "بقسماط" }, quantity: 50, unit: "g", dept: "deptPantry" },
+    { name: { fr: "Salade iceberg & Tomate", en: "Iceberg & tomato", ar: "خس وطماطم" }, quantity: 60, unit: "g", dept: "deptProduce" },
+    { name: { fr: "Sauce moutarde douce & mayo", en: "Honey mustard mayo", ar: "صلصة المايونيز والخردل" }, quantity: 2, unit: "c.à.s", dept: "deptSpices" }
+  ],
+  instructions: {
+    fr: [
+      "Aplatissez les filets de poulet, panez-les dans la chapelure croustillante.",
+      "Faites dorer 4-5 min par face à la poêle avec un filet d'huile ou à l'airfryer.",
+      "Toastez les pains à burger, tartinez de sauce.",
+      "Montez les burgers avec le poulet croustillant chaud, la salade croquante et les rondelles de tomate."
+    ],
+    en: [
+      "Flatten chicken, coat in crispy breadcrumbs.",
+      "Cook in pan or airfryer for 4-5 mins each side until golden.",
+      "Toast buns, spread sauce, layer with crispy chicken, lettuce and tomato."
+    ]
+  }
+},
+{
+  id: "sf3",
+  mealType: "lunch",
+  title: {
+    fr: "Wrap Poulet Croustillant, Avocat & Sauce Caesar",
+    en: "Crispy Chicken, Avocado & Caesar Wrap",
+    ar: "راب الدجاج المقرمش مع الأفوكادو وصلصة السيزر"
+  },
+  emoji: "🌯",
+  prepTime: 8,
+  cookTime: 8,
+  difficulty: "easy",
+  caloriesPerPerson: 460,
+  tags: ["streetfood", "dietBalanced", "dietHalal", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Grandes tortillas de blé", en: "Flour tortillas", ar: "خبز تورتيلا" }, quantity: 2, unit: "pièces", dept: "deptBakery" },
+    { name: { fr: "Aiguillettes de poulet", en: "Chicken tenders", ar: "دجاج تندرز" }, quantity: 220, unit: "g", dept: "deptMeat" },
+    { name: { fr: "Avocat mûr", en: "Ripe avocado", ar: "أفوكادو" }, quantity: 1, unit: "pièce", dept: "deptProduce" },
+    { name: { fr: "Salade romaine & Parmesan râpé", en: "Romaine & parmesan", ar: "خس وجبن بارميزان" }, quantity: 60, unit: "g", dept: "deptProduce" },
+    { name: { fr: "Sauce Caesar", en: "Caesar dressing", ar: "صلصة سيزر" }, quantity: 2, unit: "c.à.s", dept: "deptSpices" }
+  ],
+  instructions: {
+    fr: [
+      "Poêlez les aiguillettes de poulet assaisonnées jusqu'à ce qu'elles soient bien dorées.",
+      "Réchauffez légèrement les tortillas 20 secondes.",
+      "Garnissez de sauce Caesar, salade romaine, tranches d'avocat, poulet chaud et parmesan.",
+      "Roulez fermement en wrap et coupez en biseau."
+    ],
+    en: [
+      "Sear seasoned chicken in pan until golden.",
+      "Warm tortillas for 20 seconds.",
+      "Fill with Caesar sauce, romaine, sliced avocado, hot chicken and parmesan.",
+      "Roll tightly and slice diagonally."
+    ]
+  }
+},
+{
+  id: "sf4",
+  mealType: "dinner",
+  title: {
+    fr: "French Tacos Maison (Sauce Fromagère Onctueuse & Poulet Tenders)",
+    en: "Homemade French Tacos with Cheese Sauce & Tenders",
+    ar: "تاكوس فرنسي منزلي بصلصة الجبن وقطع الدجاج"
+  },
+  emoji: "🌮",
+  prepTime: 10,
+  cookTime: 10,
+  difficulty: "easy",
+  caloriesPerPerson: 540,
+  tags: ["streetfood", "dietBalanced", "dietHalal"],
+  ingredients: [
+    { name: { fr: "Galettes de blé format maxi", en: "Maxi tortillas", ar: "خبز تورتيلا كبير" }, quantity: 2, unit: "pièces", dept: "deptBakery" },
+    { name: { fr: "Tenders ou filets de poulet émincés", en: "Chicken strips", ar: "قطع دجاج" }, quantity: 240, unit: "g", dept: "deptMeat" },
+    { name: { fr: "Frites au four croustillantes", en: "Oven fries", ar: "بطاطس مقلية" }, quantity: 100, unit: "g", dept: "deptFrozen" },
+    { name: { fr: "Crème liquide & Fromage râpé (sauce fromagère)", en: "Cream & grated cheese", ar: "كريمة وجبن مبشور" }, quantity: 100, unit: "ml", dept: "deptDairy" },
+    { name: { fr: "Sauce algérienne ou samouraï", en: "Spicy sauce", ar: "صلصة حارة" }, quantity: 2, unit: "c.à.s", dept: "deptSpices" }
+  ],
+  instructions: {
+    fr: [
+      "Préparez la sauce fromagère : faites chauffer la crème avec le fromage râpé, sel et poivre 3 min à feu doux.",
+      "Faites cuire les frites au four ou à l'airfryer et faites dorer le poulet à la poêle.",
+      "Étalez la sauce sur la tortilla, déposez le poulet, quelques frites chaudes et nappez de sauce fromagère.",
+      "Pliez en carré rectangulaire hermétique et toastez 3 min dans un appareil à panini ou à la poêle."
+    ],
+    en: [
+      "Make cheese sauce: warm cream with grated cheese for 3 mins.",
+      "Cook fries and sear chicken.",
+      "Layer sauce, chicken, fries and hot cheese sauce on tortilla.",
+      "Fold tightly into a rectangle and press on a grill or pan for 3 mins."
+    ]
+  }
+},
+{
+  id: "sf5",
+  mealType: "lunch",
+  title: {
+    fr: "Panini Toasté Poulet Rôti, Mozzarella & Pesto Vert",
+    en: "Toasted Chicken, Mozzarella & Green Pesto Panini",
+    ar: "بانيني الدجاج المشوي والموزاريلا وصلصة البيستو"
+  },
+  emoji: "🥪",
+  prepTime: 5,
+  cookTime: 5,
+  difficulty: "easy",
+  caloriesPerPerson: 440,
+  tags: ["streetfood", "dietBalanced", "dietHalal", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Pains panini individuels", en: "Panini breads", ar: "خبز بانيني" }, quantity: 2, unit: "pièces", dept: "deptBakery" },
+    { name: { fr: "Blanc de poulet rôti émincé", en: "Roasted chicken slices", ar: "دجاج مشوي" }, quantity: 180, unit: "g", dept: "deptMeat" },
+    { name: { fr: "Mozzarella en tranches", en: "Mozzarella slices", ar: "جبن موزاريلا" }, quantity: 80, unit: "g", dept: "deptDairy" },
+    { name: { fr: "Pesto vert au basilic", en: "Basil pesto", ar: "صلصة بيستو" }, quantity: 2, unit: "c.à.s", dept: "deptPantry" },
+    { name: { fr: "Tomates séchées ou fraîches", en: "Sun-dried tomatoes", ar: "طماطم مجففة" }, quantity: 40, unit: "g", dept: "deptProduce" }
+  ],
+  instructions: {
+    fr: [
+      "Ouvrez les pains panini, tartinez l'intérieur de pesto au basilic.",
+      "Ajoutez les lamelles de poulet rôti, les tomates séchées et les tranches de mozzarella.",
+      "Refermez et toastez 4-5 minutes dans une presse à panini ou une poêle striée jusqu'à ce que le fromage soit bien coulant."
+    ],
+    en: [
+      "Slice panini bread, spread basil pesto inside.",
+      "Layer with chicken, sun-dried tomatoes and mozzarella.",
+      "Press and toast 4-5 mins until cheese melts."
+    ]
+  }
+},
+{
+  id: "sf6",
+  mealType: "dinner",
+  title: {
+    fr: "Hot-Dog Gourmet Brioché, Oignons Frits & Cheddar Fondu",
+    en: "Gourmet Brioche Hot Dog with Crispy Onions & Melted Cheddar",
+    ar: "هوت دوج بريوش مع البصل المقلي والجبن الذائب"
+  },
+  emoji: "🌭",
+  prepTime: 5,
+  cookTime: 8,
+  difficulty: "easy",
+  caloriesPerPerson: 420,
+  tags: ["streetfood", "dietBalanced", "dietHalal", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Pains hot-dog briochés", en: "Brioche hot dog buns", ar: "خبز هوت دوج" }, quantity: 2, unit: "pièces", dept: "deptBakery" },
+    { name: { fr: "Saucisses volaille ou bœuf", en: "Poultry or beef sausages", ar: "نقانق حلال" }, quantity: 2, unit: "pièces", dept: "deptMeat" },
+    { name: { fr: "Cheddar râpé", en: "Grated cheddar", ar: "جبن شيدر مبشور" }, quantity: 40, unit: "g", dept: "deptDairy" },
+    { name: { fr: "Oignons frits croustillants", en: "Crispy fried onions", ar: "بصل مقلي مقرمش" }, quantity: 20, unit: "g", dept: "deptPantry" },
+    { name: { fr: "Ketchup & Moutarde douce", en: "Ketchup & mustard", ar: "كاتشب وخردل" }, quantity: 2, unit: "c.à.s", dept: "deptSpices" }
+  ],
+  instructions: {
+    fr: [
+      "Faites pocher ou griller les saucisses 5 min à la poêle.",
+      "Incisez les pains briochés, glissez la saucisse chaude et saupoudrez de cheddar râpé.",
+      "Passez 2 min sous le grill du four pour faire fondre le fromage.",
+      "Nappez de ketchup/moutarde et parsemez d'oignons frits croustillants."
+    ],
+    en: [
+      "Grill or poach sausages for 5 mins.",
+      "Place sausage in buns and top with shredded cheddar.",
+      "Broil 2 mins to melt cheese.",
+      "Drizzle with sauces and top with crispy onions."
+    ]
+  }
+},
+{
+  id: "sf7",
+  mealType: "lunch",
+  title: {
+    fr: "Club Sandwich Triple Étage Dinde, Œuf & Crudités",
+    en: "Triple-Decker Turkey, Egg & Crisp Veggie Club Sandwich",
+    ar: "كلوب ساندوتش الديك الرومي والبيض والخضار"
+  },
+  emoji: "🥪",
+  prepTime: 8,
+  cookTime: 5,
+  difficulty: "easy",
+  caloriesPerPerson: 430,
+  tags: ["streetfood", "dietBalanced", "dietHalal", "dietQuick", "dietHighProtein"],
+  ingredients: [
+    { name: { fr: "Pain de mie complet ou blanc", en: "Sliced sandwich bread", ar: "خبز توست" }, quantity: 6, unit: "tranches", dept: "deptBakery" },
+    { name: { fr: "Filet de dinde fumée", en: "Smoked turkey slices", ar: "ديك رومي مدخن" }, quantity: 4, unit: "tranches", dept: "deptMeat" },
+    { name: { fr: "Œufs durs", en: "Hard-boiled eggs", ar: "بيض مسلوق" }, quantity: 2, unit: "pièces", dept: "deptDairy" },
+    { name: { fr: "Tomate & Salade iceberg", en: "Tomato & lettuce", ar: "طماطم وخس" }, quantity: 60, unit: "g", dept: "deptProduce" },
+    { name: { fr: "Mayonnaise légère", en: "Light mayo", ar: "مايونيز" }, quantity: 2, unit: "c.à.s", dept: "deptSpices" }
+  ],
+  instructions: {
+    fr: [
+      "Faites dorer les tranches de pain au grille-pain.",
+      "Tartinez de mayonnaise légère.",
+      "Montez le premier étage avec salade, dinde et rondelles de tomate, puis le second avec l'œuf dur en tranches.",
+      "Coupez en triangles et maintenez avec des piques."
+    ],
+    en: [
+      "Toast bread slices until golden.",
+      "Spread with light mayo.",
+      "Layer turkey, lettuce, tomato and sliced hard-boiled egg across tiers.",
+      "Cut into triangles and serve."
+    ]
+  }
+},
+{
+  id: "sf8",
+  mealType: "dinner",
+  title: {
+    fr: "Smash Tacos au Bœuf Épicé, Cheddar & Guacamole Express",
+    en: "Crispy Beef Smash Tacos with Cheddar & Guacamole",
+    ar: "سماش تاكوس باللحم المفروم والجبن والجواكامولي"
+  },
+  emoji: "🌮",
+  prepTime: 8,
+  cookTime: 6,
+  difficulty: "easy",
+  caloriesPerPerson: 470,
+  tags: ["streetfood", "dietBalanced", "dietHalal", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Petites tortillas de maïs ou blé", en: "Small tortillas", ar: "تورتيلا صغيرة" }, quantity: 4, unit: "pièces", dept: "deptBakery" },
+    { name: { fr: "Bœuf haché 5% ou 15%", en: "Ground beef", ar: "لحم بقر مفروم" }, quantity: 220, unit: "g", dept: "deptMeat" },
+    { name: { fr: "Cheddar râpé", en: "Shredded cheddar", ar: "جبن شيدر" }, quantity: 50, unit: "g", dept: "deptDairy" },
+    { name: { fr: "Guacamole maison (avocat/citron)", en: "Guacamole", ar: "جواكامولي" }, quantity: 60, unit: "g", dept: "deptProduce" },
+    { name: { fr: "Épices tex-mex & Sel", en: "Taco seasoning", ar: "بهارات تاكو" }, quantity: 1, unit: "c.à.c", dept: "deptSpices" }
+  ],
+  instructions: {
+    fr: [
+      "Étalez une fine couche de bœuf assaisonné directement sur chaque tortilla crue.",
+      "Posez la tortilla face viande contre la poêle brûlante pendant 2-3 min.",
+      "Retournez la tortilla, ajoutez le cheddar sur la viande cuite, pliez en deux et laissez dorer.",
+      "Servez chaud avec le guacamole crémeux."
+    ],
+    en: [
+      "Press thin layer of seasoned beef directly onto raw tortilla.",
+      "Place meat-side down in hot skillet for 2-3 mins.",
+      "Flip, top with cheddar, fold in half until crispy.",
+      "Serve with fresh guacamole."
+    ]
+  }
+},
+{
+  id: "sf9",
+  mealType: "lunch",
+  title: {
+    fr: "Pizza Naan Express au Poulet Tikka & Mozzarella",
+    en: "Quick Naan Pizza with Chicken Tikka & Mozzarella",
+    ar: "بيتزا النان السريعة بدجاج التيكا والموزاريلا"
+  },
+  emoji: "🍕",
+  prepTime: 6,
+  cookTime: 8,
+  difficulty: "easy",
+  caloriesPerPerson: 480,
+  tags: ["streetfood", "dietBalanced", "dietHalal", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Pains naans nature ou fromage", en: "Plain or cheese naans", ar: "خبز نان" }, quantity: 2, unit: "pièces", dept: "deptBakery" },
+    { name: { fr: "Dés de poulet mariné au curry/tikka", en: "Tikka chicken cubes", ar: "قطع دجاج تيكا" }, quantity: 200, unit: "g", dept: "deptMeat" },
+    { name: { fr: "Coulis de tomate cuisiné", en: "Tomato sauce", ar: "صلصة طماطم" }, quantity: 4, unit: "c.à.s", dept: "deptPantry" },
+    { name: { fr: "Mozzarella râpée", en: "Grated mozzarella", ar: "جبن موزاريلا مبشور" }, quantity: 70, unit: "g", dept: "deptDairy" },
+    { name: { fr: "Oignon rouge & Poivron émincé", en: "Red onion & bell pepper", ar: "بصل أحمر وفلفل" }, quantity: 50, unit: "g", dept: "deptProduce" }
+  ],
+  instructions: {
+    fr: [
+      "Tartinez les naans de coulis de tomate.",
+      "Garnissez avec les dés de poulet, les lamelles d'oignon rouge, le poivron et la mozzarella.",
+      "Enfournez à 200°C pendant 8 minutes jusqu'à ce que la pâte soit croustillante et le fromage gratiné."
+    ],
+    en: [
+      "Spread tomato sauce over naan breads.",
+      "Top with chicken, onion slices, peppers and mozzarella.",
+      "Bake at 200°C for 8 mins until bubbly and crisp."
+    ]
+  }
+},
+{
+  id: "sf10",
+  mealType: "dinner",
+  title: {
+    fr: "Croque-Monsieur Gourmet au Pain Doré & Emmental Fondu",
+    en: "Gourmet Golden Croque-Monsieur with Melted Emmental",
+    ar: "كروك مسيو ذهبي بجبن الإيمنتال الذائب"
+  },
+  emoji: "🥪",
+  prepTime: 5,
+  cookTime: 7,
+  difficulty: "easy",
+  caloriesPerPerson: 410,
+  tags: ["streetfood", "dietBalanced", "dietHalal", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Tranches de pain de campagne ou mie", en: "Country bread slices", ar: "خبز ريفي" }, quantity: 4, unit: "tranches", dept: "deptBakery" },
+    { name: { fr: "Jambon de dinde de qualité", en: "Turkey ham", ar: "حبش تركي" }, quantity: 2, unit: "tranches", dept: "deptMeat" },
+    { name: { fr: "Emmental râpé ou tranches", en: "Emmental cheese", ar: "جبن إيمنتال" }, quantity: 60, unit: "g", dept: "deptDairy" },
+    { name: { fr: "Beurre ou pointe de crème", en: "Butter or light cream", ar: "زبدة" }, quantity: 15, unit: "g", dept: "deptDairy" }
+  ],
+  instructions: {
+    fr: [
+      "Beurrez légèrement l'extérieur des tranches de pain.",
+      "Garnissez avec le jambon de dinde et l'emmental généreux.",
+      "Faites dorer à la poêle 3-4 min par face à feu moyen ou 6 min au four pour un croque ultra fondant."
+    ],
+    en: [
+      "Lightly butter outer bread sides.",
+      "Layer turkey ham and emmental cheese.",
+      "Toast in skillet for 3-4 mins each side until melted and golden."
+    ]
+  }
+},
+{
+  id: "sf11",
+  mealType: "lunch",
+  title: {
+    fr: "Tenders de Poulet Croustillants aux Corn-Flakes & Frites au Four",
+    en: "Crispy Cornflake Chicken Tenders with Oven Baked Fries",
+    ar: "قطع دجاج تندرز مقرمشة بالكورن فليكس وبطاطس بالفرن"
+  },
+  emoji: "🍗",
+  prepTime: 10,
+  cookTime: 15,
+  difficulty: "easy",
+  caloriesPerPerson: 470,
+  tags: ["streetfood", "dietBalanced", "dietHalal", "dietHighProtein"],
+  ingredients: [
+    { name: { fr: "Aiguillettes de poulet", en: "Chicken tenders", ar: "صدور دجاج" }, quantity: 250, unit: "g", dept: "deptMeat" },
+    { name: { fr: "Pétales de maïs (Corn-Flakes nature)", en: "Cornflakes", ar: "رقائق الذرة" }, quantity: 60, unit: "g", dept: "deptPantry" },
+    { name: { fr: "Œuf battu & Paprika", en: "Beaten egg & paprika", ar: "بيض وبابريكا" }, quantity: 1, unit: "pièce", dept: "deptDairy" },
+    { name: { fr: "Pommes de terre coupées en frites", en: "Potatoes for fries", ar: "بطاطس للأصابع" }, quantity: 300, unit: "g", dept: "deptProduce" },
+    { name: { fr: "Huile d'olive & Sel", en: "Olive oil & salt", ar: "زيت زيتون وملح" }, quantity: 1, unit: "c.à.s", dept: "deptSpices" }
+  ],
+  instructions: {
+    fr: [
+      "Écrasez grossièrement les corn-flakes avec du paprika et du sel.",
+      "Trempez les aiguillettes dans l'œuf battu puis dans la panure de corn-flakes.",
+      "Disposez les tenders et les frites assaisonnées sur une plaque de four.",
+      "Enfournez 15 min à 200°C (ou à l'airfryer) jusqu'à ce que tout soit ultra croustillant."
+    ],
+    en: [
+      "Crush cornflakes with paprika and salt.",
+      "Dip chicken in egg then in crushed cornflakes.",
+      "Place tenders and seasoned fries on baking sheet.",
+      "Bake at 200°C for 15 mins until golden and crunchy."
+    ]
+  }
+},
+{
+  id: "sf12",
+  mealType: "dinner",
+  title: {
+    fr: "Fish & Chips Croustillant au Four & Sauce Tartare Légère",
+    en: "Crispy Oven-Baked Fish & Chips with Light Tartar Sauce",
+    ar: "سمك وبطاطس مقرمشة بالفرن مع صلصة التارتار"
+  },
+  emoji: "🐟",
+  prepTime: 10,
+  cookTime: 18,
+  difficulty: "easy",
+  caloriesPerPerson: 460,
+  tags: ["streetfood", "dietBalanced", "dietHalal", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Dos de cabillaud ou colin", en: "Cod or hake fillets", ar: "فيليه سمك القد" }, quantity: 260, unit: "g", dept: "deptMeat" },
+    { name: { fr: "Chapelure dorée & Herbes", en: "Breadcrumbs & herbs", ar: "بقسماط وأعشاب" }, quantity: 50, unit: "g", dept: "deptPantry" },
+    { name: { fr: "Pommes de terre coupées en frites", en: "Potatoes", ar: "بطاطس" }, quantity: 300, unit: "g", dept: "deptProduce" },
+    { name: { fr: "Sauce tartare (yaourt grec, cornichons, ciboulette)", en: "Light tartar sauce", ar: "صلصة تارتار" }, quantity: 3, unit: "c.à.s", dept: "deptDairy" }
+  ],
+  instructions: {
+    fr: [
+      "Coupez les pommes de terre en frites et enfournez-les à 200°C avec un filet d'huile.",
+      "Panez les morceaux de poisson dans la chapelure assaisonnée.",
+      "Ajoutez le poisson sur la plaque 10 minutes avant la fin de cuisson des frites.",
+      "Servez chaud avec la sauce tartare maison et un filet de citron."
+    ],
+    en: [
+      "Toss potato fries with oil and bake at 200°C.",
+      "Coat fish in seasoned breadcrumbs.",
+      "Add fish to the tray for the last 10 mins of baking.",
+      "Serve hot with tartar sauce and lemon wedge."
+    ]
+  }
+},
+{
+  id: "sf13",
+  mealType: "lunch",
+  title: {
+    fr: "Burrito Bowl Street Food au Bœuf Haché, Maïs & Haricots Rouges",
+    en: "Street Food Burrito Bowl with Minced Beef, Corn & Beans",
+    ar: "وعاء البوريتو باللحم المفروم والذرة والفاصوليا"
+  },
+  emoji: "🍲",
+  prepTime: 8,
+  cookTime: 10,
+  difficulty: "easy",
+  caloriesPerPerson: 480,
+  tags: ["streetfood", "dietBalanced", "dietHalal", "dietHighProtein"],
+  ingredients: [
+    { name: { fr: "Riz basmati ou complet cuit", en: "Cooked basmati rice", ar: "أرز بسمتي" }, quantity: 180, unit: "g", dept: "deptPantry" },
+    { name: { fr: "Bœuf haché assaisonné tex-mex", en: "Spiced ground beef", ar: "لحم مفروم متبل" }, quantity: 220, unit: "g", dept: "deptMeat" },
+    { name: { fr: "Haricots rouges & Maïs égouttés", en: "Black/kidney beans & corn", ar: "فاصوليا حمراء وذرة" }, quantity: 100, unit: "g", dept: "deptPantry" },
+    { name: { fr: "Cheddar râpé & Guacamole", en: "Cheddar & guacamole", ar: "شيدر وجواكامولي" }, quantity: 50, unit: "g", dept: "deptDairy" },
+    { name: { fr: "Coriandre fraîche & Citron vert", en: "Cilantro & lime", ar: "كزبرة وليمون أخضر" }, quantity: 1, unit: "portion", dept: "deptProduce" }
+  ],
+  instructions: {
+    fr: [
+      "Faites revenir le bœuf haché 6 min à la poêle avec les épices tex-mex.",
+      "Réchauffez le riz et disposez-le dans le fond des bols.",
+      "Ajoutez les sections : bœuf chaud, haricots rouges, maïs croquant, cheddar râpé et guacamole.",
+      "Parsemez de coriandre et d'un trait de jus de citron vert."
+    ],
+    en: [
+      "Brown ground beef with taco spices for 6 mins.",
+      "Place warm rice in bowls.",
+      "Arrange spiced beef, beans, corn, cheddar and guacamole in sections.",
+      "Garnish with fresh cilantro and lime juice."
+    ]
+  }
+},
+{
+  id: "sf14",
+  mealType: "dinner",
+  title: {
+    fr: "Kebab Maison à la Dinde Grillée, Pain Pita & Sauce Blanche",
+    en: "Homemade Grilled Turkey Kebab with Pita & Garlic White Sauce",
+    ar: "كباب تركي منزلي بخبز البيتا والصلصة البيضاء"
+  },
+  emoji: "🥙",
+  prepTime: 8,
+  cookTime: 8,
+  difficulty: "easy",
+  caloriesPerPerson: 450,
+  tags: ["streetfood", "dietBalanced", "dietHalal", "dietHighProtein"],
+  ingredients: [
+    { name: { fr: "Pains pita libanais ou ronds", en: "Pita pockets", ar: "خبز بيتا" }, quantity: 2, unit: "pièces", dept: "deptBakery" },
+    { name: { fr: "Lamelles de dinde marinées (cumin, paprika, ail)", en: "Marinated turkey strips", ar: "شرائح دجاج/ديك رومي" }, quantity: 240, unit: "g", dept: "deptMeat" },
+    { name: { fr: "Salade, tomates & oignons rouges", en: "Salad, tomato, red onion", ar: "خس، طماطم، بصل" }, quantity: 80, unit: "g", dept: "deptProduce" },
+    { name: { fr: "Sauce blanche (yaourt, ail, menthe)", en: "White garlic sauce", ar: "صلصة بيضاء" }, quantity: 3, unit: "c.à.s", dept: "deptDairy" }
+  ],
+  instructions: {
+    fr: [
+      "Saisissez les lamelles de dinde marinées 6-7 min à la poêle bien chaude pour les griller.",
+      "Tiédissez les pains pita et ouvrez la poche.",
+      "Nappez l'intérieur de sauce blanche, ajoutez la salade, tomate et oignon rouge.",
+      "Garnissez généreusement de viande grillée parfumée."
+    ],
+    en: [
+      "Sear marinated turkey strips in a hot pan for 6-7 mins.",
+      "Warm pita pockets and open.",
+      "Spread white sauce, add veggies and stuff with grilled meat."
+    ]
+  }
+},
+{
+  id: "sf15",
+  mealType: "lunch",
+  title: {
+    fr: "Bagel Toasté au Saumon Fumé, Cream Cheese & Concombre",
+    en: "Toasted Salmon, Cream Cheese & Cucumber Bagel",
+    ar: "بيغل السلمون المدخن والجبن الكريمي والخيار"
+  },
+  emoji: "🥯",
+  prepTime: 5,
+  cookTime: 2,
+  difficulty: "easy",
+  caloriesPerPerson: 400,
+  tags: ["streetfood", "dietBalanced", "dietHalal", "dietQuick"],
+  ingredients: [
+    { name: { fr: "Pains bagels aux graines de sésame", en: "Sesame bagel buns", ar: "خبز بيغل بالسمسم" }, quantity: 2, unit: "pièces", dept: "deptBakery" },
+    { name: { fr: "Tranches de saumon fumé", en: "Smoked salmon slices", ar: "سلمون مدخن" }, quantity: 120, unit: "g", dept: "deptMeat" },
+    { name: { fr: "Fromage frais à tartiner (Cream Cheese)", en: "Cream cheese", ar: "جبن كريمي" }, quantity: 50, unit: "g", dept: "deptDairy" },
+    { name: { fr: "Concombre en fines rondelles & Aneth", en: "Cucumber & dill", ar: "خيار وشبت" }, quantity: 40, unit: "g", dept: "deptProduce" }
+  ],
+  instructions: {
+    fr: [
+      "Coupez les bagels en deux et toastez-les légèrement.",
+      "Tartinez généreusement de cream cheese.",
+      "Disposez les tranches de concombre croquantes et le saumon fumé.",
+      "Ajoutez un filet de jus de citron, un peu d'aneth et refermez."
+    ],
+    en: [
+      "Slice and lightly toast bagels.",
+      "Spread with cream cheese.",
+      "Layer cucumber slices, smoked salmon, lemon juice and dill.",
+      "Close and serve."
+    ]
+  }
+},
+{
+  id: "sf16",
+  mealType: "dinner",
+  title: {
+    fr: "Loaded Sweet Potato Fries au Poulet Épicé & Fromage Fondu",
+    en: "Loaded Sweet Potato Fries with Spiced Chicken & Melted Cheese",
+    ar: "بطاطا حلوة محملة بالدجاج المتبل والجبن"
+  },
+  emoji: "🍟",
+  prepTime: 10,
+  cookTime: 18,
+  difficulty: "easy",
+  caloriesPerPerson: 470,
+  tags: ["streetfood", "dietBalanced", "dietHalal"],
+  ingredients: [
+    { name: { fr: "Frites de patate douce au four", en: "Sweet potato fries", ar: "أصابع بطاطا حلوة" }, quantity: 300, unit: "g", dept: "deptProduce" },
+    { name: { fr: "Dés de poulet épicé (paprika, ail)", en: "Spiced chicken bites", ar: "دجاج متبل" }, quantity: 200, unit: "g", dept: "deptMeat" },
+    { name: { fr: "Cheddar ou mozzarella râpée", en: "Shredded cheese", ar: "جبن مبشور" }, quantity: 60, unit: "g", dept: "deptDairy" },
+    { name: { fr: "Oignon cébette & Sauce yaourt ciboulette", en: "Scallions & herb sauce", ar: "بصل أخضر وصلصة أعشاب" }, quantity: 2, unit: "c.à.s", dept: "deptProduce" }
+  ],
+  instructions: {
+    fr: [
+      "Enfournez les frites de patate douce 18 min à 200°C avec un filet d'huile.",
+      "Faites sauter les dés de poulet épicés à la poêle 5 min.",
+      "Déposez le poulet sur les frites chaudes, parsemez de fromage et remettez 2 min au four pour faire fondre.",
+      "Arrosez de sauce fraîche et parsemez de cébette émincée."
+    ],
+    en: [
+      "Bake sweet potato fries for 18 mins at 200°C.",
+      "Sauté spiced chicken bites for 5 mins.",
+      "Top fries with chicken and cheese, melt in oven for 2 mins.",
+      "Drizzle with herb sauce and green onions."
+    ]
+  }
 }
 ];

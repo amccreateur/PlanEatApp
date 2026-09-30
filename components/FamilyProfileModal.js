@@ -160,7 +160,7 @@ export default function FamilyProfileModal({
   const cuisineList = [
     { key: "french", name: t.cuisineFrench, desc: t.cuisineFrenchDesc, emoji: "🇫🇷" },
     { key: "italian", name: t.cuisineItalian, desc: t.cuisineItalianDesc, emoji: "🇮🇹" },
-    { key: "oriental", name: t.cuisineOriental, desc: t.cuisineOrientalDesc, emoji: "🇲🇦" },
+    { key: "oriental", name: t.cuisineOriental, desc: t.cuisineOrientalDesc, emoji: "🧆" },
     { key: "asian", name: t.cuisineAsian, desc: t.cuisineAsianDesc, emoji: "🥢" },
     { key: "mexican", name: t.cuisineMexican, desc: t.cuisineMexicanDesc, emoji: "🇲🇽" },
     { key: "indian", name: t.cuisineIndian, desc: t.cuisineIndianDesc, emoji: "🇮🇳" },

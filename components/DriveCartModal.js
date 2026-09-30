@@ -9,7 +9,8 @@ import {
   ActivityIndicator,
   Platform,
   Linking,
-  TextInput
+  TextInput,
+  Keyboard
 } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -217,6 +218,27 @@ export default function DriveCartModal({
     await copyToClipboard(fullText, "📄 Toute la liste a été copiée !");
   };
 
+  const dismissAllKeyboards = () => {
+    Keyboard.dismiss();
+    if (Platform.OS !== "web") {
+      const blurJs = `
+        (function() {
+          try {
+            if (document.activeElement && document.activeElement.blur) {
+              document.activeElement.blur();
+            }
+            var inputs = document.querySelectorAll('input, textarea, select');
+            for (var i = 0; i < inputs.length; i++) {
+              inputs[i].blur();
+            }
+          } catch(e) {}
+        })();
+        true;
+      `;
+      webViewRef.current?.injectJavaScript(blurJs);
+    }
+  };
+
   // Mobile WebView Navigation & Injection
   const handleNavigationStateChange = (navState) => {
     setCanGoBack(navState.canGoBack);
@@ -265,6 +287,7 @@ export default function DriveCartModal({
 
         if (isStoreSelected) {
           setIsSelectingStore(false);
+          dismissAllKeyboards();
           setTimeout(() => {
             if (currentItem) {
               const q = getCleanItemName(currentItem);
@@ -400,11 +423,13 @@ export default function DriveCartModal({
     setSelectedStore(store);
     setCurrentUrl(store.homeUrl);
     setIsSelectingStore(true);
+    dismissAllKeyboards();
     AsyncStorage.setItem("@planeat_preferred_drive_store", store.id).catch(() => {});
   };
 
   const handleStartShopping = () => {
     setIsSelectingStore(false);
+    dismissAllKeyboards();
     if (currentItem) {
       const q = getCleanItemName(currentItem);
       if (q) {
@@ -418,6 +443,7 @@ export default function DriveCartModal({
     const q = (term !== undefined ? term : searchQuery).trim();
     if (!q) return;
     setSearchQuery(q);
+    dismissAllKeyboards();
     if (Platform.OS === "web") {
       handleOpenSearchWeb(q);
     } else {
@@ -427,6 +453,7 @@ export default function DriveCartModal({
   };
 
   const handleItemAdded = () => {
+    dismissAllKeyboards();
     if (!currentItem) return;
     onToggleItem(currentItem.id);
 
@@ -447,6 +474,7 @@ export default function DriveCartModal({
   };
 
   const handleSkipItem = () => {
+    dismissAllKeyboards();
     if (currentIndex < groceries.length - 1) {
       const nextIndex = currentIndex + 1;
       setCurrentIndex(nextIndex);
@@ -464,6 +492,7 @@ export default function DriveCartModal({
   };
 
   const handlePrevItem = () => {
+    dismissAllKeyboards();
     if (currentIndex > 0) {
       const prevIndex = currentIndex - 1;
       setCurrentIndex(prevIndex);
@@ -484,6 +513,11 @@ export default function DriveCartModal({
     ? Math.round(((groceries.filter(g => g.checked).length) / groceries.length) * 100)
     : 0;
 
+  const handleCloseModal = () => {
+    dismissAllKeyboards();
+    onClose();
+  };
+
   // ==========================================
   // RENDER WEB (Optimisé Ordinateur & Navigateur)
   // ==========================================
@@ -493,7 +527,7 @@ export default function DriveCartModal({
         visible={visible}
         animationType="fade"
         transparent={false}
-        onRequestClose={onClose}
+        onRequestClose={handleCloseModal}
       >
         <View style={[styles.webSafeWrapper, { backgroundColor: theme.bg }]}>
           <View style={styles.webContentContainer}>
@@ -522,7 +556,7 @@ export default function DriveCartModal({
 
                 <TouchableOpacity
                   style={styles.webCloseBtn}
-                  onPress={onClose}
+                  onPress={handleCloseModal}
                 >
                   <Ionicons name="close" size={20} color="#ffffff" />
                 </TouchableOpacity>
@@ -863,7 +897,7 @@ export default function DriveCartModal({
       visible={visible}
       animationType="slide"
       transparent={false}
-      onRequestClose={onClose}
+      onRequestClose={handleCloseModal}
     >
       <SafeAreaView style={[styles.safeContainer, { backgroundColor: theme.bg }]} edges={["top", "bottom", "left", "right"]}>
         {/* Top Header */}
@@ -928,7 +962,7 @@ export default function DriveCartModal({
               <TouchableOpacity
                 hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
                 style={styles.closeBtn}
-                onPress={onClose}
+                onPress={handleCloseModal}
               >
                 <Ionicons name="close" size={20} color="#ffffff" />
               </TouchableOpacity>

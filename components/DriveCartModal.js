@@ -27,6 +27,98 @@ if (Platform.OS !== "web") {
   WebView = require("react-native-webview").WebView;
 }
 
+const STORE_DETECTOR_INJECTION_JS = `
+(function() {
+  if (window.__planeatDetectorActive) return;
+  window.__planeatDetectorActive = true;
+
+  function emitStoreChosen(reason) {
+    try {
+      if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: 'STORE_SELECTED',
+          url: window.location.href,
+          reason: reason || ''
+        }));
+      }
+    } catch(e) {}
+  }
+
+  // Interception des clics sur les boutons / liens de choix de Drive ou magasin
+  document.addEventListener('click', function(e) {
+    try {
+      var el = e.target;
+      var depth = 0;
+      while (el && depth < 6) {
+        var text = (el.innerText || el.textContent || '').trim().toLowerCase();
+        var aria = (el.getAttribute('aria-label') || '').toLowerCase();
+        var cls = (typeof el.className === 'string' ? el.className : '').toLowerCase();
+        var testId = (el.getAttribute('data-testid') || el.getAttribute('data-test') || '').toLowerCase();
+        var href = (el.getAttribute('href') || '').toLowerCase();
+
+        var isStoreAction = (
+          text.includes('choisir ce drive') ||
+          text.includes('choisir ce magasin') ||
+          text.includes('sélectionner ce drive') ||
+          text.includes('sélectionner ce magasin') ||
+          text.includes('selectionner ce drive') ||
+          text.includes('selectionner ce magasin') ||
+          text.includes('choisir ce point') ||
+          text.includes('faire mes courses ici') ||
+          text.includes('je choisis ce drive') ||
+          text.includes('valider ce magasin') ||
+          text.includes('retrait en drive') ||
+          text.includes('retrait drive') ||
+          aria.includes('choisir ce drive') ||
+          aria.includes('choisir ce magasin') ||
+          aria.includes('sélectionner') ||
+          testId.includes('select-store') ||
+          testId.includes('choose-store') ||
+          testId.includes('store-card-cta') ||
+          cls.includes('select-store') ||
+          cls.includes('choose-store') ||
+          cls.includes('btn-select-drive') ||
+          cls.includes('drive-choice') ||
+          href.includes('/magasin-') ||
+          href.includes('/magasins/')
+        );
+
+        if (isStoreAction) {
+          setTimeout(function() {
+            emitStoreChosen('click:' + text.substring(0, 30));
+          }, 400);
+          break;
+        }
+        el = el.parentElement;
+        depth++;
+      }
+    } catch(err) {}
+  }, true);
+
+  // Surveillance périodique de l'URL ou du DOM (SPA / redirections)
+  var checkCount = 0;
+  var interval = setInterval(function() {
+    checkCount++;
+    if (checkCount > 180) { clearInterval(interval); return; }
+    try {
+      var url = (window.location.href || '').toLowerCase();
+      if (
+        url.includes('/magasin-') ||
+        url.includes('/magasins/') ||
+        url.includes('m-courses.leclercdrive.fr/magasin') ||
+        url.includes('/courses-en-ligne/') ||
+        url.includes('/pdv/') ||
+        url.includes('/rayons') ||
+        url.includes('service_point')
+      ) {
+        emitStoreChosen('url_detection');
+      }
+    } catch(e) {}
+  }, 1000);
+})();
+true;
+`;
+
 export default function DriveCartModal({
   visible,
   onClose,
@@ -58,6 +150,12 @@ export default function DriveCartModal({
   const [isAssistantCollapsed, setIsAssistantCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSelectingStore, setIsSelectingStore] = useState(true);
+  const isSelectingStoreRef = useRef(true);
+
+  useEffect(() => {
+    isSelectingStoreRef.current = isSelectingStore;
+  }, [isSelectingStore]);
+
   const [isCopied, setIsCopied] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState("");
 
@@ -239,6 +337,43 @@ export default function DriveCartModal({
     }
   };
 
+  const triggerStoreSelectionSuccess = (sourceUrl) => {
+    if (!isSelectingStoreRef.current) return;
+    isSelectingStoreRef.current = false;
+    setIsSelectingStore(false);
+    dismissAllKeyboards();
+
+    if (sourceUrl) {
+      const match = sourceUrl.match(/(https?:\/\/[^\/]+\/magasin-[^\/\?#]+)/i);
+      if (match && match[1]) {
+        storeBaseUrlRef.current = match[1];
+        setCustomStoreUrl(match[1]);
+        AsyncStorage.setItem("@planeat_custom_drive_store_url", match[1]).catch(() => {});
+      }
+    }
+
+    setTimeout(() => {
+      if (currentItem) {
+        const q = getCleanItemName(currentItem);
+        if (q) {
+          setSearchQuery(q);
+          injectSearchInStore(q);
+        }
+      }
+    }, 400);
+  };
+
+  const handleWebViewMessage = (event) => {
+    try {
+      const data = JSON.parse(event.nativeEvent.data);
+      if (data && data.type === "STORE_SELECTED") {
+        if (isSelectingStoreRef.current) {
+          triggerStoreSelectionSuccess(data.url);
+        }
+      }
+    } catch (e) {}
+  };
+
   // Mobile WebView Navigation & Injection
   const handleNavigationStateChange = (navState) => {
     setCanGoBack(navState.canGoBack);
@@ -258,7 +393,7 @@ export default function DriveCartModal({
       }
     }
 
-    if (isSelectingStore && url) {
+    if (isSelectingStoreRef.current && url) {
       const cleanUrl = url.replace(/\/+$/, "").toLowerCase();
       const isInitialHome = (
         cleanUrl === selectedStore.homeUrl.replace(/\/+$/, "").toLowerCase() ||
@@ -286,17 +421,7 @@ export default function DriveCartModal({
           (selectedStore.id === "intermarche" && (url.includes("/magasin") || url.includes("/pdv/") || url.includes("/rayons")));
 
         if (isStoreSelected) {
-          setIsSelectingStore(false);
-          dismissAllKeyboards();
-          setTimeout(() => {
-            if (currentItem) {
-              const q = getCleanItemName(currentItem);
-              if (q) {
-                setSearchQuery(q);
-                injectSearchInStore(q);
-              }
-            }
-          }, 400);
+          triggerStoreSelectionSuccess(url);
         }
       }
     }
@@ -422,21 +547,14 @@ export default function DriveCartModal({
   const handleSelectStore = (store) => {
     setSelectedStore(store);
     setCurrentUrl(store.homeUrl);
+    isSelectingStoreRef.current = true;
     setIsSelectingStore(true);
     dismissAllKeyboards();
     AsyncStorage.setItem("@planeat_preferred_drive_store", store.id).catch(() => {});
   };
 
   const handleStartShopping = () => {
-    setIsSelectingStore(false);
-    dismissAllKeyboards();
-    if (currentItem) {
-      const q = getCleanItemName(currentItem);
-      if (q) {
-        setSearchQuery(q);
-        injectSearchInStore(q);
-      }
-    }
+    triggerStoreSelectionSuccess(currentUrl);
   };
 
   const handleSearchTerm = (term) => {
@@ -1015,7 +1133,12 @@ export default function DriveCartModal({
               source={{ uri: currentUrl }}
               onNavigationStateChange={handleNavigationStateChange}
               onLoadStart={() => setIsLoadingWeb(true)}
-              onLoadEnd={() => setIsLoadingWeb(false)}
+              onLoadEnd={() => {
+                setIsLoadingWeb(false);
+                webViewRef.current?.injectJavaScript(STORE_DETECTOR_INJECTION_JS);
+              }}
+              injectedJavaScript={STORE_DETECTOR_INJECTION_JS}
+              onMessage={handleWebViewMessage}
               originWhitelist={["*"]}
               setSupportMultipleWindows={false}
               sharedCookiesEnabled={true}

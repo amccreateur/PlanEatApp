@@ -29,6 +29,8 @@ import GroceryItemRow from "./components/GroceryItemRow";
 import FridgeModal from "./components/FridgeModal";
 import QuickMenuModal from "./components/QuickMenuModal";
 import DriveCartModal from "./components/DriveCartModal";
+import PaywallModal from "./components/PaywallModal";
+import { purchaseService } from "./services/purchaseService";
 
 function MainApp() {
   const insets = useSafeAreaInsets();
@@ -55,6 +57,8 @@ function MainApp() {
   const [isFridgeModalOpen, setIsFridgeModalOpen] = useState(false);
   const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
   const [isDriveModalOpen, setIsDriveModalOpen] = useState(false);
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [isPro, setIsPro] = useState(false);
 
   // Courses manuelles / filtre
   const [newCustomItem, setNewCustomItem] = useState("");
@@ -66,6 +70,13 @@ function MainApp() {
 
   useEffect(() => {
     loadSavedData();
+    purchaseService.init();
+    const unsub = purchaseService.subscribe((proStatus) => {
+      setIsPro(proStatus);
+    });
+    return () => {
+      if (unsub) unsub();
+    };
   }, []);
 
   const loadSavedData = async () => {
@@ -392,6 +403,20 @@ function MainApp() {
         </View>
 
         <View style={[styles.topActions, isRTL && styles.rtlRow]}>
+          <TouchableOpacity
+            style={styles.proHeaderBtn}
+            onPress={() => setIsPaywallOpen(true)}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={isPro ? ["#f59e0b", "#d97706"] : ["#10b981", "#059669"]}
+              style={styles.proHeaderGradient}
+            >
+              <Ionicons name="crown" size={13} color="#ffffff" />
+              <Text style={styles.proHeaderText}>{isPro ? "PRO" : "PREMIUM"}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={[styles.menuBurgerBtn, { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.border }]}
             onPress={() => setIsQuickMenuOpen(true)}
@@ -943,6 +968,8 @@ function MainApp() {
           onOpenFridge={() => setIsFridgeModalOpen(true)}
           onOpenProfile={() => setIsProfileModalOpen(true)}
           onOpenDrive={() => setIsDriveModalOpen(true)}
+          onOpenPaywall={() => setIsPaywallOpen(true)}
+          isPro={isPro}
           aiConfig={aiConfig}
           profile={profile}
           lang={lang}
@@ -958,6 +985,13 @@ function MainApp() {
           onToggleItem={handleToggleGrocery}
           lang={lang}
           themeMode={themeMode}
+        />
+
+        <PaywallModal
+          visible={isPaywallOpen}
+          onClose={() => setIsPaywallOpen(false)}
+          themeMode={themeMode}
+          onSuccess={() => setIsPro(true)}
         />
       </SafeAreaView>
   );
@@ -1011,6 +1045,24 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8
+  },
+  proHeaderBtn: {
+    borderRadius: 10,
+    overflow: "hidden"
+  },
+  proHeaderGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 9,
+    paddingVertical: 7,
+    borderRadius: 10
+  },
+  proHeaderText: {
+    color: "#ffffff",
+    fontSize: 11,
+    fontWeight: "800",
+    letterSpacing: 0.5
   },
   fridgeBtn: {
     flexDirection: "row",

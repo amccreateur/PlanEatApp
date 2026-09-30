@@ -22,6 +22,8 @@ export default function QuickMenuModal({
   onOpenFridge,
   onOpenProfile,
   onOpenDrive,
+  onOpenPaywall,
+  isPro = false,
   aiConfig,
   profile,
   lang,
@@ -70,6 +72,35 @@ export default function QuickMenuModal({
                 </View>
 
                 <ScrollView style={styles.menuScroll} showsVerticalScrollIndicator={false}>
+                  {/* PlanEat Pro Banner */}
+                  <TouchableOpacity
+                    style={styles.proBannerCard}
+                    activeOpacity={0.85}
+                    onPress={() => {
+                      onClose();
+                      if (onOpenPaywall) onOpenPaywall();
+                    }}
+                  >
+                    <LinearGradient
+                      colors={isPro ? ["#f59e0b", "#d97706"] : ["#10b981", "#059669"]}
+                      style={styles.proBannerGradient}
+                    >
+                      <View style={styles.proBannerLeft}>
+                        <View style={styles.proCrownCircle}>
+                          <Ionicons name="crown" size={18} color="#ffffff" />
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text style={styles.proBannerTitle}>
+                            {isPro ? "PlanEat Pro Actif 👑" : "Passer à PlanEat Pro ✨"}
+                          </Text>
+                          <Text style={styles.proBannerSubtitle}>
+                            {isPro ? "Toutes les fonctionnalités sont débloquées" : "Menus 7j/7, IA Mistral & Drive illimité"}
+                          </Text>
+                        </View>
+                      </View>
+                      <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={18} color="#ffffff" />
+                    </LinearGradient>
+                  </TouchableOpacity>
                   {/* Action 1 : Remplir mon panier Drive */}
                   <TouchableOpacity
                     style={[styles.menuActionCard, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}
@@ -489,6 +520,49 @@ const styles = StyleSheet.create({
   themeBtnTextActiveDark: {
     color: "#9333ea",
     fontWeight: "800"
+  },
+  proBannerCard: {
+    borderRadius: 16,
+    overflow: "hidden",
+    marginBottom: 12,
+    elevation: 3,
+    shadowColor: "#10b981",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5
+  },
+  proBannerGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 12,
+    paddingHorizontal: 14
+  },
+  proBannerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    marginRight: 10
+  },
+  proCrownCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10
+  },
+  proBannerTitle: {
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: "800"
+  },
+  proBannerSubtitle: {
+    color: "#ffffff",
+    opacity: 0.9,
+    fontSize: 11,
+    marginTop: 1
   }
 });
 

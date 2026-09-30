@@ -275,7 +275,11 @@ export default function FamilyProfileModal({
           >
             <Ionicons name="close" size={24} color={theme.text} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: theme.text }]}>
+          <Text
+            style={[styles.headerTitle, { color: theme.text }]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {isOnboarding ? (t.onboardingWelcomeTitle || "Bienvenue !") : t.profileTitle}
           </Text>
           <TouchableOpacity
@@ -1048,28 +1052,33 @@ const styles = StyleSheet.create({
     borderBottomColor: "#1e293b"
   },
   headerTitle: {
+    flex: 1,
     color: "#f8fafc",
-    fontSize: 17,
-    fontWeight: "700"
+    fontSize: 16,
+    fontWeight: "700",
+    textAlign: "center",
+    marginHorizontal: 8
   },
   closeBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: "#1e293b",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    flexShrink: 0
   },
   saveHeaderBtn: {
     backgroundColor: "#0284c7",
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 12
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 10,
+    flexShrink: 0
   },
   saveHeaderText: {
     color: "#ffffff",
     fontWeight: "700",
-    fontSize: 14
+    fontSize: 13
   },
   scroll: {
     flex: 1

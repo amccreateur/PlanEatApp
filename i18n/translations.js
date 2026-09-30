@@ -166,7 +166,7 @@ export const TRANSLATIONS = {
     dislikedTitle: "Aliments exclus ou allergies",
     dislikedPlaceholder: "Ex: Coriandre, Champignons, Fruits de mer, Arachides...",
     addDislike: "Exclure cet aliment",
-    saveProfile: "Enregistrer mon profil",
+    saveProfile: "Enregistrer",
     profileSaved: "Profil enregistré avec succès !",
     
     // Language selection
@@ -391,7 +391,7 @@ export const TRANSLATIONS = {
     dislikedTitle: "Disliked Foods & Allergies",
     dislikedPlaceholder: "E.g., Cilantro, Mushrooms, Seafood, Peanuts...",
     addDislike: "Exclude this food",
-    saveProfile: "Save Household Profile",
+    saveProfile: "Save",
     profileSaved: "Profile saved successfully!",
     
     // Language selection

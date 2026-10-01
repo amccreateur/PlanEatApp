@@ -54,10 +54,18 @@ const STORE_DETECTOR_INJECTION_JS = `
     } catch(e) {}
   }
 
-  // Auto-recovery si écran incident Leclerc
+  // Auto-recovery si ancien domaine ou écran incident Leclerc
   try {
+    var curHref = (window.location.href || '').toLowerCase();
     var bodyText = (document.body && (document.body.innerText || document.body.textContent) || '').toLowerCase();
-    if (bodyText.includes('momentanément indisponible') || bodyText.includes('incident :') || bodyText.includes('incident:')) {
+    if (
+      curHref.includes('leclercdrive.fr') ||
+      curHref.includes('erreur.aspx') ||
+      curHref.includes('pgewcsd') ||
+      bodyText.includes('momentanément indisponible') ||
+      bodyText.includes('incident :') ||
+      bodyText.includes('incident:')
+    ) {
       window.location.replace('https://www.e.leclerc/e/drive');
       return;
     }
@@ -419,12 +427,24 @@ export default function DriveCartModal({
     const url = navState.url || "";
     if (url) {
       sendRemoteLog("WEBVIEW_NAV", `URL: ${url}`);
-      if (url.includes("/404") || url.includes("page-introuvable") || url.includes("/erreur-404")) {
+      if (
+        url.includes("leclercdrive.fr") ||
+        url.includes("pgeWCSD") ||
+        url.includes("Erreur.aspx") ||
+        url.includes("/404") ||
+        url.includes("page-introuvable") ||
+        url.includes("/erreur-404")
+      ) {
+        if (url.includes("leclercdrive.fr") || url.includes("pgeWCSD") || url.includes("Erreur.aspx")) {
+          sendRemoteLog("AUTO_REDIRECT", "Bascule immédiate vers https://www.e.leclerc/e/drive");
+          setCurrentUrl("https://www.e.leclerc/e/drive");
+          return;
+        }
         setCurrentUrl(selectedStore.homeUrl);
         return;
       }
       const match = url.match(/(https?:\/\/[^\/]+\/magasin-[^\/\?#]+)/i);
-      if (match && match[1]) {
+      if (match && match[1] && !match[1].includes("leclercdrive.fr")) {
         storeBaseUrlRef.current = match[1];
         setCustomStoreUrl(match[1]);
         AsyncStorage.setItem("@planeat_custom_drive_store_url", match[1]).catch(() => {});

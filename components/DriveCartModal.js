@@ -246,12 +246,8 @@ export default function DriveCartModal({
     const q = encodeURIComponent(clean);
     if (selectedStore.id === "leclerc") {
       const base = customStoreUrl || storeBaseUrlRef.current;
-      if (base && base.includes("magasin-")) {
-        const cleanBase = base.replace(/\/+$/, "").replace(/\/recherche\.aspx.*$/i, "").replace(/\/recherche\/.*$/i, "");
-        if (cleanBase.includes("m-courses")) {
-          return `${cleanBase}/recherche/${q}`;
-        }
-        return `${cleanBase}/recherche.aspx?TexteRecherche=${q}`;
+      if (base && base.includes("e.leclerc")) {
+        return `${base.replace(/\/+$/, "")}/recherche?q=${q}`;
       }
       return `https://www.e.leclerc/recherche?q=${q}`;
     }
@@ -448,7 +444,7 @@ export default function DriveCartModal({
             var forms = document.querySelectorAll('form');
             for (var f = 0; f < forms.length; f++) {
               var formEl = forms[f];
-              var qEl = formEl.querySelector('input[name="q"], input[type="search"], input[name="TexteRecherche"], input[name="text"], input[name="query"], input[name="keyword"], input[name="search"], input[placeholder*="recherch" i], input[placeholder*="produit" i], input[placeholder*="article" i], input.search-input, input#search-input');
+              var qEl = formEl.querySelector('input[name="q"], input[type="search"], input[name="txtRecherche"], input#txtRecherche, input[name="txtSearch"], input[name="TexteRecherche"], input[name="text"], input[name="query"], input[name="keyword"], input[name="search"], input[placeholder*="recherch" i], input[placeholder*="produit" i], input[placeholder*="article" i], input.search-input, input#search-input');
               if (qEl) {
                 try {
                   qEl.focus();
@@ -462,7 +458,7 @@ export default function DriveCartModal({
                   qEl.dispatchEvent(new Event('change', { bubbles: true }));
                   qEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
                   qEl.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-                  var submitBtn = formEl.querySelector('button[type="submit"], input[type="submit"], button.search-button, button.header-search__btn');
+                  var submitBtn = formEl.querySelector('button[type="submit"], input[type="submit"], button.search-button, button.header-search__btn, button[aria-label*="recherch" i]');
                   if (submitBtn) {
                     submitBtn.click();
                     return;
@@ -475,6 +471,9 @@ export default function DriveCartModal({
 
             var selectors = [
               'input[type="search"]',
+              'input[name="txtRecherche"]',
+              'input#txtRecherche',
+              'input[name="txtSearch"]',
               'input[name="q"]',
               'input[name="keyword"]',
               'input[name="search"]',
@@ -482,7 +481,9 @@ export default function DriveCartModal({
               'input[name="TexteRecherche"]',
               'input[name="text"]',
               'input[name="query"]',
-              'input[placeholder*="recherch" i]'
+              'input[placeholder*="recherch" i]',
+              'input[id*="recherche" i]',
+              'input[id*="search" i]'
             ];
 
             for (var i = 0; i < selectors.length; i++) {

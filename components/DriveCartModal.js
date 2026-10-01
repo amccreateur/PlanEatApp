@@ -294,7 +294,7 @@ export default function DriveCartModal({
     if (selectedStore.id === "leclerc") {
       const base = customStoreUrl || storeBaseUrlRef.current;
       if (base && (base.includes("magasin-") || base.includes("m-courses"))) {
-        const cleanBase = base.replace(/\/+$/, "").replace(/\/recherche.*$/i, "").replace(/\/accueil\.aspx.*$/i, "");
+        const cleanBase = base.replace(/\.aspx.*$/i, "").replace(/\/+$/, "").replace(/\/recherche.*$/i, "").replace(/\/accueil.*$/i, "");
         return `${cleanBase}/recherche/${q}`;
       }
       if (base && base.includes("e.leclerc")) {
@@ -504,7 +504,7 @@ export default function DriveCartModal({
     if (selectedStore.id === "leclerc") {
       const base = customStoreUrl || storeBaseUrlRef.current;
       if (base && (base.includes("m-courses") || base.includes("magasin-"))) {
-        const cleanBase = base.replace(/\/+$/, "").replace(/\/recherche.*$/i, "").replace(/\/accueil\.aspx.*$/i, "");
+        const cleanBase = base.replace(/\.aspx.*$/i, "").replace(/\/+$/, "").replace(/\/recherche.*$/i, "").replace(/\/accueil.*$/i, "");
         const targetSearchUrl = `${cleanBase}/recherche/${encodeURIComponent(cleanQ)}`;
         sendRemoteLog("LECLERC_NAVIGATE_SEARCH", targetSearchUrl);
         const searchJs = `
@@ -618,11 +618,24 @@ export default function DriveCartModal({
 
   const handleSelectStore = (store) => {
     setSelectedStore(store);
+    setCustomStoreUrl("");
+    storeBaseUrlRef.current = "";
     setCurrentUrl(store.homeUrl);
     isSelectingStoreRef.current = true;
     setIsSelectingStore(true);
     dismissAllKeyboards();
+    sendRemoteLog("STORE_SWITCHED", `Passage à ${store.name} -> ${store.homeUrl}`);
     AsyncStorage.setItem("@planeat_preferred_drive_store", store.id).catch(() => {});
+
+    const navJs = `
+      (function() {
+        try {
+          window.location.href = ${JSON.stringify(store.homeUrl)};
+        } catch(e) {}
+      })();
+      true;
+    `;
+    webViewRef.current?.injectJavaScript(navJs);
   };
 
   const handleStartShopping = () => {

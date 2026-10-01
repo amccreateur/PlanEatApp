@@ -1134,6 +1134,9 @@ export default function DriveCartModal({
               thirdPartyCookiesEnabled={true}
               domStorageEnabled={true}
               javaScriptEnabled={true}
+              incognito={false}
+              contentMode="mobile"
+              allowsBackForwardNavigationGestures={true}
               style={styles.webView}
             />
           ) : null}

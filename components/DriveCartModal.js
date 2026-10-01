@@ -293,10 +293,14 @@ export default function DriveCartModal({
     const q = encodeURIComponent(clean);
     if (selectedStore.id === "leclerc") {
       const base = customStoreUrl || storeBaseUrlRef.current;
+      if (base && (base.includes("magasin-") || base.includes("m-courses"))) {
+        const cleanBase = base.replace(/\/+$/, "").replace(/\/recherche.*$/i, "").replace(/\/accueil\.aspx.*$/i, "");
+        return `${cleanBase}/recherche/${q}`;
+      }
       if (base && base.includes("e.leclerc")) {
         return `${base.replace(/\/+$/, "")}/recherche?q=${q}`;
       }
-      return `https://www.e.leclerc/recherche?q=${q}`;
+      return `https://www.leclercdrive.fr/`;
     }
     if (selectedStore.id === "carrefour") return `https://www.carrefour.fr/r?q=${q}`;
     if (selectedStore.id === "auchan") return `https://www.auchan.fr/recherche?text=${q}`;
@@ -496,6 +500,25 @@ export default function DriveCartModal({
     Clipboard.setStringAsync(cleanQ).catch(() => {});
     const targetUrl = getDirectSearchUrl(cleanQ);
     sendRemoteLog("APP_START_SEARCH", `Recherche: "${cleanQ}" (${selectedStore.name}) -> ${targetUrl}`);
+
+    if (selectedStore.id === "leclerc") {
+      const base = customStoreUrl || storeBaseUrlRef.current;
+      if (base && (base.includes("m-courses") || base.includes("magasin-"))) {
+        const cleanBase = base.replace(/\/+$/, "").replace(/\/recherche.*$/i, "").replace(/\/accueil\.aspx.*$/i, "");
+        const targetSearchUrl = `${cleanBase}/recherche/${encodeURIComponent(cleanQ)}`;
+        sendRemoteLog("LECLERC_NAVIGATE_SEARCH", targetSearchUrl);
+        const searchJs = `
+          (function() {
+            try {
+              window.location.href = ${JSON.stringify(targetSearchUrl)};
+            } catch(e) {}
+          })();
+          true;
+        `;
+        webViewRef.current?.injectJavaScript(searchJs);
+        return;
+      }
+    }
 
     const domSearchJs = `
       (function() {

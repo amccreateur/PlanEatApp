@@ -44,6 +44,15 @@ const STORE_DETECTOR_INJECTION_JS = `
     } catch(e) {}
   }
 
+  // Auto-recovery si écran incident Leclerc
+  try {
+    var bodyText = (document.body && (document.body.innerText || document.body.textContent) || '').toLowerCase();
+    if (bodyText.includes('momentanément indisponible') || bodyText.includes('incident :') || bodyText.includes('incident:')) {
+      window.location.replace('https://www.e.leclerc/e/drive');
+      return;
+    }
+  } catch(eRecov) {}
+
   // Interception des clics sur les boutons / liens de choix de Drive ou magasin
   document.addEventListener('click', function(e) {
     try {
@@ -203,9 +212,16 @@ export default function DriveCartModal({
     AsyncStorage.getItem("@planeat_custom_drive_store_url")
       .then((savedUrl) => {
         if (savedUrl) {
-          setCustomStoreUrl(savedUrl);
-          setStoreUrlInput(savedUrl);
-          storeBaseUrlRef.current = savedUrl;
+          if (savedUrl.includes("leclercdrive.fr") || savedUrl.includes("m-courses") || savedUrl.includes("fd16")) {
+            AsyncStorage.removeItem("@planeat_custom_drive_store_url").catch(() => {});
+            setCustomStoreUrl("");
+            setStoreUrlInput("");
+            storeBaseUrlRef.current = "";
+          } else {
+            setCustomStoreUrl(savedUrl);
+            setStoreUrlInput(savedUrl);
+            storeBaseUrlRef.current = savedUrl;
+          }
         }
       })
       .catch(() => {});

@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#38bdf8/40",
+    borderColor: "rgba(56, 189, 248, 0.4)",
     gap: 6
   },
   chipText: {

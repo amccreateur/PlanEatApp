@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#334155/40",
+    borderBottomColor: "rgba(51, 65, 85, 0.4)",
     gap: 10
   },
   ingredientName: {

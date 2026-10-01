@@ -1224,7 +1224,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#334155/50"
+    borderBottomColor: "rgba(51, 65, 85, 0.5)"
   },
   counterLabel: {
     color: "#e2e8f0",
@@ -1369,7 +1369,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#ef4444/40",
+    borderColor: "rgba(239, 68, 68, 0.4)",
     gap: 6
   },
   dislikeText: {
@@ -1476,14 +1476,14 @@ const styles = StyleSheet.create({
     marginTop: 8
   },
   testSuccessBox: {
-    backgroundColor: "#064e3b/40",
+    backgroundColor: "rgba(6, 78, 59, 0.4)",
     borderWidth: 1,
-    borderColor: "#10b981/50"
+    borderColor: "rgba(16, 185, 129, 0.5)"
   },
   testErrorBox: {
-    backgroundColor: "#7f1d1d/40",
+    backgroundColor: "rgba(127, 29, 29, 0.4)",
     borderWidth: 1,
-    borderColor: "#ef4444/50"
+    borderColor: "rgba(239, 68, 68, 0.5)"
   },
   testResultText: {
     fontSize: 12,

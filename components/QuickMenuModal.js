@@ -72,35 +72,6 @@ export default function QuickMenuModal({
                 </View>
 
                 <ScrollView style={styles.menuScroll} showsVerticalScrollIndicator={false}>
-                  {/* PlanEat Pro Banner */}
-                  <TouchableOpacity
-                    style={styles.proBannerCard}
-                    activeOpacity={0.85}
-                    onPress={() => {
-                      onClose();
-                      if (onOpenPaywall) onOpenPaywall();
-                    }}
-                  >
-                    <LinearGradient
-                      colors={isPro ? ["#f59e0b", "#d97706"] : ["#10b981", "#059669"]}
-                      style={styles.proBannerGradient}
-                    >
-                      <View style={styles.proBannerLeft}>
-                        <View style={styles.proCrownCircle}>
-                          <Ionicons name="crown" size={18} color="#ffffff" />
-                        </View>
-                        <View style={{ flex: 1 }}>
-                          <Text style={styles.proBannerTitle}>
-                            {isPro ? "PlanEat Pro Actif 👑" : "Passer à PlanEat Pro ✨"}
-                          </Text>
-                          <Text style={styles.proBannerSubtitle}>
-                            {isPro ? "Toutes les fonctionnalités sont débloquées" : "Menus 7j/7, IA Mistral & Drive illimité"}
-                          </Text>
-                        </View>
-                      </View>
-                      <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={18} color="#ffffff" />
-                    </LinearGradient>
-                  </TouchableOpacity>
                   {/* Action 1 : Remplir mon panier Drive */}
                   <TouchableOpacity
                     style={[styles.menuActionCard, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}

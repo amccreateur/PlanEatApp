@@ -436,23 +436,6 @@ export default function DriveCartModal({
     Clipboard.setStringAsync(cleanQ).catch(() => {});
     const targetUrl = getDirectSearchUrl(cleanQ);
 
-    if (selectedStore.id === "leclerc" || selectedStore.id === "carrefour") {
-      setCurrentUrl(targetUrl);
-      const js = `
-        (function() {
-          try {
-            var target = ${JSON.stringify(targetUrl)};
-            if (window.location.href !== target) {
-              window.location.replace(target);
-            }
-          } catch(e) {}
-        })();
-        true;
-      `;
-      webViewRef.current?.injectJavaScript(js);
-      return;
-    }
-
     const domSearchJs = `
       (function() {
         try {
@@ -1131,6 +1114,11 @@ export default function DriveCartModal({
             <WebView
               ref={webViewRef}
               source={{ uri: currentUrl }}
+              userAgent={
+                Platform.OS === "ios"
+                  ? "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1"
+                  : "Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36"
+              }
               onNavigationStateChange={handleNavigationStateChange}
               onLoadStart={() => setIsLoadingWeb(true)}
               onLoadEnd={() => {

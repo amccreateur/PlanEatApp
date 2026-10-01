@@ -27,6 +27,16 @@ if (Platform.OS !== "web") {
   WebView = require("react-native-webview").WebView;
 }
 
+const sendRemoteLog = (type, text) => {
+  try {
+    fetch("http://192.168.1.111:8088/log", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type, text: typeof text === 'string' ? text : JSON.stringify(text) })
+    }).catch(() => {});
+  } catch(e) {}
+};
+
 const STORE_DETECTOR_INJECTION_JS = `
 (function() {
   if (window.__planeatDetectorActive) return;
@@ -322,6 +332,7 @@ export default function DriveCartModal({
       if (nextItem) {
         const nextQuery = getCleanItemName(nextItem);
         setSearchQuery(nextQuery);
+        sendRemoteLog("ACTION_NEXT_ITEM", `Article suivant [#${nextIndex + 1}]: "${nextQuery}"`);
         if (Platform.OS !== "web") {
           injectSearchInStore(nextQuery);
         }
@@ -407,6 +418,7 @@ export default function DriveCartModal({
 
     const url = navState.url || "";
     if (url) {
+      sendRemoteLog("WEBVIEW_NAV", `URL: ${url}`);
       if (url.includes("/404") || url.includes("page-introuvable") || url.includes("/erreur-404")) {
         setCurrentUrl(selectedStore.homeUrl);
         return;
@@ -425,9 +437,12 @@ export default function DriveCartModal({
         cleanUrl === selectedStore.homeUrl.replace(/\/+$/, "").toLowerCase() ||
         cleanUrl === "https://www.carrefour.fr" ||
         cleanUrl === "https://www.carrefour.fr/drive" ||
+        cleanUrl === "https://www.e.leclerc/e/drive" ||
+        cleanUrl === "https://www.e.leclerc" ||
         cleanUrl === "https://www.leclercdrive.fr" ||
         cleanUrl === "https://m-courses.leclercdrive.fr" ||
         cleanUrl === "https://www.coursesu.com" ||
+        cleanUrl === "https://www.coursesu.com/drive" ||
         cleanUrl === "https://www.coursesu.com/drive/accueil" ||
         cleanUrl === "https://www.auchan.fr" ||
         cleanUrl === "https://www.auchan.fr/drive" ||
@@ -447,6 +462,7 @@ export default function DriveCartModal({
           (selectedStore.id === "intermarche" && (url.includes("/magasin") || url.includes("/pdv/") || url.includes("/rayons")));
 
         if (isStoreSelected) {
+          sendRemoteLog("STORE_AUTO_DETECTED", url);
           triggerStoreSelectionSuccess(url);
         }
       }
@@ -461,6 +477,7 @@ export default function DriveCartModal({
 
     Clipboard.setStringAsync(cleanQ).catch(() => {});
     const targetUrl = getDirectSearchUrl(cleanQ);
+    sendRemoteLog("APP_START_SEARCH", `Recherche: "${cleanQ}" (${selectedStore.name}) -> ${targetUrl}`);
 
     const domSearchJs = `
       (function() {

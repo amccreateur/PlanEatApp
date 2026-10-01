@@ -10,9 +10,12 @@ if (Platform.OS !== "web") {
   }
 }
 
+// Mode gratuit / test : mettre à false pour débloquer 100% de l'appli sans popup ni achat
+export const ENABLE_SUBSCRIPTIONS = false;
+
 export const REVENUECAT_KEYS = {
   ios: "appl_fyeupvTKMGvuvRdPAtTDjmQIiXp",
-  android: "test_BswsJFbKUxnGLOuaIJDhEOPnFcM"
+  android: "" // Laisser vide en test pour éviter l'erreur de clé test sur Android release
 };
 
 export const ENTITLEMENT_IDS = ["PlanEat Pro", "pro", "premium", "planeat_pro"];
@@ -20,44 +23,52 @@ export const ENTITLEMENT_IDS = ["PlanEat Pro", "pro", "premium", "planeat_pro"];
 class PurchaseService {
   constructor() {
     this.isInitialized = false;
-    this.isPro = false;
+    this.isPro = true; // Débloqué par défaut pour tous les utilisateurs en phase de test
     this.listeners = new Set();
   }
 
   async init() {
     if (this.isInitialized) return;
+    this.isInitialized = true;
 
-    if (Platform.OS === "web" || !Purchases) {
-      this.isInitialized = true;
-      const cached = await AsyncStorage.getItem("@planeat_is_pro");
-      this.isPro = cached === "true";
+    // Si les abonnements sont désactivés ou sur le web
+    if (!ENABLE_SUBSCRIPTIONS || Platform.OS === "web" || !Purchases) {
+      this.isPro = true;
+      this._notifyListeners();
       return;
     }
 
     try {
       const apiKey = Platform.OS === "ios" ? REVENUECAT_KEYS.ios : REVENUECAT_KEYS.android;
-      if (apiKey) {
+      // Ne pas configurer si la clé est vide ou est une clé de test sur un build release
+      if (apiKey && !apiKey.startsWith("test_")) {
         Purchases.setLogLevel(Purchases.LOG_LEVEL.WARN);
         await Purchases.configure({ apiKey });
-        this.isInitialized = true;
 
-        // Listen for customer info updates
         Purchases.addCustomerInfoUpdateListener((info) => {
           this._handleCustomerInfoUpdate(info);
         });
 
-        // Initial check
         const info = await Purchases.getCustomerInfo();
         this._handleCustomerInfoUpdate(info);
+      } else {
+        this.isPro = true;
+        this._notifyListeners();
       }
     } catch (err) {
       console.warn("RevenueCat initialization error:", err);
-      const cached = await AsyncStorage.getItem("@planeat_is_pro");
-      this.isPro = cached === "true";
+      this.isPro = true;
+      this._notifyListeners();
     }
   }
 
   _handleCustomerInfoUpdate(customerInfo) {
+    if (!ENABLE_SUBSCRIPTIONS) {
+      this.isPro = true;
+      this._notifyListeners();
+      return;
+    }
+
     if (!customerInfo) return;
     const hasPro = ENTITLEMENT_IDS.some(
       (entId) => customerInfo.entitlements?.active?.[entId]?.isActive
@@ -83,7 +94,7 @@ class PurchaseService {
   }
 
   async getOfferings() {
-    if (Platform.OS === "web" || !Purchases) {
+    if (!ENABLE_SUBSCRIPTIONS || Platform.OS === "web" || !Purchases) {
       return null;
     }
     try {
@@ -97,8 +108,8 @@ class PurchaseService {
   }
 
   async purchasePackage(pkg) {
-    if (Platform.OS === "web" || !Purchases) {
-      throw new Error("Paiement non supporté sur le web");
+    if (!ENABLE_SUBSCRIPTIONS || Platform.OS === "web" || !Purchases) {
+      throw new Error("Paiement non supporté en phase de test");
     }
     try {
       const { customerInfo } = await Purchases.purchasePackage(pkg);
@@ -113,7 +124,7 @@ class PurchaseService {
   }
 
   async restorePurchases() {
-    if (Platform.OS === "web" || !Purchases) {
+    if (!ENABLE_SUBSCRIPTIONS || Platform.OS === "web" || !Purchases) {
       return this.isPro;
     }
     try {

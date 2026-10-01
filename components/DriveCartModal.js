@@ -95,6 +95,20 @@ const STORE_DETECTOR_INJECTION_JS = `
     } catch(err) {}
   }, true);
 
+  // Auto-sélection de l'onglet "Drive" prioritaire si un choix (Drive / Livraison) apparaît
+  try {
+    var driveTabs = document.querySelectorAll('button, a, div[role="tab"], input[type="radio"]');
+    for (var d = 0; d < driveTabs.length; d++) {
+      var tabText = (driveTabs[d].innerText || driveTabs[d].textContent || driveTabs[d].getAttribute('aria-label') || '').trim().toLowerCase();
+      if (tabText === 'drive' || tabText === 'retrait drive' || tabText === 'leclerc drive' || tabText === 'auchan drive') {
+        if (!driveTabs[d].classList.contains('active') && !driveTabs[d].getAttribute('aria-selected')) {
+          driveTabs[d].click();
+        }
+        break;
+      }
+    }
+  } catch(eDrive) {}
+
   // Surveillance périodique de l'URL ou du DOM (SPA / redirections)
   var checkCount = 0;
   var interval = setInterval(function() {

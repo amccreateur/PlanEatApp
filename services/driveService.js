@@ -33,7 +33,7 @@ export const DRIVE_STORES = [
     color: "#0085ca",
     badgeColor: "#ffffff",
     textColor: "#ffffff",
-    homeUrl: "https://www.coursesu.com",
+    homeUrl: "https://www.coursesu.com/drive",
     searchUrl: (query) => `https://www.coursesu.com/recherche?q=${encodeURIComponent(query)}`,
     logoEmoji: "🔷"
   },
@@ -55,7 +55,7 @@ export const DRIVE_STORES = [
     color: "#cc0000",
     badgeColor: "#1e293b",
     textColor: "#ffffff",
-    homeUrl: "https://www.intermarche.com",
+    homeUrl: "https://www.intermarche.com/drive",
     searchUrl: (query) => `https://www.intermarche.com/recherche?q=${encodeURIComponent(query)}`,
     logoEmoji: "🟠"
   }

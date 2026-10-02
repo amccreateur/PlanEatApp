@@ -138,25 +138,7 @@ const STORE_DETECTOR_INJECTION_JS = `
   // Masquage automatique des bannières d'app, cookies, hopla et popups intrusifs
   try {
     var cleanStyle = document.createElement('style');
-    cleanStyle.innerHTML = `
-      [class*="hopla" i], [id*="hopla" i], [data-testid*="hopla" i],
-      [class*="smartbanner" i], [id*="smartbanner" i], .smartbanner, .smart-banner,
-      [class*="app-banner" i], [id*="app-banner" i], [class*="app_banner" i],
-      [class*="download-app" i], [class*="telecharger-app" i], [class*="app-promo" i],
-      #onetrust-banner-sdk, #onetrust-consent-sdk, .didomi-popup-container,
-      .tc-privacy-wrapper, #axeptio_overlay, #popin_tc_privacy_container {
-        display: none !important;
-        visibility: hidden !important;
-        pointer-events: none !important;
-        height: 0 !important;
-        max-height: 0 !important;
-        overflow: hidden !important;
-      }
-      body {
-        margin-top: 0 !important;
-        padding-top: 0 !important;
-      }
-    `;
+    cleanStyle.innerHTML = '[class*="hopla" i], [id*="hopla" i], [data-testid*="hopla" i], [class*="smartbanner" i], [id*="smartbanner" i], .smartbanner, .smart-banner, [class*="app-banner" i], [id*="app-banner" i], [class*="app_banner" i], [class*="download-app" i], [class*="telecharger-app" i], [class*="app-promo" i], #onetrust-banner-sdk, #onetrust-consent-sdk, .didomi-popup-container, .tc-privacy-wrapper, #axeptio_overlay, #popin_tc_privacy_container { display: none !important; visibility: hidden !important; pointer-events: none !important; }';
     (document.head || document.documentElement).appendChild(cleanStyle);
   } catch(eCleanStyle) {}
 

@@ -201,11 +201,19 @@ export default function DriveCartModal({
 
   const webViewRef = useRef(null);
   const storeBaseUrlRef = useRef("");
+  const storeChipsScrollRef = useRef(null);
   const [selectedStore, setSelectedStore] = useState(DRIVE_STORES[0]);
   const [currentUrl, setCurrentUrl] = useState(DRIVE_STORES[0].homeUrl);
   const [isLoadingWeb, setIsLoadingWeb] = useState(false);
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoForward, setCanGoForward] = useState(false);
+
+  useEffect(() => {
+    const idx = DRIVE_STORES.findIndex((s) => s.id === selectedStore.id);
+    if (idx >= 0 && storeChipsScrollRef.current) {
+      storeChipsScrollRef.current.scrollTo({ x: Math.max(0, idx * 95 - 20), animated: true });
+    }
+  }, [selectedStore.id]);
 
   // Local store URL custom configuration (for Leclerc Drive exact store links on Web & Mobile)
   const [customStoreUrl, setCustomStoreUrl] = useState("");
@@ -1243,6 +1251,7 @@ export default function DriveCartModal({
           {isSelectingStore && (
             <View style={{ paddingTop: 4, paddingBottom: 4 }}>
               <ScrollView
+                ref={storeChipsScrollRef}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.storeChipsScroll}

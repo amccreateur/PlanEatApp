@@ -25,7 +25,12 @@
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "ascAppId": "6815115668",
+        "appleId": "amccreateur@gmail.com"
+      }
+    }
   }
 }
 

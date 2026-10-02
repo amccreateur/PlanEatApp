@@ -638,6 +638,25 @@ export default function DriveCartModal({
     webViewRef.current?.injectJavaScript(navJs);
   };
 
+  const handleChangeStore = () => {
+    isSelectingStoreRef.current = true;
+    setIsSelectingStore(true);
+    setCustomStoreUrl("");
+    storeBaseUrlRef.current = "";
+    setCurrentUrl(selectedStore.homeUrl);
+    dismissAllKeyboards();
+    sendRemoteLog("CHANGE_STORE_CLICKED", `Changer de magasin pour ${selectedStore.name} -> ${selectedStore.homeUrl}`);
+    const navJs = `
+      (function() {
+        try {
+          window.location.href = ${JSON.stringify(selectedStore.homeUrl)};
+        } catch(e) {}
+      })();
+      true;
+    `;
+    webViewRef.current?.injectJavaScript(navJs);
+  };
+
   const handleStartShopping = () => {
     triggerStoreSelectionSuccess(currentUrl);
   };
@@ -1113,10 +1132,7 @@ export default function DriveCartModal({
                 {!isSelectingStore ? (
                   <TouchableOpacity
                     style={styles.changeStoreInlineChip}
-                    onPress={() => {
-                      setIsSelectingStore(true);
-                      setCurrentUrl(selectedStore.homeUrl);
-                    }}
+                    onPress={handleChangeStore}
                   >
                     <Ionicons name="swap-horizontal" size={11} color="#38bdf8" />
                     <Text style={styles.changeStoreInlineText}>Changer de magasin</Text>

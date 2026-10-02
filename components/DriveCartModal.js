@@ -191,10 +191,24 @@ export default function DriveCartModal({
   const [searchQuery, setSearchQuery] = useState("");
   const [isSelectingStore, setIsSelectingStore] = useState(true);
   const isSelectingStoreRef = useRef(true);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
   useEffect(() => {
     isSelectingStoreRef.current = isSelectingStore;
   }, [isSelectingStore]);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener(Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow", () => {
+      setIsKeyboardVisible(true);
+    });
+    const hideSub = Keyboard.addListener(Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide", () => {
+      setIsKeyboardVisible(false);
+    });
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   const [isCopied, setIsCopied] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState("");
@@ -1265,7 +1279,7 @@ export default function DriveCartModal({
             </View>
           )}
 
-          {isSelectingStore && (
+          {isSelectingStore && !isKeyboardVisible && (
             <View style={styles.floatingStartBar}>
               <TouchableOpacity
                 style={styles.floatingStartBtn}
@@ -1276,7 +1290,7 @@ export default function DriveCartModal({
                   colors={["#10b981", "#059669"]}
                   style={styles.floatingStartGradient}
                 >
-                  <Ionicons name="checkmark-circle" size={18} color="#ffffff" />
+                  <Ionicons name="checkmark-circle" size={16} color="#ffffff" />
                   <Text style={styles.floatingStartBtnText}>
                     J'ai choisi mon magasin ➔ Commencer
                   </Text>
@@ -1837,30 +1851,30 @@ const styles = StyleSheet.create({
     backgroundColor: "#1e293b",
     borderBottomWidth: 1,
     borderBottomColor: "#334155",
-    paddingVertical: 6
+    paddingVertical: 3
   },
   headerTopRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 14
+    paddingHorizontal: 10
   },
   brandTitleBox: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8
+    gap: 6
   },
   brandEmoji: {
-    fontSize: 22
+    fontSize: 18
   },
   storeNameText: {
     color: "#f8fafc",
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "800"
   },
   subTitleText: {
     color: "#94a3b8",
-    fontSize: 11
+    fontSize: 10
   },
   changeStoreInlineChip: {
     flexDirection: "row",
@@ -1870,7 +1884,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 6,
     gap: 4,
-    marginTop: 2
+    marginTop: 1
   },
   changeStoreInlineText: {
     color: "#38bdf8",
@@ -1880,12 +1894,12 @@ const styles = StyleSheet.create({
   navControls: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6
+    gap: 5
   },
   iconNavBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
+    width: 28,
+    height: 28,
+    borderRadius: 7,
     backgroundColor: "#334155",
     alignItems: "center",
     justifyContent: "center"
@@ -1894,35 +1908,37 @@ const styles = StyleSheet.create({
     opacity: 0.35
   },
   closeBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     backgroundColor: "#ef4444",
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: 4
+    marginLeft: 2
   },
   storeChipsScroll: {
-    paddingHorizontal: 14,
-    gap: 8
+    paddingHorizontal: 10,
+    gap: 6,
+    paddingTop: 2,
+    paddingBottom: 2
   },
   storeChip: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#0f172a",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: "#334155",
-    gap: 6
+    gap: 4
   },
   storeChipEmoji: {
-    fontSize: 14
+    fontSize: 12
   },
   storeChipText: {
     color: "#94a3b8",
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "700"
   },
   storeChipTextActive: {
@@ -1938,30 +1954,30 @@ const styles = StyleSheet.create({
   },
   floatingStartBar: {
     position: "absolute",
-    bottom: 16,
-    left: 14,
-    right: 14,
+    bottom: 12,
+    left: 20,
+    right: 20,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
     elevation: 8
   },
   floatingStartBtn: {
-    borderRadius: 16,
+    borderRadius: 20,
     overflow: "hidden"
   },
   floatingStartGradient: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 14,
+    paddingVertical: 10,
     paddingHorizontal: 16,
-    gap: 10
+    gap: 8
   },
   floatingStartBtnText: {
     color: "#ffffff",
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "800",
     textAlign: "center"
   },

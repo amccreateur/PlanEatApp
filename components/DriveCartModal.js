@@ -54,18 +54,41 @@ const STORE_DETECTOR_INJECTION_JS = `
     } catch(e) {}
   }
 
-  // Auto-recovery uniquement si véritable écran d'erreur ASP.NET Leclerc
+  // Auto-recovery si écran d'erreur 404 ou incident Leclerc / Auchan / Carrefour
   try {
     var curHref = (window.location.href || '').toLowerCase();
     var bodyText = (document.body && (document.body.innerText || document.body.textContent) || '').toLowerCase();
-    if (
+    var pageTitle = (document.title || '').toLowerCase();
+    var isErrorPage = (
       curHref.includes('erreur.aspx') ||
       curHref.includes('pgewcsd') ||
+      curHref.includes('/404') ||
+      pageTitle.includes('404') ||
+      pageTitle.includes('oups') ||
+      pageTitle.includes('erreur') ||
       bodyText.includes('momentanément indisponible') ||
       bodyText.includes('incident :') ||
-      bodyText.includes('incident:')
-    ) {
-      window.location.replace('https://www.leclercdrive.fr/');
+      bodyText.includes('incident:') ||
+      bodyText.includes('oups, cette page') ||
+      bodyText.includes('oups !') ||
+      bodyText.includes('page introuvable') ||
+      bodyText.includes('erreur 404') ||
+      bodyText.includes("la page demandée n'a pu être") ||
+      bodyText.includes("cette page n'existe pas")
+    );
+
+    if (isErrorPage) {
+      if (curHref.includes('leclerc')) {
+        window.location.replace('https://www.leclercdrive.fr/');
+      } else if (curHref.includes('auchan')) {
+        window.location.replace('https://www.auchan.fr/');
+      } else if (curHref.includes('carrefour')) {
+        window.location.replace('https://www.carrefour.fr/');
+      } else if (curHref.includes('coursesu')) {
+        window.location.replace('https://www.coursesu.com/');
+      } else if (curHref.includes('intermarche')) {
+        window.location.replace('https://www.intermarche.com/');
+      }
       return;
     }
   } catch(eRecov) {}
@@ -540,9 +563,9 @@ export default function DriveCartModal({
           url.includes("/magasins/") ||
           url.includes("m-courses.leclercdrive.fr/magasin") ||
           (selectedStore.id === "carrefour" && (url.includes("/magasins/") || url.includes("/drive/") || url.includes("service_point"))) ||
-          (selectedStore.id === "coursesu" && (url.includes("/magasin-") || url.includes("/courses-en-ligne/"))) ||
-          (selectedStore.id === "auchan" && (url.includes("/magasin") || url.includes("/courses/"))) ||
-          (selectedStore.id === "intermarche" && (url.includes("/magasin") || url.includes("/pdv/") || url.includes("/rayons")));
+          (selectedStore.id === "coursesu" && (url.includes("/magasin-") || url.includes("/courses-en-ligne/") || url.includes("/drive-") || url.includes("/drive/"))) ||
+          (selectedStore.id === "auchan" && (url.includes("/magasin") || url.includes("/courses") || url.includes("/achat-") || url.includes("/drive-"))) ||
+          (selectedStore.id === "intermarche" && (url.includes("/magasin") || url.includes("/pdv/") || url.includes("/rayons") || url.includes("/drive-")));
 
         if (isStoreSelected) {
           sendRemoteLog("STORE_AUTO_DETECTED", url);

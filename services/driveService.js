@@ -33,7 +33,7 @@ export const DRIVE_STORES = [
     color: "#0085ca",
     badgeColor: "#ffffff",
     textColor: "#ffffff",
-    homeUrl: "https://www.coursesu.com/drive",
+    homeUrl: "https://www.coursesu.com",
     searchUrl: (query) => `https://www.coursesu.com/recherche?q=${encodeURIComponent(query)}`,
     logoEmoji: "🔷"
   },
@@ -44,7 +44,7 @@ export const DRIVE_STORES = [
     color: "#e1001a",
     badgeColor: "#22c55e",
     textColor: "#ffffff",
-    homeUrl: "https://www.auchan.fr/drive",
+    homeUrl: "https://www.auchan.fr",
     searchUrl: (query) => `https://www.auchan.fr/recherche?text=${encodeURIComponent(query)}`,
     logoEmoji: "🟢"
   },
@@ -55,7 +55,7 @@ export const DRIVE_STORES = [
     color: "#cc0000",
     badgeColor: "#1e293b",
     textColor: "#ffffff",
-    homeUrl: "https://www.intermarche.com/drive",
+    homeUrl: "https://www.intermarche.com",
     searchUrl: (query) => `https://www.intermarche.com/recherche?q=${encodeURIComponent(query)}`,
     logoEmoji: "🟠"
   }

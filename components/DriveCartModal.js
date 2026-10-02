@@ -158,33 +158,72 @@ const STORE_DETECTOR_INJECTION_JS = `
     }
   } catch(eDrive) {}
 
-  // Masquage / fermeture automatique de l'assistant Hopla et cookies Carrefour
+  // Masquage automatique des bannières d'app, cookies, hopla et popups intrusifs
   try {
-    var hoplaStyle = document.createElement('style');
-    hoplaStyle.innerHTML = '[class*="hopla" i], [id*="hopla" i], [data-testid*="hopla" i] { display: none !important; visibility: hidden !important; pointer-events: none !important; }';
-    (document.head || document.documentElement).appendChild(hoplaStyle);
-  } catch(eHoplaStyle) {}
+    var cleanStyle = document.createElement('style');
+    cleanStyle.innerHTML = `
+      [class*="hopla" i], [id*="hopla" i], [data-testid*="hopla" i],
+      [class*="smartbanner" i], [id*="smartbanner" i], .smartbanner, .smart-banner,
+      [class*="app-banner" i], [id*="app-banner" i], [class*="app_banner" i],
+      [class*="download-app" i], [class*="telecharger-app" i], [class*="app-promo" i],
+      #onetrust-banner-sdk, #onetrust-consent-sdk, .didomi-popup-container,
+      .tc-privacy-wrapper, #axeptio_overlay, #popin_tc_privacy_container {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        height: 0 !important;
+        max-height: 0 !important;
+        overflow: hidden !important;
+      }
+      body {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+      }
+    `;
+    (document.head || document.documentElement).appendChild(cleanStyle);
+  } catch(eCleanStyle) {}
 
-  function dismissCarrefourOverlays() {
+  // Viewport adaptation pour éviter tout débordement horizontal ou zoom excessif
+  try {
+    var metaVp = document.querySelector('meta[name="viewport"]');
+    if (!metaVp) {
+      metaVp = document.createElement('meta');
+      metaVp.name = 'viewport';
+      (document.head || document.documentElement).appendChild(metaVp);
+    }
+    metaVp.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes';
+  } catch(eVp) {}
+
+  function dismissOverlays() {
     try {
-      var closeBtns = document.querySelectorAll('button[aria-label*="hopla" i], button[aria-label*="fermer" i], button[aria-label*="close" i], div[class*="hopla" i] button, button.tc-privacy-button, #onetrust-accept-btn-handler, button#popin_tc_privacy_button_2');
+      var closeBtns = document.querySelectorAll('button[aria-label*="hopla" i], button[aria-label*="fermer" i], button[aria-label*="close" i], div[class*="hopla" i] button, button.tc-privacy-button, #onetrust-accept-btn-handler, #onetrust-reject-all-handler, button#popin_tc_privacy_button_2, button[id*="accept" i], button[id*="consent" i], button[class*="accept" i]');
       for (var c = 0; c < closeBtns.length; c++) {
         var btn = closeBtns[c];
         var aria = (btn.getAttribute('aria-label') || '').toLowerCase();
         var txt = (btn.innerText || btn.textContent || '').toLowerCase();
-        if (aria.includes('hopla') || txt.includes('hopla') || (aria.includes('fermer') && !aria.includes('recherche')) || txt.includes('continuer sans accepter') || txt.includes('accepter')) {
+        if (
+          aria.includes('hopla') || txt.includes('hopla') ||
+          (aria.includes('fermer') && !aria.includes('recherche')) ||
+          txt.includes('continuer sans accepter') ||
+          txt.includes('accepter & fermer') ||
+          txt.includes('tout accepter') ||
+          txt.includes('accepter tous les cookies') ||
+          txt === 'accepter' ||
+          txt === "j'accepte"
+        ) {
           btn.click();
         }
       }
-      var hoplas = document.querySelectorAll('[class*="hopla" i], [id*="hopla" i]');
-      for (var h = 0; h < hoplas.length; h++) {
-        hoplas[h].remove();
+      var popups = document.querySelectorAll('[class*="hopla" i], [id*="hopla" i], [class*="smartbanner" i], #onetrust-consent-sdk');
+      for (var h = 0; h < popups.length; h++) {
+        popups[h].remove();
       }
     } catch(eDismiss) {}
   }
-  dismissCarrefourOverlays();
-  setTimeout(dismissCarrefourOverlays, 600);
-  setTimeout(dismissCarrefourOverlays, 1500);
+  dismissOverlays();
+  setTimeout(dismissOverlays, 500);
+  setTimeout(dismissOverlays, 1200);
+  setTimeout(dismissOverlays, 2500);
 
   // Surveillance périodique de l'URL ou du DOM (SPA / redirections)
   var checkCount = 0;
@@ -1920,55 +1959,55 @@ const styles = StyleSheet.create({
     backgroundColor: "#1e293b",
     borderBottomWidth: 1,
     borderBottomColor: "#334155",
-    paddingVertical: 3
+    paddingVertical: 2
   },
   headerTopRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 10
+    paddingHorizontal: 8
   },
   brandTitleBox: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6
+    gap: 5
   },
   brandEmoji: {
-    fontSize: 18
+    fontSize: 16
   },
   storeNameText: {
     color: "#f8fafc",
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "800"
   },
   subTitleText: {
     color: "#94a3b8",
-    fontSize: 10
+    fontSize: 9
   },
   changeStoreInlineChip: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "rgba(56, 189, 248, 0.12)",
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
-    gap: 4,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 5,
+    gap: 3,
     marginTop: 1
   },
   changeStoreInlineText: {
     color: "#38bdf8",
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: "700"
   },
   navControls: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5
+    gap: 4
   },
   iconNavBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 7,
+    width: 26,
+    height: 26,
+    borderRadius: 6,
     backgroundColor: "#334155",
     alignItems: "center",
     justifyContent: "center"
@@ -1977,37 +2016,37 @@ const styles = StyleSheet.create({
     opacity: 0.35
   },
   closeBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     backgroundColor: "#ef4444",
     alignItems: "center",
     justifyContent: "center",
     marginLeft: 2
   },
   storeChipsScroll: {
-    paddingHorizontal: 10,
-    gap: 6,
-    paddingTop: 2,
+    paddingHorizontal: 8,
+    gap: 5,
+    paddingTop: 1,
     paddingBottom: 2
   },
   storeChip: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#0f172a",
-    paddingHorizontal: 9,
-    paddingVertical: 4,
-    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: "#334155",
     gap: 4
   },
   storeChipEmoji: {
-    fontSize: 12
+    fontSize: 11
   },
   storeChipText: {
     color: "#94a3b8",
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "700"
   },
   storeChipTextActive: {
@@ -2016,37 +2055,38 @@ const styles = StyleSheet.create({
   webContainer: {
     flex: 1,
     backgroundColor: "#ffffff",
-    position: "relative"
+    position: "relative",
+    overflow: "hidden"
   },
   webView: {
     flex: 1
   },
   floatingStartBar: {
     position: "absolute",
-    bottom: 12,
+    bottom: 8,
     left: 20,
     right: 20,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
     elevation: 8
   },
   floatingStartBtn: {
-    borderRadius: 20,
+    borderRadius: 18,
     overflow: "hidden"
   },
   floatingStartGradient: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    gap: 8
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    gap: 6
   },
   floatingStartBtnText: {
     color: "#ffffff",
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "800",
     textAlign: "center"
   },

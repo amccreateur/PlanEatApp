@@ -307,8 +307,13 @@ export default function DriveCartModal({
     const q = encodeURIComponent(clean);
     if (selectedStore.id === "leclerc") {
       const base = customStoreUrl || storeBaseUrlRef.current;
-      if (base && (base.includes("magasin-") || base.includes("m-courses"))) {
-        const cleanBase = base.replace(/\.aspx.*$/i, "").replace(/\/+$/, "").replace(/\/recherche.*$/i, "").replace(/\/accueil.*$/i, "");
+      if (base && (base.includes("magasin-") || base.includes("m-courses") || base.includes("courses.leclercdrive"))) {
+        const cleanBase = base
+          .replace(/https?:\/\/[^\/]*leclercdrive\.fr/i, "https://m-courses.leclercdrive.fr")
+          .replace(/\.aspx.*$/i, "")
+          .replace(/\/+$/, "")
+          .replace(/\/recherche.*$/i, "")
+          .replace(/\/accueil.*$/i, "");
         return `${cleanBase}/recherche/${q}`;
       }
       if (base && base.includes("e.leclerc")) {
@@ -461,9 +466,15 @@ export default function DriveCartModal({
       }
       const match = url.match(/(https?:\/\/[^\/]+\/magasin-[^\/\?#]+)/i);
       if (match && match[1]) {
-        storeBaseUrlRef.current = match[1];
-        setCustomStoreUrl(match[1]);
-        AsyncStorage.setItem("@planeat_custom_drive_store_url", match[1]).catch(() => {});
+        let storeUrl = match[1];
+        if (selectedStore.id === "leclerc") {
+          storeUrl = storeUrl
+            .replace(/https?:\/\/[^\/]*leclercdrive\.fr/i, "https://m-courses.leclercdrive.fr")
+            .replace(/\.aspx.*$/i, "");
+        }
+        storeBaseUrlRef.current = storeUrl;
+        setCustomStoreUrl(storeUrl);
+        AsyncStorage.setItem("@planeat_custom_drive_store_url", storeUrl).catch(() => {});
       }
     }
 
@@ -517,14 +528,12 @@ export default function DriveCartModal({
 
     if (selectedStore.id === "leclerc") {
       const base = customStoreUrl || storeBaseUrlRef.current;
-      if (base && (base.includes("m-courses") || base.includes("magasin-"))) {
-        const cleanBase = base.replace(/\.aspx.*$/i, "").replace(/\/+$/, "").replace(/\/recherche.*$/i, "").replace(/\/accueil.*$/i, "");
-        const targetSearchUrl = `${cleanBase}/recherche/${encodeURIComponent(cleanQ)}`;
-        sendRemoteLog("LECLERC_NAVIGATE_SEARCH", targetSearchUrl);
+      if (base && (base.includes("m-courses") || base.includes("magasin-") || base.includes("courses.leclercdrive"))) {
+        sendRemoteLog("LECLERC_NAVIGATE_SEARCH", targetUrl);
         const searchJs = `
           (function() {
             try {
-              window.location.href = ${JSON.stringify(targetSearchUrl)};
+              window.location.href = ${JSON.stringify(targetUrl)};
             } catch(e) {}
           })();
           true;

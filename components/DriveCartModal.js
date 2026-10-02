@@ -54,42 +54,19 @@ const STORE_DETECTOR_INJECTION_JS = `
     } catch(e) {}
   }
 
-  // Auto-recovery si écran d'erreur 404 ou incident Leclerc / Auchan / Carrefour
+  // Auto-recovery uniquement sur véritable page d'erreur ASP.NET / 404 dédiée
   try {
     var curHref = (window.location.href || '').toLowerCase();
-    var bodyText = (document.body && (document.body.innerText || document.body.textContent) || '').toLowerCase();
-    var pageTitle = (document.title || '').toLowerCase();
-    var isErrorPage = (
+    if (
       curHref.includes('erreur.aspx') ||
       curHref.includes('pgewcsd') ||
-      curHref.includes('/404') ||
-      pageTitle.includes('404') ||
-      pageTitle.includes('oups') ||
-      pageTitle.includes('erreur') ||
-      bodyText.includes('momentanément indisponible') ||
-      bodyText.includes('incident :') ||
-      bodyText.includes('incident:') ||
-      bodyText.includes('oups, cette page') ||
-      bodyText.includes('oups !') ||
-      bodyText.includes('page introuvable') ||
-      bodyText.includes('erreur 404') ||
-      bodyText.includes("la page demandée n'a pu être") ||
-      bodyText.includes("cette page n'existe pas")
-    );
-
-    if (isErrorPage) {
-      if (curHref.includes('leclerc')) {
+      curHref.includes('/erreur-404') ||
+      curHref.includes('/page-non-trouvee')
+    ) {
+      if (curHref.includes('leclerc') && !curHref.endsWith('leclercdrive.fr/')) {
         window.location.replace('https://www.leclercdrive.fr/');
-      } else if (curHref.includes('auchan')) {
-        window.location.replace('https://www.auchan.fr/');
-      } else if (curHref.includes('carrefour')) {
-        window.location.replace('https://www.carrefour.fr/');
-      } else if (curHref.includes('coursesu')) {
-        window.location.replace('https://www.coursesu.com/');
-      } else if (curHref.includes('intermarche')) {
-        window.location.replace('https://www.intermarche.com/');
+        return;
       }
-      return;
     }
   } catch(eRecov) {}
 

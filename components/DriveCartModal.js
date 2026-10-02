@@ -321,7 +321,7 @@ export default function DriveCartModal({
       }
       return `https://www.leclercdrive.fr/`;
     }
-    if (selectedStore.id === "carrefour") return `https://www.carrefour.fr/r?q=${q}`;
+    if (selectedStore.id === "carrefour") return `https://www.carrefour.fr/s?q=${q}`;
     if (selectedStore.id === "auchan") return `https://www.auchan.fr/recherche?text=${q}`;
     if (selectedStore.id === "coursesu") return `https://www.coursesu.com/recherche?q=${q}`;
     if (selectedStore.id === "intermarche") return `https://www.intermarche.com/recherche?q=${q}`;

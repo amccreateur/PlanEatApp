@@ -22,8 +22,8 @@ export const DRIVE_STORES = [
     color: "#004e9a",
     badgeColor: "#e2001a",
     textColor: "#ffffff",
-    homeUrl: "https://www.carrefour.fr/drive",
-    searchUrl: (query) => `https://www.carrefour.fr/r?q=${encodeURIComponent(query)}`,
+    homeUrl: "https://www.carrefour.fr",
+    searchUrl: (query) => `https://www.carrefour.fr/s?q=${encodeURIComponent(query)}`,
     logoEmoji: "🔴"
   },
   {

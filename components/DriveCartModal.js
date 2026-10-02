@@ -135,6 +135,34 @@ const STORE_DETECTOR_INJECTION_JS = `
     }
   } catch(eDrive) {}
 
+  // Masquage / fermeture automatique de l'assistant Hopla et cookies Carrefour
+  try {
+    var hoplaStyle = document.createElement('style');
+    hoplaStyle.innerHTML = '[class*="hopla" i], [id*="hopla" i], [data-testid*="hopla" i] { display: none !important; visibility: hidden !important; pointer-events: none !important; }';
+    (document.head || document.documentElement).appendChild(hoplaStyle);
+  } catch(eHoplaStyle) {}
+
+  function dismissCarrefourOverlays() {
+    try {
+      var closeBtns = document.querySelectorAll('button[aria-label*="hopla" i], button[aria-label*="fermer" i], button[aria-label*="close" i], div[class*="hopla" i] button, button.tc-privacy-button, #onetrust-accept-btn-handler, button#popin_tc_privacy_button_2');
+      for (var c = 0; c < closeBtns.length; c++) {
+        var btn = closeBtns[c];
+        var aria = (btn.getAttribute('aria-label') || '').toLowerCase();
+        var txt = (btn.innerText || btn.textContent || '').toLowerCase();
+        if (aria.includes('hopla') || txt.includes('hopla') || (aria.includes('fermer') && !aria.includes('recherche')) || txt.includes('continuer sans accepter') || txt.includes('accepter')) {
+          btn.click();
+        }
+      }
+      var hoplas = document.querySelectorAll('[class*="hopla" i], [id*="hopla" i]');
+      for (var h = 0; h < hoplas.length; h++) {
+        hoplas[h].remove();
+      }
+    } catch(eDismiss) {}
+  }
+  dismissCarrefourOverlays();
+  setTimeout(dismissCarrefourOverlays, 600);
+  setTimeout(dismissCarrefourOverlays, 1500);
+
   // Surveillance périodique de l'URL ou du DOM (SPA / redirections)
   var checkCount = 0;
   var interval = setInterval(function() {

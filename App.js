@@ -30,7 +30,10 @@ import FridgeModal from "./components/FridgeModal";
 import QuickMenuModal from "./components/QuickMenuModal";
 import DriveCartModal from "./components/DriveCartModal";
 import PaywallModal from "./components/PaywallModal";
+import BannerAdView from "./components/BannerAdView";
+import AdRewardModal from "./components/AdRewardModal";
 import { purchaseService } from "./services/purchaseService";
+import { adService } from "./services/adService";
 
 function MainApp() {
   const insets = useSafeAreaInsets();
@@ -57,6 +60,7 @@ function MainApp() {
   const [isFridgeModalOpen, setIsFridgeModalOpen] = useState(false);
   const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
   const [isDriveModalOpen, setIsDriveModalOpen] = useState(false);
+  const [isDriveRewardModalOpen, setIsDriveRewardModalOpen] = useState(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [isPro, setIsPro] = useState(true);
 
@@ -71,6 +75,7 @@ function MainApp() {
   useEffect(() => {
     loadSavedData();
     purchaseService.init();
+    adService.init();
     const unsub = purchaseService.subscribe((proStatus) => {
       setIsPro(proStatus);
     });
@@ -134,6 +139,14 @@ function MainApp() {
     await StorageService.saveAiConfig(updatedConfig);
   };
 
+  const handleOpenDrive = () => {
+    if (purchaseService.getIsPro()) {
+      setIsDriveModalOpen(true);
+    } else {
+      setIsDriveRewardModalOpen(true);
+    }
+  };
+
   const handleGeneratePlan = async (
     customProfile = profile,
     durationWeeks = 1,
@@ -164,6 +177,7 @@ function MainApp() {
       Alert.alert("Erreur", err.message || "Erreur inconnue");
     } finally {
       setIsGenerating(false);
+      adService.showInterstitial({ minIntervalSeconds: 20 });
     }
   };
 
@@ -327,6 +341,7 @@ function MainApp() {
       await Share.share({
         message: lines.join("\n")
       });
+      adService.showInterstitial({ minIntervalSeconds: 30 });
     } catch {}
   };
 
@@ -645,7 +660,7 @@ function MainApp() {
           {groceries.length > 0 && (
             <TouchableOpacity
               style={styles.driveBannerBtn}
-              onPress={() => setIsDriveModalOpen(true)}
+              onPress={handleOpenDrive}
               activeOpacity={0.8}
             >
               <LinearGradient
@@ -829,6 +844,9 @@ function MainApp() {
         </View>
       )}
 
+      {/* BANNER AD (UTILISATEURS NON-PRO) */}
+      <BannerAdView isPro={isPro} style={{ width: "100%", paddingVertical: 1, backgroundColor: currentTheme.headerBg, borderTopWidth: 1, borderTopColor: currentTheme.border }} />
+
       {/* BOTTOM TAB BAR */}
       <View
         style={[
@@ -942,6 +960,7 @@ function MainApp() {
           aiConfig={aiConfig}
           lang={lang}
           themeMode={themeMode}
+          onOpenPaywall={() => setIsPaywallOpen(true)}
           onOpenRecipe={(recipe) => {
             setIsFridgeModalOpen(false);
             setSelectedRecipe(recipe);
@@ -953,7 +972,7 @@ function MainApp() {
           onClose={() => setIsQuickMenuOpen(false)}
           onOpenFridge={() => setIsFridgeModalOpen(true)}
           onOpenProfile={() => setIsProfileModalOpen(true)}
-          onOpenDrive={() => setIsDriveModalOpen(true)}
+          onOpenDrive={handleOpenDrive}
           onOpenPaywall={() => setIsPaywallOpen(true)}
           isPro={isPro}
           aiConfig={aiConfig}
@@ -970,6 +989,19 @@ function MainApp() {
           groceries={groceries}
           onToggleItem={handleToggleGrocery}
           lang={lang}
+          themeMode={themeMode}
+        />
+
+        <AdRewardModal
+          visible={isDriveRewardModalOpen}
+          onClose={() => setIsDriveRewardModalOpen(false)}
+          onRewardEarned={() => setIsDriveModalOpen(true)}
+          onOpenPaywall={() => setIsPaywallOpen(true)}
+          title="Remplissage Panier Drive"
+          subtitle="Regardez une courte vidéo pour lancer le remplissage guidé de vos courses sur le Drive, ou passez à PlanEat Pro pour un accès illimité sans publicité."
+          icon="cart"
+          iconColor="#0284c7"
+          actionLabel="Lancer le Drive"
           themeMode={themeMode}
         />
 

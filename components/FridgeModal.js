@@ -18,6 +18,9 @@ import { TRANSLATIONS } from "../i18n/translations";
 import { AIPlannerService } from "../services/aiPlannerService";
 import { THEMES } from "../utils/theme";
 import MealCard from "./MealCard";
+import AdRewardModal from "./AdRewardModal";
+import { purchaseService } from "../services/purchaseService";
+import { adService } from "../services/adService";
 
 export default function FridgeModal({
   visible,
@@ -26,6 +29,7 @@ export default function FridgeModal({
   aiConfig,
   lang = "fr",
   onOpenRecipe,
+  onOpenPaywall,
   themeMode = "dark"
 }) {
   const insets = useSafeAreaInsets();
@@ -40,6 +44,7 @@ export default function FridgeModal({
   const [mealType, setMealType] = useState("lunch");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedRecipe, setGeneratedRecipe] = useState(null);
+  const [isRewardModalOpen, setIsRewardModalOpen] = useState(false);
 
   const quickSuggestions = [
     { name: "Œufs", emoji: "🥚" },
@@ -67,12 +72,7 @@ export default function FridgeModal({
     setFridgeItems(fridgeItems.filter((_, i) => i !== index));
   };
 
-  const handleGenerate = async () => {
-    if (fridgeItems.length === 0) {
-      Alert.alert("⚠️", t.fridgeEmptyIngredients);
-      return;
-    }
-
+  const executeGenerate = async () => {
     setIsGenerating(true);
     try {
       const recipe = await AIPlannerService.generateFridgeRecipe(
@@ -88,6 +88,19 @@ export default function FridgeModal({
       Alert.alert("Erreur", err.message || "Impossible de générer la recette");
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleGenerate = () => {
+    if (fridgeItems.length === 0) {
+      Alert.alert("⚠️", t.fridgeEmptyIngredients);
+      return;
+    }
+
+    if (purchaseService.getIsPro()) {
+      executeGenerate();
+    } else {
+      setIsRewardModalOpen(true);
     }
   };
 
@@ -264,6 +277,19 @@ export default function FridgeModal({
           )}
         </ScrollView>
       </View>
+
+      <AdRewardModal
+        visible={isRewardModalOpen}
+        onClose={() => setIsRewardModalOpen(false)}
+        onRewardEarned={() => executeGenerate()}
+        onOpenPaywall={onOpenPaywall}
+        title="Recette Frigo Anti-Gaspi"
+        subtitle="Regardez une courte vidéo pour générer votre recette personnalisée avec vos ingrédients, ou passez à PlanEat Pro pour un accès illimité."
+        icon="sparkles"
+        iconColor="#10b981"
+        actionLabel="Générer ma recette"
+        themeMode={themeMode}
+      />
     </Modal>
   );
 }

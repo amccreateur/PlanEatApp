@@ -30,16 +30,16 @@ if (Platform.OS !== "web") {
 // Remplacer par vos IDs de production créés sur Google AdMob
 export const AD_UNIT_IDS = {
   banner: {
-    ios: TestIds?.BANNER || "ca-app-pub-3940256099942544/2934735716",
-    android: TestIds?.BANNER || "ca-app-pub-3940256099942544/6300978111"
+    ios: "ca-app-pub-5303925075056294/1445825405",
+    android: "ca-app-pub-5303925075056294/4399291807"
   },
   interstitial: {
-    ios: TestIds?.INTERSTITIAL || "ca-app-pub-3940256099942544/4411468910",
-    android: TestIds?.INTERSTITIAL || "ca-app-pub-3940256099942544/1033173712"
+    ios: "ca-app-pub-5303925075056294/9132743736",
+    android: "ca-app-pub-5303925075056294/5354025685"
   },
   rewarded: {
-    ios: TestIds?.REWARDED || "ca-app-pub-3940256099942544/1712485313",
-    android: TestIds?.REWARDED || "ca-app-pub-3940256099942544/5224354917"
+    ios: "ca-app-pub-5303925075056294/6570159575",
+    android: "ca-app-pub-5303925075056294/1509404584"
   }
 };
 
@@ -224,3 +224,4 @@ class AdService {
 }
 
 export const adService = new AdService();
+

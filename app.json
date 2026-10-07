@@ -1,4 +1,8 @@
 {
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-5303925075056294~4135567925",
+    "ios_app_id": "ca-app-pub-5303925075056294~8146965129"
+  },
   "expo": {
     "name": "PlanEat",
     "slug": "PlanEatApp",
@@ -45,8 +49,8 @@
       [
         "react-native-google-mobile-ads",
         {
-          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
-          "iosAppId": "ca-app-pub-3940256099942544~1458783787",
+          "androidAppId": "ca-app-pub-5303925075056294~4135567925",
+          "iosAppId": "ca-app-pub-5303925075056294~8146965129",
           "userTrackingUsageDescription": "Cette autorisation permet d'afficher des annonces pertinentes et de débloquer vos fonctionnalités sans abonnement."
         }
       ]

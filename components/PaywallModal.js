@@ -56,9 +56,9 @@ export default function PaywallModal({
             packageType: "ANNUAL",
             product: {
               title: "PlanEat Pro Annuel",
-              priceString: "24,99 €",
-              price: 24.99,
-              description: "Facturé 24,99 € par an (~2,08 € / mois)"
+              priceString: "9,99 €",
+              price: 9.99,
+              description: "Facturé 9,99 € par an (~0,83 € / mois)"
             }
           },
           {
@@ -66,9 +66,9 @@ export default function PaywallModal({
             packageType: "MONTHLY",
             product: {
               title: "PlanEat Pro Mensuel",
-              priceString: "2,99 €",
-              price: 2.99,
-              description: "Facturé 2,99 € par mois"
+              priceString: "0,99 €",
+              price: 0.99,
+              description: "Facturé 0,99 € par mois"
             }
           }
         ]);
@@ -77,9 +77,9 @@ export default function PaywallModal({
           packageType: "ANNUAL",
           product: {
             title: "PlanEat Pro Annuel",
-            priceString: "24,99 €",
-            price: 24.99,
-            description: "Facturé 24,99 € par an (~2,08 € / mois)"
+            priceString: "9,99 €",
+            price: 9.99,
+            description: "Facturé 9,99 € par an (~0,83 € / mois)"
           }
         });
       }
@@ -240,7 +240,7 @@ export default function PaywallModal({
                 pkg.identifier.includes("yearly") ||
                 pkg.identifier.includes("annual");
 
-              const priceStr = pkg.product?.priceString || (isAnnual ? "24,99 € / an" : "2,99 € / mois");
+              const priceStr = pkg.product?.priceString || (isAnnual ? "9,99 € / an" : "0,99 € / mois");
 
               return (
                 <TouchableOpacity
@@ -255,7 +255,7 @@ export default function PaywallModal({
                 >
                   {isAnnual && (
                     <View style={styles.popularBadge}>
-                      <Text style={styles.popularBadgeText}>🌟 MEILLEURE OFFRE (-30%)</Text>
+                      <Text style={styles.popularBadgeText}>🌟 MEILLEURE OFFRE</Text>
                     </View>
                   )}
 
@@ -275,13 +275,13 @@ export default function PaywallModal({
                         {isAnnual ? "Abonnement Annuel" : "Abonnement Mensuel"}
                       </Text>
                       <Text style={styles.planSubDesc}>
-                        {isAnnual ? "7 jours d'essai gratuit, puis 24,99 € / an" : "2,99 € / mois • Sans engagement"}
+                        {isAnnual ? "7 jours d'essai gratuit, puis 9,99 € / an" : "0,99 € / mois • Sans engagement"}
                       </Text>
                     </View>
 
                     <View style={styles.planPriceBox}>
                       <Text style={styles.planPriceText}>{priceStr}</Text>
-                      {isAnnual && <Text style={styles.planPerMonthText}>soit 2,08 €/mois</Text>}
+                      {isAnnual && <Text style={styles.planPerMonthText}>soit 0,83 €/mois</Text>}
                     </View>
                   </View>
                 </TouchableOpacity>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PlanEat - Menus, Recettes & Courses Drive</title>
+  <meta name="description" content="Planificateur de repas de la semaine, assistant Drive et anti-gaspi.">
+  <style>
+    :root {
+      --bg: #0b1329;
+      --card-bg: #1e293b;
+      --primary: #10b981;
+      --accent: #38bdf8;
+      --text: #f8fafc;
+      --text-sub: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 30px 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 720px;
+      width: 100%;
+      background: var(--card-bg);
+      border-radius: 24px;
+      border: 1px solid #334155;
+      padding: 40px 24px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .logo {
+      font-size: 56px;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    p.subtitle {
+      font-size: 16px;
+      color: var(--text-sub);
+      margin-bottom: 30px;
+      line-height: 1.5;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+      text-align: left;
+    }
+    .item {
+      background: rgba(11, 19, 41, 0.6);
+      padding: 18px;
+      border-radius: 14px;
+      border: 1px solid #334155;
+    }
+    .item h3 {
+      color: var(--primary);
+      font-size: 16px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .item p {
+      color: var(--text-sub);
+      font-size: 13px;
+    }
+    .btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 16px;
+      padding: 14px 28px;
+      border-radius: 14px;
+      margin-bottom: 24px;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.9; }
+    .footer-links {
+      border-top: 1px solid #334155;
+      padding-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 13px;
+    }
+    .footer-links a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .footer-links a:hover { text-decoration: underline; }
+    .copyright {
+      margin-top: 12px;
+      color: var(--text-sub);
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">🥗</div>
+    <h1>PlanEat</h1>
+    <p class="subtitle">Planifiez vos repas de la semaine en 1 clic, générez votre liste de courses et remplissez vos paniers Drive automatiquement.</p>
+
+    <div class="grid">
+      <div class="item">
+        <h3>🍽️ Menus 7j/7</h3>
+        <p>Planning personnalisé midi & soir adapté à votre foyer et vos goûts.</p>
+      </div>
+      <div class="item">
+        <h3>🛒 Assistant Drive</h3>
+        <p>Remplissage automatique chez Leclerc, Carrefour, Auchan, U & Intermarché.</p>
+      </div>
+      <div class="item">
+        <h3>🧊 Frigo Anti-Gaspi</h3>
+        <p>Idées recettes gourmandes avec ce qu'il vous reste au réfrigérateur.</p>
+      </div>
+    </div>
+
+    <div class="footer-links">
+      <a href="privacy-policy.html">Politique de Confidentialité</a>
+      <span>•</span>
+      <a href="mailto:support@planeatapp.fr">Contact & Assistance</a>
+      <span>•</span>
+      <a href="https://www.apple.com/legal/itunes/appstore/dev/stdeula/" target="_blank">Conditions (EULA)</a>
+    </div>
+
+    <div class="copyright">
+      &copy; 2026 PlanEat by AMC Créateur. Tous droits réservés.
+    </div>
+  </div>
+</body>
+</html>

@@ -13,9 +13,9 @@ const KEYS = {
 };
 
 export const DEFAULT_AI_CONFIG = {
-  engine: "mistral", // 'local' | 'mistral'
-  mistralApiKey: "oJZSFumYzCJu0mK054kieW9FiSo3qBiI",
-  mistralModel: "codestral-latest"
+  engine: "local", // 'local' | 'mistral'
+  mistralApiKey: "",
+  mistralModel: "mistral-small-latest"
 };
 
 export const DEFAULT_CUISINES = {

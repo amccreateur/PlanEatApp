@@ -3,8 +3,8 @@
  * Communicates with the official Mistral REST API / Codestral endpoint
  */
 
-export const DEFAULT_MISTRAL_API_KEY = "oJZSFumYzCJu0mK054kieW9FiSo3qBiI";
-export const DEFAULT_MISTRAL_MODEL = "codestral-latest";
+export const DEFAULT_MISTRAL_API_KEY = "";
+export const DEFAULT_MISTRAL_MODEL = "mistral-small-latest";
 
 export class MistralService {
   static getEndpoint(model) {

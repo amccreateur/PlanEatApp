@@ -333,7 +333,7 @@ export default function PaywallModal({
               </TouchableOpacity>
               <Text style={styles.legalSeparator}>•</Text>
               <TouchableOpacity
-                onPress={() => Linking.openURL("https://madmohsii.github.io/PlanEatApp/privacy-policy.html")}
+                onPress={() => Linking.openURL("https://amccreateur.github.io/PlanEatApp/privacy-policy.html")}
               >
                 <Text style={styles.legalLink}>Confidentialité</Text>
               </TouchableOpacity>

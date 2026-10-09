@@ -172,9 +172,17 @@ const STORE_DETECTOR_INJECTION_JS = `
           btn.click();
         }
       }
-      var popups = document.querySelectorAll('[class*="hopla" i], [id*="hopla" i], [class*="smartbanner" i], #onetrust-consent-sdk');
+      var popups = document.querySelectorAll('[class*="hopla" i], [id*="hopla" i], [class*="smartbanner" i], #onetrust-consent-sdk, .onetrust-pc-dark-filter, .modal-backdrop, .didomi-popup-backdrop, [class*="backdrop" i], [id*="backdrop" i], #popin_tc_privacy_container_filter, .tc-privacy-wrapper');
       for (var h = 0; h < popups.length; h++) {
         popups[h].remove();
+      }
+      if (document.body) {
+        document.body.style.overflow = 'auto';
+        document.body.style.pointerEvents = 'auto';
+      }
+      if (document.documentElement) {
+        document.documentElement.style.overflow = 'auto';
+        document.documentElement.style.pointerEvents = 'auto';
       }
     } catch(eDismiss) {}
   }
@@ -1339,7 +1347,7 @@ export default function DriveCartModal({
           ) : null}
 
           {isLoadingWeb && (
-            <View style={styles.loadingOverlay}>
+            <View style={styles.loadingOverlay} pointerEvents="none">
               <ActivityIndicator size="large" color="#10b981" />
               <Text style={styles.loadingText}>Chargement du Drive...</Text>
             </View>

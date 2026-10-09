@@ -186,6 +186,15 @@ function MainApp() {
       setSelectedWeek(1);
       setSelectedDayIndex(0);
 
+      try {
+        const summary = (compiledGroceries || []).map(g => `${g.name?.fr || g.customName} (${g.totalQuantity || ''} ${g.unit || ''})`).join(', ');
+        fetch("http://192.168.1.111:8088/log", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "NEW_GENERATED_GROCERIES", text: `Articles (${compiledGroceries.length}): ${summary}` })
+        }).catch(() => {});
+      } catch(e) {}
+
       await StorageService.saveCurrentPlan(plan);
       await StorageService.saveGroceries(compiledGroceries);
     } catch (err) {

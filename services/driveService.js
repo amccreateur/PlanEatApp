@@ -88,9 +88,9 @@ export class DriveService {
     // 4. Supprimer les unités de mesure brutes (ex: "200g de", "1L de")
     cleaned = cleaned.replace(/^(?:\d+[\s\/\.,\d]*\s*)(g|kg|ml|cl|l|c\.à\.s|c\.a\.s|cas|cac|c\.à\.c|c\.a\.c)\s+(d'|d’|de\s+la\s+|de\s+l'|de\s+l’|du\s+|des\s+|de\s+)?/i, "");
 
-    // 5. Supprimer les adjectifs qualificatifs parasites (en préservant "crème fraîche")
+    // 5. Supprimer les états de cuisson, préparation et adjectifs qualificatifs (en préservant "crème fraîche")
     cleaned = cleaned.replace(/(?<!crème\s+)(frais|fraîche|fraiche|fraîches|fraiches)\b/gi, "");
-    cleaned = cleaned.replace(/\b(bio|biologique|surgelé|surgelée|surgelés|surgelées|en boîte|en conserve|râpé|râpée|râpés|râpées|émincé|émincée|émincés|émincées|haché|hachée|hachés|hachées|concassé|concassés|coupé|coupés|cuit|cuits|cuite|cuites|entier|entiers|nature|maison|extra|vierge\s+extra|au\s+choix|selon\s+goût|environ)\b/gi, "");
+    cleaned = cleaned.replace(/\b(bio|biologique|surgelé|surgelée|surgelés|surgelées|en boîte|en conserve|râpé|râpée|râpés|râpées|émincé|émincée|émincés|émincées|haché|hachée|hachés|hachées|concassé|concassés|coupé|coupés|cuit|cuits|cuite|cuites|grillé|grillée|grillés|grillées|toasté|toastée|toastés|toastées|rôti|rôtie|rôtis|rôties|poêlé|poêlée|poêlés|poêlées|doré|dorée|dorés|dorées|fondant|fondante|fondants|fondantes|moelleux|moelleuse|moelleuses|grec|grecs|grecque|grecques|entier|entiers|nature|maison|extra|vierge\s+extra|au\s+choix|selon\s+goût|environ|égoutté|égouttée|rincé|rincée|pelé|pelée|épluché|épluchée|dénoyauté|dénoyautée|tiède|chaud|chaude|froid|froide|finement|grossièrement)\b/gi, "");
 
     // 6. Nettoyer les ponctuations et espaces multiples
     cleaned = cleaned.replace(/[,;:.!?]/g, " ");

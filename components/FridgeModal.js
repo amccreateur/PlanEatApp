@@ -205,11 +205,12 @@ export default function FridgeModal({
             <Text style={[styles.sectionTitle, { color: theme.text }, isRTL && styles.rtlText]}>
               🍽️ Moment du repas :
             </Text>
-            <View style={styles.mealTypeRow}>
+            <View style={[styles.mealTypeRow, isRTL && styles.rtlRow]}>
               {[
                 { key: "breakfast", label: t.breakfast, emoji: "🥣" },
                 { key: "lunch", label: t.lunch, emoji: "🍲" },
-                { key: "snack", label: t.snack, emoji: "🍎" }
+                { key: "snack", label: t.snack, emoji: "🍎" },
+                { key: "dinner", label: t.dinner, emoji: "🌙" }
               ].map(item => (
                 <TouchableOpacity
                   key={item.key}
@@ -221,11 +222,14 @@ export default function FridgeModal({
                   onPress={() => setMealType(item.key)}
                 >
                   <Text style={styles.mealTypeEmoji}>{item.emoji}</Text>
-                  <Text style={[
-                    styles.mealTypeBtnText,
-                    { color: theme.textSub },
-                    mealType === item.key && styles.mealTypeBtnTextActive
-                  ]}>
+                  <Text
+                    style={[
+                      styles.mealTypeBtnText,
+                      { color: theme.textSub },
+                      mealType === item.key && styles.mealTypeBtnTextActive
+                    ]}
+                    numberOfLines={2}
+                  >
                     {item.label}
                   </Text>
                 </TouchableOpacity>
@@ -458,7 +462,7 @@ const styles = StyleSheet.create({
   },
   mealTypeRow: {
     flexDirection: "row",
-    gap: 8
+    gap: 6
   },
   mealTypeBtn: {
     flex: 1,
@@ -466,9 +470,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#0f172a",
     paddingVertical: 10,
+    paddingHorizontal: 4,
     borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: "#334155"
+    borderColor: "#334155",
+    minHeight: 68
   },
   mealTypeBtnActive: {
     backgroundColor: "#1e3a8a",
@@ -476,12 +482,15 @@ const styles = StyleSheet.create({
   },
   mealTypeEmoji: {
     fontSize: 18,
-    marginBottom: 2
+    marginBottom: 4,
+    textAlign: "center"
   },
   mealTypeBtnText: {
     color: "#94a3b8",
-    fontSize: 12,
-    fontWeight: "600"
+    fontSize: 11,
+    fontWeight: "600",
+    textAlign: "center",
+    lineHeight: 14
   },
   mealTypeBtnTextActive: {
     color: "#f8fafc",

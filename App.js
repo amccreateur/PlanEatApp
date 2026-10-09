@@ -32,6 +32,7 @@ import DriveCartModal from "./components/DriveCartModal";
 import PaywallModal from "./components/PaywallModal";
 import BannerAdView from "./components/BannerAdView";
 import AdRewardModal from "./components/AdRewardModal";
+import AiGenerationLoadingModal from "./components/AiGenerationLoadingModal";
 import { purchaseService } from "./services/purchaseService";
 import { adService } from "./services/adService";
 
@@ -168,8 +169,10 @@ function MainApp() {
     activeLang = lang
   ) => {
     setIsGenerating(true);
-    // Déclencher la pub interstitielle pendant la génération pour masquer le temps d'attente
-    adService.showInterstitial({ minIntervalSeconds: 20 });
+    // Déclencher la pub avec un délai de 1.2s pour laisser l'utilisateur lire l'écran de préparation
+    setTimeout(() => {
+      adService.showInterstitial({ minIntervalSeconds: 15 });
+    }, 1200);
     try {
       const { plan, groceries: compiledGroceries, error } = await AIPlannerService.generateMealPlan(
         customProfile,
@@ -1029,6 +1032,14 @@ function MainApp() {
           onClose={() => setIsPaywallOpen(false)}
           themeMode={themeMode}
           onSuccess={() => setIsPro(true)}
+        />
+
+        {/* Écran immersif de préparation IA & notice publicitaire */}
+        <AiGenerationLoadingModal
+          visible={isGenerating}
+          lang={lang}
+          themeMode={themeMode}
+          durationWeeks={selectedDurationWeeks}
         />
       </SafeAreaView>
   );

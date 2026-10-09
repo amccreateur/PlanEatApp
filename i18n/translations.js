@@ -179,6 +179,15 @@ export const TRANSLATIONS = {
     noMealsDesc: "Cliquez sur 'Générer avec l'IA' pour créer vos menus personnalisés et votre liste de courses.",
     noGroceriesTitle: "Votre panier est vide",
     noGroceriesDesc: "Générez un planning pour remplir automatiquement votre liste de courses.",
+    aiLoadingTitle: "Votre Chef IA est aux fourneaux...",
+    aiLoadingSubtitle: "Préparation d'un planning savoureux & équilibré",
+    aiLoadingStep1: "Analyse des profils & régimes du foyer...",
+    aiLoadingStep2: "Création des recettes sur-mesure par l'IA...",
+    aiLoadingStep3: "Calcul des portions et ingrédients...",
+    aiLoadingStep4: "Génération de la liste de courses optimisée...",
+    aiLoadingAdNoticeTitle: "Pourquoi une courte annonce ?",
+    aiLoadingAdNoticeText: "Pendant que notre IA cuisine vos repas, une courte annonce est diffusée pour garder PlanEat 100% gratuit. Ne quittez pas l'application, tout sera prêt dans quelques secondes !",
+    aiLoadingKeepAppOpen: "Veuillez patienter quelques instants...",
     
     // Mistral AI Configuration
     aiSectionTitle: "Moteur d'Intelligence Artificielle",
@@ -404,6 +413,15 @@ export const TRANSLATIONS = {
     noMealsDesc: "Tap 'Generate with AI' to build customized weekly menus and smart shopping lists.",
     noGroceriesTitle: "Your grocery list is empty",
     noGroceriesDesc: "Generate a meal plan to automatically fill your grocery list.",
+    aiLoadingTitle: "Your AI Chef is cooking...",
+    aiLoadingSubtitle: "Crafting a delicious & balanced meal plan",
+    aiLoadingStep1: "Analyzing household diets & preferences...",
+    aiLoadingStep2: "Generating personalized AI recipes...",
+    aiLoadingStep3: "Calculating scaled portions & ingredients...",
+    aiLoadingStep4: "Building smart grocery list...",
+    aiLoadingAdNoticeTitle: "Why a short ad?",
+    aiLoadingAdNoticeText: "While our AI prepares your custom plan, a short ad helps keep PlanEat 100% free. Please stay on this screen, everything will be ready in seconds!",
+    aiLoadingKeepAppOpen: "Please hold on for a moment...",
     
     // Mistral AI Configuration
     aiSectionTitle: "Artificial Intelligence Engine",

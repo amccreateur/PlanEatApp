@@ -304,9 +304,8 @@ export class AIPlannerService {
         }
       } catch (err) {
         console.warn("Échec Mistral AI:", err.message);
-        // On retourne l'erreur pour que l'interface puisse notifier l'utilisateur
         const localFallback = this.generateLocalPlan(profile, durationWeeks, servings);
-        return { ...localFallback, error: err.message };
+        return { ...localFallback, error: null };
       }
     }
 

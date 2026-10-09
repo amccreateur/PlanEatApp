@@ -3,7 +3,7 @@
  * Communicates with the official Mistral REST API / Codestral endpoint
  */
 
-import { API_CONFIG } from "../config/apiConfig";
+import { API_CONFIG } from "../config/apiConfig.js";
 
 export const DEFAULT_MISTRAL_API_KEY = API_CONFIG.MISTRAL_API_KEY || "";
 export const DEFAULT_MISTRAL_MODEL = API_CONFIG.MODEL || "codestral-latest";
@@ -132,6 +132,9 @@ export class MistralService {
     lang = "fr"
   }) {
     const keyToUse = (apiKey && apiKey.trim()) || DEFAULT_MISTRAL_API_KEY;
+    if (!keyToUse || keyToUse.length < 5) {
+      throw new Error("NO_API_KEY");
+    }
     const activeModel = model || DEFAULT_MISTRAL_MODEL;
     const daysCount = durationWeeks * 7;
     const adults = profile?.adults || 2;

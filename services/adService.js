@@ -234,16 +234,29 @@ class AdService {
         this._onDismissCallback = onDismiss;
         this._onFailCallback = onFail;
         await this.rewardedAd.show();
+        return;
       } catch (e) {
-        // En cas d'erreur d'affichage, accorder le déblocage pour ne pas bloquer l'utilisateur
-        onRewarded({ type: "fallback_reward", amount: 1 });
-        this._preloadRewarded();
+        console.warn("Erreur affichage rewarded ad:", e);
       }
-    } else {
-      // Si la pub n'était pas prête (ex: réseau lent ou dev), débloquer gracieusement
-      onRewarded({ type: "instant_fallback", amount: 1 });
-      this._preloadRewarded();
     }
+
+    // Si la vidéo récompensée n'est pas encore en cache, afficher l'interstitiel
+    if (this.isInterstitialLoaded && this.interstitialAd) {
+      try {
+        await this.showInterstitial({
+          onComplete: () => {
+            onRewarded({ type: "interstitial_reward", amount: 1 });
+          },
+          minIntervalSeconds: 0
+        });
+        return;
+      } catch (e) {}
+    }
+
+    // Si aucune pub n'était prête en cache, recharger et débloquer pour ne pas bloquer l'expérience
+    this._preloadRewarded();
+    this._preloadInterstitial();
+    onRewarded({ type: "fallback_reward", amount: 1 });
   }
 }
 

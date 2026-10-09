@@ -120,8 +120,24 @@ const STORE_DETECTOR_INJECTION_JS = `
         )) ||
         // Carrefour
         (url.includes('carrefour.fr') && (url.includes('/magasin') || bodyText.includes('mon magasin') || bodyText.includes('mon drive'))) ||
-        // Intermarché
-        (url.includes('intermarche.com') && (url.includes('/pdv/') || bodyText.includes('mon magasin') || bodyText.includes('mon drive')))
+        // Intermarché : Détection via URL, sélecteurs d'en-tête, présence d'un magasin actif ou stockage local
+        (url.includes('intermarche.com') && (
+          url.includes('/pdv/') ||
+          url.includes('/rayons') ||
+          url.includes('/recherche') ||
+          bodyText.includes('intermarché super') ||
+          bodyText.includes('intermarché contact') ||
+          bodyText.includes('intermarché express') ||
+          bodyText.includes('intermarché hyper') ||
+          bodyText.includes('votre intermarché') ||
+          bodyText.includes('changer de magasin') ||
+          document.querySelector('button[aria-label*="magasin" i], button[aria-label*="intermarché" i], [data-testid*="store" i], [data-testid*="pdv" i], [class*="StoreButton" i], [class*="storeButton" i], [class*="StoreSelector" i], [class*="storeSelector" i], [class*="HeaderStore" i], [class*="headerStore" i]') !== null ||
+          (function() {
+            try {
+              return !!(localStorage.getItem('userStore') || localStorage.getItem('selectedPdv') || localStorage.getItem('pdv') || localStorage.getItem('currentPdv') || (document.cookie && (document.cookie.includes('pdv=') || document.cookie.includes('storeId='))));
+            } catch(eStorage) { return false; }
+          })()
+        ))
       );
 
       if (isStoreActive) {
@@ -133,7 +149,7 @@ const STORE_DETECTOR_INJECTION_JS = `
   setTimeout(checkAlreadySelectedStore, 1200);
   setTimeout(checkAlreadySelectedStore, 2500);
 
-  // MutationObserver pour détecter instantanément tout changement de magasin dans le DOM (comme Auchan)
+  // MutationObserver pour détecter instantanément tout changement de magasin dans le DOM (Auchan, Intermarché, etc.)
   try {
     var observer = new MutationObserver(function() {
       checkAlreadySelectedStore();
@@ -148,7 +164,7 @@ const STORE_DETECTOR_INJECTION_JS = `
     try {
       var el = e.target;
       var depth = 0;
-      while (el && depth < 6) {
+      while (el && depth < 8) {
         var text = (el.innerText || el.textContent || '').trim().toLowerCase();
         var aria = (el.getAttribute('aria-label') || '').toLowerCase();
         var cls = (typeof el.className === 'string' ? el.className : '').toLowerCase();
@@ -164,6 +180,7 @@ const STORE_DETECTOR_INJECTION_JS = `
           text.includes('selectionner ce magasin') ||
           text.includes('choisir ce point') ||
           text.includes('faire mes courses ici') ||
+          text.includes('faire mes courses dans ce magasin') ||
           text.includes('faire mes courses') ||
           text.includes('je choisis ce drive') ||
           text.includes('valider ce magasin') ||
@@ -177,22 +194,35 @@ const STORE_DETECTOR_INJECTION_JS = `
           text.includes('choisir ce creneau') ||
           text.includes('sélectionner ce créneau') ||
           text.includes('selectionner ce creneau') ||
+          text.includes('choisir ce point de retrait') ||
+          text.includes('selectionner ce point de retrait') ||
           aria.includes('choisir ce drive') ||
           aria.includes('choisir ce magasin') ||
+          aria.includes('choisir ce point') ||
+          aria.includes('sélectionner ce magasin') ||
+          aria.includes('sélectionner ce drive') ||
+          aria.includes('selectionner ce drive') ||
           aria.includes('sélectionner') ||
           aria.includes('selectionner') ||
           aria.includes('valider') ||
           testId.includes('select-store') ||
           testId.includes('choose-store') ||
+          testId.includes('choose-pdv') ||
+          testId.includes('select-pdv') ||
+          testId.includes('store-card') ||
           testId.includes('store-card-cta') ||
           testId.includes('journey-reminder') ||
+          testId.includes('pdv') ||
           cls.includes('select-store') ||
           cls.includes('choose-store') ||
           cls.includes('btn-select-drive') ||
           cls.includes('drive-choice') ||
           cls.includes('journey-reminder') ||
+          cls.includes('store-card') ||
+          cls.includes('pdv') ||
           href.includes('/magasin') ||
-          href.includes('/courses')
+          href.includes('/courses') ||
+          href.includes('/pdv/')
         );
 
         if (isStoreAction) {

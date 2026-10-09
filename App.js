@@ -62,7 +62,7 @@ function MainApp() {
   const [isDriveModalOpen, setIsDriveModalOpen] = useState(false);
   const [isDriveRewardModalOpen, setIsDriveRewardModalOpen] = useState(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
-  const [isPro, setIsPro] = useState(true);
+  const [isPro, setIsPro] = useState(false);
 
   // Courses manuelles / filtre
   const [newCustomItem, setNewCustomItem] = useState("");

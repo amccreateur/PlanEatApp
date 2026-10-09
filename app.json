@@ -29,7 +29,7 @@
     },
     "android": {
       "package": "com.amccreateur.PlanEatApp",
-      "versionCode": 17,
+      "versionCode": 18,
       "adaptiveIcon": {
         "backgroundColor": "#3eb5ec",
         "foregroundImage": "./assets/android-icon-foreground.png"

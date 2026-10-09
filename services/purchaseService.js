@@ -23,7 +23,7 @@ export const ENTITLEMENT_IDS = ["PlanEat Pro", "pro", "premium", "planeat_pro"];
 class PurchaseService {
   constructor() {
     this.isInitialized = false;
-    this.isPro = true; // Débloqué par défaut pour tous les utilisateurs en phase de test
+    this.isPro = false;
     this.listeners = new Set();
   }
 
@@ -31,9 +31,16 @@ class PurchaseService {
     if (this.isInitialized) return;
     this.isInitialized = true;
 
+    try {
+      const savedPro = await AsyncStorage.getItem("@planeat_is_pro");
+      if (savedPro === "true") {
+        this.isPro = true;
+        this._notifyListeners();
+      }
+    } catch (e) {}
+
     // Si les abonnements sont désactivés ou sur le web
     if (!ENABLE_SUBSCRIPTIONS || Platform.OS === "web" || !Purchases) {
-      this.isPro = true;
       this._notifyListeners();
       return;
     }
@@ -52,12 +59,10 @@ class PurchaseService {
         const info = await Purchases.getCustomerInfo();
         this._handleCustomerInfoUpdate(info);
       } else {
-        this.isPro = true;
         this._notifyListeners();
       }
     } catch (err) {
       console.warn("RevenueCat initialization error:", err);
-      this.isPro = true;
       this._notifyListeners();
     }
   }

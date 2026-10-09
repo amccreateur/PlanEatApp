@@ -320,7 +320,10 @@ export default function DriveCartModal({
     if (selectedStore.id === "leclerc") {
       const base = customStoreUrl || storeBaseUrlRef.current;
       if (base && (base.includes("magasin-") || base.includes("courses.leclercdrive.fr") || base.includes("leclercdrive.fr"))) {
-        const cleanBase = base.replace(/\/+$/, "").replace(/\/recherche.*$/i, "");
+        const cleanBase = base
+          .replace(/https?:\/\/m-courses\.leclercdrive\.fr/i, "https://courses.leclercdrive.fr")
+          .replace(/\/+$/, "")
+          .replace(/\/recherche.*$/i, "");
         return `${cleanBase}/recherche.aspx?TexteRecherche=${q}`;
       }
       return `https://www.leclercdrive.fr`;

@@ -43,7 +43,7 @@ const STORE_DETECTOR_INJECTION_JS = `
   window.__planeatDetectorActive = true;
 
   try {
-    var info = "Title: " + document.title + " | BodyHTML: " + (document.body ? document.body.innerHTML.length : 0) + " | URL: " + window.location.href;
+    var info = "Title: " + document.title + " | BodyHTML: " + (document.body ? document.body.innerHTML.length : 0) + " | URL: " + window.location.href + " | Content: " + (document.body ? document.body.innerHTML.substring(0, 500) : "");
     fetch("http://192.168.1.111:8088/log", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

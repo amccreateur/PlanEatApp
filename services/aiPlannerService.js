@@ -534,7 +534,7 @@ export class AIPlannerService {
       return { canonKey: "canon_tortillas", name: { fr: "Tortillas de blé", en: "Flour tortillas", ar: "خبز التورتيلا" }, unit: "", dept: "deptBakery", multiplier: 1 };
     }
     if (lower.includes("naan")) {
-      return { canonKey: "canon_naans", name: { fr: "Pains naans", en: "Naan bread", ar: "خبز النان" }, unit: "", dept: "deptBakery", multiplier: 1 };
+      return { canonKey: "canon_naans", name: { fr: "Pains naans", en: "Naan bread", ar: "خبز النان" }, unit: "", dept: "deptBakery", multiplier: unit === "g" ? 0.01 : 1 };
     }
     if (lower.includes("burger") && (lower.includes("pain") || lower.includes("brioche"))) {
       return { canonKey: "canon_pain_burger", name: { fr: "Pains burger", en: "Burger buns", ar: "خبز البرجر" }, unit: "", dept: "deptBakery", multiplier: 1 };
@@ -844,16 +844,16 @@ export class AIPlannerService {
 
     // Fruits
     if (/\bcitrons?\s+verts?\b/.test(lower) || lower.includes("citron vert") || lower.includes("citrons verts") || lower.includes("lime")) {
-      return { canonKey: "canon_citron_vert", name: { fr: "Citron vert", en: "Lime", ar: "ليمون أخضر" }, unit: "", dept: "deptProduce", multiplier: 1 };
+      return { canonKey: "canon_citron_vert", name: { fr: "Citron vert", en: "Lime", ar: "ليمون أخضر" }, unit: "", dept: "deptProduce", multiplier: unit === "g" ? 0.015 : 1 };
     }
     if (/\bcitrons?\b/.test(lower) && !lower.includes("vert") && !lower.includes("combava")) {
-      return { canonKey: "canon_citron_jaune", name: { fr: "Citron jaune", en: "Lemon", ar: "ليمون" }, unit: "", dept: "deptProduce", multiplier: 1 };
+      return { canonKey: "canon_citron_jaune", name: { fr: "Citron jaune", en: "Lemon", ar: "ليمون" }, unit: "", dept: "deptProduce", multiplier: unit === "g" ? 0.01 : 1 };
     }
     if (/\bbananes?\b/.test(lower)) {
-      return { canonKey: "canon_banane", name: { fr: "Banane", en: "Banana", ar: "موز" }, unit: "", dept: "deptProduce", multiplier: 1 };
+      return { canonKey: "canon_banane", name: { fr: "Banane", en: "Banana", ar: "موز" }, unit: "", dept: "deptProduce", multiplier: unit === "g" ? 0.008 : 1 };
     }
     if (/\bpommes?\b/.test(lower) && !lower.includes("terre") && !lower.includes("pin") && !lower.includes("compote")) {
-      return { canonKey: "canon_pomme", name: { fr: "Pomme", en: "Apple", ar: "تفاح" }, unit: "", dept: "deptProduce", multiplier: 1 };
+      return { canonKey: "canon_pomme", name: { fr: "Pomme", en: "Apple", ar: "تفاح" }, unit: "", dept: "deptProduce", multiplier: unit === "g" ? 0.007 : 1 };
     }
     if (lower.includes("mangue")) {
       return { canonKey: "canon_mangue", name: { fr: "Mangue", en: "Mango", ar: "مانجو" }, unit: "", dept: "deptProduce", multiplier: unit === "g" ? 0.004 : 1 };
@@ -1289,7 +1289,8 @@ export class AIPlannerService {
 
           const subItems = expanded.length > 0 ? expanded : [rawName];
 
-          subItems.forEach(partName => {
+          subItems.forEach(rawPart => {
+            const partName = rawPart.split(/\s+(?:ou|ou bien|\/)\s+/i)[0].trim() || rawPart;
             const canon = this.getCanonicalGrocery(partName, ing.unit, ing.dept);
             const qty = ((Number(ing.quantity) || 1) * factor) * canon.multiplier;
 

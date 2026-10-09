@@ -93,8 +93,22 @@ export class DriveService {
     cleaned = cleaned.replace(/\b(en\s+neige(?:\s+ferme)?|en\s+poudre|en\s+morceaux|en\s+dés|en\s+tranches|en\s+bâtonnets|en\s+rondelles|en\s+cube|en\s+cubes|en\s+boîte|en\s+conserve)\b/gi, "");
     cleaned = cleaned.replace(/\b(bio|biologique|surgelé|surgelée|surgelés|surgelées|râpé|râpée|râpés|râpées|émincé|émincée|émincés|émincées|haché|hachée|hachés|hachées|concassé|concassés|coupé|coupés|cuit|cuits|cuite|cuites|grillé|grillée|grillés|grillées|toasté|toastée|toastés|toastées|rôti|rôtie|rôtis|rôties|poêlé|poêlée|poêlés|poêlées|doré|dorée|dorés|dorées|fondant|fondante|fondants|fondantes|moelleux|moelleuse|moelleuses|grec|grecs|grecque|grecques|entier|entiers|nature|maison|extra|vierge\s+extra|au\s+choix|selon\s+goût|environ|égoutté|égouttée|rincé|rincée|pelé|pelée|épluché|épluchée|dénoyauté|dénoyautée|tiède|chaud|chaude|froid|froide|finement|grossièrement|battu|battus|battue|battues|séché|séchée|séchés|séchées|déshydraté|déshydratée|déshydratés|déshydratées|effilé|effilée|effilés|effilées|moulu|moulue|moulus|moulues|concassé|concassée)\b/gi, "");
 
-    // 6. Nettoyer les ponctuations et espaces multiples
-    cleaned = cleaned.replace(/[,;:.!?]/g, " ");
+    // 6. Remplacement des pluriels fréquents par leur forme singulière reconnue par les moteurs Drive
+    cleaned = cleaned.replace(/^pains\s+/i, "Pain ");
+    cleaned = cleaned.replace(/^bagels\s+/i, "Bagel ");
+    cleaned = cleaned.replace(/^steaks\s+/i, "Steak ");
+    cleaned = cleaned.replace(/^avocats\s+/i, "Avocat ");
+    cleaned = cleaned.replace(/^oignons\s+/i, "Oignon ");
+    cleaned = cleaned.replace(/^concombres\s+/i, "Concombre ");
+    cleaned = cleaned.replace(/^poivrons\s+/i, "Poivron ");
+    cleaned = cleaned.replace(/^courgettes\s+/i, "Courgette ");
+    cleaned = cleaned.replace(/^aubergines\s+/i, "Aubergine ");
+    cleaned = cleaned.replace(/^carottes\s+/i, "Carotte ");
+    cleaned = cleaned.replace(/^pommes\s+de\s+terre\b/i, "Pomme de terre");
+    cleaned = cleaned.replace(/^œufs?\b|^oeufs?\b/i, "Oeufs");
+
+    // 7. Nettoyer les ponctuations et espaces multiples
+    cleaned = cleaned.replace(/[,;:.!?&]/g, " ");
     cleaned = cleaned.replace(/\s+/g, " ").trim();
 
     // Fallback si la chaîne devient vide
@@ -107,9 +121,9 @@ export class DriveService {
 
   /**
    * Génère des suggestions de mots-clés intelligents et d'alternatives pour un ingrédient
+   * Ex: "Pains pita" -> ["Pain pita", "Pita"]
    * Ex: "Lait d'amande ou demi-écrémé" -> ["Lait d'amande", "Lait demi-écrémé"]
    * Ex: "Pain complet ou de campagne" -> ["Pain complet", "Pain de campagne"]
-   * Ex: "Pâtes complètes (penne ou fusilli)" -> ["Pâtes complètes", "penne", "fusilli"]
    */
   static getSearchSuggestions(rawName) {
     if (!rawName) return [];
@@ -139,6 +153,20 @@ export class DriveService {
     } else {
       const primary = this.cleanSearchQuery(withoutParens);
       if (primary) list.push(primary);
+
+      // Suggestions contextuelles supplémentaires
+      if (/pita/i.test(primary) && primary !== "Pita") {
+        list.push("Pita");
+      }
+      if (/bagel/i.test(primary) && primary !== "Bagel") {
+        list.push("Bagel");
+      }
+      if (/oeufs?|œufs?/i.test(primary)) {
+        list.push("Oeufs plein air");
+      }
+      if (/pain\s+complet/i.test(primary)) {
+        list.push("Pain de mie complet");
+      }
     }
 
     const parenMatch = rawName.match(/\((.*?)\)/);

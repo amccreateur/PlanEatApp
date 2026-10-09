@@ -489,10 +489,16 @@ export class AIPlannerService {
    * Normalise les unités culinaires courantes
    */
   static normalizeGroceryUnit(rawUnit) {
-    if (!rawUnit) return "pièce";
-    const u = rawUnit.toLowerCase().trim();
-    if (["piece", "pieces", "pièce", "pièces", "unite", "unites", "unité", "unités", "portion", "portions", "tranche", "tranches", "gousse", "gousses", "oeuf", "oeufs", "feuille", "feuilles"].includes(u)) {
-      return "pièce";
+    if (!rawUnit) return "piece";
+    const u = rawUnit.toLowerCase().trim().replace(/\.$/, "");
+    if ([
+      "piece", "pieces", "pièce", "pièces", "unite", "unites", "unité", "unités",
+      "unit", "units", "pc", "pcs", "portion", "portions", "tranche", "tranches",
+      "gousse", "gousses", "oeuf", "oeufs", "feuille", "feuilles", "brin", "brins",
+      "botte", "bottes", "sachet", "sachets", "pot", "pots", "boite", "boites",
+      "boîte", "boîtes", "pincee", "pincees", "pincée", "pincées"
+    ].includes(u)) {
+      return "piece";
     }
     if (["g", "gramme", "grammes", "gr", "grs"].includes(u)) return "g";
     if (["kg", "kilo", "kilos", "kilogramme", "kilogrammes"].includes(u)) return "kg";
@@ -505,9 +511,289 @@ export class AIPlannerService {
   }
 
   /**
+   * Détermine la clé et le nom canoniques pour un ingrédient
+   */
+  static getCanonicalGrocery(rawName, rawUnit, rawDept) {
+    const name = (rawName || "").trim();
+    const unit = this.normalizeGroceryUnit(rawUnit);
+    const dept = rawDept || "deptOther";
+
+    const lower = name.toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // suppression des accents
+      .replace(/œ/g, "oe")
+      .trim();
+
+    // 1. ŒUFS (Tout œuf ou dérivé sauf nouilles/pâtes aux œufs)
+    if (!lower.includes("nouille") && !lower.includes("pate") && !lower.includes("biscuit") && (
+      /\b(oeufs?|blancs?\s+d'oeufs?|jaunes?\s+d'oeufs?)\b/.test(lower) ||
+      lower.startsWith("oeuf")
+    )) {
+      let mult = 1;
+      if (unit === "g") mult = 0.02; // 50g ~ 1 oeuf
+      return {
+        canonKey: "canon_oeufs",
+        name: { fr: "Œufs", en: "Eggs", ar: "بيض" },
+        unit: "",
+        dept: "deptDairy",
+        multiplier: mult
+      };
+    }
+
+    // 2. BŒUF HACHÉ / STEAK HACHÉ
+    if (/\b(boeuf\s+hache|steaks?\s+haches?|viande\s+hachee)\b/.test(lower) || (lower.includes("boeuf") && lower.includes("hache"))) {
+      let mult = 1;
+      if (unit === "kg") mult = 1000;
+      else if (unit === "piece") mult = 125;
+      return {
+        canonKey: "canon_boeuf_hache",
+        name: { fr: "Bœuf haché", en: "Minced beef", ar: "لحم مفروم" },
+        unit: "g",
+        dept: "deptMeat",
+        multiplier: mult
+      };
+    }
+
+    // 3. BLANCS / FILETS DE POULET
+    if (/\b(blancs?|filets?|escalopes?)\s+de\s+poulet\b/.test(lower) || lower === "poulet" || lower === "filets de poulet") {
+      let mult = 1;
+      if (unit === "kg") mult = 1000;
+      return {
+        canonKey: "canon_poulet_filet",
+        name: { fr: "Blancs de poulet", en: "Chicken breast", ar: "صدور دجاج" },
+        unit: unit === "piece" ? "" : "g",
+        dept: "deptMeat",
+        multiplier: mult
+      };
+    }
+
+    // 4. AIL
+    if (/\b(ail|gousses?\s+d'ail)\b/.test(lower)) {
+      return {
+        canonKey: "canon_ail",
+        name: { fr: "Ail", en: "Garlic", ar: "ثوم" },
+        unit: "",
+        dept: "deptProduce",
+        multiplier: 1
+      };
+    }
+
+    // 5. OIGNONS JAUNES
+    if (/\b(oignons?|oignons?\s+jaunes?)\b/.test(lower) && !lower.includes("nouveau") && !lower.includes("rouge") && !lower.includes("fume") && !lower.includes("frit")) {
+      return {
+        canonKey: "canon_oignon",
+        name: { fr: "Oignon", en: "Onion", ar: "بصل" },
+        unit: "",
+        dept: "deptProduce",
+        multiplier: 1
+      };
+    }
+
+    // 6. HUILE D'OLIVE
+    if (lower.includes("huile d'olive") || lower.includes("huile olive")) {
+      return {
+        canonKey: "canon_huile_olive",
+        name: { fr: "Huile d'olive", en: "Olive oil", ar: "زيت زيتون" },
+        unit: unit === "c.à.s" || unit === "c.à.c" ? "c.à.s" : (unit === "L" ? "L" : "ml"),
+        dept: "deptPantry",
+        multiplier: 1
+      };
+    }
+
+    // 7. BEURRE
+    if (/\bbeurre\b/.test(lower) && !lower.includes("cacahuete") && !lower.includes("amande")) {
+      return {
+        canonKey: "canon_beurre",
+        name: { fr: "Beurre", en: "Butter", ar: "زبدة" },
+        unit: "g",
+        dept: "deptDairy",
+        multiplier: 1
+      };
+    }
+
+    // 8. CRÈME FRAÎCHE
+    if (lower.includes("creme fraiche") || lower.includes("creme liquide") || lower.includes("creme entiere") || lower.includes("creme fleurette")) {
+      return {
+        canonKey: "canon_creme_fraiche",
+        name: { fr: "Crème fraîche liquide", en: "Heavy cream", ar: "كريمة طازجة" },
+        unit: unit === "c.à.s" ? "c.à.s" : (unit === "L" ? "L" : "ml"),
+        dept: "deptDairy",
+        multiplier: 1
+      };
+    }
+
+    // 9. LAIT
+    if (/\blait\b/.test(lower) && !lower.includes("amande") && !lower.includes("coco") && !lower.includes("avoine") && !lower.includes("soja")) {
+      return {
+        canonKey: "canon_lait",
+        name: { fr: "Lait demi-écrémé", en: "Semi-skimmed milk", ar: "حليب نصف دسم" },
+        unit: unit === "L" ? "L" : "ml",
+        dept: "deptDairy",
+        multiplier: 1
+      };
+    }
+
+    // 10. COULIS DE TOMATE
+    if (lower.includes("coulis de tomate") || lower.includes("pulpe de tomate") || lower.includes("sauce tomate") || lower.includes("tomates concassees")) {
+      return {
+        canonKey: "canon_coulis_tomate",
+        name: { fr: "Coulis de tomate", en: "Tomato coulis", ar: "صلصة طماطم" },
+        unit: unit === "g" ? "g" : "ml",
+        dept: "deptPantry",
+        multiplier: 1
+      };
+    }
+
+    // 11. PARMESAN
+    if (lower.includes("parmesan") || lower.includes("parmigiano")) {
+      return {
+        canonKey: "canon_parmesan",
+        name: { fr: "Parmesan", en: "Parmesan cheese", ar: "جبن بارميزان" },
+        unit: "g",
+        dept: "deptDairy",
+        multiplier: 1
+      };
+    }
+
+    // 12. MOZZARELLA
+    if (lower.includes("mozzarella") || lower.includes("mozza")) {
+      return {
+        canonKey: "canon_mozzarella",
+        name: { fr: "Mozzarella", en: "Mozzarella cheese", ar: "جبن موزاريلا" },
+        unit: unit === "piece" ? "" : "g",
+        dept: "deptDairy",
+        multiplier: 1
+      };
+    }
+
+    // 13. FETA
+    if (lower.includes("feta")) {
+      return {
+        canonKey: "canon_feta",
+        name: { fr: "Feta", en: "Feta cheese", ar: "جبن فيتا" },
+        unit: "g",
+        dept: "deptDairy",
+        multiplier: 1
+      };
+    }
+
+    // 14. AVOCAT
+    if (/\bavocats?\b/.test(lower)) {
+      return {
+        canonKey: "canon_avocat",
+        name: { fr: "Avocat", en: "Avocado", ar: "أفوكادو" },
+        unit: "",
+        dept: "deptProduce",
+        multiplier: 1
+      };
+    }
+
+    // 15. CITRON
+    if (/\bcitrons?\b/.test(lower) && !lower.includes("vert")) {
+      return {
+        canonKey: "canon_citron",
+        name: { fr: "Citron jaune", en: "Lemon", ar: "ليمون" },
+        unit: "",
+        dept: "deptProduce",
+        multiplier: 1
+      };
+    }
+
+    // 16. CITRON VERT
+    if (lower.includes("citron vert") || lower.includes("lime")) {
+      return {
+        canonKey: "canon_citron_vert",
+        name: { fr: "Citron vert", en: "Lime", ar: "ليمون أخضر" },
+        unit: "",
+        dept: "deptProduce",
+        multiplier: 1
+      };
+    }
+
+    // 17. THON AU NATUREL
+    if (lower.includes("thon") && (lower.includes("naturel") || lower.includes("boite") || lower.includes("egoutte") || lower === "thon")) {
+      return {
+        canonKey: "canon_thon",
+        name: { fr: "Thon au naturel", en: "Canned tuna", ar: "تونة معلبة" },
+        unit: "g",
+        dept: "deptPantry",
+        multiplier: 1
+      };
+    }
+
+    // 18. RIZ BASMATI
+    if (lower.includes("riz") && (lower.includes("basmati") || lower.includes("blanc") || lower.includes("thai") || lower === "riz")) {
+      return {
+        canonKey: "canon_riz_basmati",
+        name: { fr: "Riz basmati", en: "Basmati rice", ar: "أرز بسمتي" },
+        unit: "g",
+        dept: "deptPantry",
+        multiplier: 1
+      };
+    }
+
+    // 19. FARINE
+    if (lower.includes("farine")) {
+      return {
+        canonKey: "canon_farine",
+        name: { fr: "Farine de blé", en: "Wheat flour", ar: "دقيق قمح" },
+        unit: "g",
+        dept: "deptPantry",
+        multiplier: 1
+      };
+    }
+
+    // 20. SEL
+    if (lower === "sel" || lower.startsWith("sel ") || lower === "sel fin" || lower === "sel poivre") {
+      return {
+        canonKey: "canon_sel",
+        name: { fr: "Sel", en: "Salt", ar: "ملح" },
+        unit: "",
+        dept: "deptSpices",
+        multiplier: 1
+      };
+    }
+
+    // 21. POIVRE
+    if (lower === "poivre" || lower.startsWith("poivre ") || lower === "poivre noir" || lower === "poivre du moulin") {
+      return {
+        canonKey: "canon_poivre",
+        name: { fr: "Poivre noir", en: "Black pepper", ar: "فلفل أسود" },
+        unit: "",
+        dept: "deptSpices",
+        multiplier: 1
+      };
+    }
+
+    // 22. PAIN DE MIE / COMPLET
+    if (lower.includes("pain de mie") || lower.includes("pain complet")) {
+      return {
+        canonKey: "canon_pain_complet",
+        name: { fr: "Pain complet", en: "Whole wheat bread", ar: "خبز كامل" },
+        unit: unit === "piece" ? "" : unit,
+        dept: "deptBakery",
+        multiplier: 1
+      };
+    }
+
+    // Ingrédient générique
+    let cleanName = DriveService.cleanSearchQuery(name);
+    cleanName = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+    const canonKey = lower.replace(/s\b/g, "").replace(/[^a-z0-9]/g, "_") + "_" + unit;
+
+    return {
+      canonKey,
+      name: { fr: cleanName, en: cleanName, ar: cleanName },
+      unit: unit === "piece" ? "" : unit,
+      dept,
+      multiplier: 1
+    };
+  }
+
+  /**
    * Compile et consolide la liste des courses par rayon et ingrédients unifiés
    */
   static compileGroceries(plan) {
+    if (!plan || !plan.days) return [];
     const itemsMap = {};
 
     plan.days.forEach(day => {
@@ -516,40 +802,32 @@ export class AIPlannerService {
         const factor = (meal.calculatedServings || 2) / 2;
 
         meal.ingredients.forEach(ing => {
-          const nameFr = typeof ing.name === "object" ? ing.name.fr : ing.name;
-          if (!nameFr) return;
+          const rawName = typeof ing.name === "object" ? ing.name.fr : ing.name;
+          if (!rawName) return;
 
-          const cleanName = DriveService.cleanSearchQuery(nameFr);
-          const normUnit = this.normalizeGroceryUnit(ing.unit);
-          
-          // Clé canonique normalisée (ex: "oeuf_piece")
-          const canonKey = cleanName.toLowerCase().trim()
-            .replace(/œ/g, "oe")
-            .replace(/[éèêë]/g, "e")
-            .replace(/[àâä]/g, "a")
-            .replace(/[îï]/g, "i")
-            .replace(/[ôö]/g, "o")
-            .replace(/[ùûü]/g, "u")
-            .replace(/ç/g, "c")
-            .replace(/s\b/g, "") + "_" + normUnit;
+          // Découper les ingrédients composés (ex: "Thon égoutté & Œuf frais")
+          let parts = [rawName];
+          if (rawName.includes(" & ")) parts = rawName.split(" & ");
+          else if (rawName.includes(" + ")) parts = rawName.split(" + ");
+          else if (/\s+et\s+/i.test(rawName) && !/sel\s+et\s+poivre/i.test(rawName)) parts = rawName.split(/\s+et\s+/i);
 
-          const qty = ((Number(ing.quantity) || 1) * factor);
+          parts.forEach(partName => {
+            const canon = this.getCanonicalGrocery(partName, ing.unit, ing.dept);
+            const qty = ((Number(ing.quantity) || 1) * factor) * canon.multiplier;
 
-          if (!itemsMap[canonKey]) {
-            let displayFr = cleanName;
-            if (/^oeufs?\b/i.test(displayFr)) displayFr = "Œufs";
-
-            itemsMap[canonKey] = {
-              id: `item_${Math.random().toString(36).substr(2, 9)}`,
-              name: typeof ing.name === "object" ? { ...ing.name, fr: displayFr } : { fr: displayFr, en: displayFr, ar: displayFr },
-              totalQuantity: qty,
-              unit: normUnit === "pièce" ? "" : normUnit,
-              dept: ing.dept || "deptOther",
-              checked: false
-            };
-          } else {
-            itemsMap[canonKey].totalQuantity += qty;
-          }
+            if (!itemsMap[canon.canonKey]) {
+              itemsMap[canon.canonKey] = {
+                id: `item_${Math.random().toString(36).substr(2, 9)}`,
+                name: canon.name,
+                totalQuantity: qty,
+                unit: canon.unit,
+                dept: canon.dept,
+                checked: false
+              };
+            } else {
+              itemsMap[canon.canonKey].totalQuantity += qty;
+            }
+          });
         });
       });
     });

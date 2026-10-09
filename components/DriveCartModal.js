@@ -635,19 +635,41 @@ export default function DriveCartModal({
                   input.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
                   input.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
                   
+                  // Diagnostic log du conteneur
+                  var containerHtml = input.parentElement ? input.parentElement.outerHTML.substring(0, 350) : input.outerHTML.substring(0, 200);
+                  logSearch('SUCCESS_INPUT_FOUND | Container: ' + containerHtml.replace(/\s+/g, ' '));
+
+                  // Chercher le bouton de soumission / loupe
+                  var nearbyBtn = input.parentElement ? input.parentElement.querySelector('button, [role="button"], a, svg') : null;
                   var form = input.closest('form');
-                  var btn = form ? form.querySelector('button[type="submit"], input[type="submit"], button.header-search__btn, button.search-button, button[aria-label*="recherch" i]') : document.querySelector('button[type="submit"], button[aria-label*="recherch" i]');
-                  
-                  if (btn) {
-                    btn.click();
-                  } else if (form && form.submit) {
-                    form.submit();
-                  } else {
-                    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true }));
-                    input.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true }));
-                    input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true }));
+                  var formBtn = form ? form.querySelector('button[type="submit"], input[type="submit"], button, [role="button"]') : null;
+                  var docBtn = document.querySelector('button[aria-label*="recherch" i], button.search-button, button.header-search__btn');
+
+                  var targetBtn = nearbyBtn || formBtn || docBtn;
+                  if (targetBtn && targetBtn !== input) {
+                    try { targetBtn.click(); } catch(eBtn) {}
                   }
-                  logSearch('SUCCESS_INPUT_FOUND');
+
+                  if (form && form.submit && !targetBtn) {
+                    try { form.submit(); } catch(eSubmit) {}
+                  }
+
+                  // Touche Entrée
+                  input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true }));
+                  input.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true }));
+                  input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true }));
+
+                  // Après 400ms, si une liste d'autosuggestion est apparue, cliquer sur le 1er résultat ou "voir tous les résultats"
+                  setTimeout(function() {
+                    try {
+                      var suggestion = document.querySelector('[role="option"], .search-suggestion, .autocomplete-item, [data-testid*="suggestion" i], ul.suggestions li, .search-results-list a');
+                      if (suggestion) {
+                        suggestion.click();
+                        logSearch('AUTOCOMPLETE_CLICKED');
+                      }
+                    } catch(eSugg) {}
+                  }, 400);
+
                   return;
                 } catch(errInput) {
                   logSearch('ERROR_FILLING_INPUT: ' + errInput.message);

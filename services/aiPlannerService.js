@@ -1,5 +1,6 @@
 import { RECIPES_CATALOG } from "./defaultRecipes.js";
 import { MistralService } from "./mistralService.js";
+import { DriveService } from "./driveService.js";
 
 export class AIPlannerService {
   /**
@@ -485,7 +486,26 @@ export class AIPlannerService {
   }
 
   /**
-   * Compile et consolide la liste des courses par rayon
+   * Normalise les unités culinaires courantes
+   */
+  static normalizeGroceryUnit(rawUnit) {
+    if (!rawUnit) return "pièce";
+    const u = rawUnit.toLowerCase().trim();
+    if (["piece", "pieces", "pièce", "pièces", "unite", "unites", "unité", "unités", "portion", "portions", "tranche", "tranches", "gousse", "gousses", "oeuf", "oeufs", "feuille", "feuilles"].includes(u)) {
+      return "pièce";
+    }
+    if (["g", "gramme", "grammes", "gr", "grs"].includes(u)) return "g";
+    if (["kg", "kilo", "kilos", "kilogramme", "kilogrammes"].includes(u)) return "kg";
+    if (["ml", "millilitre", "millilitres"].includes(u)) return "ml";
+    if (["cl", "centilitre", "centilitres"].includes(u)) return "cl";
+    if (["l", "litre", "litres"].includes(u)) return "L";
+    if (["c.à.s", "c.a.s", "cas", "cuillère à soupe", "cuillères à soupe", "cuillere a soupe", "cuilleres a soupe"].includes(u)) return "c.à.s";
+    if (["c.à.c", "c.a.c", "cac", "cuillère à café", "cuillères à café", "cuillere a cafe", "cuilleres a cafe"].includes(u)) return "c.à.c";
+    return u;
+  }
+
+  /**
+   * Compile et consolide la liste des courses par rayon et ingrédients unifiés
    */
   static compileGroceries(plan) {
     const itemsMap = {};
@@ -497,20 +517,38 @@ export class AIPlannerService {
 
         meal.ingredients.forEach(ing => {
           const nameFr = typeof ing.name === "object" ? ing.name.fr : ing.name;
-          const key = (nameFr || "item") + "_" + (ing.unit || "");
+          if (!nameFr) return;
+
+          const cleanName = DriveService.cleanSearchQuery(nameFr);
+          const normUnit = this.normalizeGroceryUnit(ing.unit);
+          
+          // Clé canonique normalisée (ex: "oeuf_piece")
+          const canonKey = cleanName.toLowerCase().trim()
+            .replace(/œ/g, "oe")
+            .replace(/[éèêë]/g, "e")
+            .replace(/[àâä]/g, "a")
+            .replace(/[îï]/g, "i")
+            .replace(/[ôö]/g, "o")
+            .replace(/[ùûü]/g, "u")
+            .replace(/ç/g, "c")
+            .replace(/s\b/g, "") + "_" + normUnit;
+
           const qty = ((Number(ing.quantity) || 1) * factor);
 
-          if (!itemsMap[key]) {
-            itemsMap[key] = {
+          if (!itemsMap[canonKey]) {
+            let displayFr = cleanName;
+            if (/^oeufs?\b/i.test(displayFr)) displayFr = "Œufs";
+
+            itemsMap[canonKey] = {
               id: `item_${Math.random().toString(36).substr(2, 9)}`,
-              name: typeof ing.name === "object" ? ing.name : { fr: ing.name, en: ing.name, ar: ing.name },
+              name: typeof ing.name === "object" ? { ...ing.name, fr: displayFr } : { fr: displayFr, en: displayFr, ar: displayFr },
               totalQuantity: qty,
-              unit: ing.unit || "",
+              unit: normUnit === "pièce" ? "" : normUnit,
               dept: ing.dept || "deptOther",
               checked: false
             };
           } else {
-            itemsMap[key].totalQuantity += qty;
+            itemsMap[canonKey].totalQuantity += qty;
           }
         });
       });

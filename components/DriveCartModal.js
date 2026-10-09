@@ -80,6 +80,24 @@ const STORE_DETECTOR_INJECTION_JS = `
   setTimeout(dismissCookieBanners, 400);
   setTimeout(dismissCookieBanners, 1200);
 
+  // Auto-ouverture du choix Drive / code postal sur Auchan si pas encore choisi
+  try {
+    if (window.location.hostname.includes('auchan.fr')) {
+      setTimeout(function() {
+        var journeyBtn = document.querySelector('.layerTriggerJourneyReminder, button.journey-reminder__initial-choice-button, button.context-header__button, button[aria-label*="Faire mes courses en drive" i], button[data-title="Choisir vos courses" i], button[aria-label*="Choisir mon mode de livraison" i]');
+        if (journeyBtn) {
+          journeyBtn.click();
+        }
+      }, 600);
+      setTimeout(function() {
+        var journeyBtn2 = document.querySelector('.layerTriggerJourneyReminder, button.journey-reminder__initial-choice-button, button[aria-label*="Faire mes courses en drive" i]');
+        if (journeyBtn2) {
+          journeyBtn2.click();
+        }
+      }, 1500);
+    }
+  } catch(eAuchan) {}
+
   // Interception passive des clics utilisateur sur les boutons de choix de magasin / Drive
   document.addEventListener('click', function(e) {
     try {

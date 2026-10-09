@@ -240,6 +240,7 @@ function MainApp() {
       setGroceries(updatedGroceries);
       await StorageService.saveCurrentPlan(updatedPlan);
       await StorageService.saveGroceries(updatedGroceries);
+      adService.recordActionAndCheckInterstitial({ triggerEveryActions: 3, minIntervalSeconds: 30 });
     } catch (err) {
       console.error("Erreur lors du swap:", err);
     } finally {

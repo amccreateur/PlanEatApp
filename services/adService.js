@@ -51,6 +51,7 @@ class AdService {
     this.isInterstitialLoaded = false;
     this.isRewardedLoaded = false;
     this.lastInterstitialTime = 0;
+    this.actionCounter = 0;
   }
 
   async init() {
@@ -186,6 +187,29 @@ class AdService {
     } else {
       // Si la pub n'était pas encore chargée, continuer normalement
       this._preloadInterstitial();
+      onComplete();
+    }
+  }
+
+  /**
+   * Enregistre une action importante (ex: swap de repas, recette frigo, export)
+   * et déclenche l'interstitiel toutes les N actions (défaut: 3).
+   * @param {Object} options
+   * @param {number} options.triggerEveryActions Nombre d'actions requises (défaut: 3)
+   * @param {Function} options.onComplete Callback appelé à la fin
+   * @param {number} options.minIntervalSeconds Intervalle minimum en secondes (défaut: 30s)
+   */
+  async recordActionAndCheckInterstitial({ triggerEveryActions = 3, onComplete = () => {}, minIntervalSeconds = 30 } = {}) {
+    if (purchaseService.getIsPro()) {
+      onComplete();
+      return;
+    }
+
+    this.actionCounter++;
+    if (this.actionCounter >= triggerEveryActions) {
+      this.actionCounter = 0;
+      await this.showInterstitial({ onComplete, minIntervalSeconds });
+    } else {
       onComplete();
     }
   }

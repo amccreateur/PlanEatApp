@@ -290,12 +290,15 @@ export default function DriveCartModal({
   const getDirectSearchUrl = (query) => {
     const clean = (query || getCleanItemName(currentItem) || "").trim();
     const q = encodeURIComponent(clean);
+    const qPlus = encodeURIComponent(clean).replace(/%20/g, "+");
+
     if (selectedStore.id === "leclerc") {
       const base = customStoreUrl || storeBaseUrlRef.current;
-      if (base && base.includes("e.leclerc")) {
-        return `${base.replace(/\/+$/, "")}/recherche?q=${q}`;
+      const match = (base || "").match(/magasin-(\d{6})/i);
+      if (match && match[1]) {
+        return `https://m-courses.leclercdrive.fr/magasin-${match[1]}/recherche/${qPlus}`;
       }
-      return `https://www.e.leclerc/recherche?q=${q}`;
+      return `https://www.leclercdrive.fr`;
     }
     if (selectedStore.id === "carrefour") return `https://www.carrefour.fr/s?q=${q}`;
     if (selectedStore.id === "auchan") return `https://www.auchan.fr/recherche?text=${q}`;

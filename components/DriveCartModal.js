@@ -273,7 +273,7 @@ export default function DriveCartModal({
     AsyncStorage.getItem("@planeat_custom_drive_store_url")
       .then((savedUrl) => {
         if (savedUrl) {
-          if (savedUrl.includes("leclercdrive.fr") || savedUrl.includes("m-courses") || savedUrl.includes("fd16")) {
+          if (savedUrl.includes("pgeWCSD") || savedUrl.includes("erreur") || savedUrl.includes("error")) {
             AsyncStorage.removeItem("@planeat_custom_drive_store_url").catch(() => {});
             setCustomStoreUrl("");
             setStoreUrlInput("");
@@ -337,10 +337,10 @@ export default function DriveCartModal({
     const q = encodeURIComponent(clean);
     if (selectedStore.id === "leclerc") {
       const base = customStoreUrl || storeBaseUrlRef.current;
-      if (base && base.includes("e.leclerc")) {
-        return `${base.replace(/\/+$/, "")}/recherche?q=${q}`;
+      if (base && (base.includes("magasin-") || base.includes("courses.leclercdrive.fr"))) {
+        return `${base.replace(/\/+$/, "")}/recherche/${q}`;
       }
-      return `https://www.e.leclerc/recherche?q=${q}`;
+      return `https://www.leclercdrive.fr`;
     }
     if (selectedStore.id === "carrefour") return `https://www.carrefour.fr/s?q=${q}`;
     if (selectedStore.id === "auchan") return `https://www.auchan.fr/recherche?text=${q}`;
@@ -472,12 +472,7 @@ export default function DriveCartModal({
       sendRemoteLog("WEBVIEW_NAV", `URL: ${url}`);
       const match = url.match(/(https?:\/\/[^\/]+\/magasin-[^\/\?#]+)/i);
       if (match && match[1]) {
-        let storeUrl = match[1];
-        if (selectedStore.id === "leclerc") {
-          storeUrl = storeUrl
-            .replace(/https?:\/\/[^\/]*leclercdrive\.fr/i, "https://m-courses.leclercdrive.fr")
-            .replace(/\.aspx.*$/i, "");
-        }
+        let storeUrl = match[1].replace(/\.aspx.*$/i, "").replace(/\/recherche.*$/i, "");
         storeBaseUrlRef.current = storeUrl;
         setCustomStoreUrl(storeUrl);
         AsyncStorage.setItem("@planeat_custom_drive_store_url", storeUrl).catch(() => {});
@@ -490,11 +485,9 @@ export default function DriveCartModal({
         cleanUrl === selectedStore.homeUrl.replace(/\/+$/, "").toLowerCase() ||
         cleanUrl === "https://www.carrefour.fr" ||
         cleanUrl === "https://www.carrefour.fr/drive" ||
-        cleanUrl === "https://www.e.leclerc/recherche-magasin" ||
-        cleanUrl === "https://www.e.leclerc/e/drive" ||
-        cleanUrl === "https://www.e.leclerc" ||
         cleanUrl === "https://www.leclercdrive.fr" ||
-        cleanUrl === "https://m-courses.leclercdrive.fr" ||
+        cleanUrl === "https://courses.leclercdrive.fr" ||
+        cleanUrl === "https://coursesu.com" ||
         cleanUrl === "https://www.coursesu.com" ||
         cleanUrl === "https://www.coursesu.com/drive" ||
         cleanUrl === "https://www.coursesu.com/drive/accueil" ||
@@ -510,7 +503,6 @@ export default function DriveCartModal({
           url.includes("/magasin-") ||
           url.includes("/magasins/") ||
           url.includes("/mag/") ||
-          url.includes("m-courses.leclercdrive.fr/magasin") ||
           url.includes("courses.leclercdrive.fr/magasin") ||
           (selectedStore.id === "carrefour" && (url.includes("/magasins/") || url.includes("/drive/") || url.includes("service_point"))) ||
           (selectedStore.id === "coursesu" && (url.includes("/magasin-") || url.includes("/courses-en-ligne/") || url.includes("/drive-") || url.includes("/drive/"))) ||
@@ -535,19 +527,6 @@ export default function DriveCartModal({
     const targetUrl = getDirectSearchUrl(cleanQ);
     sendRemoteLog("APP_START_SEARCH", `Recherche: "${cleanQ}" (${selectedStore.name}) -> ${targetUrl}`);
 
-    if (selectedStore.id === "leclerc") {
-      const searchJs = `
-        (function() {
-          try {
-            window.location.href = ${JSON.stringify(targetUrl)};
-          } catch(e) {}
-        })();
-        true;
-      `;
-      webViewRef.current?.injectJavaScript(searchJs);
-      return;
-    }
-
     const domSearchJs = `
       (function() {
         try {
@@ -560,7 +539,7 @@ export default function DriveCartModal({
             var forms = document.querySelectorAll('form');
             for (var f = 0; f < forms.length; f++) {
               var formEl = forms[f];
-              var qEl = formEl.querySelector('input[name="q"], input[type="search"], input[name="txtRecherche"], input#txtRecherche, input[name="txtSearch"], input[name="TexteRecherche"], input[name="text"], input[name="query"], input[name="keyword"], input[name="search"], input[placeholder*="recherch" i], input[placeholder*="produit" i], input[placeholder*="article" i], input.search-input, input#search-input');
+              var qEl = formEl.querySelector('input#txtRecherche, input[name="txtRecherche"], input#txtSearch, input[name="txtSearch"], input[name="TexteRecherche"], input[name="q"], input[type="search"], input[name="text"], input[name="query"], input[name="keyword"], input[name="search"], input[placeholder*="recherch" i], input[placeholder*="produit" i], input[placeholder*="article" i], input.search-input, input#search-input');
               if (qEl) {
                 try {
                   qEl.focus();
@@ -574,7 +553,7 @@ export default function DriveCartModal({
                   qEl.dispatchEvent(new Event('change', { bubbles: true }));
                   qEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
                   qEl.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-                  var submitBtn = formEl.querySelector('button[type="submit"], input[type="submit"], button.search-button, button.header-search__btn, button[aria-label*="recherch" i]');
+                  var submitBtn = formEl.querySelector('#btnRechercher, button#btnRechercher, a#btnRechercher, button[type="submit"], input[type="submit"], button.search-button, button.header-search__btn, button[aria-label*="recherch" i]');
                   if (submitBtn) {
                     submitBtn.click();
                     return;
@@ -586,18 +565,21 @@ export default function DriveCartModal({
             }
 
             var selectors = [
-              'input[type="search"]',
-              'input[name="txtRecherche"]',
               'input#txtRecherche',
+              'input[name="txtRecherche"]',
+              'input#txtSearch',
               'input[name="txtSearch"]',
+              'input[name="TexteRecherche"]',
+              'input[type="search"]',
               'input[name="q"]',
               'input[name="keyword"]',
               'input[name="search"]',
               'input#search-input',
-              'input[name="TexteRecherche"]',
               'input[name="text"]',
               'input[name="query"]',
               'input[placeholder*="recherch" i]',
+              'input[placeholder*="produit" i]',
+              'input[placeholder*="article" i]',
               'input[id*="recherche" i]',
               'input[id*="search" i]'
             ];
@@ -617,7 +599,7 @@ export default function DriveCartModal({
                   input.dispatchEvent(new Event('change', { bubbles: true }));
                   input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
                   input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-                  var nearbyBtn = input.parentElement?.querySelector('button') || document.querySelector('button[aria-label*="recherch" i], button.search-button');
+                  var nearbyBtn = input.parentElement?.querySelector('#btnRechercher, button#btnRechercher, a#btnRechercher, button, a') || document.querySelector('#btnRechercher, button[aria-label*="recherch" i], button.search-button');
                   if (nearbyBtn) nearbyBtn.click();
                   return;
                 } catch(errInput) {}
@@ -625,7 +607,11 @@ export default function DriveCartModal({
             }
 
             if (attempts >= 2) {
-              if (${JSON.stringify(selectedStore.id)} !== "intermarche") {
+              if (${JSON.stringify(selectedStore.id)} === "leclerc") {
+                if (targetUrl && targetUrl.includes('/recherche/')) {
+                  window.location.href = targetUrl;
+                }
+              } else if (${JSON.stringify(selectedStore.id)} !== "intermarche") {
                 window.location.href = targetUrl;
               }
               return;
@@ -634,7 +620,11 @@ export default function DriveCartModal({
           }
           trySearch();
         } catch(err) {
-          if (${JSON.stringify(selectedStore.id)} !== "intermarche") {
+          if (${JSON.stringify(selectedStore.id)} === "leclerc") {
+            if (targetUrl && targetUrl.includes('/recherche/')) {
+              window.location.href = targetUrl;
+            }
+          } else if (${JSON.stringify(selectedStore.id)} !== "intermarche") {
             window.location.href = targetUrl;
           }
         }
@@ -862,7 +852,7 @@ export default function DriveCartModal({
                           🏪 Votre magasin Leclerc Drive :
                         </Text>
                         <Text style={[styles.webStoreConfigSub, { color: customStoreUrl ? "#10b981" : "#94a3b8" }]} numberOfLines={1}>
-                          {customStoreUrl ? customStoreUrl : "Non configuré (Recherche globale E.Leclerc)"}
+                          {customStoreUrl ? customStoreUrl : "Non configuré (Détection automatique au choix du Drive)"}
                         </Text>
                       </View>
                       <TouchableOpacity

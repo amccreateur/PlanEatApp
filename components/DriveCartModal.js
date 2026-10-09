@@ -80,21 +80,19 @@ const STORE_DETECTOR_INJECTION_JS = `
   setTimeout(dismissCookieBanners, 400);
   setTimeout(dismissCookieBanners, 1200);
 
-  // Auto-ouverture du choix Drive / code postal sur Auchan si pas encore choisi
+  // Auto-ouverture du choix Drive / code postal sur Auchan uniquement sur la page d'accueil initiale
   try {
-    if (window.location.hostname.includes('auchan.fr')) {
+    if (window.location.hostname.includes('auchan.fr') && (window.location.pathname === '/' || window.location.pathname === '')) {
       setTimeout(function() {
-        var journeyBtn = document.querySelector('.layerTriggerJourneyReminder, button.journey-reminder__initial-choice-button, button.context-header__button, button[aria-label*="Faire mes courses en drive" i], button[data-title="Choisir vos courses" i], button[aria-label*="Choisir mon mode de livraison" i]');
+        if (window.location.search.includes('text=') || window.location.search.includes('redirect_keywords=')) return;
+        var bodyTxt = document.body ? (document.body.innerText || '') : '';
+        if (bodyTxt.includes('Retrait:') || bodyTxt.includes('Retrait :')) return;
+
+        var journeyBtn = document.querySelector('button.journey-reminder__initial-choice-button, .layerTriggerJourneyReminder');
         if (journeyBtn) {
           journeyBtn.click();
         }
-      }, 600);
-      setTimeout(function() {
-        var journeyBtn2 = document.querySelector('.layerTriggerJourneyReminder, button.journey-reminder__initial-choice-button, button[aria-label*="Faire mes courses en drive" i]');
-        if (journeyBtn2) {
-          journeyBtn2.click();
-        }
-      }, 1500);
+      }, 700);
     }
   } catch(eAuchan) {}
 
@@ -513,7 +511,7 @@ export default function DriveCartModal({
         cleanUrl === "https://www.intermarche.com/drive"
       );
 
-      if (!isInitialHome && !url.includes("?q=") && !url.includes("&q=") && !url.includes("?text=")) {
+      if (!isInitialHome && !url.includes("?q=") && !url.includes("&q=") && !url.includes("?text=") && !url.includes("redirect_keywords=")) {
         const isStoreSelected =
           url.includes("/magasin") ||
           url.includes("/mag/") ||

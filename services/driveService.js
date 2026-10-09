@@ -88,9 +88,10 @@ export class DriveService {
     // 4. Supprimer les unités de mesure brutes (ex: "200g de", "1L de")
     cleaned = cleaned.replace(/^(?:\d+[\s\/\.,\d]*\s*)(g|kg|ml|cl|l|c\.à\.s|c\.a\.s|cas|cac|c\.à\.c|c\.a\.c)\s+(d'|d’|de\s+la\s+|de\s+l'|de\s+l’|du\s+|des\s+|de\s+)?/i, "");
 
-    // 5. Supprimer les états de cuisson, préparation et adjectifs qualificatifs (en préservant "crème fraîche")
+    // 5. Supprimer les états de cuisson, préparation et adjectifs qualificatifs (en préservant "crème fraîche" et "petits pois")
     cleaned = cleaned.replace(/(?<!crème\s+)(frais|fraîche|fraiche|fraîches|fraiches)\b/gi, "");
     cleaned = cleaned.replace(/\b(en\s+neige(?:\s+ferme)?|en\s+poudre|en\s+morceaux|en\s+dés|en\s+tranches|en\s+bâtonnets|en\s+rondelles|en\s+cube|en\s+cubes|en\s+boîte|en\s+conserve)\b/gi, "");
+    cleaned = cleaned.replace(/(?<!\bpetits?\s+)(mini|minis|petit|petite|petits|petites|grand|grande|grands|grandes|moyen|moyens|moyenne|moyennes)\b/gi, "");
     cleaned = cleaned.replace(/\b(bio|biologique|surgelé|surgelée|surgelés|surgelées|râpé|râpée|râpés|râpées|émincé|émincée|émincés|émincées|haché|hachée|hachés|hachées|concassé|concassés|coupé|coupés|cuit|cuits|cuite|cuites|grillé|grillée|grillés|grillées|toasté|toastée|toastés|toastées|rôti|rôtie|rôtis|rôties|poêlé|poêlée|poêlés|poêlées|doré|dorée|dorés|dorées|fondant|fondante|fondants|fondantes|moelleux|moelleuse|moelleuses|grec|grecs|grecque|grecques|entier|entiers|nature|maison|extra|vierge\s+extra|au\s+choix|selon\s+goût|environ|égoutté|égouttée|rincé|rincée|pelé|pelée|épluché|épluchée|dénoyauté|dénoyautée|tiède|chaud|chaude|froid|froide|finement|grossièrement|battu|battus|battue|battues|séché|séchée|séchés|séchées|déshydraté|déshydratée|déshydratés|déshydratées|effilé|effilée|effilés|effilées|moulu|moulue|moulus|moulues|concassé|concassée)\b/gi, "");
 
     // 6. Remplacement des pluriels fréquents par leur forme singulière reconnue par les moteurs Drive
@@ -157,6 +158,11 @@ export class DriveService {
       // Suggestions contextuelles supplémentaires
       if (/pita/i.test(primary) && primary !== "Pita") {
         list.push("Pita");
+      }
+      if (/tortilla/i.test(primary)) {
+        list.push("Tortillas");
+        list.push("Fajitas");
+        list.push("Wrap");
       }
       if (/bagel/i.test(primary) && primary !== "Bagel") {
         list.push("Bagel");

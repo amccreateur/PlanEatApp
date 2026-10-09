@@ -306,13 +306,12 @@ export default function DriveCartModal({
   const getDirectSearchUrl = (query) => {
     const clean = (query || getCleanItemName(currentItem) || "").trim();
     const q = encodeURIComponent(clean);
-    const qPlus = encodeURIComponent(clean).replace(/%20/g, "+");
 
     if (selectedStore.id === "leclerc") {
       const base = customStoreUrl || storeBaseUrlRef.current;
       const match = (base || "").match(/magasin-(\d{6})/i);
       if (match && match[1]) {
-        return `https://m-courses.leclercdrive.fr/magasin-${match[1]}/recherche/${qPlus}`;
+        return `https://m-courses.leclercdrive.fr/magasin-${match[1]}/recherche/${q}`;
       }
       return `https://www.leclercdrive.fr`;
     }

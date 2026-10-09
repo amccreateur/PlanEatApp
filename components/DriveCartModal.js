@@ -501,7 +501,7 @@ export default function DriveCartModal({
           url.includes("courses.leclercdrive.fr/magasin") ||
           (selectedStore.id === "carrefour" && (url.includes("/magasin") || url.includes("/drive") || url.includes("/courses") || url.includes("service_point"))) ||
           (selectedStore.id === "coursesu" && (url.includes("/magasin") || url.includes("/courses-en-ligne/") || url.includes("/drive/accueil") || url.includes("/drive-") || url.includes("/drive/"))) ||
-          (selectedStore.id === "auchan" && (url.includes("/magasin") || url.includes("/courses") || url.includes("/achat-") || url.includes("/drive-"))) ||
+          (selectedStore.id === "auchan" && (url.includes("/magasin") || url.includes("/courses") || url.includes("/achat-") || url.includes("/drive") || url.includes("/point-de-retrait") || url.includes("/hypermarche") || url.includes("/supermarche"))) ||
           (selectedStore.id === "intermarche" && (url.includes("/magasin") || url.includes("/pdv/") || url.includes("/rayons") || url.includes("/drive-")));
 
         if (isStoreSelected) {

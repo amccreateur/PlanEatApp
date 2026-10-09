@@ -581,30 +581,79 @@ export default function DriveCartModal({
             var targetUrl = ${JSON.stringify(targetUrl)};
             var attempts = 0;
 
+            function logSearch(status) {
+              try {
+                fetch("http://192.168.1.111:8088/log", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ type: "DOM_SEARCH_" + storeId.toUpperCase(), text: status + ' | query: ' + q })
+                }).catch(function() {});
+              } catch(e) {}
+            }
+
             function tryInputSearch() {
               attempts++;
-              var input = document.querySelector('input[placeholder*="recherch" i], input[type="search"], input[name="q"], input#header-search, input.search-field, input[name="search"], input#q, input[placeholder*="produit" i], input[placeholder*="article" i]');
+              
+              // 1. Chercher un champ visible existant
+              var inputs = document.querySelectorAll('input[placeholder*="recherch" i], input[type="search"], input[name="q"], input#header-search, input.search-field, input[name="search"], input#q, input[placeholder*="produit" i], input[placeholder*="article" i], input.search-input');
+              var input = null;
+              for (var i = 0; i < inputs.length; i++) {
+                if (inputs[i].offsetParent !== null || inputs.length === 1) {
+                  input = inputs[i];
+                  break;
+                }
+              }
+
+              // 2. Si pas d'input visible, tenter d'ouvrir la barre de recherche via l'icône/bouton "Rechercher" du header
+              if (!input) {
+                var searchToggle = document.querySelector('header button[aria-label*="recherch" i], header a[aria-label*="recherch" i], button.header-search, .search-icon, button[data-testid*="search" i]');
+                if (searchToggle) {
+                  searchToggle.click();
+                } else {
+                  var allBtns = document.querySelectorAll('header button, header a');
+                  for (var b = 0; b < allBtns.length; b++) {
+                    var bTxt = (allBtns[b].innerText || allBtns[b].textContent || '').trim().toLowerCase();
+                    if (bTxt === 'rechercher' || bTxt.includes('recherche')) {
+                      allBtns[b].click();
+                      break;
+                    }
+                  }
+                }
+              }
+
+              // 3. Réespérer l'input après clic éventuel
+              if (!input) {
+                input = document.querySelector('input[placeholder*="recherch" i], input[type="search"], input[name="q"], input#header-search, input.search-field, input[name="search"], input#q, input[placeholder*="produit" i], input[placeholder*="article" i]');
+              }
+
               if (input) {
-                input.focus();
-                var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value') ? Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set : null;
-                if (nativeSetter) {
-                  nativeSetter.call(input, q);
-                } else {
-                  input.value = q;
+                try {
+                  input.focus();
+                  var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value') ? Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set : null;
+                  if (nativeSetter) {
+                    nativeSetter.call(input, q);
+                  } else {
+                    input.value = q;
+                  }
+                  input.dispatchEvent(new Event('input', { bubbles: true }));
+                  input.dispatchEvent(new Event('change', { bubbles: true }));
+                  
+                  var form = input.closest('form');
+                  var btn = form ? form.querySelector('button[type="submit"], input[type="submit"], button.header-search__btn, button.search-button, button[aria-label*="recherch" i]') : document.querySelector('button[type="submit"], button[aria-label*="recherch" i]');
+                  
+                  if (btn) {
+                    btn.click();
+                  } else if (form && form.submit) {
+                    form.submit();
+                  } else {
+                    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
+                    input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
+                  }
+                  logSearch('SUCCESS_INPUT_FOUND');
+                  return;
+                } catch(errInput) {
+                  logSearch('ERROR_FILLING_INPUT: ' + errInput.message);
                 }
-                input.dispatchEvent(new Event('input', { bubbles: true }));
-                input.dispatchEvent(new Event('change', { bubbles: true }));
-                var form = input.closest('form');
-                var btn = form ? form.querySelector('button[type="submit"], input[type="submit"], button.header-search__btn, button.search-button, button[aria-label*="recherch" i]') : document.querySelector('button[type="submit"], button[aria-label*="recherch" i]');
-                if (btn) {
-                  btn.click();
-                } else if (form) {
-                  form.submit();
-                } else {
-                  input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-                  input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-                }
-                return;
               }
 
               if (attempts < 6) {
@@ -612,6 +661,7 @@ export default function DriveCartModal({
                 return;
               }
 
+              logSearch('NO_INPUT_FOUND_AFTER_ATTEMPTS');
               if (storeId === "coursesu") {
                 window.location.href = targetUrl;
               }

@@ -110,10 +110,10 @@ const STORE_DETECTOR_INJECTION_JS = `
     } catch(err) {}
   }, true);
 
-  // Masquage CSS non destructif des bannières d'app uniquement (sans supprimer d'éléments du DOM)
+  // Masquage CSS non destructif des bannières smartbanner externes uniquement
   try {
     var cleanStyle = document.createElement('style');
-    cleanStyle.innerHTML = '[class*="smartbanner" i], [id*="smartbanner" i], .smartbanner, .smart-banner, [class*="app-banner" i], [id*="app-banner" i], [class*="download-app" i], [class*="telecharger-app" i], [class*="app-promo" i] { display: none !important; }';
+    cleanStyle.innerHTML = '.smartbanner, .smart-banner, #smartbanner { display: none !important; }';
     (document.head || document.documentElement).appendChild(cleanStyle);
   } catch(eCleanStyle) {}
 
@@ -1237,6 +1237,9 @@ export default function DriveCartModal({
               thirdPartyCookiesEnabled={true}
               domStorageEnabled={true}
               javaScriptEnabled={true}
+              allowsInlineMediaPlayback={true}
+              mediaPlaybackRequiresUserAction={false}
+              mixedContentMode="always"
               incognito={false}
               contentMode="mobile"
               allowsBackForwardNavigationGestures={true}

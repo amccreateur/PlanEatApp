@@ -455,7 +455,7 @@ function MainApp() {
               colors={isPro ? ["#10b981", "#059669"] : ["#f59e0b", "#d97706"]}
               style={styles.proHeaderGradient}
             >
-              <Ionicons name={isPro ? "checkmark-circle" : "star"} size={13} color="#ffffff" />
+              {isPro && <Ionicons name="checkmark-circle" size={13} color="#ffffff" />}
               <Text style={styles.proHeaderText}>{isPro ? "PRO" : "⭐ PRO"}</Text>
             </LinearGradient>
           </TouchableOpacity>

@@ -104,7 +104,21 @@ function MainApp() {
       setCurrentPlan(savedPlan);
       setSelectedDurationWeeks(savedPlan.durationWeeks || 1);
       const savedGroceries = await StorageService.getGroceries();
-      setGroceries(savedGroceries.length > 0 ? savedGroceries : AIPlannerService.compileGroceries(savedPlan));
+      const compiled = AIPlannerService.compileGroceries(savedPlan);
+      // Conserver l'état coché des articles et les articles personnalisés
+      const checkedNames = new Set(
+        (savedGroceries || [])
+          .filter(g => g.checked)
+          .map(g => (g.name?.fr || g.customName || "").toLowerCase().trim())
+      );
+      const customItems = (savedGroceries || []).filter(g => g.id && g.id.startsWith("custom_"));
+      const consolidated = compiled.map(c => ({
+        ...c,
+        checked: checkedNames.has((c.name?.fr || "").toLowerCase().trim())
+      }));
+      const fullList = [...customItems, ...consolidated];
+      setGroceries(fullList);
+      StorageService.saveGroceries(fullList);
     }
 
     // Premier lancement : si l'onboarding n'est pas fait, ouvrir la configuration

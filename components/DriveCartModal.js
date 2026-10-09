@@ -1344,26 +1344,10 @@ export default function DriveCartModal({
         <View style={[styles.header, { backgroundColor: theme.headerBg, borderBottomColor: theme.border }]}>
           <View style={styles.headerTopRow}>
             <View style={styles.brandTitleBox}>
-              <TouchableOpacity
-                style={[styles.radialHubPill, { backgroundColor: selectedStore.color }]}
-                onPress={openRadialMenu}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.brandEmoji}>{selectedStore.logoEmoji}</Text>
-                <Ionicons name="apps-outline" size={13} color="#ffffff" style={{ marginLeft: 3 }} />
-              </TouchableOpacity>
-
+              <Text style={styles.brandEmoji}>{selectedStore.logoEmoji}</Text>
               <View>
-                <TouchableOpacity
-                  style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
-                  onPress={openRadialMenu}
-                  activeOpacity={0.7}
-                >
-                  <Text style={[styles.storeNameText, { color: theme.text }]}>{selectedStore.name}</Text>
-                  <Ionicons name="chevron-down-circle-outline" size={14} color="#38bdf8" />
-                </TouchableOpacity>
-
-                {!isSelectingStore ? (
+                <Text style={[styles.storeNameText, { color: theme.text }]}>{selectedStore.name}</Text>
+                {!isSelectingStore && (
                   <TouchableOpacity
                     style={styles.changeStoreInlineChip}
                     onPress={handleChangeStore}
@@ -1371,8 +1355,6 @@ export default function DriveCartModal({
                     <Ionicons name="swap-horizontal" size={11} color="#38bdf8" />
                     <Text style={styles.changeStoreInlineText}>Changer de magasin</Text>
                   </TouchableOpacity>
-                ) : (
-                  <Text style={[styles.subTitleText, { color: theme.textSub }]}>Choix du Drive</Text>
                 )}
               </View>
             </View>
@@ -1431,14 +1413,6 @@ export default function DriveCartModal({
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.storeChipsScroll}
               >
-                <TouchableOpacity
-                  style={[styles.storeChip, { backgroundColor: "#0284c7", borderColor: "#38bdf8" }]}
-                  onPress={openRadialMenu}
-                >
-                  <Text style={styles.storeChipEmoji}>🏪</Text>
-                  <Text style={[styles.storeChipTextActive, { fontWeight: "800" }]}>Roue Drive</Text>
-                </TouchableOpacity>
-
                 {DRIVE_STORES.map((store) => {
                   const isSelected = selectedStore.id === store.id;
                   return (

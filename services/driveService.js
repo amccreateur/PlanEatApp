@@ -34,7 +34,7 @@ export const DRIVE_STORES = [
     badgeColor: "#ffffff",
     textColor: "#ffffff",
     homeUrl: "https://www.coursesu.com/drive/home",
-    searchUrl: (query) => `https://www.coursesu.com/search?q=${encodeURIComponent(query)}`,
+    searchUrl: (query) => `https://www.coursesu.com/recherche?q=${encodeURIComponent(query)}`,
     logoEmoji: "🔷"
   },
   {

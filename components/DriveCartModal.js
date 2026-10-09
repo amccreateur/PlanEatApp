@@ -104,11 +104,14 @@ const STORE_DETECTOR_INJECTION_JS = `
 
       var isStoreActive = (
         // Auchan
-        (url.includes('auchan.fr') && (bodyText.includes('Retrait:') || bodyText.includes('Retrait :') || bodyText.includes('Retrait en drive') || bodyText.includes('supermarché') || bodyText.includes('hypermarché'))) ||
+        (url.includes('auchan.fr') && (bodyText.includes('Retrait:') || bodyText.includes('Retrait :') || bodyText.includes('Retrait en drive'))) ||
         // Leclerc
         (url.includes('leclercdrive.fr') && (url.includes('/magasin-') || bodyText.includes('mon drive') || bodyText.includes('mon magasin'))) ||
-        // Courses U
-        (url.includes('coursesu.com') && (url.includes('/drive-') || bodyText.includes('bienvenue au drive') || bodyText.includes('super u') || bodyText.includes('hyper u') || bodyText.includes('u express'))) ||
+        // Courses U (exclusion stricte des URLs d'accueil et pas de détection sur texte générique de footer)
+        (url.includes('coursesu.com') && (
+          (url.includes('/drive-') && !url.includes('/drive/home') && !url.includes('/drive/accueil')) ||
+          url.includes('/courses-en-ligne/magasin-')
+        )) ||
         // Carrefour
         (url.includes('carrefour.fr') && (url.includes('/magasin') || bodyText.includes('mon magasin') || bodyText.includes('mon drive'))) ||
         // Intermarché
@@ -254,6 +257,7 @@ export default function DriveCartModal({
   const [searchQuery, setSearchQuery] = useState("");
   const [isSelectingStore, setIsSelectingStore] = useState(true);
   const isSelectingStoreRef = useRef(true);
+  const ignoreAutoDetectUntilRef = useRef(0);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
   useEffect(() => {
@@ -379,7 +383,7 @@ export default function DriveCartModal({
     }
     if (selectedStore.id === "carrefour") return `https://www.carrefour.fr/s?q=${q}`;
     if (selectedStore.id === "auchan") return `https://www.auchan.fr/recherche?text=${q}`;
-    if (selectedStore.id === "coursesu") return `https://www.coursesu.com/search?q=${q}`;
+    if (selectedStore.id === "coursesu") return `https://www.coursesu.com/recherche?q=${q}`;
     if (selectedStore.id === "intermarche") return `https://www.google.com/search?q=${encodeURIComponent("Intermarché Drive " + clean)}`;
     return `https://www.google.com/search?q=${encodeURIComponent(selectedStore.name + " " + clean)}`;
   };
@@ -490,7 +494,7 @@ export default function DriveCartModal({
     try {
       const data = JSON.parse(event.nativeEvent.data);
       if (data && data.type === "STORE_SELECTED") {
-        if (isSelectingStoreRef.current) {
+        if (isSelectingStoreRef.current && Date.now() >= ignoreAutoDetectUntilRef.current) {
           triggerStoreSelectionSuccess(data.url);
         }
       }
@@ -513,7 +517,7 @@ export default function DriveCartModal({
         return;
       }
       const match = url.match(/(https?:\/\/[^\/]+\/(?:magasin-[^\/\?#]+|drive-[^\/\?#]+))/i);
-      if (match && match[1] && !match[1].includes("erreur") && !match[1].includes("pgeWCSD")) {
+      if (match && match[1] && !match[1].includes("erreur") && !match[1].includes("pgeWCSD") && !match[1].includes("/drive/home") && !match[1].includes("/drive/accueil")) {
         let storeUrl = match[1].replace(/\.aspx.*$/i, "").replace(/\/recherche.*$/i, "");
         storeBaseUrlRef.current = storeUrl;
         setCustomStoreUrl(storeUrl);
@@ -522,6 +526,9 @@ export default function DriveCartModal({
     }
 
     if (isSelectingStoreRef.current && url) {
+      if (Date.now() < ignoreAutoDetectUntilRef.current) {
+        return;
+      }
       const cleanUrl = url.replace(/\/+$/, "").toLowerCase();
       const isInitialHome = (
         cleanUrl === selectedStore.homeUrl.replace(/\/+$/, "").toLowerCase() ||
@@ -536,6 +543,7 @@ export default function DriveCartModal({
         cleanUrl === "https://www.coursesu.com/drive/home" ||
         cleanUrl === "https://www.coursesu.com/home" ||
         cleanUrl === "https://www.coursesu.com/drive/accueil" ||
+        cleanUrl === "https://www.coursesu.com/recherche-magasins" ||
         cleanUrl === "https://www.auchan.fr" ||
         cleanUrl === "https://www.auchan.fr/courses" ||
         cleanUrl === "https://www.auchan.fr/drive" ||
@@ -546,12 +554,15 @@ export default function DriveCartModal({
 
       if (!isInitialHome && !url.includes("?q=") && !url.includes("&q=") && !url.includes("?text=") && !url.includes("redirect_keywords=")) {
         const isStoreSelected =
-          url.includes("/magasin") ||
+          url.includes("/magasin-") ||
           url.includes("/mag/") ||
           url.includes("courses.leclercdrive.fr/magasin") ||
-          (selectedStore.id === "carrefour" && (url.includes("/magasin") || url.includes("/drive") || url.includes("/courses") || url.includes("service_point"))) ||
-          (selectedStore.id === "coursesu" && (url.includes("/magasin") || url.includes("/courses-en-ligne/") || url.includes("/drive/accueil") || url.includes("/drive-") || url.includes("/drive/"))) ||
-          (selectedStore.id === "auchan" && (url.includes("/magasin") || url.includes("/courses") || url.includes("/achat-") || url.includes("/drive") || url.includes("/point-de-retrait") || url.includes("/hypermarche") || url.includes("/supermarche"))) ||
+          (selectedStore.id === "carrefour" && (url.includes("/magasin") || (url.includes("/drive") && !url.endsWith("/drive")) || url.includes("service_point"))) ||
+          (selectedStore.id === "coursesu" && (
+            (url.includes("/drive-") && !url.includes("/drive/home") && !url.includes("/drive/accueil") && !url.includes("/drive/")) ||
+            url.includes("/courses-en-ligne/")
+          )) ||
+          (selectedStore.id === "auchan" && (url.includes("/magasin") || url.includes("/achat-") || (url.includes("/drive") && !url.endsWith("/drive")) || url.includes("/point-de-retrait") || url.includes("/hypermarche") || url.includes("/supermarche"))) ||
           (selectedStore.id === "intermarche" && (url.includes("/magasin") || url.includes("/pdv/") || url.includes("/rayons") || url.includes("/drive-")));
 
         if (isStoreSelected) {
@@ -718,6 +729,7 @@ export default function DriveCartModal({
   };
 
   const handleSelectStore = (store) => {
+    ignoreAutoDetectUntilRef.current = Date.now() + 4000;
     setSelectedStore(store);
     setCustomStoreUrl("");
     storeBaseUrlRef.current = "";
@@ -727,6 +739,7 @@ export default function DriveCartModal({
     dismissAllKeyboards();
     sendRemoteLog("STORE_SWITCHED", `Passage à ${store.name} -> ${store.homeUrl}`);
     AsyncStorage.setItem("@planeat_preferred_drive_store", store.id).catch(() => {});
+    AsyncStorage.removeItem("@planeat_custom_drive_store_url").catch(() => {});
 
     const navJs = `
       (function() {
@@ -740,6 +753,7 @@ export default function DriveCartModal({
   };
 
   const handleChangeStore = () => {
+    ignoreAutoDetectUntilRef.current = Date.now() + 6000;
     isSelectingStoreRef.current = true;
     setIsSelectingStore(true);
     setCustomStoreUrl("");
@@ -747,6 +761,8 @@ export default function DriveCartModal({
     setCurrentUrl(selectedStore.homeUrl);
     dismissAllKeyboards();
     sendRemoteLog("CHANGE_STORE_CLICKED", `Changer de magasin pour ${selectedStore.name} -> ${selectedStore.homeUrl}`);
+    AsyncStorage.removeItem("@planeat_custom_drive_store_url").catch(() => {});
+
     const navJs = `
       (function() {
         try {

@@ -555,16 +555,16 @@ export class AIPlannerService {
       return { canonKey: "canon_pate_brisee", name: { fr: "Pâte brisée", en: "Shortcrust pastry", ar: "عجينة مكسرة" }, unit: "", dept: "deptBakery", multiplier: 1 };
     }
     if (lower.includes("brioche")) {
-      return { canonKey: "canon_brioche", name: { fr: "Brioche", en: "Brioche", ar: "بريوش" }, unit: "", dept: "deptBakery", multiplier: 1 };
+      return { canonKey: "canon_brioche", name: { fr: "Tranches de brioche", en: "Brioche slices", ar: "شرائح بريوش" }, unit: "tranches", dept: "deptBakery", multiplier: 1 };
     }
     if (lower.includes("seigle")) {
-      return { canonKey: "canon_pain_seigle", name: { fr: "Pain de seigle", en: "Rye bread", ar: "خبز الجاودار" }, unit: "", dept: "deptBakery", multiplier: 1 };
+      return { canonKey: "canon_pain_seigle", name: { fr: "Pain de seigle", en: "Rye bread", ar: "خبز الجاودار" }, unit: "tranches", dept: "deptBakery", multiplier: 1 };
     }
     if (lower.includes("campagne")) {
-      return { canonKey: "canon_pain_campagne", name: { fr: "Pain de campagne", en: "Country bread", ar: "خبز ريفي" }, unit: "", dept: "deptBakery", multiplier: 1 };
+      return { canonKey: "canon_pain_campagne", name: { fr: "Pain de campagne", en: "Country bread", ar: "خبز ريفي" }, unit: "tranches", dept: "deptBakery", multiplier: 1 };
     }
     if (lower.includes("pain de mie") || lower.includes("pain complet") || lower.includes("pain traditionnel") || lower === "pain") {
-      return { canonKey: "canon_pain_complet", name: { fr: "Pain complet", en: "Whole wheat bread", ar: "خبز كامل" }, unit: "", dept: "deptBakery", multiplier: 1 };
+      return { canonKey: "canon_pain_complet", name: { fr: "Pain complet", en: "Whole wheat bread", ar: "خبز كامل" }, unit: "tranches", dept: "deptBakery", multiplier: 1 };
     }
     if (lower.includes("galette") && lower.includes("riz")) {
       return { canonKey: "canon_galettes_riz", name: { fr: "Galettes de riz soufflé", en: "Rice cakes", ar: "كعك الأرز" }, unit: "", dept: "deptBakery", multiplier: 1 };
@@ -692,7 +692,7 @@ export class AIPlannerService {
     if (/\bbeurre\b/.test(lower) && !lower.includes("cacahuete") && !lower.includes("amande")) {
       return { canonKey: "canon_beurre", name: { fr: "Beurre doux", en: "Butter", ar: "زبدة" }, unit: "g", dept: "deptDairy", multiplier: 1 };
     }
-    if (lower.includes("creme fraiche") || lower.includes("creme liquide") || lower.includes("creme legere") || lower.includes("creme fleurette") || lower.includes("creme entiere") || lower.includes("creme")) {
+    if ((lower.includes("creme fraiche") || lower.includes("creme liquide") || lower.includes("creme legere") || lower.includes("creme fleurette") || lower.includes("creme entiere") || /\bcreme\b/.test(lower)) && !lower.includes("ecreme") && !lower.includes("lait") && !lower.includes("coco")) {
       return { canonKey: "canon_creme_fraiche", name: { fr: "Crème fraîche liquide", en: "Single cream", ar: "كريمة طازجة" }, unit: "ml", dept: "deptDairy", multiplier: unit === "c.à.s" ? 15 : (unit === "L" ? 1000 : 1) };
     }
     if (lower.includes("lait d'amande") || lower.includes("lait amande")) {
@@ -967,10 +967,16 @@ export class AIPlannerService {
     if (lower.includes("coulis de tomate") || lower.includes("pulpe de tomate") || lower.includes("sauce tomate") || lower.includes("tomates concassees") || lower.includes("concentre de tomate") || lower === "concentre" || lower === "coulis") {
       return { canonKey: "canon_coulis_tomate", name: { fr: "Coulis de tomate", en: "Tomato coulis", ar: "صلصة طماطم" }, unit: "g", dept: "deptPantry", multiplier: unit === "ml" ? 1 : 1 };
     }
-    if (lower.includes("olive") && lower.includes("noire")) {
+    if (lower.includes("huile d'olive") || lower.includes("huile olive")) {
+      return { canonKey: "canon_huile_olive", name: { fr: "Huile d'olive", en: "Olive oil", ar: "زيت زيتون" }, unit: "c.à.s", dept: "deptPantry", multiplier: unit === "ml" ? 0.067 : (unit === "c.à.c" ? 0.33 : 1) };
+    }
+    if (lower.includes("huile de sesame")) {
+      return { canonKey: "canon_huile_sesame", name: { fr: "Huile de sésame", en: "Sesame oil", ar: "زيت سمسم" }, unit: "c.à.s", dept: "deptPantry", multiplier: unit === "c.à.c" ? 0.33 : 1 };
+    }
+    if (lower.includes("olive") && lower.includes("noire") && !lower.includes("huile")) {
       return { canonKey: "canon_olives_noires", name: { fr: "Olives noires", en: "Black olives", ar: "زيتون أسود" }, unit: "g", dept: "deptPantry", multiplier: 1 };
     }
-    if (lower.includes("olive")) {
+    if (lower.includes("olive") && !lower.includes("huile")) {
       return { canonKey: "canon_olives_vertes", name: { fr: "Olives vertes", en: "Green olives", ar: "زيتون أخضر" }, unit: "g", dept: "deptPantry", multiplier: 1 };
     }
     if (lower.includes("capre")) {
@@ -1306,21 +1312,29 @@ export class AIPlannerService {
 
     const result = Object.values(itemsMap).map(item => {
       let rounded = item.totalQuantity;
-      if (item.unit === "g" || item.unit === "ml") {
+      const u = (item.unit || "").trim().toLowerCase();
+
+      if (u === "g" || u === "ml") {
         if (item.totalQuantity < 10 && item.totalQuantity > 0) {
           rounded = Math.ceil(item.totalQuantity);
         } else {
-          rounded = Math.round(item.totalQuantity / 10) * 10;
+          rounded = Math.ceil(item.totalQuantity / 5) * 5;
         }
-      } else {
+      } else if (u === "c.à.s" || u === "c.à.c") {
+        rounded = Math.ceil(item.totalQuantity * 2) / 2;
+      } else if (u === "l" || u === "kg") {
         rounded = Math.round(item.totalQuantity * 10) / 10;
-        if (rounded === 0 && item.totalQuantity > 0) {
-          rounded = Math.round(item.totalQuantity * 100) / 100;
-        }
+        if (rounded === 0 && item.totalQuantity > 0) rounded = 0.1;
+      } else {
+        // Unités discrètes / comptables (pièces, tranches, etc.) : toujours un nombre entier supérieur ou égal à 1
+        rounded = Math.ceil(item.totalQuantity);
       }
+
+      const minQty = (u === "g" || u === "ml" || u === "l" || u === "kg" || u === "c.à.s" || u === "c.à.c") ? 0.1 : 1;
+
       return {
         ...item,
-        totalQuantity: Math.max(0.1, rounded)
+        totalQuantity: Math.max(minQty, rounded)
       };
     });
 

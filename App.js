@@ -154,6 +154,8 @@ function MainApp() {
     activeLang = lang
   ) => {
     setIsGenerating(true);
+    // Déclencher la pub interstitielle pendant la génération pour masquer le temps d'attente
+    adService.showInterstitial({ minIntervalSeconds: 20 });
     try {
       const { plan, groceries: compiledGroceries, error } = await AIPlannerService.generateMealPlan(
         customProfile,
@@ -177,7 +179,6 @@ function MainApp() {
       Alert.alert("Erreur", err.message || "Erreur inconnue");
     } finally {
       setIsGenerating(false);
-      adService.showInterstitial({ minIntervalSeconds: 20 });
     }
   };
 

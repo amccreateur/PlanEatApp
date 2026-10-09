@@ -59,7 +59,6 @@ const STORE_DETECTOR_INJECTION_JS = `
     var curHref = (window.location.href || '').toLowerCase();
     if (
       curHref.includes('erreur.aspx') ||
-      curHref.includes('pgewcsd') ||
       curHref.includes('/erreur-404') ||
       curHref.includes('/page-non-trouvee')
     ) {
@@ -507,13 +506,12 @@ export default function DriveCartModal({
     if (url) {
       sendRemoteLog("WEBVIEW_NAV", `URL: ${url}`);
       if (
-        url.includes("pgeWCSD") ||
         url.includes("Erreur.aspx") ||
         url.includes("/404") ||
         url.includes("page-introuvable") ||
         url.includes("/erreur-404")
       ) {
-        if (url.includes("pgeWCSD") || url.includes("Erreur.aspx")) {
+        if (url.includes("Erreur.aspx")) {
           sendRemoteLog("AUTO_REDIRECT", "Récupération vers https://www.leclercdrive.fr");
           setCurrentUrl("https://www.leclercdrive.fr");
           return;
@@ -560,6 +558,7 @@ export default function DriveCartModal({
           url.includes("/magasin-") ||
           url.includes("/magasins/") ||
           url.includes("m-courses.leclercdrive.fr/magasin") ||
+          url.includes("courses.leclercdrive.fr/magasin") ||
           (selectedStore.id === "carrefour" && (url.includes("/magasins/") || url.includes("/drive/") || url.includes("service_point"))) ||
           (selectedStore.id === "coursesu" && (url.includes("/magasin-") || url.includes("/courses-en-ligne/") || url.includes("/drive-") || url.includes("/drive/"))) ||
           (selectedStore.id === "auchan" && (url.includes("/magasin") || url.includes("/courses") || url.includes("/achat-") || url.includes("/drive-"))) ||

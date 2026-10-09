@@ -42,6 +42,11 @@ const STORE_DETECTOR_INJECTION_JS = `
   if (window.__planeatDetectorActive) return;
   window.__planeatDetectorActive = true;
 
+  // Empêcher les scripts de redirection d'erreur intempestifs (ex: WCTD610 sur Leclerc Drive)
+  try {
+    window.onerror = function() { return true; };
+  } catch(e) {}
+
   function emitStoreChosen(reason) {
     try {
       if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
@@ -54,7 +59,7 @@ const STORE_DETECTOR_INJECTION_JS = `
     } catch(e) {}
   }
 
-  // Interception des clics sur les boutons / liens de choix de Drive ou magasin
+  // Interception passive des clics utilisateur sur les boutons de choix de magasin / Drive
   document.addEventListener('click', function(e) {
     try {
       var el = e.target;
@@ -105,59 +110,14 @@ const STORE_DETECTOR_INJECTION_JS = `
     } catch(err) {}
   }, true);
 
-  // Auto-sélection de l'onglet "Drive" prioritaire si un choix (Drive / Livraison) apparaît
-  try {
-    var driveTabs = document.querySelectorAll('button, a, div[role="tab"], input[type="radio"]');
-    for (var d = 0; d < driveTabs.length; d++) {
-      var tabText = (driveTabs[d].innerText || driveTabs[d].textContent || driveTabs[d].getAttribute('aria-label') || '').trim().toLowerCase();
-      if (tabText === 'drive' || tabText === 'retrait drive' || tabText === 'leclerc drive' || tabText === 'auchan drive') {
-        if (!driveTabs[d].classList.contains('active') && !driveTabs[d].getAttribute('aria-selected')) {
-          driveTabs[d].click();
-        }
-        break;
-      }
-    }
-  } catch(eDrive) {}
-
-  // Masquage automatique des bannières d'app, cookies, hopla et popups intrusifs
+  // Masquage CSS non destructif des bannières d'app uniquement (sans supprimer d'éléments du DOM)
   try {
     var cleanStyle = document.createElement('style');
-    cleanStyle.innerHTML = '[class*="hopla" i], [id*="hopla" i], [data-testid*="hopla" i], [class*="smartbanner" i], [id*="smartbanner" i], .smartbanner, .smart-banner, [class*="app-banner" i], [id*="app-banner" i], [class*="app_banner" i], [class*="download-app" i], [class*="telecharger-app" i], [class*="app-promo" i], #onetrust-banner-sdk, #onetrust-consent-sdk, .didomi-popup-container, .tc-privacy-wrapper, #axeptio_overlay, #popin_tc_privacy_container { display: none !important; visibility: hidden !important; pointer-events: none !important; }';
+    cleanStyle.innerHTML = '[class*="smartbanner" i], [id*="smartbanner" i], .smartbanner, .smart-banner, [class*="app-banner" i], [id*="app-banner" i], [class*="download-app" i], [class*="telecharger-app" i], [class*="app-promo" i] { display: none !important; }';
     (document.head || document.documentElement).appendChild(cleanStyle);
   } catch(eCleanStyle) {}
 
-  // Viewport adaptation pour éviter tout débordement horizontal ou zoom excessif
-  try {
-    var metaVp = document.querySelector('meta[name="viewport"]');
-    if (!metaVp) {
-      metaVp = document.createElement('meta');
-      metaVp.name = 'viewport';
-      (document.head || document.documentElement).appendChild(metaVp);
-    }
-    metaVp.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes';
-  } catch(eVp) {}
-
-  function dismissOverlays() {
-    try {
-      var popups = document.querySelectorAll('[class*="hopla" i], [id*="hopla" i], [class*="smartbanner" i], #onetrust-consent-sdk, .onetrust-pc-dark-filter, .modal-backdrop, .didomi-popup-backdrop, [class*="backdrop" i], [id*="backdrop" i], #popin_tc_privacy_container_filter, .tc-privacy-wrapper');
-      for (var h = 0; h < popups.length; h++) {
-        popups[h].remove();
-      }
-      if (document.body) {
-        document.body.style.overflow = 'auto';
-        document.body.style.pointerEvents = 'auto';
-      }
-      if (document.documentElement) {
-        document.documentElement.style.overflow = 'auto';
-        document.documentElement.style.pointerEvents = 'auto';
-      }
-    } catch(eDismiss) {}
-  }
-  dismissOverlays();
-  setTimeout(dismissOverlays, 600);
-  setTimeout(dismissOverlays, 1800);
-
-  // Surveillance périodique de l'URL ou du DOM (SPA / redirections)
+  // Surveillance périodique de l'URL pour détecter l'arrivée sur la page magasin
   var checkCount = 0;
   var interval = setInterval(function() {
     checkCount++;
@@ -167,7 +127,7 @@ const STORE_DETECTOR_INJECTION_JS = `
       if (
         url.includes('/magasin-') ||
         url.includes('/magasins/') ||
-        url.includes('m-courses.leclercdrive.fr/magasin') ||
+        url.includes('courses.leclercdrive.fr/magasin') ||
         url.includes('/courses-en-ligne/') ||
         url.includes('/pdv/') ||
         url.includes('/rayons') ||
@@ -470,8 +430,15 @@ export default function DriveCartModal({
     const url = navState.url || "";
     if (url) {
       sendRemoteLog("WEBVIEW_NAV", `URL: ${url}`);
+      if (url.includes("pgeWCSD") || url.includes("Erreur.aspx")) {
+        sendRemoteLog("RECOVERING_FROM_ERROR_PAGE", url);
+        setTimeout(() => {
+          webViewRef.current?.injectJavaScript(`window.location.href = "https://www.leclercdrive.fr/"; true;`);
+        }, 600);
+        return;
+      }
       const match = url.match(/(https?:\/\/[^\/]+\/magasin-[^\/\?#]+)/i);
-      if (match && match[1]) {
+      if (match && match[1] && !match[1].includes("erreur") && !match[1].includes("pgeWCSD")) {
         let storeUrl = match[1].replace(/\.aspx.*$/i, "").replace(/\/recherche.*$/i, "");
         storeBaseUrlRef.current = storeUrl;
         setCustomStoreUrl(storeUrl);

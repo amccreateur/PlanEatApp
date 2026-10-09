@@ -11,7 +11,7 @@ export const DRIVE_STORES = [
     color: "#0066c0",
     badgeColor: "#ffcc00",
     textColor: "#ffffff",
-    homeUrl: "https://www.e.leclerc/e/drive",
+    homeUrl: "https://www.e.leclerc/recherche-magasin",
     searchUrl: (query) => `https://www.e.leclerc/recherche?q=${encodeURIComponent(query)}`,
     logoEmoji: "🔵"
   },

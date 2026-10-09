@@ -383,7 +383,7 @@ export default function DriveCartModal({
       if (base && base.includes("e.leclerc")) {
         return `${base.replace(/\/+$/, "")}/recherche?q=${q}`;
       }
-      return `https://www.leclercdrive.fr/`;
+      return `https://www.e.leclerc/recherche?q=${q}`;
     }
     if (selectedStore.id === "carrefour") return `https://www.carrefour.fr/s?q=${q}`;
     if (selectedStore.id === "auchan") return `https://www.auchan.fr/recherche?text=${q}`;
@@ -547,6 +547,7 @@ export default function DriveCartModal({
         cleanUrl === selectedStore.homeUrl.replace(/\/+$/, "").toLowerCase() ||
         cleanUrl === "https://www.carrefour.fr" ||
         cleanUrl === "https://www.carrefour.fr/drive" ||
+        cleanUrl === "https://www.e.leclerc/recherche-magasin" ||
         cleanUrl === "https://www.e.leclerc/e/drive" ||
         cleanUrl === "https://www.e.leclerc" ||
         cleanUrl === "https://www.leclercdrive.fr" ||

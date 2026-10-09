@@ -379,8 +379,8 @@ export default function DriveCartModal({
     }
     if (selectedStore.id === "carrefour") return `https://www.carrefour.fr/s?q=${q}`;
     if (selectedStore.id === "auchan") return `https://www.auchan.fr/recherche?text=${q}`;
-    if (selectedStore.id === "coursesu") return `https://www.coursesu.com/recherche?q=${q}`;
-    if (selectedStore.id === "intermarche") return `https://www.intermarche.com/recherche?q=${q}`;
+    if (selectedStore.id === "coursesu") return `https://www.coursesu.com/search?q=${q}`;
+    if (selectedStore.id === "intermarche") return `https://www.google.com/search?q=${encodeURIComponent("Intermarché Drive " + clean)}`;
     return `https://www.google.com/search?q=${encodeURIComponent(selectedStore.name + " " + clean)}`;
   };
 
@@ -577,33 +577,47 @@ export default function DriveCartModal({
         (function() {
           try {
             var q = ${JSON.stringify(cleanQ)};
-            var input = document.querySelector('input[placeholder*="recherch" i], input[type="search"], input[name="q"], input#header-search, input.search-field, input[name="search"], input#q');
-            if (input) {
-              input.focus();
-              var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value') ? Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set : null;
-              if (nativeSetter) {
-                nativeSetter.call(input, q);
-              } else {
-                input.value = q;
+            var storeId = ${JSON.stringify(selectedStore.id)};
+            var targetUrl = ${JSON.stringify(targetUrl)};
+            var attempts = 0;
+
+            function tryInputSearch() {
+              attempts++;
+              var input = document.querySelector('input[placeholder*="recherch" i], input[type="search"], input[name="q"], input#header-search, input.search-field, input[name="search"], input#q, input[placeholder*="produit" i], input[placeholder*="article" i]');
+              if (input) {
+                input.focus();
+                var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value') ? Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set : null;
+                if (nativeSetter) {
+                  nativeSetter.call(input, q);
+                } else {
+                  input.value = q;
+                }
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+                var form = input.closest('form');
+                var btn = form ? form.querySelector('button[type="submit"], input[type="submit"], button.header-search__btn, button.search-button, button[aria-label*="recherch" i]') : document.querySelector('button[type="submit"], button[aria-label*="recherch" i]');
+                if (btn) {
+                  btn.click();
+                } else if (form) {
+                  form.submit();
+                } else {
+                  input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
+                  input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
+                }
+                return;
               }
-              input.dispatchEvent(new Event('input', { bubbles: true }));
-              input.dispatchEvent(new Event('change', { bubbles: true }));
-              var form = input.closest('form');
-              var btn = form ? form.querySelector('button[type="submit"], input[type="submit"], button.header-search__btn, button.search-button, button[aria-label*="recherch" i]') : document.querySelector('button[type="submit"], button[aria-label*="recherch" i]');
-              if (btn) {
-                btn.click();
-              } else if (form) {
-                form.submit();
-              } else {
-                input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-                input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
+
+              if (attempts < 6) {
+                setTimeout(tryInputSearch, 400);
+                return;
               }
-            } else {
-              window.location.href = ${JSON.stringify(targetUrl)};
+
+              if (storeId === "coursesu") {
+                window.location.href = targetUrl;
+              }
             }
-          } catch(e) {
-            window.location.href = ${JSON.stringify(targetUrl)};
-          }
+            tryInputSearch();
+          } catch(e) {}
         })();
         true;
       `;

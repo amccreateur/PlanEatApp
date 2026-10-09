@@ -44,7 +44,7 @@ export const DRIVE_STORES = [
     color: "#e1001a",
     badgeColor: "#22c55e",
     textColor: "#ffffff",
-    homeUrl: "https://www.auchan.fr/courses",
+    homeUrl: "https://www.auchan.fr/",
     searchUrl: (query) => `https://www.auchan.fr/recherche?text=${encodeURIComponent(query)}`,
     logoEmoji: "🟢"
   },

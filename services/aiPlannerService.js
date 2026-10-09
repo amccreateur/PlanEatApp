@@ -513,6 +513,9 @@ export class AIPlannerService {
   /**
    * Détermine la clé et le nom canoniques pour un ingrédient
    */
+  /**
+   * Détermine la clé et le nom canoniques pour un ingrédient
+   */
   static getCanonicalGrocery(rawName, rawUnit, rawDept) {
     const name = (rawName || "").trim();
     const unit = this.normalizeGroceryUnit(rawUnit);
@@ -539,7 +542,215 @@ export class AIPlannerService {
       };
     }
 
-    // 2. BŒUF HACHÉ / STEAK HACHÉ
+    // 2. CONCOMBRE
+    if (/\bconcombres?\b/.test(lower) && !lower.includes("tzatziki")) {
+      let mult = 1;
+      if (unit === "g") mult = 0.005; // 200g ~ 1 concombre (100g = 0.5)
+      return {
+        canonKey: "canon_concombre",
+        name: { fr: "Concombre", en: "Cucumber", ar: "خيار" },
+        unit: "",
+        dept: "deptProduce",
+        multiplier: mult
+      };
+    }
+
+    // 3. COURGETTE
+    if (/\bcourgettes?\b/.test(lower)) {
+      let mult = 1;
+      if (unit === "g") mult = 0.005; // 200g ~ 1 courgette
+      return {
+        canonKey: "canon_courgette",
+        name: { fr: "Courgette", en: "Zucchini", ar: "كوسة" },
+        unit: "",
+        dept: "deptProduce",
+        multiplier: mult
+      };
+    }
+
+    // 4. AUBERGINE
+    if (/\baubergines?\b/.test(lower)) {
+      let mult = 1;
+      if (unit === "g") mult = 0.004; // 250g ~ 1 aubergine
+      return {
+        canonKey: "canon_aubergine",
+        name: { fr: "Aubergine", en: "Eggplant", ar: "باذنجان" },
+        unit: "",
+        dept: "deptProduce",
+        multiplier: mult
+      };
+    }
+
+    // 5. POIVRON
+    if (/\bpoivrons?\b/.test(lower)) {
+      let mult = 1;
+      if (unit === "g") mult = 0.007; // 150g ~ 1 poivron
+      return {
+        canonKey: "canon_poivron",
+        name: { fr: "Poivron", en: "Bell pepper", ar: "فلفل حلو" },
+        unit: "",
+        dept: "deptProduce",
+        multiplier: mult
+      };
+    }
+
+    // 6. TOMATES CERISES
+    if (lower.includes("tomate cerise") || lower.includes("tomates cerises")) {
+      return {
+        canonKey: "canon_tomates_cerises",
+        name: { fr: "Tomates cerises", en: "Cherry tomatoes", ar: "طماطم كرزية" },
+        unit: "g",
+        dept: "deptProduce",
+        multiplier: unit === "kg" ? 1000 : 1
+      };
+    }
+
+    // 7. TOMATES FRAÎCHES
+    if (/\btomates?\b/.test(lower) && !lower.includes("sauce") && !lower.includes("coulis") && !lower.includes("pulpe") && !lower.includes("sechee") && !lower.includes("sechees")) {
+      let mult = 1;
+      if (unit === "piece") mult = 150; // 1 tomate ~ 150g
+      return {
+        canonKey: "canon_tomates",
+        name: { fr: "Tomates fraîches", en: "Tomatoes", ar: "طماطم طازجة" },
+        unit: "g",
+        dept: "deptProduce",
+        multiplier: mult
+      };
+    }
+
+    // 8. CAROTTE
+    if (/\bcarottes?\b/.test(lower)) {
+      let mult = 1;
+      if (unit === "piece") mult = 100; // 1 carotte ~ 100g
+      return {
+        canonKey: "canon_carottes",
+        name: { fr: "Carottes", en: "Carrots", ar: "جزر" },
+        unit: "g",
+        dept: "deptProduce",
+        multiplier: mult
+      };
+    }
+
+    // 9. AVOCAT
+    if (/\bavocats?\b/.test(lower) && !lower.includes("guacamole")) {
+      return {
+        canonKey: "canon_avocat",
+        name: { fr: "Avocat", en: "Avocado", ar: "أفوكادو" },
+        unit: "",
+        dept: "deptProduce",
+        multiplier: 1
+      };
+    }
+
+    // 10. CITRON JAUNE
+    if (/\bcitrons?\b/.test(lower) && !lower.includes("vert") && !lower.includes("combava")) {
+      return {
+        canonKey: "canon_citron",
+        name: { fr: "Citron jaune", en: "Lemon", ar: "ليمون" },
+        unit: "",
+        dept: "deptProduce",
+        multiplier: 1
+      };
+    }
+
+    // 11. CITRON VERT
+    if (lower.includes("citron vert") || lower.includes("lime")) {
+      return {
+        canonKey: "canon_citron_vert",
+        name: { fr: "Citron vert", en: "Lime", ar: "ليمون أخضر" },
+        unit: "",
+        dept: "deptProduce",
+        multiplier: 1
+      };
+    }
+
+    // 12. CHAMPIGNONS
+    if (lower.includes("champignon")) {
+      return {
+        canonKey: "canon_champignons",
+        name: { fr: "Champignons de Paris", en: "Mushrooms", ar: "فطر" },
+        unit: "g",
+        dept: "deptProduce",
+        multiplier: 1
+      };
+    }
+
+    // 13. ÉPINARDS
+    if (lower.includes("epinard")) {
+      return {
+        canonKey: "canon_epinards",
+        name: { fr: "Jeunes pousses d'épinards", en: "Baby spinach", ar: "سبانخ" },
+        unit: "g",
+        dept: "deptProduce",
+        multiplier: 1
+      };
+    }
+
+    // 14. SALADE VERTE / ROMAINE / ROQUETTE
+    if (lower.includes("salade romaine") || lower.includes("salade verte") || lower.includes("batavia") || lower.includes("laitue")) {
+      return {
+        canonKey: "canon_salade_verte",
+        name: { fr: "Salade verte", en: "Lettuce", ar: "خس" },
+        unit: unit === "piece" ? "" : "g",
+        dept: "deptProduce",
+        multiplier: 1
+      };
+    }
+    if (lower.includes("roquette")) {
+      return {
+        canonKey: "canon_roquette",
+        name: { fr: "Roquette fraîche", en: "Arugula", ar: "جرجير" },
+        unit: "g",
+        dept: "deptProduce",
+        multiplier: 1
+      };
+    }
+
+    // 15. POMMES DE TERRE
+    if (lower.includes("pomme de terre") || lower.includes("pommes de terre") || (lower.includes("patate") && !lower.includes("douce"))) {
+      return {
+        canonKey: "canon_pommes_de_terre",
+        name: { fr: "Pommes de terre", en: "Potatoes", ar: "بطاطس" },
+        unit: unit === "kg" ? "kg" : "g",
+        dept: "deptProduce",
+        multiplier: 1
+      };
+    }
+
+    // 16. PATATE DOUCE
+    if (lower.includes("patate douce") || lower.includes("patates douces")) {
+      return {
+        canonKey: "canon_patate_douce",
+        name: { fr: "Patate douce", en: "Sweet potato", ar: "بطاطا حلوة" },
+        unit: unit === "piece" ? "" : "g",
+        dept: "deptProduce",
+        multiplier: 1
+      };
+    }
+
+    // 17. BANANE
+    if (/\bbananes?\b/.test(lower)) {
+      return {
+        canonKey: "canon_banane",
+        name: { fr: "Banane", en: "Banana", ar: "موز" },
+        unit: "",
+        dept: "deptProduce",
+        multiplier: 1
+      };
+    }
+
+    // 18. POMME (Fruit)
+    if (/\bpommes?\b/.test(lower) && !lower.includes("terre") && !lower.includes("pin") && !lower.includes("compote")) {
+      return {
+        canonKey: "canon_pomme_fruit",
+        name: { fr: "Pomme", en: "Apple", ar: "تفاح" },
+        unit: "",
+        dept: "deptProduce",
+        multiplier: 1
+      };
+    }
+
+    // 19. BŒUF HACHÉ / STEAK HACHÉ
     if (/\b(boeuf\s+hache|steaks?\s+haches?|viande\s+hachee)\b/.test(lower) || (lower.includes("boeuf") && lower.includes("hache"))) {
       let mult = 1;
       if (unit === "kg") mult = 1000;
@@ -553,7 +764,7 @@ export class AIPlannerService {
       };
     }
 
-    // 3. BLANCS / FILETS DE POULET
+    // 20. BLANCS / FILETS DE POULET
     if (/\b(blancs?|filets?|escalopes?)\s+de\s+poulet\b/.test(lower) || lower === "poulet" || lower === "filets de poulet") {
       let mult = 1;
       if (unit === "kg") mult = 1000;
@@ -566,7 +777,7 @@ export class AIPlannerService {
       };
     }
 
-    // 4. AIL
+    // 21. AIL
     if (/\b(ail|gousses?\s+d'ail)\b/.test(lower)) {
       return {
         canonKey: "canon_ail",
@@ -577,7 +788,7 @@ export class AIPlannerService {
       };
     }
 
-    // 5. OIGNONS JAUNES
+    // 22. OIGNONS JAUNES
     if (/\b(oignons?|oignons?\s+jaunes?)\b/.test(lower) && !lower.includes("nouveau") && !lower.includes("rouge") && !lower.includes("fume") && !lower.includes("frit")) {
       return {
         canonKey: "canon_oignon",
@@ -588,7 +799,7 @@ export class AIPlannerService {
       };
     }
 
-    // 6. HUILE D'OLIVE
+    // 23. HUILE D'OLIVE
     if (lower.includes("huile d'olive") || lower.includes("huile olive")) {
       return {
         canonKey: "canon_huile_olive",
@@ -599,7 +810,7 @@ export class AIPlannerService {
       };
     }
 
-    // 7. BEURRE
+    // 24. BEURRE
     if (/\bbeurre\b/.test(lower) && !lower.includes("cacahuete") && !lower.includes("amande")) {
       return {
         canonKey: "canon_beurre",
@@ -610,7 +821,7 @@ export class AIPlannerService {
       };
     }
 
-    // 8. CRÈME FRAÎCHE
+    // 25. CRÈME FRAÎCHE
     if (lower.includes("creme fraiche") || lower.includes("creme liquide") || lower.includes("creme entiere") || lower.includes("creme fleurette")) {
       return {
         canonKey: "canon_creme_fraiche",
@@ -621,7 +832,7 @@ export class AIPlannerService {
       };
     }
 
-    // 9. LAIT
+    // 26. LAIT
     if (/\blait\b/.test(lower) && !lower.includes("amande") && !lower.includes("coco") && !lower.includes("avoine") && !lower.includes("soja")) {
       return {
         canonKey: "canon_lait",
@@ -632,7 +843,7 @@ export class AIPlannerService {
       };
     }
 
-    // 10. COULIS DE TOMATE
+    // 27. COULIS DE TOMATE
     if (lower.includes("coulis de tomate") || lower.includes("pulpe de tomate") || lower.includes("sauce tomate") || lower.includes("tomates concassees")) {
       return {
         canonKey: "canon_coulis_tomate",
@@ -643,7 +854,7 @@ export class AIPlannerService {
       };
     }
 
-    // 11. PARMESAN
+    // 28. PARMESAN
     if (lower.includes("parmesan") || lower.includes("parmigiano")) {
       return {
         canonKey: "canon_parmesan",
@@ -654,7 +865,7 @@ export class AIPlannerService {
       };
     }
 
-    // 12. MOZZARELLA
+    // 29. MOZZARELLA
     if (lower.includes("mozzarella") || lower.includes("mozza")) {
       return {
         canonKey: "canon_mozzarella",
@@ -665,7 +876,7 @@ export class AIPlannerService {
       };
     }
 
-    // 13. FETA
+    // 30. FETA
     if (lower.includes("feta")) {
       return {
         canonKey: "canon_feta",
@@ -676,40 +887,7 @@ export class AIPlannerService {
       };
     }
 
-    // 14. AVOCAT
-    if (/\bavocats?\b/.test(lower)) {
-      return {
-        canonKey: "canon_avocat",
-        name: { fr: "Avocat", en: "Avocado", ar: "أفوكادو" },
-        unit: "",
-        dept: "deptProduce",
-        multiplier: 1
-      };
-    }
-
-    // 15. CITRON
-    if (/\bcitrons?\b/.test(lower) && !lower.includes("vert")) {
-      return {
-        canonKey: "canon_citron",
-        name: { fr: "Citron jaune", en: "Lemon", ar: "ليمون" },
-        unit: "",
-        dept: "deptProduce",
-        multiplier: 1
-      };
-    }
-
-    // 16. CITRON VERT
-    if (lower.includes("citron vert") || lower.includes("lime")) {
-      return {
-        canonKey: "canon_citron_vert",
-        name: { fr: "Citron vert", en: "Lime", ar: "ليمون أخضر" },
-        unit: "",
-        dept: "deptProduce",
-        multiplier: 1
-      };
-    }
-
-    // 17. THON AU NATUREL
+    // 31. THON AU NATUREL
     if (lower.includes("thon") && (lower.includes("naturel") || lower.includes("boite") || lower.includes("egoutte") || lower === "thon")) {
       return {
         canonKey: "canon_thon",
@@ -720,7 +898,7 @@ export class AIPlannerService {
       };
     }
 
-    // 18. RIZ BASMATI
+    // 32. RIZ BASMATI
     if (lower.includes("riz") && (lower.includes("basmati") || lower.includes("blanc") || lower.includes("thai") || lower === "riz")) {
       return {
         canonKey: "canon_riz_basmati",
@@ -731,7 +909,7 @@ export class AIPlannerService {
       };
     }
 
-    // 19. FARINE
+    // 33. FARINE
     if (lower.includes("farine")) {
       return {
         canonKey: "canon_farine",
@@ -742,7 +920,7 @@ export class AIPlannerService {
       };
     }
 
-    // 20. SEL
+    // 34. SEL
     if (lower === "sel" || lower.startsWith("sel ") || lower === "sel fin" || lower === "sel poivre") {
       return {
         canonKey: "canon_sel",
@@ -753,7 +931,7 @@ export class AIPlannerService {
       };
     }
 
-    // 21. POIVRE
+    // 35. POIVRE
     if (lower === "poivre" || lower.startsWith("poivre ") || lower === "poivre noir" || lower === "poivre du moulin") {
       return {
         canonKey: "canon_poivre",
@@ -764,7 +942,7 @@ export class AIPlannerService {
       };
     }
 
-    // 22. PAIN DE MIE / COMPLET
+    // 36. PAIN DE MIE / COMPLET
     if (lower.includes("pain de mie") || lower.includes("pain complet")) {
       return {
         canonKey: "canon_pain_complet",
@@ -805,13 +983,14 @@ export class AIPlannerService {
           const rawName = typeof ing.name === "object" ? ing.name.fr : ing.name;
           if (!rawName) return;
 
-          // Découper les ingrédients composés (ex: "Thon égoutté & Œuf frais")
-          let parts = [rawName];
-          if (rawName.includes(" & ")) parts = rawName.split(" & ");
-          else if (rawName.includes(" + ")) parts = rawName.split(" + ");
-          else if (/\s+et\s+/i.test(rawName) && !/sel\s+et\s+poivre/i.test(rawName)) parts = rawName.split(/\s+et\s+/i);
+          // Découper les ingrédients composés (ex: "Salade romaine, concombre, radis & sumac")
+          const parts = rawName.split(/\s*(?:&|\+|,|\s+et\s+)\s*/i)
+            .map(p => p.trim())
+            .filter(p => p.length > 0 && !/^(ou|ou bien|\/)$/i.test(p));
 
-          parts.forEach(partName => {
+          const subItems = parts.length > 0 ? parts : [rawName];
+
+          subItems.forEach(partName => {
             const canon = this.getCanonicalGrocery(partName, ing.unit, ing.dept);
             const qty = ((Number(ing.quantity) || 1) * factor) * canon.multiplier;
 

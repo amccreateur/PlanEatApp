@@ -639,9 +639,24 @@ export default function DriveCartModal({
                   var containerHtml = input.parentElement ? input.parentElement.outerHTML.substring(0, 350) : input.outerHTML.substring(0, 200);
                   logSearch('SUCCESS_INPUT_FOUND | Container: ' + containerHtml.replace(/\s+/g, ' '));
 
-                  // Chercher le bouton de soumission / loupe
+                  // Soumettre le formulaire immédiatement via prototype pour garantir la navigation
+                  var form = input.closest('form') || document.querySelector('form[name="simpleSearch"], form[role="search"]');
+                  if (form) {
+                    try {
+                      HTMLFormElement.prototype.submit.call(form);
+                      logSearch('FORM_SUBMITTED_VIA_PROTOTYPE');
+                      return;
+                    } catch(eForm) {
+                      try {
+                        form.submit();
+                        logSearch('FORM_SUBMITTED_DIRECT');
+                        return;
+                      } catch(e2) {}
+                    }
+                  }
+
+                  // Chercher le bouton de soumission / loupe si pas de form.submit
                   var nearbyBtn = input.parentElement ? input.parentElement.querySelector('button, [role="button"], a, svg') : null;
-                  var form = input.closest('form');
                   var formBtn = form ? form.querySelector('button[type="submit"], input[type="submit"], button, [role="button"]') : null;
                   var docBtn = document.querySelector('button[aria-label*="recherch" i], button.search-button, button.header-search__btn');
 
@@ -650,16 +665,12 @@ export default function DriveCartModal({
                     try { targetBtn.click(); } catch(eBtn) {}
                   }
 
-                  if (form && form.submit && !targetBtn) {
-                    try { form.submit(); } catch(eSubmit) {}
-                  }
-
                   // Touche Entrée
                   input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true }));
                   input.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true }));
                   input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true }));
 
-                  // Après 400ms, si une liste d'autosuggestion est apparue, cliquer sur le 1er résultat ou "voir tous les résultats"
+                  // Après 300ms, si une liste d'autosuggestion est apparue, cliquer sur le 1er résultat
                   setTimeout(function() {
                     try {
                       var suggestion = document.querySelector('[role="option"], .search-suggestion, .autocomplete-item, [data-testid*="suggestion" i], ul.suggestions li, .search-results-list a');
@@ -668,7 +679,7 @@ export default function DriveCartModal({
                         logSearch('AUTOCOMPLETE_CLICKED');
                       }
                     } catch(eSugg) {}
-                  }, 400);
+                  }, 300);
 
                   return;
                 } catch(errInput) {

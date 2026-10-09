@@ -1350,7 +1350,7 @@ export default function DriveCartModal({
                 activeOpacity={0.8}
               >
                 <Text style={styles.brandEmoji}>{selectedStore.logoEmoji}</Text>
-                <Ionicons name="pie-chart" size={13} color="#ffffff" style={{ marginLeft: 3 }} />
+                <Ionicons name="apps-outline" size={13} color="#ffffff" style={{ marginLeft: 3 }} />
               </TouchableOpacity>
 
               <View>
@@ -1435,8 +1435,8 @@ export default function DriveCartModal({
                   style={[styles.storeChip, { backgroundColor: "#0284c7", borderColor: "#38bdf8" }]}
                   onPress={openRadialMenu}
                 >
-                  <Text style={styles.storeChipEmoji}>🥧</Text>
-                  <Text style={[styles.storeChipTextActive, { fontWeight: "800" }]}>Camembert</Text>
+                  <Text style={styles.storeChipEmoji}>🏪</Text>
+                  <Text style={[styles.storeChipTextActive, { fontWeight: "800" }]}>Roue Drive</Text>
                 </TouchableOpacity>
 
                 {DRIVE_STORES.map((store) => {
@@ -1770,9 +1770,9 @@ export default function DriveCartModal({
               <Animated.View style={[styles.radialBackdrop, { opacity: radialFadeAnim }]}>
                 <TouchableWithoutFeedback>
                   <View style={styles.radialContainer}>
-                    {/* Header Camembert */}
+                    {/* Header Roue Drive */}
                     <View style={styles.radialHeaderBox}>
-                      <Text style={styles.radialTitle}>🥧 Roue des Enseignes</Text>
+                      <Text style={styles.radialTitle}>🏪 Choisir votre Drive</Text>
                       <Text style={styles.radialSub}>Touchez une enseigne pour basculer instantanément</Text>
                     </View>
 

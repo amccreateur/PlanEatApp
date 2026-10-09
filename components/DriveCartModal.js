@@ -10,7 +10,9 @@ import {
   Platform,
   Linking,
   TextInput,
-  Keyboard
+  Keyboard,
+  Animated,
+  TouchableWithoutFeedback
 } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -313,6 +315,55 @@ export default function DriveCartModal({
   const ignoreAutoDetectUntilRef = useRef(0);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
+  // Menu Camembert / Radial Store Switcher
+  const [isRadialMenuOpen, setIsRadialMenuOpen] = useState(false);
+  const radialAnim = useRef(new Animated.Value(0)).current;
+  const radialFadeAnim = useRef(new Animated.Value(0)).current;
+
+  const openRadialMenu = () => {
+    dismissAllKeyboards();
+    setIsRadialMenuOpen(true);
+    radialAnim.setValue(0);
+    radialFadeAnim.setValue(0);
+    Animated.parallel([
+      Animated.spring(radialAnim, {
+        toValue: 1,
+        friction: 6,
+        tension: 50,
+        useNativeDriver: true
+      }),
+      Animated.timing(radialFadeAnim, {
+        toValue: 1,
+        duration: 220,
+        useNativeDriver: true
+      })
+    ]).start();
+  };
+
+  const closeRadialMenu = (callback) => {
+    Animated.parallel([
+      Animated.timing(radialAnim, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: true
+      }),
+      Animated.timing(radialFadeAnim, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: true
+      })
+    ]).start(() => {
+      setIsRadialMenuOpen(false);
+      if (typeof callback === "function") callback();
+    });
+  };
+
+  const handleRadialStoreSelect = (store) => {
+    closeRadialMenu(() => {
+      handleSelectStore(store);
+    });
+  };
+
   useEffect(() => {
     isSelectingStoreRef.current = isSelectingStore;
   }, [isSelectingStore]);
@@ -540,7 +591,7 @@ export default function DriveCartModal({
           injectSearchInStore(q);
         }
       }
-    }, 400);
+    }, 700);
   };
 
   const handleWebViewMessage = (event) => {
@@ -636,7 +687,7 @@ export default function DriveCartModal({
     const targetUrl = getDirectSearchUrl(cleanQ);
     sendRemoteLog("APP_START_SEARCH", `Recherche: "${cleanQ}" (${selectedStore.name}) -> ${targetUrl}`);
 
-    if (selectedStore.id === "coursesu" || selectedStore.id === "intermarche") {
+    if (selectedStore.id === "intermarche") {
       const domSearchJs = `
         (function() {
           try {
@@ -757,9 +808,6 @@ export default function DriveCartModal({
               }
 
               logSearch('NO_INPUT_FOUND_AFTER_ATTEMPTS');
-              if (storeId === "coursesu") {
-                window.location.href = targetUrl;
-              }
             }
             tryInputSearch();
           } catch(e) {}
@@ -1296,9 +1344,25 @@ export default function DriveCartModal({
         <View style={[styles.header, { backgroundColor: theme.headerBg, borderBottomColor: theme.border }]}>
           <View style={styles.headerTopRow}>
             <View style={styles.brandTitleBox}>
-              <Text style={styles.brandEmoji}>{selectedStore.logoEmoji}</Text>
+              <TouchableOpacity
+                style={[styles.radialHubPill, { backgroundColor: selectedStore.color }]}
+                onPress={openRadialMenu}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.brandEmoji}>{selectedStore.logoEmoji}</Text>
+                <Ionicons name="pie-chart" size={13} color="#ffffff" style={{ marginLeft: 3 }} />
+              </TouchableOpacity>
+
               <View>
-                <Text style={[styles.storeNameText, { color: theme.text }]}>{selectedStore.name}</Text>
+                <TouchableOpacity
+                  style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
+                  onPress={openRadialMenu}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.storeNameText, { color: theme.text }]}>{selectedStore.name}</Text>
+                  <Ionicons name="chevron-down-circle-outline" size={14} color="#38bdf8" />
+                </TouchableOpacity>
+
                 {!isSelectingStore ? (
                   <TouchableOpacity
                     style={styles.changeStoreInlineChip}
@@ -1367,6 +1431,14 @@ export default function DriveCartModal({
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.storeChipsScroll}
               >
+                <TouchableOpacity
+                  style={[styles.storeChip, { backgroundColor: "#0284c7", borderColor: "#38bdf8" }]}
+                  onPress={openRadialMenu}
+                >
+                  <Text style={styles.storeChipEmoji}>🥧</Text>
+                  <Text style={[styles.storeChipTextActive, { fontWeight: "800" }]}>Camembert</Text>
+                </TouchableOpacity>
+
                 {DRIVE_STORES.map((store) => {
                   const isSelected = selectedStore.id === store.id;
                   return (
@@ -1684,6 +1756,138 @@ export default function DriveCartModal({
               )}
             </View>
           )
+        )}
+
+        {/* Camembert / Radial Store Switcher Modal */}
+        {isRadialMenuOpen && (
+          <Modal
+            transparent
+            visible={isRadialMenuOpen}
+            animationType="none"
+            onRequestClose={() => closeRadialMenu()}
+          >
+            <TouchableWithoutFeedback onPress={() => closeRadialMenu()}>
+              <Animated.View style={[styles.radialBackdrop, { opacity: radialFadeAnim }]}>
+                <TouchableWithoutFeedback>
+                  <View style={styles.radialContainer}>
+                    {/* Header Camembert */}
+                    <View style={styles.radialHeaderBox}>
+                      <Text style={styles.radialTitle}>🥧 Roue des Enseignes</Text>
+                      <Text style={styles.radialSub}>Touchez une enseigne pour basculer instantanément</Text>
+                    </View>
+
+                    {/* Radial Disc & Petals */}
+                    <View style={styles.radialWheelBox}>
+                      {/* Outer Ring Ambient Glow */}
+                      <Animated.View
+                        style={[
+                          styles.radialRingGlow,
+                          {
+                            transform: [
+                              {
+                                scale: radialAnim.interpolate({
+                                  inputRange: [0, 1],
+                                  outputRange: [0.3, 1]
+                                })
+                              }
+                            ]
+                          }
+                        ]}
+                      />
+
+                      {/* Store Petals */}
+                      {DRIVE_STORES.map((store, i) => {
+                        const count = DRIVE_STORES.length;
+                        const angle = (i * (2 * Math.PI) / count) - (Math.PI / 2);
+                        const RADIUS = 120;
+                        const targetX = RADIUS * Math.cos(angle);
+                        const targetY = RADIUS * Math.sin(angle);
+                        const isSelected = selectedStore.id === store.id;
+
+                        const translateX = radialAnim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [0, targetX]
+                        });
+                        const translateY = radialAnim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [0, targetY]
+                        });
+                        const scale = radialAnim.interpolate({
+                          inputRange: [0, 0.4, 1],
+                          outputRange: [0, 0.5, 1]
+                        });
+
+                        return (
+                          <Animated.View
+                            key={store.id}
+                            style={[
+                              styles.radialPetalWrapper,
+                              {
+                                transform: [{ translateX }, { translateY }, { scale }]
+                              }
+                            ]}
+                          >
+                            <TouchableOpacity
+                              activeOpacity={0.8}
+                              style={[
+                                styles.radialPetalBtn,
+                                { backgroundColor: store.color },
+                                isSelected && styles.radialPetalBtnSelected
+                              ]}
+                              onPress={() => handleRadialStoreSelect(store)}
+                            >
+                              <Text style={styles.radialPetalEmoji}>{store.logoEmoji}</Text>
+                              {isSelected && (
+                                <View style={styles.radialPetalCheckBadge}>
+                                  <Ionicons name="checkmark-sharp" size={12} color="#ffffff" />
+                                </View>
+                              )}
+                            </TouchableOpacity>
+                            <View style={styles.radialPetalLabelBadge}>
+                              <Text style={[styles.radialPetalLabelText, isSelected && styles.radialPetalLabelTextSelected]}>
+                                {store.shortName}
+                              </Text>
+                            </View>
+                          </Animated.View>
+                        );
+                      })}
+
+                      {/* Central Hub Close Button */}
+                      <Animated.View
+                        style={[
+                          styles.radialCenterHub,
+                          {
+                            transform: [
+                              {
+                                scale: radialAnim.interpolate({
+                                  inputRange: [0, 1],
+                                  outputRange: [0.6, 1]
+                                })
+                              }
+                            ]
+                          }
+                        ]}
+                      >
+                        <TouchableOpacity
+                          activeOpacity={0.8}
+                          style={styles.radialCenterBtn}
+                          onPress={() => closeRadialMenu()}
+                        >
+                          <LinearGradient
+                            colors={["#334155", "#0f172a"]}
+                            style={styles.radialCenterGradient}
+                          >
+                            <Ionicons name="close" size={26} color="#ffffff" />
+                            <Text style={styles.radialCenterText}>Fermer</Text>
+                          </LinearGradient>
+                        </TouchableOpacity>
+                      </Animated.View>
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
+              </Animated.View>
+            </TouchableWithoutFeedback>
+          </Modal>
         )}
       </SafeAreaView>
     </Modal>
@@ -2446,5 +2650,157 @@ const styles = StyleSheet.create({
     color: "#10b981",
     fontSize: 15,
     fontWeight: "800"
+  },
+  radialHubPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 255, 255, 0.3)",
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3
+  },
+  radialBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(10, 15, 30, 0.88)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20
+  },
+  radialContainer: {
+    width: "100%",
+    maxWidth: 360,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  radialHeaderBox: {
+    alignItems: "center",
+    marginBottom: 40
+  },
+  radialTitle: {
+    color: "#ffffff",
+    fontSize: 20,
+    fontWeight: "900",
+    letterSpacing: 0.3,
+    marginBottom: 4
+  },
+  radialSub: {
+    color: "#94a3b8",
+    fontSize: 12,
+    fontWeight: "600",
+    textAlign: "center"
+  },
+  radialWheelBox: {
+    width: 300,
+    height: 300,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative"
+  },
+  radialRingGlow: {
+    position: "absolute",
+    width: 250,
+    height: 250,
+    borderRadius: 125,
+    borderWidth: 2,
+    borderColor: "rgba(56, 189, 248, 0.25)",
+    backgroundColor: "rgba(15, 23, 42, 0.5)"
+  },
+  radialPetalWrapper: {
+    position: "absolute",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 80,
+    height: 80
+  },
+  radialPetalBtn: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "rgba(255, 255, 255, 0.25)",
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 5
+  },
+  radialPetalBtnSelected: {
+    borderColor: "#ffffff",
+    borderWidth: 3,
+    transform: [{ scale: 1.08 }]
+  },
+  radialPetalEmoji: {
+    fontSize: 24
+  },
+  radialPetalCheckBadge: {
+    position: "absolute",
+    top: -3,
+    right: -3,
+    backgroundColor: "#10b981",
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1.5,
+    borderColor: "#ffffff"
+  },
+  radialPetalLabelBadge: {
+    marginTop: 4,
+    backgroundColor: "rgba(15, 23, 42, 0.9)",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "rgba(51, 65, 85, 0.6)"
+  },
+  radialPetalLabelText: {
+    color: "#cbd5e1",
+    fontSize: 10,
+    fontWeight: "700"
+  },
+  radialPetalLabelTextSelected: {
+    color: "#38bdf8",
+    fontWeight: "900"
+  },
+  radialCenterHub: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6
+  },
+  radialCenterBtn: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 34,
+    overflow: "hidden"
+  },
+  radialCenterGradient: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 34,
+    borderWidth: 2,
+    borderColor: "#475569"
+  },
+  radialCenterText: {
+    color: "#ffffff",
+    fontSize: 9,
+    fontWeight: "800",
+    marginTop: -2
   }
 });

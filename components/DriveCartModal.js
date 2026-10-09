@@ -43,16 +43,16 @@ const STORE_DETECTOR_INJECTION_JS = `
   window.__planeatDetectorActive = true;
 
   try {
-    var allInputs = Array.from(document.querySelectorAll("input, button, a[href*='recherche']")).map(function(e) {
-      return (e.tagName + (e.id ? '#' + e.id : '') + (e.name ? '[name=' + e.name + ']' : '') + (e.className ? '.' + e.className.toString().substring(0,25) : '') + (e.placeholder ? '[ph=' + e.placeholder + ']' : ''));
-    }).join(' | ');
-    var info = "Inputs: " + allInputs;
+    var links = Array.from(document.querySelectorAll('a[href], button')).map(function(a) {
+      return (a.tagName + ':' + (a.getAttribute('href') || '') + ':' + (a.innerText || '').trim().substring(0, 20));
+    }).filter(function(x) { return x.length > 5; }).slice(0, 30).join(' | ');
+    var info = "URL: " + window.location.href + " | Elements: " + links;
     fetch("http://192.168.1.111:8088/log", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "INPUTS_FOUND", text: info })
+      body: JSON.stringify({ type: "ANGULAR_LINKS", text: info })
     }).catch(function() {});
-  } catch(eInputs) {}
+  } catch(eLinks) {}
 
   function emitStoreChosen(reason) {
     try {

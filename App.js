@@ -448,12 +448,6 @@ function MainApp() {
             onPress={() => setIsQuickMenuOpen(true)}
           >
             <Ionicons name="menu" size={22} color={currentTheme.text} />
-            <View
-              style={[
-                styles.menuIndicatorDot,
-                aiConfig.engine === "mistral" ? styles.dotMistral : styles.dotLocal
-              ]}
-            />
           </TouchableOpacity>
         </View>
       </View>
@@ -469,7 +463,7 @@ function MainApp() {
               disabled={isGenerating}
             >
               <LinearGradient
-                colors={aiConfig.engine === "mistral" ? ["#7c3aed", "#6d28d9"] : ["#0284c7", "#0369a1"]}
+                colors={["#7c3aed", "#6d28d9"]}
                 style={styles.aiGradient}
               >
                 {isGenerating ? (

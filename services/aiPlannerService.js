@@ -226,14 +226,14 @@ export class AIPlannerService {
     const servings = this.calculateHouseholdServings(profile);
     const dayKeys = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 
-    // 1. Tenter la génération avec Mistral AI si configuré
-    if (aiConfig?.engine === "mistral" && aiConfig?.mistralApiKey) {
+    // 1. Tenter la génération avec Mistral AI (par défaut ou si activé)
+    if (aiConfig?.engine !== "local") {
       try {
         const mistralResult = await MistralService.generateMealPlan({
           profile,
           durationWeeks,
-          apiKey: aiConfig.mistralApiKey,
-          model: aiConfig.mistralModel || "mistral-small-latest",
+          apiKey: aiConfig?.mistralApiKey,
+          model: aiConfig?.mistralModel || "codestral-latest",
           lang
         });
 
@@ -1348,15 +1348,15 @@ export class AIPlannerService {
   static async swapMeal(currentMealId, mealType, profile, currentMeal = null, aiConfig = null, lang = "fr") {
     const servings = this.calculateHouseholdServings(profile);
 
-    // Si mode Mistral AI activé
-    if (aiConfig?.engine === "mistral" && aiConfig?.mistralApiKey) {
+    // Si mode Mistral AI activé (par défaut)
+    if (aiConfig?.engine !== "local") {
       try {
         const generated = await MistralService.swapSingleMeal({
           currentMeal,
           mealType,
           profile,
-          apiKey: aiConfig.mistralApiKey,
-          model: aiConfig.mistralModel || "mistral-small-latest",
+          apiKey: aiConfig?.mistralApiKey,
+          model: aiConfig?.mistralModel || "codestral-latest",
           lang
         });
 
@@ -1403,15 +1403,15 @@ export class AIPlannerService {
   static async generateFridgeRecipe(ingredients = [], mealType = "lunch", profile = null, aiConfig = null, lang = "fr") {
     const servings = this.calculateHouseholdServings(profile);
 
-    // 1. Tenter avec Mistral AI
-    if (aiConfig?.engine === "mistral" && aiConfig?.mistralApiKey) {
+    // 1. Tenter avec Mistral AI (par défaut)
+    if (aiConfig?.engine !== "local") {
       try {
         const generated = await MistralService.generateFridgeRecipe({
           ingredients,
           mealType,
           profile,
-          apiKey: aiConfig.mistralApiKey,
-          model: aiConfig.mistralModel || "mistral-small-latest",
+          apiKey: aiConfig?.mistralApiKey,
+          model: aiConfig?.mistralModel || "codestral-latest",
           lang
         });
 

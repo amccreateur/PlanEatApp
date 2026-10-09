@@ -127,46 +127,7 @@ export default function QuickMenuModal({
                     <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={20} color={theme.textMuted} />
                   </TouchableOpacity>
 
-                  {/* Action 3 : Moteur IA (Mistral vs Local) */}
-                  <TouchableOpacity
-                    style={[styles.menuActionCard, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}
-                    activeOpacity={0.7}
-                    onPress={() => {
-                      onClose();
-                      onOpenProfile();
-                    }}
-                  >
-                    <LinearGradient
-                      colors={aiConfig?.engine === "mistral" ? ["#9333ea", "#7e22ce"] : ["#0ea5e9", "#0284c7"]}
-                      style={styles.actionIconBg}
-                    >
-                      <Ionicons
-                        name={aiConfig?.engine === "mistral" ? "sparkles" : "hardware-chip"}
-                        size={22}
-                        color="#ffffff"
-                      />
-                    </LinearGradient>
-                    <View style={styles.actionTextBox}>
-                      <View style={[styles.actionTitleRow, isRTL && styles.rtlRow]}>
-                        <Text style={[styles.actionTitle, { color: theme.text }]}>Moteur IA</Text>
-                        <View style={[
-                          styles.statusBadge,
-                          aiConfig?.engine === "mistral" ? styles.statusBadgeMistral : styles.statusBadgeLocal
-                        ]}>
-                          <Text style={[
-                            styles.statusBadgeText,
-                            aiConfig?.engine === "mistral" ? styles.statusBadgeTextMistral : styles.statusBadgeTextLocal
-                          ]}>
-                            {aiConfig?.engine === "mistral" ? "Mistral AI" : "Local Hors-ligne"}
-                          </Text>
-                        </View>
-                      </View>
-                      <Text style={[styles.actionDesc, { color: theme.textSub }]}>
-                        {aiConfig?.engine === "mistral" ? "Modèle actif : " + (aiConfig.mistralModel || "mistral-small") : "Génération instantanée locale"}
-                      </Text>
-                    </View>
-                    <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={20} color={theme.textMuted} />
-                  </TouchableOpacity>
+
 
                   {/* Action 4 : Mon Foyer & Profil */}
                   <TouchableOpacity

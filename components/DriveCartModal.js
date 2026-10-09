@@ -537,6 +537,7 @@ export default function DriveCartModal({
         const isStoreSelected =
           url.includes("/magasin-") ||
           url.includes("/magasins/") ||
+          url.includes("/mag/") ||
           url.includes("m-courses.leclercdrive.fr/magasin") ||
           url.includes("courses.leclercdrive.fr/magasin") ||
           (selectedStore.id === "carrefour" && (url.includes("/magasins/") || url.includes("/drive/") || url.includes("service_point"))) ||
@@ -563,20 +564,16 @@ export default function DriveCartModal({
     sendRemoteLog("APP_START_SEARCH", `Recherche: "${cleanQ}" (${selectedStore.name}) -> ${targetUrl}`);
 
     if (selectedStore.id === "leclerc") {
-      const base = customStoreUrl || storeBaseUrlRef.current;
-      if (base && (base.includes("m-courses") || base.includes("magasin-") || base.includes("courses.leclercdrive"))) {
-        sendRemoteLog("LECLERC_NAVIGATE_SEARCH", targetUrl);
-        const searchJs = `
-          (function() {
-            try {
-              window.location.href = ${JSON.stringify(targetUrl)};
-            } catch(e) {}
-          })();
-          true;
-        `;
-        webViewRef.current?.injectJavaScript(searchJs);
-        return;
-      }
+      const searchJs = `
+        (function() {
+          try {
+            window.location.href = ${JSON.stringify(targetUrl)};
+          } catch(e) {}
+        })();
+        true;
+      `;
+      webViewRef.current?.injectJavaScript(searchJs);
+      return;
     }
 
     const domSearchJs = `

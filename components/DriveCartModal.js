@@ -463,7 +463,7 @@ export default function DriveCartModal({
         }, 600);
         return;
       }
-      const match = url.match(/(https?:\/\/[^\/]+\/magasin-[^\/\?#]+)/i);
+      const match = url.match(/(https?:\/\/[^\/]+\/(?:magasin-[^\/\?#]+|drive-[^\/\?#]+))/i);
       if (match && match[1] && !match[1].includes("erreur") && !match[1].includes("pgeWCSD")) {
         let storeUrl = match[1].replace(/\.aspx.*$/i, "").replace(/\/recherche.*$/i, "");
         storeBaseUrlRef.current = storeUrl;
@@ -494,13 +494,13 @@ export default function DriveCartModal({
         cleanUrl === "https://www.intermarche.com/drive"
       );
 
-      if (!isInitialHome) {
+      if (!isInitialHome && !url.includes("?q=") && !url.includes("&q=") && !url.includes("?text=")) {
         const isStoreSelected =
           url.includes("/magasin") ||
           url.includes("/mag/") ||
           url.includes("courses.leclercdrive.fr/magasin") ||
-          (selectedStore.id === "carrefour" && (url.includes("/magasin") || url.includes("/drive") || url.includes("/courses") || url.includes("/s?") || url.includes("/r?") || url.includes("service_point"))) ||
-          (selectedStore.id === "coursesu" && (url.includes("/magasin") || url.includes("/courses-en-ligne/") || url.includes("/drive/accueil") || url.includes("/search") || url.includes("/recherche") || url.includes("/drive-") || url.includes("/drive/"))) ||
+          (selectedStore.id === "carrefour" && (url.includes("/magasin") || url.includes("/drive") || url.includes("/courses") || url.includes("service_point"))) ||
+          (selectedStore.id === "coursesu" && (url.includes("/magasin") || url.includes("/courses-en-ligne/") || url.includes("/drive/accueil") || url.includes("/drive-") || url.includes("/drive/"))) ||
           (selectedStore.id === "auchan" && (url.includes("/magasin") || url.includes("/courses") || url.includes("/achat-") || url.includes("/drive-"))) ||
           (selectedStore.id === "intermarche" && (url.includes("/magasin") || url.includes("/pdv/") || url.includes("/rayons") || url.includes("/drive-")));
 
@@ -521,6 +521,45 @@ export default function DriveCartModal({
     Clipboard.setStringAsync(cleanQ).catch(() => {});
     const targetUrl = getDirectSearchUrl(cleanQ);
     sendRemoteLog("APP_START_SEARCH", `Recherche: "${cleanQ}" (${selectedStore.name}) -> ${targetUrl}`);
+
+    if (selectedStore.id === "coursesu" || selectedStore.id === "intermarche") {
+      const domSearchJs = `
+        (function() {
+          try {
+            var q = ${JSON.stringify(cleanQ)};
+            var input = document.querySelector('input[placeholder*="recherch" i], input[type="search"], input[name="q"], input#header-search, input.search-field, input[name="search"], input#q');
+            if (input) {
+              input.focus();
+              var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value') ? Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set : null;
+              if (nativeSetter) {
+                nativeSetter.call(input, q);
+              } else {
+                input.value = q;
+              }
+              input.dispatchEvent(new Event('input', { bubbles: true }));
+              input.dispatchEvent(new Event('change', { bubbles: true }));
+              var form = input.closest('form');
+              var btn = form ? form.querySelector('button[type="submit"], input[type="submit"], button.header-search__btn, button.search-button, button[aria-label*="recherch" i]') : document.querySelector('button[type="submit"], button[aria-label*="recherch" i]');
+              if (btn) {
+                btn.click();
+              } else if (form) {
+                form.submit();
+              } else {
+                input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
+                input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
+              }
+            } else {
+              window.location.href = ${JSON.stringify(targetUrl)};
+            }
+          } catch(e) {
+            window.location.href = ${JSON.stringify(targetUrl)};
+          }
+        })();
+        true;
+      `;
+      webViewRef.current?.injectJavaScript(domSearchJs);
+      return;
+    }
 
     const searchJs = `
       (function() {

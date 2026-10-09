@@ -129,7 +129,34 @@ export default function QuickMenuModal({
 
 
 
-                  {/* Action 4 : Mon Foyer & Profil */}
+                  {/* Action 3 : PlanEat Pro */}
+                  <TouchableOpacity
+                    style={[styles.menuActionCard, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}
+                    activeOpacity={0.7}
+                    onPress={() => {
+                      onClose();
+                      if (onOpenPaywall) onOpenPaywall();
+                    }}
+                  >
+                    <LinearGradient
+                      colors={["#f59e0b", "#d97706"]}
+                      style={styles.actionIconBg}
+                    >
+                      <Ionicons name="star" size={22} color="#ffffff" />
+                    </LinearGradient>
+                    <View style={styles.actionTextBox}>
+                      <View style={[styles.actionTitleRow, isRTL && styles.rtlRow]}>
+                        <Text style={[styles.actionTitle, { color: theme.text }]}>PlanEat Pro (Sans pub)</Text>
+                        <View style={[styles.newBadge, { backgroundColor: "rgba(245, 158, 11, 0.2)" }]}>
+                          <Text style={[styles.newBadgeText, { color: "#f59e0b" }]}>{isPro ? "Actif 👑" : "0,83 €/m"}</Text>
+                        </View>
+                      </View>
+                      <Text style={[styles.actionDesc, { color: theme.textSub }]}>
+                        {isPro ? "Abonnement actif • Aucune publicité" : "Supprimez toutes les publicités & vidéos"}
+                      </Text>
+                    </View>
+                    <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={20} color={theme.textMuted} />
+                  </TouchableOpacity>
                   <TouchableOpacity
                     style={[styles.menuActionCard, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}
                     activeOpacity={0.7}

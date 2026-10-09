@@ -42,17 +42,32 @@ const STORE_DETECTOR_INJECTION_JS = `
   if (window.__planeatDetectorActive) return;
   window.__planeatDetectorActive = true;
 
-  try {
-    var links = Array.from(document.querySelectorAll('a[href], button')).map(function(a) {
-      return (a.tagName + ':' + (a.getAttribute('href') || '') + ':' + (a.innerText || '').trim().substring(0, 20));
-    }).filter(function(x) { return x.length > 5; }).slice(0, 30).join(' | ');
-    var info = "URL: " + window.location.href + " | Elements: " + links;
-    fetch("http://192.168.1.111:8088/log", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "ANGULAR_LINKS", text: info })
-    }).catch(function() {});
-  } catch(eLinks) {}
+  function logDOMState() {
+    try {
+      var tags = Array.from(document.querySelectorAll("input, button, [role='button'], [placeholder], cwcrs-search, cw-search, [class*='search'], [class*='recherche']")).map(function(a) {
+        var t = (a.tagName || '').toLowerCase();
+        var id = a.id ? '#' + a.id : '';
+        var name = a.name ? '[name=' + a.name + ']' : '';
+        var ph = a.placeholder ? '[ph=' + a.placeholder + ']' : '';
+        var aria = a.getAttribute('aria-label') ? '[aria=' + a.getAttribute('aria-label') + ']' : '';
+        var cls = (typeof a.className === 'string' ? '.' + a.className.trim().replace(/\\s+/g, '.') : '');
+        var txt = (a.innerText || a.textContent || '').trim().substring(0, 20);
+        return t + id + name + ph + aria + cls + (txt ? '(' + txt + ')' : '');
+      }).slice(0, 30).join(' | ');
+
+      fetch("http://192.168.1.111:8088/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "DOM_ELEMENTS",
+          text: "URL: " + window.location.href + " | Elements (" + tags.length + "): " + tags
+        })
+      }).catch(function() {});
+    } catch(e) {}
+  }
+  logDOMState();
+  setTimeout(logDOMState, 1500);
+  setTimeout(logDOMState, 3500);
 
   function emitStoreChosen(reason) {
     try {

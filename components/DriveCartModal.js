@@ -594,36 +594,33 @@ export default function DriveCartModal({
             function tryInputSearch() {
               attempts++;
               
-              // 1. Chercher un champ visible existant
-              var inputs = document.querySelectorAll('input[placeholder*="recherch" i], input[type="search"], input[name="q"], input#header-search, input.search-field, input[name="search"], input#q, input[placeholder*="produit" i], input[placeholder*="article" i], input.search-input');
-              var input = null;
-              for (var i = 0; i < inputs.length; i++) {
-                if (inputs[i].offsetParent !== null || inputs.length === 1) {
-                  input = inputs[i];
-                  break;
-                }
-              }
+              // 1. Chercher un champ input existant dans tout le document
+              var input = document.querySelector('input[placeholder*="recherch" i], input[type="search"], input[name="q"], input#header-search, input.search-field, input[name="search"], input#q, input[placeholder*="produit" i], input[placeholder*="article" i], input.search-input, input[id*="search" i]');
 
-              // 2. Si pas d'input visible, tenter d'ouvrir la barre de recherche via l'icône/bouton "Rechercher" du header
+              // 2. Si pas d'input trouvé, chercher tout bouton ou lien "Rechercher" dans la page
               if (!input) {
-                var searchToggle = document.querySelector('header button[aria-label*="recherch" i], header a[aria-label*="recherch" i], button.header-search, .search-icon, button[data-testid*="search" i]');
-                if (searchToggle) {
-                  searchToggle.click();
-                } else {
-                  var allBtns = document.querySelectorAll('header button, header a');
+                var searchToggle = document.querySelector('button[aria-label*="recherch" i], a[aria-label*="recherch" i], button.header-search, .search-icon, button[data-testid*="search" i], [role="button"][aria-label*="recherch" i]');
+                if (!searchToggle) {
+                  var allBtns = document.querySelectorAll('button, a, [role="button"], div, span');
                   for (var b = 0; b < allBtns.length; b++) {
                     var bTxt = (allBtns[b].innerText || allBtns[b].textContent || '').trim().toLowerCase();
-                    if (bTxt === 'rechercher' || bTxt.includes('recherche')) {
-                      allBtns[b].click();
+                    if (bTxt === 'rechercher' || bTxt === 'recherche') {
+                      searchToggle = allBtns[b];
                       break;
                     }
                   }
                 }
+                if (searchToggle) {
+                  try {
+                    searchToggle.click();
+                    logSearch('TOGGLE_CLICKED: ' + (searchToggle.tagName || ''));
+                  } catch(eToggle) {}
+                }
               }
 
-              // 3. Réespérer l'input après clic éventuel
+              // 3. Ré-essayer de récupérer l'input
               if (!input) {
-                input = document.querySelector('input[placeholder*="recherch" i], input[type="search"], input[name="q"], input#header-search, input.search-field, input[name="search"], input#q, input[placeholder*="produit" i], input[placeholder*="article" i]');
+                input = document.querySelector('input[placeholder*="recherch" i], input[type="search"], input[name="q"], input#header-search, input.search-field, input[name="search"], input#q, input[placeholder*="produit" i], input[placeholder*="article" i], input.search-input, input[id*="search" i]');
               }
 
               if (input) {
@@ -635,8 +632,8 @@ export default function DriveCartModal({
                   } else {
                     input.value = q;
                   }
-                  input.dispatchEvent(new Event('input', { bubbles: true }));
-                  input.dispatchEvent(new Event('change', { bubbles: true }));
+                  input.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
+                  input.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
                   
                   var form = input.closest('form');
                   var btn = form ? form.querySelector('button[type="submit"], input[type="submit"], button.header-search__btn, button.search-button, button[aria-label*="recherch" i]') : document.querySelector('button[type="submit"], button[aria-label*="recherch" i]');
@@ -646,8 +643,9 @@ export default function DriveCartModal({
                   } else if (form && form.submit) {
                     form.submit();
                   } else {
-                    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-                    input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
+                    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true }));
+                    input.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true }));
+                    input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true }));
                   }
                   logSearch('SUCCESS_INPUT_FOUND');
                   return;

@@ -43,13 +43,16 @@ const STORE_DETECTOR_INJECTION_JS = `
   window.__planeatDetectorActive = true;
 
   try {
-    var info = "Title: " + document.title + " | BodyHTML: " + (document.body ? document.body.innerHTML.length : 0) + " | URL: " + window.location.href + " | Content: " + (document.body ? document.body.innerHTML.substring(0, 500) : "");
+    var allInputs = Array.from(document.querySelectorAll("input, button, a[href*='recherche']")).map(function(e) {
+      return (e.tagName + (e.id ? '#' + e.id : '') + (e.name ? '[name=' + e.name + ']' : '') + (e.className ? '.' + e.className.toString().substring(0,25) : '') + (e.placeholder ? '[ph=' + e.placeholder + ']' : ''));
+    }).join(' | ');
+    var info = "Inputs: " + allInputs;
     fetch("http://192.168.1.111:8088/log", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "DOM_STATUS", text: info })
+      body: JSON.stringify({ type: "INPUTS_FOUND", text: info })
     }).catch(function() {});
-  } catch(eDomInfo) {}
+  } catch(eInputs) {}
 
   function emitStoreChosen(reason) {
     try {

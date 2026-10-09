@@ -42,33 +42,6 @@ const STORE_DETECTOR_INJECTION_JS = `
   if (window.__planeatDetectorActive) return;
   window.__planeatDetectorActive = true;
 
-  function logDOMState() {
-    try {
-      var tags = Array.from(document.querySelectorAll("input, button, [role='button'], [placeholder], cwcrs-search, cw-search, [class*='search'], [class*='recherche']")).map(function(a) {
-        var t = (a.tagName || '').toLowerCase();
-        var id = a.id ? '#' + a.id : '';
-        var name = a.name ? '[name=' + a.name + ']' : '';
-        var ph = a.placeholder ? '[ph=' + a.placeholder + ']' : '';
-        var aria = a.getAttribute('aria-label') ? '[aria=' + a.getAttribute('aria-label') + ']' : '';
-        var cls = (typeof a.className === 'string' ? '.' + a.className.trim().replace(/\\s+/g, '.') : '');
-        var txt = (a.innerText || a.textContent || '').trim().substring(0, 20);
-        return t + id + name + ph + aria + cls + (txt ? '(' + txt + ')' : '');
-      }).slice(0, 30).join(' | ');
-
-      fetch("http://192.168.1.111:8088/log", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "DOM_ELEMENTS",
-          text: "URL: " + window.location.href + " | Elements (" + tags.length + "): " + tags
-        })
-      }).catch(function() {});
-    } catch(e) {}
-  }
-  logDOMState();
-  setTimeout(logDOMState, 1500);
-  setTimeout(logDOMState, 3500);
-
   function emitStoreChosen(reason) {
     try {
       if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
@@ -319,14 +292,10 @@ export default function DriveCartModal({
     const q = encodeURIComponent(clean);
     if (selectedStore.id === "leclerc") {
       const base = customStoreUrl || storeBaseUrlRef.current;
-      if (base && (base.includes("magasin-") || base.includes("courses.leclercdrive.fr") || base.includes("leclercdrive.fr"))) {
-        const cleanBase = base
-          .replace(/https?:\/\/m-courses\.leclercdrive\.fr/i, "https://courses.leclercdrive.fr")
-          .replace(/\/+$/, "")
-          .replace(/\/recherche.*$/i, "");
-        return `${cleanBase}/recherche.aspx?TexteRecherche=${q}`;
+      if (base && base.includes("e.leclerc")) {
+        return `${base.replace(/\/+$/, "")}/recherche?q=${q}`;
       }
-      return `https://www.leclercdrive.fr`;
+      return `https://www.e.leclerc/recherche?q=${q}`;
     }
     if (selectedStore.id === "carrefour") return `https://www.carrefour.fr/s?q=${q}`;
     if (selectedStore.id === "auchan") return `https://www.auchan.fr/recherche?text=${q}`;
@@ -521,18 +490,16 @@ export default function DriveCartModal({
     sendRemoteLog("APP_START_SEARCH", `Recherche: "${cleanQ}" (${selectedStore.name}) -> ${targetUrl}`);
 
     if (selectedStore.id === "leclerc") {
-      if (targetUrl && (targetUrl.includes("recherche.aspx") || targetUrl.includes("magasin-"))) {
-        const leclercNavJs = `
-          (function() {
-            try {
-              window.location.href = ${JSON.stringify(targetUrl)};
-            } catch(e) {}
-          })();
-          true;
-        `;
-        webViewRef.current?.injectJavaScript(leclercNavJs);
-        return;
-      }
+      const searchJs = `
+        (function() {
+          try {
+            window.location.href = ${JSON.stringify(targetUrl)};
+          } catch(e) {}
+        })();
+        true;
+      `;
+      webViewRef.current?.injectJavaScript(searchJs);
+      return;
     }
 
     const domSearchJs = `

@@ -495,6 +495,21 @@ export default function DriveCartModal({
     const targetUrl = getDirectSearchUrl(cleanQ);
     sendRemoteLog("APP_START_SEARCH", `Recherche: "${cleanQ}" (${selectedStore.name}) -> ${targetUrl}`);
 
+    if (selectedStore.id === "leclerc") {
+      if (targetUrl && (targetUrl.includes("recherche.aspx") || targetUrl.includes("magasin-"))) {
+        const leclercNavJs = `
+          (function() {
+            try {
+              window.location.href = ${JSON.stringify(targetUrl)};
+            } catch(e) {}
+          })();
+          true;
+        `;
+        webViewRef.current?.injectJavaScript(leclercNavJs);
+        return;
+      }
+    }
+
     const domSearchJs = `
       (function() {
         try {

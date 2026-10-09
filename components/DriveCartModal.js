@@ -484,6 +484,8 @@ export default function DriveCartModal({
         cleanUrl === "https://coursesu.com" ||
         cleanUrl === "https://www.coursesu.com" ||
         cleanUrl === "https://www.coursesu.com/drive" ||
+        cleanUrl === "https://www.coursesu.com/drive/home" ||
+        cleanUrl === "https://www.coursesu.com/home" ||
         cleanUrl === "https://www.coursesu.com/drive/accueil" ||
         cleanUrl === "https://www.auchan.fr" ||
         cleanUrl === "https://www.auchan.fr/drive" ||
@@ -498,7 +500,7 @@ export default function DriveCartModal({
           url.includes("/mag/") ||
           url.includes("courses.leclercdrive.fr/magasin") ||
           (selectedStore.id === "carrefour" && (url.includes("/magasin") || url.includes("/drive") || url.includes("/courses") || url.includes("/s?") || url.includes("/r?") || url.includes("service_point"))) ||
-          (selectedStore.id === "coursesu" && (url.includes("/magasin") || url.includes("/courses-en-ligne/") || url.includes("/drive-") || url.includes("/drive/"))) ||
+          (selectedStore.id === "coursesu" && (url.includes("/magasin") || url.includes("/courses-en-ligne/") || url.includes("/drive/accueil") || url.includes("/search") || url.includes("/recherche") || url.includes("/drive-") || url.includes("/drive/"))) ||
           (selectedStore.id === "auchan" && (url.includes("/magasin") || url.includes("/courses") || url.includes("/achat-") || url.includes("/drive-"))) ||
           (selectedStore.id === "intermarche" && (url.includes("/magasin") || url.includes("/pdv/") || url.includes("/rayons") || url.includes("/drive-")));
 

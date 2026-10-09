@@ -42,10 +42,14 @@ const STORE_DETECTOR_INJECTION_JS = `
   if (window.__planeatDetectorActive) return;
   window.__planeatDetectorActive = true;
 
-  // Empêcher les scripts de redirection d'erreur intempestifs (ex: WCTD610 sur Leclerc Drive)
   try {
-    window.onerror = function() { return true; };
-  } catch(e) {}
+    var info = "Title: " + document.title + " | BodyHTML: " + (document.body ? document.body.innerHTML.length : 0) + " | URL: " + window.location.href;
+    fetch("http://192.168.1.111:8088/log", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "DOM_STATUS", text: info })
+    }).catch(function() {});
+  } catch(eDomInfo) {}
 
   function emitStoreChosen(reason) {
     try {

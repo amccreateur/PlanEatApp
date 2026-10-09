@@ -139,24 +139,6 @@ const STORE_DETECTOR_INJECTION_JS = `
 
   function dismissOverlays() {
     try {
-      var closeBtns = document.querySelectorAll('button[aria-label*="hopla" i], button[aria-label*="fermer" i], button[aria-label*="close" i], div[class*="hopla" i] button, button.tc-privacy-button, #onetrust-accept-btn-handler, #onetrust-reject-all-handler, button#popin_tc_privacy_button_2, button[id*="accept" i], button[id*="consent" i], button[class*="accept" i]');
-      for (var c = 0; c < closeBtns.length; c++) {
-        var btn = closeBtns[c];
-        var aria = (btn.getAttribute('aria-label') || '').toLowerCase();
-        var txt = (btn.innerText || btn.textContent || '').toLowerCase();
-        if (
-          aria.includes('hopla') || txt.includes('hopla') ||
-          (aria.includes('fermer') && !aria.includes('recherche')) ||
-          txt.includes('continuer sans accepter') ||
-          txt.includes('accepter & fermer') ||
-          txt.includes('tout accepter') ||
-          txt.includes('accepter tous les cookies') ||
-          txt === 'accepter' ||
-          txt === "j'accepte"
-        ) {
-          btn.click();
-        }
-      }
       var popups = document.querySelectorAll('[class*="hopla" i], [id*="hopla" i], [class*="smartbanner" i], #onetrust-consent-sdk, .onetrust-pc-dark-filter, .modal-backdrop, .didomi-popup-backdrop, [class*="backdrop" i], [id*="backdrop" i], #popin_tc_privacy_container_filter, .tc-privacy-wrapper');
       for (var h = 0; h < popups.length; h++) {
         popups[h].remove();
@@ -172,9 +154,8 @@ const STORE_DETECTOR_INJECTION_JS = `
     } catch(eDismiss) {}
   }
   dismissOverlays();
-  setTimeout(dismissOverlays, 500);
-  setTimeout(dismissOverlays, 1200);
-  setTimeout(dismissOverlays, 2500);
+  setTimeout(dismissOverlays, 600);
+  setTimeout(dismissOverlays, 1800);
 
   // Surveillance périodique de l'URL ou du DOM (SPA / redirections)
   var checkCount = 0;

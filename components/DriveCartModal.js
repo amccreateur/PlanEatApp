@@ -80,7 +80,7 @@ const STORE_DETECTOR_INJECTION_JS = `
   setTimeout(dismissCookieBanners, 400);
   setTimeout(dismissCookieBanners, 1200);
 
-  // Auto-ouverture du choix Drive / code postal sur Auchan uniquement sur la page d'accueil initiale
+  // Auto-ouverture du choix Drive / code postal sur Auchan uniquement sur la page d'accueil initiale si pas encore de magasin
   try {
     if (window.location.hostname.includes('auchan.fr') && (window.location.pathname === '/' || window.location.pathname === '')) {
       setTimeout(function() {
@@ -95,6 +95,34 @@ const STORE_DETECTOR_INJECTION_JS = `
       }, 700);
     }
   } catch(eAuchan) {}
+
+  // Détection active immédiate si un magasin est déjà sélectionné dans la page
+  function checkAlreadySelectedStore() {
+    try {
+      var bodyText = document.body ? (document.body.innerText || '') : '';
+      var url = (window.location.href || '').toLowerCase();
+
+      var isStoreActive = (
+        // Auchan
+        (url.includes('auchan.fr') && (bodyText.includes('Retrait:') || bodyText.includes('Retrait :') || bodyText.includes('Retrait en drive') || bodyText.includes('supermarché') || bodyText.includes('hypermarché'))) ||
+        // Leclerc
+        (url.includes('leclercdrive.fr') && (url.includes('/magasin-') || bodyText.includes('mon drive') || bodyText.includes('mon magasin'))) ||
+        // Courses U
+        (url.includes('coursesu.com') && (url.includes('/drive-') || bodyText.includes('bienvenue au drive') || bodyText.includes('super u') || bodyText.includes('hyper u') || bodyText.includes('u express'))) ||
+        // Carrefour
+        (url.includes('carrefour.fr') && (url.includes('/magasin') || bodyText.includes('mon magasin') || bodyText.includes('mon drive'))) ||
+        // Intermarché
+        (url.includes('intermarche.com') && (url.includes('/pdv/') || bodyText.includes('mon magasin') || bodyText.includes('mon drive')))
+      );
+
+      if (isStoreActive) {
+        emitStoreChosen('active_store_detected');
+      }
+    } catch(e) {}
+  }
+  setTimeout(checkAlreadySelectedStore, 500);
+  setTimeout(checkAlreadySelectedStore, 1500);
+  setTimeout(checkAlreadySelectedStore, 3000);
 
   // Interception passive des clics utilisateur sur les boutons de choix de magasin / Drive
   document.addEventListener('click', function(e) {
@@ -120,12 +148,17 @@ const STORE_DETECTOR_INJECTION_JS = `
           text.includes('faire mes courses') ||
           text.includes('je choisis ce drive') ||
           text.includes('valider ce magasin') ||
+          text.includes('valider ce drive') ||
+          text.includes('valider mon drive') ||
           text.includes('retrait en drive') ||
           text.includes('retrait drive') ||
+          text.includes('continuer mes courses') ||
+          text.includes('commencer mes courses') ||
           aria.includes('choisir ce drive') ||
           aria.includes('choisir ce magasin') ||
           aria.includes('sélectionner') ||
           aria.includes('selectionner') ||
+          aria.includes('valider') ||
           testId.includes('select-store') ||
           testId.includes('choose-store') ||
           testId.includes('store-card-cta') ||

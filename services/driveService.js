@@ -11,8 +11,8 @@ export const DRIVE_STORES = [
     color: "#0066c0",
     badgeColor: "#ffcc00",
     textColor: "#ffffff",
-    homeUrl: "https://www.e.leclerc",
-    searchUrl: (query) => `https://www.e.leclerc/recherche?q=${encodeURIComponent(query)}`,
+    homeUrl: "https://m-courses.leclercdrive.fr",
+    searchUrl: (query) => `https://m-courses.leclercdrive.fr/recherche/${encodeURIComponent(query)}`,
     logoEmoji: "🔵"
   },
   {
@@ -22,7 +22,7 @@ export const DRIVE_STORES = [
     color: "#004e9a",
     badgeColor: "#e2001a",
     textColor: "#ffffff",
-    homeUrl: "https://www.carrefour.fr",
+    homeUrl: "https://www.carrefour.fr/drive",
     searchUrl: (query) => `https://www.carrefour.fr/s?q=${encodeURIComponent(query)}`,
     logoEmoji: "🔴"
   },
@@ -33,7 +33,7 @@ export const DRIVE_STORES = [
     color: "#0085ca",
     badgeColor: "#ffffff",
     textColor: "#ffffff",
-    homeUrl: "https://www.coursesu.com",
+    homeUrl: "https://www.coursesu.com/drive",
     searchUrl: (query) => `https://www.coursesu.com/recherche?q=${encodeURIComponent(query)}`,
     logoEmoji: "🔷"
   },
@@ -44,7 +44,7 @@ export const DRIVE_STORES = [
     color: "#e1001a",
     badgeColor: "#22c55e",
     textColor: "#ffffff",
-    homeUrl: "https://www.auchan.fr",
+    homeUrl: "https://www.auchan.fr/drive",
     searchUrl: (query) => `https://www.auchan.fr/recherche?text=${encodeURIComponent(query)}`,
     logoEmoji: "🟢"
   },
@@ -55,7 +55,7 @@ export const DRIVE_STORES = [
     color: "#cc0000",
     badgeColor: "#1e293b",
     textColor: "#ffffff",
-    homeUrl: "https://www.intermarche.com",
+    homeUrl: "https://www.intermarche.com/drive",
     searchUrl: (query) => `https://www.intermarche.com/recherche?q=${encodeURIComponent(query)}`,
     logoEmoji: "🟠"
   }

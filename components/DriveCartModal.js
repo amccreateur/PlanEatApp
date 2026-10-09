@@ -368,7 +368,7 @@ export default function DriveCartModal({
       if (base && base.includes("e.leclerc")) {
         return `${base.replace(/\/+$/, "")}/recherche?q=${q}`;
       }
-      return `https://www.e.leclerc/recherche?q=${q}`;
+      return `https://m-courses.leclercdrive.fr/recherche/${q}`;
     }
     if (selectedStore.id === "carrefour") return `https://www.carrefour.fr/s?q=${q}`;
     if (selectedStore.id === "auchan") return `https://www.auchan.fr/recherche?text=${q}`;

@@ -54,21 +54,6 @@ const STORE_DETECTOR_INJECTION_JS = `
     } catch(e) {}
   }
 
-  // Auto-recovery uniquement sur véritable page d'erreur ASP.NET / 404 dédiée
-  try {
-    var curHref = (window.location.href || '').toLowerCase();
-    if (
-      curHref.includes('erreur.aspx') ||
-      curHref.includes('/erreur-404') ||
-      curHref.includes('/page-non-trouvee')
-    ) {
-      if (curHref.includes('leclerc') && !curHref.endsWith('leclercdrive.fr/')) {
-        window.location.replace('https://www.leclercdrive.fr/');
-        return;
-      }
-    }
-  } catch(eRecov) {}
-
   // Interception des clics sur les boutons / liens de choix de Drive ou magasin
   document.addEventListener('click', function(e) {
     try {
@@ -513,20 +498,6 @@ export default function DriveCartModal({
     const url = navState.url || "";
     if (url) {
       sendRemoteLog("WEBVIEW_NAV", `URL: ${url}`);
-      if (
-        url.includes("Erreur.aspx") ||
-        url.includes("/404") ||
-        url.includes("page-introuvable") ||
-        url.includes("/erreur-404")
-      ) {
-        if (url.includes("Erreur.aspx")) {
-          sendRemoteLog("AUTO_REDIRECT", "Récupération vers https://www.leclercdrive.fr");
-          setCurrentUrl("https://www.leclercdrive.fr");
-          return;
-        }
-        setCurrentUrl(selectedStore.homeUrl);
-        return;
-      }
       const match = url.match(/(https?:\/\/[^\/]+\/magasin-[^\/\?#]+)/i);
       if (match && match[1]) {
         let storeUrl = match[1];

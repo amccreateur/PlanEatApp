@@ -11,7 +11,7 @@ if (Platform.OS !== "web") {
 }
 
 // Mode gratuit / test : mettre à false pour débloquer 100% de l'appli sans popup ni achat
-export const ENABLE_SUBSCRIPTIONS = false;
+export const ENABLE_SUBSCRIPTIONS = true;
 
 export const REVENUECAT_KEYS = {
   ios: "appl_fyeupvTKMGvuvRdPAtTDjmQIiXp",
@@ -68,13 +68,11 @@ class PurchaseService {
   }
 
   _handleCustomerInfoUpdate(customerInfo) {
-    if (!ENABLE_SUBSCRIPTIONS) {
-      this.isPro = true;
+    if (!customerInfo) {
+      this.isPro = false;
       this._notifyListeners();
       return;
     }
-
-    if (!customerInfo) return;
     const hasPro = ENTITLEMENT_IDS.some(
       (entId) => customerInfo.entitlements?.active?.[entId]?.isActive
     );

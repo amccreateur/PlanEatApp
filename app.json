@@ -6,7 +6,7 @@
   "expo": {
     "name": "PlanEat",
     "slug": "PlanEatApp",
-    "version": "1.2.4",
+    "version": "1.2.6",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -19,17 +19,19 @@
       "icon": "./assets/icon.png",
       "supportsTablet": true,
       "bundleIdentifier": "com.amccreateur.PlanEatApp",
-      "buildNumber": "25",
+      "buildNumber": "28",
       "config": {
         "usesNonExemptEncryption": false
       },
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "GADApplicationIdentifier": "ca-app-pub-5303925075056294~8146965129",
+        "NSUserTrackingUsageDescription": "Cette autorisation permet d'afficher des annonces pertinentes et de débloquer vos fonctionnalités sans abonnement."
       }
     },
     "android": {
       "package": "com.amccreateur.PlanEatApp",
-      "versionCode": 24,
+      "versionCode": 26,
       "adaptiveIcon": {
         "backgroundColor": "#3eb5ec",
         "foregroundImage": "./assets/android-icon-foreground.png"

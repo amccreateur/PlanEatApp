@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { THEMES } from "../utils/theme";
 import { TRANSLATIONS } from "../i18n/translations";
 
@@ -19,6 +20,7 @@ export default function AiGenerationLoadingModal({
   themeMode = "dark",
   durationWeeks = 1
 }) {
+  const insets = useSafeAreaInsets();
   const theme = THEMES[themeMode] || THEMES.dark;
   const t = TRANSLATIONS[lang] || TRANSLATIONS.fr;
   const isRTL = lang === "ar";
@@ -121,7 +123,7 @@ export default function AiGenerationLoadingModal({
       animationType="fade"
       statusBarTranslucent
     >
-      <View style={styles.backdrop}>
+      <View style={[styles.backdrop, { paddingBottom: Math.max(insets.bottom, 20), paddingTop: Math.max(insets.top, 20) }]}>
         <View style={[styles.card, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
           
           {/* Animated Chef Glowing Icon */}

@@ -169,9 +169,9 @@ function MainApp() {
     activeLang = lang
   ) => {
     setIsGenerating(true);
-    // Déclencher la pub avec un délai de 1.2s pour laisser l'utilisateur lire l'écran de préparation
+    // Déclencher la vidéo récompensée (avec fallback automatique)
     setTimeout(() => {
-      adService.showInterstitial({ minIntervalSeconds: 15 });
+      adService.showRewardedVideo();
     }, 1200);
     try {
       const { plan, groceries: compiledGroceries, error } = await AIPlannerService.generateMealPlan(

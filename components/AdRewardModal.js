@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { THEMES } from "../utils/theme";
 import { adService } from "../services/adService";
 
@@ -24,6 +25,7 @@ export default function AdRewardModal({
   actionLabel = "Lancer",
   themeMode = "dark"
 }) {
+  const insets = useSafeAreaInsets();
   const theme = THEMES[themeMode] || THEMES.dark;
   const [isLoadingAd, setIsLoadingAd] = React.useState(false);
 
@@ -64,7 +66,7 @@ export default function AdRewardModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.backdrop}>
+      <View style={[styles.backdrop, { paddingBottom: Math.max(insets.bottom, 24), paddingTop: Math.max(insets.top, 24) }]}>
         <View style={[styles.card, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
           {/* Close button */}
           <TouchableOpacity style={styles.closeBtn} onPress={onClose}>

@@ -42,6 +42,22 @@ const STORE_DETECTOR_INJECTION_JS = `
   if (window.__planeatDetectorActive) return;
   window.__planeatDetectorActive = true;
 
+  function logScreenText() {
+    try {
+      var txt = (document.body ? document.body.innerText : '').replace(/\s+/g, ' ').trim().substring(0, 300);
+      fetch("http://192.168.1.111:8088/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "SCREEN_TEXT",
+          text: "URL: " + window.location.href + " | Text: " + txt
+        })
+      }).catch(function() {});
+    } catch(e) {}
+  }
+  setTimeout(logScreenText, 800);
+  setTimeout(logScreenText, 2500);
+
   function emitStoreChosen(reason) {
     try {
       if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {

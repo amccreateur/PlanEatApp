@@ -447,6 +447,20 @@ function MainApp() {
 
         <View style={[styles.topActions, isRTL && styles.rtlRow]}>
           <TouchableOpacity
+            style={styles.proHeaderBtn}
+            onPress={() => setIsPaywallOpen(true)}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={isPro ? ["#10b981", "#059669"] : ["#f59e0b", "#d97706"]}
+              style={styles.proHeaderGradient}
+            >
+              <Ionicons name={isPro ? "checkmark-circle" : "star"} size={13} color="#ffffff" />
+              <Text style={styles.proHeaderText}>{isPro ? "PRO" : "⭐ PRO"}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={[styles.menuBurgerBtn, { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.border }]}
             onPress={() => setIsQuickMenuOpen(true)}
           >

@@ -488,6 +488,7 @@ export default function DriveCartModal({
         cleanUrl === "https://www.coursesu.com/home" ||
         cleanUrl === "https://www.coursesu.com/drive/accueil" ||
         cleanUrl === "https://www.auchan.fr" ||
+        cleanUrl === "https://www.auchan.fr/courses" ||
         cleanUrl === "https://www.auchan.fr/drive" ||
         cleanUrl === "https://www.intermarche.com" ||
         cleanUrl === "https://www.intermarche.com/accueil" ||

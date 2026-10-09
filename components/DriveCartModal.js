@@ -297,8 +297,9 @@ export default function DriveCartModal({
     const q = encodeURIComponent(clean);
     if (selectedStore.id === "leclerc") {
       const base = customStoreUrl || storeBaseUrlRef.current;
-      if (base && (base.includes("magasin-") || base.includes("courses.leclercdrive.fr"))) {
-        return `${base.replace(/\/+$/, "")}/recherche/${q}`;
+      if (base && (base.includes("magasin-") || base.includes("courses.leclercdrive.fr") || base.includes("leclercdrive.fr"))) {
+        const cleanBase = base.replace(/\/+$/, "").replace(/\/recherche.*$/i, "");
+        return `${cleanBase}/recherche.aspx?TexteRecherche=${q}`;
       }
       return `https://www.leclercdrive.fr`;
     }
@@ -573,9 +574,9 @@ export default function DriveCartModal({
               }
             }
 
-            if (attempts >= 2) {
+            if (attempts >= 8) {
               if (${JSON.stringify(selectedStore.id)} === "leclerc") {
-                if (targetUrl && targetUrl.includes('/recherche/')) {
+                if (targetUrl && (targetUrl.includes('recherche') || targetUrl.includes('magasin-'))) {
                   window.location.href = targetUrl;
                 }
               } else if (${JSON.stringify(selectedStore.id)} !== "intermarche") {
@@ -583,12 +584,12 @@ export default function DriveCartModal({
               }
               return;
             }
-            setTimeout(trySearch, 200);
+            setTimeout(trySearch, 300);
           }
           trySearch();
         } catch(err) {
           if (${JSON.stringify(selectedStore.id)} === "leclerc") {
-            if (targetUrl && targetUrl.includes('/recherche/')) {
+            if (targetUrl && (targetUrl.includes('recherche') || targetUrl.includes('magasin-'))) {
               window.location.href = targetUrl;
             }
           } else if (${JSON.stringify(selectedStore.id)} !== "intermarche") {

@@ -70,6 +70,16 @@ const STORE_DETECTOR_INJECTION_JS = `
     } catch(e) {}
   }
 
+  // Auto-dismiss OneTrust / Didomi / Carrefour / Leclerc cookie banners
+  function dismissCookieBanners() {
+    try {
+      var btn = document.querySelector('#onetrust-accept-btn-handler, #onetrust-reject-all-handler, #didomi-notice-agree-button, #didomi-notice-disagree-button, button[id*="accept" i], button[id*="cookie" i], button[aria-label*="accepter" i]');
+      if (btn) btn.click();
+    } catch(e) {}
+  }
+  setTimeout(dismissCookieBanners, 400);
+  setTimeout(dismissCookieBanners, 1200);
+
   // Interception passive des clics utilisateur sur les boutons de choix de magasin / Drive
   document.addEventListener('click', function(e) {
     try {
@@ -91,6 +101,7 @@ const STORE_DETECTOR_INJECTION_JS = `
           text.includes('selectionner ce magasin') ||
           text.includes('choisir ce point') ||
           text.includes('faire mes courses ici') ||
+          text.includes('faire mes courses') ||
           text.includes('je choisis ce drive') ||
           text.includes('valider ce magasin') ||
           text.includes('retrait en drive') ||
@@ -98,6 +109,7 @@ const STORE_DETECTOR_INJECTION_JS = `
           aria.includes('choisir ce drive') ||
           aria.includes('choisir ce magasin') ||
           aria.includes('sélectionner') ||
+          aria.includes('selectionner') ||
           testId.includes('select-store') ||
           testId.includes('choose-store') ||
           testId.includes('store-card-cta') ||
@@ -105,8 +117,8 @@ const STORE_DETECTOR_INJECTION_JS = `
           cls.includes('choose-store') ||
           cls.includes('btn-select-drive') ||
           cls.includes('drive-choice') ||
-          href.includes('/magasin-') ||
-          href.includes('/magasins/')
+          href.includes('/magasin') ||
+          href.includes('/courses')
         );
 
         if (isStoreAction) {
@@ -121,14 +133,14 @@ const STORE_DETECTOR_INJECTION_JS = `
     } catch(err) {}
   }, true);
 
-  // Masquage CSS non destructif des bannières smartbanner externes uniquement
+  // Masquage CSS non destructif des bannières smartbanner et popups intrusives
   try {
     var cleanStyle = document.createElement('style');
-    cleanStyle.innerHTML = '.smartbanner, .smart-banner, #smartbanner { display: none !important; }';
+    cleanStyle.innerHTML = '.smartbanner, .smart-banner, #smartbanner, .app-banner { display: none !important; }';
     (document.head || document.documentElement).appendChild(cleanStyle);
   } catch(eCleanStyle) {}
 
-  // Surveillance périodique de l'URL pour détecter l'arrivée sur la page magasin
+  // Surveillance périodique de l'URL pour détecter l'arrivée sur la page magasin ou recherche
   var checkCount = 0;
   var interval = setInterval(function() {
     checkCount++;
@@ -136,12 +148,13 @@ const STORE_DETECTOR_INJECTION_JS = `
     try {
       var url = (window.location.href || '').toLowerCase();
       if (
-        url.includes('/magasin-') ||
-        url.includes('/magasins/') ||
+        url.includes('/magasin') ||
         url.includes('courses.leclercdrive.fr/magasin') ||
         url.includes('/courses-en-ligne/') ||
         url.includes('/pdv/') ||
         url.includes('/rayons') ||
+        url.includes('/s?') ||
+        url.includes('/r?') ||
         url.includes('service_point')
       ) {
         emitStoreChosen('url_detection');
@@ -465,6 +478,7 @@ export default function DriveCartModal({
         cleanUrl === selectedStore.homeUrl.replace(/\/+$/, "").toLowerCase() ||
         cleanUrl === "https://www.carrefour.fr" ||
         cleanUrl === "https://www.carrefour.fr/drive" ||
+        cleanUrl === "https://www.carrefour.fr/courses" ||
         cleanUrl === "https://www.leclercdrive.fr" ||
         cleanUrl === "https://courses.leclercdrive.fr" ||
         cleanUrl === "https://coursesu.com" ||
@@ -480,12 +494,11 @@ export default function DriveCartModal({
 
       if (!isInitialHome) {
         const isStoreSelected =
-          url.includes("/magasin-") ||
-          url.includes("/magasins/") ||
+          url.includes("/magasin") ||
           url.includes("/mag/") ||
           url.includes("courses.leclercdrive.fr/magasin") ||
-          (selectedStore.id === "carrefour" && (url.includes("/magasins/") || url.includes("/drive/") || url.includes("service_point"))) ||
-          (selectedStore.id === "coursesu" && (url.includes("/magasin-") || url.includes("/courses-en-ligne/") || url.includes("/drive-") || url.includes("/drive/"))) ||
+          (selectedStore.id === "carrefour" && (url.includes("/magasin") || url.includes("/drive") || url.includes("/courses") || url.includes("/s?") || url.includes("/r?") || url.includes("service_point"))) ||
+          (selectedStore.id === "coursesu" && (url.includes("/magasin") || url.includes("/courses-en-ligne/") || url.includes("/drive-") || url.includes("/drive/"))) ||
           (selectedStore.id === "auchan" && (url.includes("/magasin") || url.includes("/courses") || url.includes("/achat-") || url.includes("/drive-"))) ||
           (selectedStore.id === "intermarche" && (url.includes("/magasin") || url.includes("/pdv/") || url.includes("/rayons") || url.includes("/drive-")));
 
@@ -507,124 +520,15 @@ export default function DriveCartModal({
     const targetUrl = getDirectSearchUrl(cleanQ);
     sendRemoteLog("APP_START_SEARCH", `Recherche: "${cleanQ}" (${selectedStore.name}) -> ${targetUrl}`);
 
-    if (selectedStore.id === "leclerc") {
-      const searchJs = `
-        (function() {
-          try {
-            window.location.href = ${JSON.stringify(targetUrl)};
-          } catch(e) {}
-        })();
-        true;
-      `;
-      webViewRef.current?.injectJavaScript(searchJs);
-      return;
-    }
-
-    const domSearchJs = `
+    const searchJs = `
       (function() {
         try {
-          var query = ${JSON.stringify(cleanQ)};
-          var targetUrl = ${JSON.stringify(targetUrl)};
-          var attempts = 0;
-
-          function trySearch() {
-            attempts++;
-            var forms = document.querySelectorAll('form');
-            for (var f = 0; f < forms.length; f++) {
-              var formEl = forms[f];
-              var qEl = formEl.querySelector('input#txtRecherche, input[name="txtRecherche"], input#txtSearch, input[name="txtSearch"], input[name="TexteRecherche"], input[name="q"], input[type="search"], input[name="text"], input[name="query"], input[name="keyword"], input[name="search"], input[placeholder*="recherch" i], input[placeholder*="produit" i], input[placeholder*="article" i], input.search-input, input#search-input');
-              if (qEl) {
-                try {
-                  qEl.focus();
-                  var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value') ? Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set : null;
-                  if (nativeSetter) {
-                    nativeSetter.call(qEl, query);
-                  } else {
-                    qEl.value = query;
-                  }
-                  qEl.dispatchEvent(new Event('input', { bubbles: true }));
-                  qEl.dispatchEvent(new Event('change', { bubbles: true }));
-                  qEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-                  qEl.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-                  var submitBtn = formEl.querySelector('#btnRechercher, button#btnRechercher, a#btnRechercher, button[type="submit"], input[type="submit"], button.search-button, button.header-search__btn, button[aria-label*="recherch" i]');
-                  if (submitBtn) {
-                    submitBtn.click();
-                    return;
-                  }
-                  formEl.submit();
-                  return;
-                } catch(errForm) {}
-              }
-            }
-
-            var selectors = [
-              'input#txtRecherche',
-              'input[name="txtRecherche"]',
-              'input#txtSearch',
-              'input[name="txtSearch"]',
-              'input[name="TexteRecherche"]',
-              'input[type="search"]',
-              'input[name="q"]',
-              'input[name="keyword"]',
-              'input[name="search"]',
-              'input#search-input',
-              'input[name="text"]',
-              'input[name="query"]',
-              'input[placeholder*="recherch" i]',
-              'input[placeholder*="produit" i]',
-              'input[placeholder*="article" i]',
-              'input[id*="recherche" i]',
-              'input[id*="search" i]'
-            ];
-
-            for (var i = 0; i < selectors.length; i++) {
-              var input = document.querySelector(selectors[i]);
-              if (input) {
-                try {
-                  input.focus();
-                  var nativeSetter2 = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value') ? Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set : null;
-                  if (nativeSetter2) {
-                    nativeSetter2.call(input, query);
-                  } else {
-                    input.value = query;
-                  }
-                  input.dispatchEvent(new Event('input', { bubbles: true }));
-                  input.dispatchEvent(new Event('change', { bubbles: true }));
-                  input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-                  input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-                  var nearbyBtn = input.parentElement?.querySelector('#btnRechercher, button#btnRechercher, a#btnRechercher, button, a') || document.querySelector('#btnRechercher, button[aria-label*="recherch" i], button.search-button');
-                  if (nearbyBtn) nearbyBtn.click();
-                  return;
-                } catch(errInput) {}
-              }
-            }
-
-            if (attempts >= 8) {
-              if (${JSON.stringify(selectedStore.id)} === "leclerc") {
-                if (targetUrl && (targetUrl.includes('recherche') || targetUrl.includes('magasin-'))) {
-                  window.location.href = targetUrl;
-                }
-              } else if (${JSON.stringify(selectedStore.id)} !== "intermarche") {
-                window.location.href = targetUrl;
-              }
-              return;
-            }
-            setTimeout(trySearch, 300);
-          }
-          trySearch();
-        } catch(err) {
-          if (${JSON.stringify(selectedStore.id)} === "leclerc") {
-            if (targetUrl && (targetUrl.includes('recherche') || targetUrl.includes('magasin-'))) {
-              window.location.href = targetUrl;
-            }
-          } else if (${JSON.stringify(selectedStore.id)} !== "intermarche") {
-            window.location.href = targetUrl;
-          }
-        }
+          window.location.href = ${JSON.stringify(targetUrl)};
+        } catch(e) {}
       })();
       true;
     `;
-    webViewRef.current?.injectJavaScript(domSearchJs);
+    webViewRef.current?.injectJavaScript(searchJs);
   };
 
   const handleSelectStore = (store) => {

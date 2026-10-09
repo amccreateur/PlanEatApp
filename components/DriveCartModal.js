@@ -103,14 +103,20 @@ const STORE_DETECTOR_INJECTION_JS = `
       var url = (window.location.href || '').toLowerCase();
 
       var isStoreActive = (
-        // Auchan
-        (url.includes('auchan.fr') && (bodyText.includes('Retrait:') || bodyText.includes('Retrait :') || bodyText.includes('Retrait en drive'))) ||
+        // Auchan : Détection dès que le créneau/magasin est sélectionné (ex: "Retrait: Auchan Drive...")
+        (url.includes('auchan.fr') && (
+          bodyText.includes('Retrait:') ||
+          bodyText.includes('Retrait :') ||
+          bodyText.includes('Retrait en drive') ||
+          document.querySelector('.journey-reminder__current-store, .site-header__store, [class*="JourneyReminder"], [class*="journey-reminder"], [data-testid*="current-store"]') !== null
+        )) ||
         // Leclerc
         (url.includes('leclercdrive.fr') && (url.includes('/magasin-') || bodyText.includes('mon drive') || bodyText.includes('mon magasin'))) ||
         // Courses U (exclusion stricte des URLs d'accueil et pas de détection sur texte générique de footer)
         (url.includes('coursesu.com') && (
           (url.includes('/drive-') && !url.includes('/drive/home') && !url.includes('/drive/accueil')) ||
-          url.includes('/courses-en-ligne/magasin-')
+          url.includes('/courses-en-ligne/magasin-') ||
+          document.querySelector('.header-store-name, .current-store-name, [data-action="change-store"]') !== null
         )) ||
         // Carrefour
         (url.includes('carrefour.fr') && (url.includes('/magasin') || bodyText.includes('mon magasin') || bodyText.includes('mon drive'))) ||
@@ -124,8 +130,18 @@ const STORE_DETECTOR_INJECTION_JS = `
     } catch(e) {}
   }
   setTimeout(checkAlreadySelectedStore, 500);
-  setTimeout(checkAlreadySelectedStore, 1500);
-  setTimeout(checkAlreadySelectedStore, 3000);
+  setTimeout(checkAlreadySelectedStore, 1200);
+  setTimeout(checkAlreadySelectedStore, 2500);
+
+  // MutationObserver pour détecter instantanément tout changement de magasin dans le DOM (comme Auchan)
+  try {
+    var observer = new MutationObserver(function() {
+      checkAlreadySelectedStore();
+    });
+    if (document.body) {
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    }
+  } catch(eObs) {}
 
   // Interception passive des clics utilisateur sur les boutons de choix de magasin / Drive
   document.addEventListener('click', function(e) {
@@ -157,6 +173,10 @@ const STORE_DETECTOR_INJECTION_JS = `
           text.includes('retrait drive') ||
           text.includes('continuer mes courses') ||
           text.includes('commencer mes courses') ||
+          text.includes('choisir ce créneau') ||
+          text.includes('choisir ce creneau') ||
+          text.includes('sélectionner ce créneau') ||
+          text.includes('selectionner ce creneau') ||
           aria.includes('choisir ce drive') ||
           aria.includes('choisir ce magasin') ||
           aria.includes('sélectionner') ||
@@ -165,10 +185,12 @@ const STORE_DETECTOR_INJECTION_JS = `
           testId.includes('select-store') ||
           testId.includes('choose-store') ||
           testId.includes('store-card-cta') ||
+          testId.includes('journey-reminder') ||
           cls.includes('select-store') ||
           cls.includes('choose-store') ||
           cls.includes('btn-select-drive') ||
           cls.includes('drive-choice') ||
+          cls.includes('journey-reminder') ||
           href.includes('/magasin') ||
           href.includes('/courses')
         );
@@ -192,12 +214,13 @@ const STORE_DETECTOR_INJECTION_JS = `
     (document.head || document.documentElement).appendChild(cleanStyle);
   } catch(eCleanStyle) {}
 
-  // Surveillance périodique de l'URL pour détecter l'arrivée sur la page magasin ou recherche
+  // Surveillance périodique continue de l'URL et de l'état du magasin
   var checkCount = 0;
   var interval = setInterval(function() {
     checkCount++;
-    if (checkCount > 180) { clearInterval(interval); return; }
+    if (checkCount > 300) { clearInterval(interval); return; }
     try {
+      checkAlreadySelectedStore();
       var url = (window.location.href || '').toLowerCase();
       if (
         url.includes('/magasin') ||

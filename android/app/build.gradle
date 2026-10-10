@@ -124,9 +124,10 @@ android {
         }
         release {
             signingConfig signingConfigs.release
-            def enableShrinkResources = findProperty('android.enableShrinkResourcesInReleaseBuilds') ?: 'false'
-            shrinkResources enableShrinkResources.toBoolean()
-            minifyEnabled enableMinifyInReleaseBuilds
+            def enableMinify = (findProperty('enableMinifyInReleaseBuilds') ?: 'true').toBoolean()
+            def enableShrink = (findProperty('android.enableShrinkResourcesInReleaseBuilds') ?: 'true').toBoolean()
+            minifyEnabled enableMinify
+            shrinkResources enableShrink && enableMinify
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             def enablePngCrunchInRelease = findProperty('android.enablePngCrunchInReleaseBuilds') ?: 'true'
             crunchPngs enablePngCrunchInRelease.toBoolean()

@@ -548,13 +548,9 @@ function MainApp() {
             </ScrollView>
           )}
 
-          {/* Day of week tabs */}
+          {/* Day of week tabs (7 jours parfaitement calés sur la largeur) */}
           <View style={[styles.dayTabsWrapper, { borderBottomColor: currentTheme.border }]}>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={[styles.dayTabsScroll, isRTL && styles.rtlRow]}
-            >
+            <View style={[styles.dayTabsContainer, isRTL && styles.rtlRow]}>
               {weekDays.map((day, idx) => {
                 const isSelected = selectedDayIndex === idx;
                 const dayName = t[day.dayKey] || day.dayKey;
@@ -573,7 +569,7 @@ function MainApp() {
                   </TouchableOpacity>
                 );
               })}
-            </ScrollView>
+            </View>
           </View>
 
           {/* Meal List for the selected day */}
@@ -1310,19 +1306,24 @@ const styles = StyleSheet.create({
   },
   dayTabsWrapper: {
     paddingVertical: 6,
+    paddingHorizontal: 12,
     borderBottomWidth: 1,
     borderBottomColor: "#1e293b"
   },
-  dayTabsScroll: {
-    paddingHorizontal: 16,
-    gap: 8
+  dayTabsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    gap: 4
   },
   dayTab: {
-    width: 52,
-    paddingVertical: 8,
-    borderRadius: 14,
+    flex: 1,
+    paddingVertical: 7,
+    borderRadius: 12,
     backgroundColor: "#1e293b",
     alignItems: "center",
+    justifyContent: "center",
     borderWidth: 1,
     borderColor: "#334155"
   },
@@ -1333,8 +1334,8 @@ const styles = StyleSheet.create({
   dayTabShort: {
     color: "#94a3b8",
     fontSize: 11,
-    fontWeight: "600",
-    marginBottom: 2
+    fontWeight: "700",
+    marginBottom: 1
   },
   dayTabShortActive: {
     color: "#d1fae5"

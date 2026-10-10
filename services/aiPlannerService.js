@@ -354,7 +354,27 @@ export class AIPlannerService {
   }
 
   /**
-   * Trie et mélange un pool de recettes en favorisant les cuisines préférées de l'utilisateur
+   * Détecte la catégorie de protéine / base d'un plat pour assurer l'alternance
+   */
+  static getMealProteinCategory(meal) {
+    if (!meal) return "other";
+    const titleStr = typeof meal.title === "string" ? meal.title : (meal.title?.fr || meal.title?.en || "");
+    const tagsStr = (meal.tags || []).join(" ");
+    const ingStr = (meal.ingredients || []).map(i => typeof i.name === "string" ? i.name : (i.name?.fr || i.name?.en || "")).join(" ");
+    const text = `${titleStr} ${tagsStr} ${ingStr}`.toLowerCase();
+
+    if (text.includes("poulet") || text.includes("dinde") || text.includes("volaille") || text.includes("canard")) return "poultry";
+    if (text.includes("saumon") || text.includes("cabillaud") || text.includes("poisson") || text.includes("thon") || text.includes("crevette") || text.includes("colin") || text.includes("dorade") || text.includes("fruits de mer")) return "fish";
+    if (text.includes("bœuf") || text.includes("boeuf") || text.includes("steak") || text.includes("viande hachée") || text.includes("veau") || text.includes("agneau") || text.includes("kefta")) return "meat";
+    if (text.includes("lentille") || text.includes("pois chiche") || text.includes("tofu") || text.includes("falafel") || text.includes("haricot rouge") || text.includes("dahl") || text.includes("curry végétarien")) return "legumes";
+    if (text.includes("pâtes") || text.includes("pasta") || text.includes("spaghetti") || text.includes("penne") || text.includes("tagliatelle") || text.includes("lasagne") || text.includes("gnocchi") || text.includes("risotto")) return "pasta";
+    if (text.includes("burger") || text.includes("wrap") || text.includes("tacos") || text.includes("pizza") || text.includes("panini") || text.includes("quesadilla")) return "streetfood";
+
+    return "other";
+  }
+
+  /**
+   * Trie et mélange un pool de recettes avec un algorithme de tirage pondéré équitable (Efraimidis-Spirakis)
    */
   static getWeightedPool(recipesList, userCuisines) {
     if (!recipesList || recipesList.length === 0) return [];
@@ -371,20 +391,22 @@ export class AIPlannerService {
     };
 
     const scored = recipesList.map(recipe => {
-      let weight = 1;
+      let weight = 1.0;
       const rTags = recipe.tags || [];
 
       Object.entries(userCuisines).forEach(([cuisineKey, level]) => {
         const matchTags = tagMap[cuisineKey] || [cuisineKey];
         const matches = matchTags.some(t => rTags.includes(t));
         if (matches) {
-          if (level === 3) weight += 15; // Favori / Prioritaire ⭐
-          else if (level === 2) weight += 6;  // Souvent
-          else if (level === 1) weight += 1;  // Un peu
+          if (level === 3) weight += 2.0; // Poids 3.0 (Prioritaire équilibré)
+          else if (level === 2) weight += 1.0;  // Poids 2.0 (Fréquent)
+          else if (level === 1) weight += 0.3;  // Poids 1.3 (Modéré)
         }
       });
 
-      return { recipe, randomScore: Math.random() * weight };
+      // Tirage pondéré exponentiel (évite que les mêmes plats soient toujours au début)
+      const randomScore = Math.pow(Math.random(), 1 / Math.max(0.1, weight));
+      return { recipe, randomScore };
     });
 
     scored.sort((a, b) => b.randomScore - a.randomScore);
@@ -429,9 +451,23 @@ export class AIPlannerService {
 
     const usedMealIds = new Set();
     const days = [];
+    let lastLunchCategory = null;
+    let lastDinnerCategory = null;
 
-    const getNextUniqueMeal = (preferredPool, fallbackPool) => {
-      // 1ère passe dans le pool préféré
+    const getNextUniqueMeal = (preferredPool, fallbackPool, avoidedCategory = null) => {
+      // 1. Chercher un plat non consommé avec une protéine/catégorie différente
+      for (let i = 0; i < preferredPool.length; i++) {
+        const candidate = preferredPool[i];
+        if (!usedMealIds.has(candidate.id)) {
+          const cat = this.getMealProteinCategory(candidate);
+          if (!avoidedCategory || cat === "other" || cat !== avoidedCategory) {
+            usedMealIds.add(candidate.id);
+            return candidate;
+          }
+        }
+      }
+
+      // 2. Si pas trouvé avec protéine différente, prendre le premier non consommé du pool préféré
       for (let i = 0; i < preferredPool.length; i++) {
         const candidate = preferredPool[i];
         if (!usedMealIds.has(candidate.id)) {
@@ -439,7 +475,8 @@ export class AIPlannerService {
           return candidate;
         }
       }
-      // 2ème passe dans le pool de secours
+
+      // 3. Chercher dans le pool général
       for (let i = 0; i < fallbackPool.length; i++) {
         const candidate = fallbackPool[i];
         if (!usedMealIds.has(candidate.id)) {
@@ -447,7 +484,8 @@ export class AIPlannerService {
           return candidate;
         }
       }
-      // Si toutes les recettes ont été consommées (plans très longs), re-mélanger
+
+      // 4. Fallback aléatoire si tout a été consommé
       const fallback = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
       return fallback;
     };
@@ -475,12 +513,16 @@ export class AIPlannerService {
 
       let l = null;
       if (activeMealTypes.includes("lunch")) {
-        l = getNextUniqueMeal(lunchPool, generalMainsPool);
+        l = getNextUniqueMeal(lunchPool, generalMainsPool, lastLunchCategory);
+        lastLunchCategory = this.getMealProteinCategory(l);
       }
 
       let d = null;
       if (activeMealTypes.includes("dinner")) {
-        d = getNextUniqueMeal(dinnerPool, generalMainsPool);
+        // Éviter la même protéine que le déjeuner du jour ET que le dîner de la veille
+        const avoidedCat = lastLunchCategory || lastDinnerCategory;
+        d = getNextUniqueMeal(dinnerPool, generalMainsPool, avoidedCat);
+        lastDinnerCategory = this.getMealProteinCategory(d);
       }
 
       days.push({

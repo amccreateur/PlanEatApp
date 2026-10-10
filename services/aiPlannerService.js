@@ -216,6 +216,33 @@ export class AIPlannerService {
       }
     }
 
+    // 4. Validation Stricte des Aliments Exclus et Allergies / Régimes
+    const dislikes = (profile?.dislikedFoods || []).map(d => d.toLowerCase().trim()).filter(Boolean);
+    const diets = profile?.diets || [];
+
+    const mealTitleStr = (typeof meal.title === "string" ? meal.title : (meal.title?.fr || meal.title?.en || "")).toLowerCase();
+    const mealIngStr = (meal.ingredients || []).map(i => (typeof i.name === "string" ? i.name : (i.name?.fr || i.name?.en || "")).toLowerCase()).join(" ");
+    const fullMealText = `${mealTitleStr} ${mealIngStr} ${(meal.tags || []).join(" ")}`.toLowerCase();
+
+    const containsDisliked = dislikes.some(d => d && fullMealText.includes(d));
+    const violatesNoPork = (diets.includes("dietNoPork") || diets.includes("dietHalal")) && (fullMealText.includes("porc") || fullMealText.includes("jambon") || fullMealText.includes("bacon") || fullMealText.includes("lard") || fullMealText.includes("saucisse de porc"));
+    const violatesVeggie = diets.includes("dietVegetarian") && (fullMealText.includes("poulet") || fullMealText.includes("viande") || fullMealText.includes("bœuf") || fullMealText.includes("boeuf") || fullMealText.includes("poisson") || fullMealText.includes("saumon") || fullMealText.includes("thon") || fullMealText.includes("crevette") || fullMealText.includes("veau") || fullMealText.includes("agneau"));
+    const violatesVegan = diets.includes("dietVegan") && (violatesVeggie || fullMealText.includes("œuf") || fullMealText.includes("oeuf") || fullMealText.includes("fromage") || fullMealText.includes("lait") || fullMealText.includes("beurre") || fullMealText.includes("crème") || fullMealText.includes("miel"));
+    const violatesGluten = diets.includes("dietGlutenFree") && (fullMealText.includes("farine de blé") || fullMealText.includes("pâtes") || fullMealText.includes("pain") || fullMealText.includes("boulgour") || fullMealText.includes("couscous") || fullMealText.includes("gluten"));
+    const violatesLactose = diets.includes("dietLactoseFree") && (fullMealText.includes("lait de vache") || fullMealText.includes("fromage") || fullMealText.includes("crème fraîche") || fullMealText.includes("beurre"));
+
+    if (containsDisliked || violatesNoPork || violatesVeggie || violatesVegan || violatesGluten || violatesLactose) {
+      const cleanCatalog = this.filterRecipes(profile, type);
+      if (cleanCatalog.length > 0) {
+        const replacement = cleanCatalog[fallbackIndex % cleanCatalog.length];
+        return {
+          ...replacement,
+          id: `safe_${type}_${Date.now()}_${fallbackIndex}`,
+          calculatedServings: servings
+        };
+      }
+    }
+
     return meal;
   }
 
@@ -283,7 +310,7 @@ export class AIPlannerService {
               servings: servings,
               meals: {
                 breakfast: this.sanitizeMeal(rawB, "breakfast", profile, servings, i),
-                lunch: rawL,
+                lunch: this.sanitizeMeal(rawL, "lunch", profile, servings, i),
                 snack: this.sanitizeMeal(rawS, "snack", profile, servings, i),
                 dinner: this.sanitizeMeal(rawD, "dinner", profile, servings, i)
               }

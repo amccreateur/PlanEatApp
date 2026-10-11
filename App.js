@@ -559,11 +559,20 @@ function MainApp() {
                     key={day.id}
                     style={[styles.dayTab, { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.border }, isSelected && styles.dayTabActive]}
                     onPress={() => setSelectedDayIndex(idx)}
+                    activeOpacity={0.8}
                   >
-                    <Text style={[styles.dayTabShort, { color: currentTheme.textSub }, isSelected && styles.dayTabShortActive]}>
-                      {dayName.slice(0, 3)}
+                    <Text
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      style={[styles.dayTabShort, { color: currentTheme.textSub }, isSelected && styles.dayTabShortActive]}
+                    >
+                      {dayName.slice(0, 3).toUpperCase()}
                     </Text>
-                    <Text style={[styles.dayTabNumber, { color: currentTheme.text }, isSelected && styles.dayTabNumberActive]}>
+                    <Text
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      style={[styles.dayTabNumber, { color: currentTheme.text }, isSelected && styles.dayTabNumberActive]}
+                    >
                       {idx + 1}
                     </Text>
                   </TouchableOpacity>
@@ -1305,8 +1314,8 @@ const styles = StyleSheet.create({
     color: "#ffffff"
   },
   dayTabsWrapper: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingVertical: 5,
+    paddingHorizontal: 6,
     borderBottomWidth: 1,
     borderBottomColor: "#1e293b"
   },
@@ -1315,17 +1324,19 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    gap: 4
+    gap: 3
   },
   dayTab: {
     flex: 1,
-    paddingVertical: 7,
-    borderRadius: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 1,
+    borderRadius: 10,
     backgroundColor: "#1e293b",
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "#334155"
+    borderColor: "#334155",
+    minWidth: 0
   },
   dayTabActive: {
     backgroundColor: "#10b981",
@@ -1333,17 +1344,19 @@ const styles = StyleSheet.create({
   },
   dayTabShort: {
     color: "#94a3b8",
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: "700",
-    marginBottom: 1
+    marginBottom: 1,
+    textAlign: "center"
   },
   dayTabShortActive: {
     color: "#d1fae5"
   },
   dayTabNumber: {
     color: "#f8fafc",
-    fontSize: 16,
-    fontWeight: "800"
+    fontSize: 15,
+    fontWeight: "800",
+    textAlign: "center"
   },
   dayTabNumberActive: {
     color: "#ffffff"

@@ -43,45 +43,41 @@ export default function PaywallModal({
       const offering = await purchaseService.getOfferings();
       if (offering && offering.availablePackages && offering.availablePackages.length > 0) {
         setPackages(offering.availablePackages);
-        // Default to annual or first package
-        const annual = offering.availablePackages.find(
-          (p) => p.packageType === "ANNUAL" || p.identifier.includes("yearly") || p.identifier.includes("annual")
+        // Default to annual, lifetime or first package
+        const preferred = offering.availablePackages.find(
+          (p) =>
+            p.packageType === "ANNUAL" ||
+            p.packageType === "LIFETIME" ||
+            p.identifier.includes("lifetime") ||
+            p.identifier.includes("yearly")
         );
-        setSelectedPackage(annual || offering.availablePackages[0]);
+        setSelectedPackage(preferred || offering.availablePackages[0]);
       } else {
         // Mock fallback if offerings not yet propagated or in development
-        setPackages([
+        const fallbackPackages = [
           {
-            identifier: "planeat_premium_yearly",
-            packageType: "ANNUAL",
-            product: {
-              title: "PlanEat Pro Annuel",
-              priceString: "9,99 €",
-              price: 9.99,
-              description: "Facturé 9,99 € par an (~0,83 € / mois)"
-            }
-          },
-          {
-            identifier: "planeat_premium_monthly",
+            identifier: "planeat_sub_monthly",
             packageType: "MONTHLY",
             product: {
               title: "PlanEat Pro Mensuel",
-              priceString: "0,99 €",
+              priceString: "0,99 € / mois",
               price: 0.99,
               description: "Facturé 0,99 € par mois"
             }
+          },
+          {
+            identifier: "planeat_lifetime",
+            packageType: "LIFETIME",
+            product: {
+              title: "PlanEat Pro À Vie",
+              priceString: "19,99 €",
+              price: 19.99,
+              description: "Paiement unique • Accès illimité à vie"
+            }
           }
-        ]);
-        setSelectedPackage({
-          identifier: "planeat_premium_yearly",
-          packageType: "ANNUAL",
-          product: {
-            title: "PlanEat Pro Annuel",
-            priceString: "9,99 €",
-            price: 9.99,
-            description: "Facturé 9,99 € par an (~0,83 € / mois)"
-          }
-        });
+        ];
+        setPackages(fallbackPackages);
+        setSelectedPackage(fallbackPackages[0]);
       }
     } catch (e) {
       console.warn("Could not load offerings:", e);
@@ -235,12 +231,29 @@ export default function PaywallModal({
           <View style={styles.plansContainer}>
             {packages.map((pkg) => {
               const isSelected = selectedPackage?.identifier === pkg.identifier;
+              const isLifetime =
+                pkg.packageType === "LIFETIME" ||
+                pkg.identifier.includes("lifetime");
               const isAnnual =
                 pkg.packageType === "ANNUAL" ||
                 pkg.identifier.includes("yearly") ||
                 pkg.identifier.includes("annual");
 
-              const priceStr = pkg.product?.priceString || (isAnnual ? "9,99 € / an" : "0,99 € / mois");
+              const priceStr =
+                pkg.product?.priceString ||
+                (isLifetime ? "19,99 €" : isAnnual ? "9,99 € / an" : "0,99 € / mois");
+
+              const planTitle = isLifetime
+                ? "PlanEat Pro À Vie"
+                : isAnnual
+                ? "Abonnement Annuel"
+                : "Abonnement Mensuel";
+
+              const planDesc = isLifetime
+                ? "Paiement unique • Accès à vie sans abonnement"
+                : isAnnual
+                ? "7 jours d'essai gratuit, puis 9,99 € / an"
+                : "0,99 € / mois • Sans engagement";
 
               return (
                 <TouchableOpacity
@@ -248,14 +261,16 @@ export default function PaywallModal({
                   style={[
                     styles.planCard,
                     isSelected && styles.planCardSelected,
-                    isAnnual && styles.planCardAnnualHighlight
+                    (isAnnual || isLifetime) && styles.planCardAnnualHighlight
                   ]}
                   onPress={() => setSelectedPackage(pkg)}
                   activeOpacity={0.85}
                 >
-                  {isAnnual && (
+                  {(isAnnual || isLifetime) && (
                     <View style={styles.popularBadge}>
-                      <Text style={styles.popularBadgeText}>🌟 MEILLEURE OFFRE</Text>
+                      <Text style={styles.popularBadgeText}>
+                        {isLifetime ? "💎 ACCÈS À VIE" : "🌟 MEILLEURE OFFRE"}
+                      </Text>
                     </View>
                   )}
 
@@ -271,12 +286,8 @@ export default function PaywallModal({
                     </View>
 
                     <View style={styles.planInfo}>
-                      <Text style={styles.planName}>
-                        {isAnnual ? "Abonnement Annuel" : "Abonnement Mensuel"}
-                      </Text>
-                      <Text style={styles.planSubDesc}>
-                        {isAnnual ? "7 jours d'essai gratuit, puis 9,99 € / an" : "0,99 € / mois • Sans engagement"}
-                      </Text>
+                      <Text style={styles.planName}>{planTitle}</Text>
+                      <Text style={styles.planSubDesc}>{planDesc}</Text>
                     </View>
 
                     <View style={styles.planPriceBox}>
@@ -306,9 +317,11 @@ export default function PaywallModal({
                 <>
                   <Ionicons name="sparkles" size={20} color="#ffffff" style={{ marginRight: 8 }} />
                   <Text style={styles.mainCtaText}>
-                    {selectedPackage?.packageType === "ANNUAL" || selectedPackage?.identifier?.includes("yearly")
+                    {selectedPackage?.packageType === "LIFETIME" || selectedPackage?.identifier?.includes("lifetime")
+                      ? "Débloquer l'Accès Pro À Vie"
+                      : selectedPackage?.packageType === "ANNUAL" || selectedPackage?.identifier?.includes("yearly")
                       ? "Démarrer mes 7 jours d'essai gratuit"
-                      : "Débloquer PlanEat Pro"}
+                      : "S'abonner à PlanEat Pro"}
                   </Text>
                 </>
               )}

@@ -83,8 +83,8 @@ export class AIPlannerService {
       }
 
       // Préférence Dîner Léger
-      if (recipe.mealType === "dinner" && profile?.dinnerStyle === "light") {
-        if (recipe.caloriesPerPerson && recipe.caloriesPerPerson > 460) return false;
+      if ((mealType === "dinner" || recipe.mealType === "dinner") && profile?.dinnerStyle === "light") {
+        if (recipe.caloriesPerPerson && recipe.caloriesPerPerson > 430) return false;
       }
 
       // Vérifier les aliments exclus
@@ -198,13 +198,13 @@ export class AIPlannerService {
       const fullText = `${titleStr} ${ingStr}`.toLowerCase();
 
       const isHeavy = (
-        meal.caloriesPerPerson > 500 ||
+        (meal.caloriesPerPerson && meal.caloriesPerPerson > 430) ||
         fullText.includes("burger") || fullText.includes("frite") || fullText.includes("raclette") ||
         fullText.includes("tartiflette") || fullText.includes("fondue")
       );
 
       if (isHeavy) {
-        const lightCatalog = this.filterRecipes(profile, "dinner").filter(r => (r.caloriesPerPerson || 400) <= 400);
+        const lightCatalog = this.filterRecipes(profile, "dinner").filter(r => (r.caloriesPerPerson || 400) <= 410);
         if (lightCatalog.length > 0) {
           const replacement = lightCatalog[fallbackIndex % lightCatalog.length];
           return {
@@ -445,29 +445,51 @@ export class AIPlannerService {
     const userCuisines = profile?.cuisines;
     let breakfastPool = this.shuffle(rawBreakfasts);
     let snackPool = this.shuffle(rawSnacks);
+    const dinnerBase = (profile?.dinnerStyle === "light")
+      ? mainsCatalog.filter(r => (r.caloriesPerPerson || 400) <= 460)
+      : mainsCatalog;
+    const generalDinnerFallback = dinnerBase.length > 0 ? dinnerBase : mainsCatalog;
+
     let lunchPool = this.getWeightedPool(availableLunches.length > 0 ? availableLunches : mainsCatalog, userCuisines);
-    let dinnerPool = this.getWeightedPool(availableDinners.length > 0 ? availableDinners : mainsCatalog, userCuisines);
+    let dinnerPool = this.getWeightedPool(availableDinners.length > 0 ? availableDinners : generalDinnerFallback, userCuisines);
     let generalMainsPool = this.getWeightedPool(mainsCatalog, userCuisines);
+    let generalDinnerPool = this.getWeightedPool(generalDinnerFallback, userCuisines);
 
     const usedMealIds = new Set();
     const days = [];
     let lastLunchCategory = null;
     let lastDinnerCategory = null;
 
-    const getNextUniqueMeal = (preferredPool, fallbackPool, avoidedCategory = null) => {
-      // 1. Chercher un plat non consommé avec une protéine/catégorie différente
+    const getNextUniqueMeal = (preferredPool, fallbackPool, avoidedCategories = []) => {
+      const avoidedList = Array.isArray(avoidedCategories)
+        ? avoidedCategories.filter(Boolean)
+        : [avoidedCategories].filter(Boolean);
+
+      // 1. Chercher dans le pool préféré un plat non consommé dont la catégorie est différente
       for (let i = 0; i < preferredPool.length; i++) {
         const candidate = preferredPool[i];
         if (!usedMealIds.has(candidate.id)) {
           const cat = this.getMealProteinCategory(candidate);
-          if (!avoidedCategory || cat === "other" || cat !== avoidedCategory) {
+          if (cat === "other" || !avoidedList.includes(cat)) {
             usedMealIds.add(candidate.id);
             return candidate;
           }
         }
       }
 
-      // 2. Si pas trouvé avec protéine différente, prendre le premier non consommé du pool préféré
+      // 2. Si pas trouvé dans le pool préféré, chercher dans le pool général avec catégorie différente
+      for (let i = 0; i < fallbackPool.length; i++) {
+        const candidate = fallbackPool[i];
+        if (!usedMealIds.has(candidate.id)) {
+          const cat = this.getMealProteinCategory(candidate);
+          if (cat === "other" || !avoidedList.includes(cat)) {
+            usedMealIds.add(candidate.id);
+            return candidate;
+          }
+        }
+      }
+
+      // 3. Si toutes les catégories disponibles ont déjà été consommées, prendre le premier non consommé
       for (let i = 0; i < preferredPool.length; i++) {
         const candidate = preferredPool[i];
         if (!usedMealIds.has(candidate.id)) {
@@ -475,8 +497,6 @@ export class AIPlannerService {
           return candidate;
         }
       }
-
-      // 3. Chercher dans le pool général
       for (let i = 0; i < fallbackPool.length; i++) {
         const candidate = fallbackPool[i];
         if (!usedMealIds.has(candidate.id)) {
@@ -485,7 +505,7 @@ export class AIPlannerService {
         }
       }
 
-      // 4. Fallback aléatoire si tout a été consommé
+      // 4. Fallback ultime
       const fallback = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
       return fallback;
     };
@@ -513,17 +533,24 @@ export class AIPlannerService {
 
       let l = null;
       if (activeMealTypes.includes("lunch")) {
-        l = getNextUniqueMeal(lunchPool, generalMainsPool, lastLunchCategory);
+        // Le déjeuner doit éviter le dîner de la veille (repas consécutif !) ET le déjeuner précédent
+        const avoidedForLunch = [lastDinnerCategory, lastLunchCategory];
+        l = getNextUniqueMeal(lunchPool, generalMainsPool, avoidedForLunch);
         lastLunchCategory = this.getMealProteinCategory(l);
       }
 
       let d = null;
       if (activeMealTypes.includes("dinner")) {
-        // Éviter la même protéine que le déjeuner du jour ET que le dîner de la veille
-        const avoidedCat = lastLunchCategory || lastDinnerCategory;
-        d = getNextUniqueMeal(dinnerPool, generalMainsPool, avoidedCat);
+        // Le dîner doit impérativement éviter le déjeuner du jour (même journée !) ET le dîner de la veille
+        const avoidedForDinner = [lastLunchCategory, lastDinnerCategory];
+        d = getNextUniqueMeal(dinnerPool, generalDinnerPool, avoidedForDinner);
         lastDinnerCategory = this.getMealProteinCategory(d);
       }
+
+      const mealB = b ? { ...b, calculatedServings: servings } : null;
+      const mealL = l ? { ...l, calculatedServings: servings } : null;
+      const mealD = d ? { ...d, calculatedServings: servings } : null;
+      const mealS = s ? { ...s, calculatedServings: servings } : null;
 
       days.push({
         id: `day_${i + 1}`,
@@ -532,10 +559,10 @@ export class AIPlannerService {
         dayKey: dayKey,
         servings: servings,
         meals: {
-          breakfast: b ? { ...b, calculatedServings: servings } : null,
-          lunch: l ? { ...l, calculatedServings: servings } : null,
-          dinner: d ? { ...d, calculatedServings: servings } : null,
-          snack: s ? { ...s, calculatedServings: servings } : null
+          breakfast: this.sanitizeMeal(mealB, "breakfast", profile, servings, i),
+          lunch: this.sanitizeMeal(mealL, "lunch", profile, servings, i),
+          dinner: this.sanitizeMeal(mealD, "dinner", profile, servings, i),
+          snack: this.sanitizeMeal(mealS, "snack", profile, servings, i)
         }
       });
     }

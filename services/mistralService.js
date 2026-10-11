@@ -206,8 +206,8 @@ export class MistralService {
     }
     const flavorRulesText = flavorRules.length > 0 ? `\n\nDIRECTIVES STRICTES SUR LES SAVEURS ET STYLES DE REPAS :\n${flavorRules.join("\n")}` : "";
 
-    // Découpage en blocs de 3 à 4 jours max pour éviter la troncature de token
-    const chunkSize = 3;
+    // Découpage en blocs de 7 jours (1 semaine complète) pour que l'IA optimise l'harmonie et la variété globale
+    const chunkSize = 7;
     const chunks = [];
     for (let i = 0; i < daysCount; i += chunkSize) {
       const startDay = i + 1;
@@ -217,7 +217,7 @@ export class MistralService {
 
     const endpoint = this.getEndpoint(activeModel);
 
-    const generateChunk = async ({ startDay, endDay }) => {
+    const generateChunk = async ({ startDay, endDay, excludedTitles = [] }) => {
       const count = endDay - startDay + 1;
       
       const prioritizedCuisines = Object.entries(profile?.cuisines || {})
@@ -231,6 +231,10 @@ export class MistralService {
       const chunkTheme = prioritizedCuisines.length > 0
         ? `Cuisines favorites demandées par l'utilisateur : ${prioritizedCuisines.join(", ")}.${streetFoodEmphasis}`
         : "Variation équilibrée et savoureuse pour les déjeuners et dîners.";
+
+      const excludedClause = excludedTitles && excludedTitles.length > 0
+        ? `\nINTERDICTION FORMELLE DE PROPOSER LES PLATS SUIVANTS (DÉJÀ PROGRAMMÉS) : ${excludedTitles.join(", ")}.`
+        : "";
 
       const prompt = `Tu es un Chef cuisinier étoilé et nutritionniste passionné.
 Génère un menu gourmand, équilibré et SANS AUCUNE RÉPÉTITION pour ${count} jours (du Jour ${startDay} au Jour ${endDay}) pour les repas suivants uniquement : [${mealTypesNames}] pour ${adults} adulte(s) et ${children} enfant(s).
@@ -392,30 +396,28 @@ Réponds uniquement en JSON valide conforme au schéma demandé.`;
       return this.safeJsonParse(content);
     };
 
-    const chunkResults = await Promise.all(chunks.map(c => generateChunk(c)));
-    const allDays = chunkResults.flatMap(res => res.days || []);
-
-    // Déduplication stricte des plats entre tous les jours générés
+    const allDays = [];
     const seenTitles = new Set();
-    allDays.forEach((day, dIdx) => {
-      if (!day?.meals) return;
-      ["breakfast", "lunch", "snack", "dinner"].forEach(type => {
-        const meal = day.meals[type];
-        if (!meal || !meal.title) return;
-        const frTitle = typeof meal.title === "string" ? meal.title : (meal.title.fr || "");
-        const normTitle = frTitle.toLowerCase().trim();
 
-        if (seenTitles.has(normTitle)) {
-          // Doublon détecté entre deux chunks ! Rendre le plat unique
-          if (typeof meal.title === "object") {
-            const altSuffix = ["Maison", "du Chef", "Gourmand", "aux Épices"][dIdx % 4];
-            meal.title.fr = `${frTitle} (${altSuffix})`;
-          }
-        } else {
-          seenTitles.add(normTitle);
+    for (const chunk of chunks) {
+      const res = await generateChunk({
+        ...chunk,
+        excludedTitles: Array.from(seenTitles)
+      });
+      const chunkDays = res?.days || [];
+      chunkDays.forEach((day, dIdx) => {
+        allDays.push(day);
+        if (day?.meals) {
+          ["breakfast", "lunch", "snack", "dinner"].forEach(type => {
+            const meal = day.meals[type];
+            if (!meal || !meal.title) return;
+            const frTitle = typeof meal.title === "string" ? meal.title : (meal.title.fr || "");
+            const normTitle = frTitle.toLowerCase().trim();
+            seenTitles.add(normTitle);
+          });
         }
       });
-    });
+    }
 
     return { days: allDays };
   }

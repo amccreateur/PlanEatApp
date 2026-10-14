@@ -301,16 +301,25 @@ export class AIPlannerService {
     const servings = this.calculateHouseholdServings(profile);
     const dayKeys = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 
-    // 1. Tenter la génération avec Mistral AI (par défaut ou si activé)
-    if (aiConfig?.engine !== "local") {
+    // 1. Tenter la génération avec Mistral AI UNIQUEMENT si explicitement configuré avec une clé valide
+    const mistralKey = (aiConfig?.mistralApiKey || "").trim();
+    const isMistralExplicit = aiConfig?.engine === "mistral" && mistralKey.length > 5;
+
+    if (isMistralExplicit) {
       try {
-        const mistralResult = await MistralService.generateMealPlan({
+        const mistralPromise = MistralService.generateMealPlan({
           profile,
           durationWeeks,
-          apiKey: aiConfig?.mistralApiKey,
+          apiKey: mistralKey,
           model: aiConfig?.mistralModel || "codestral-latest",
           lang
         });
+
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("MISTRAL_TIMEOUT")), 8000)
+        );
+
+        const mistralResult = await Promise.race([mistralPromise, timeoutPromise]);
 
         if (mistralResult?.days && Array.isArray(mistralResult.days)) {
           const activeMealTypes = profile?.mealTypes && profile.mealTypes.length > 0
@@ -1538,17 +1547,26 @@ export class AIPlannerService {
   static async swapMeal(currentMealId, mealType, profile, currentMeal = null, aiConfig = null, lang = "fr") {
     const servings = this.calculateHouseholdServings(profile);
 
-    // Si mode Mistral AI activé (par défaut)
-    if (aiConfig?.engine !== "local") {
+    // Si mode Mistral AI explicitement activé avec clé valide
+    const mistralKey = (aiConfig?.mistralApiKey || "").trim();
+    const isMistralExplicit = aiConfig?.engine === "mistral" && mistralKey.length > 5;
+
+    if (isMistralExplicit) {
       try {
-        const generated = await MistralService.swapSingleMeal({
+        const mistralPromise = MistralService.swapSingleMeal({
           currentMeal,
           mealType,
           profile,
-          apiKey: aiConfig?.mistralApiKey,
+          apiKey: mistralKey,
           model: aiConfig?.mistralModel || "codestral-latest",
           lang
         });
+
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("MISTRAL_TIMEOUT")), 5000)
+        );
+
+        const generated = await Promise.race([mistralPromise, timeoutPromise]);
 
         if (generated) {
           const rawSwap = {

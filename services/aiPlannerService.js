@@ -38,11 +38,33 @@ export class AIPlannerService {
       }
 
       // Vérifier les régimes stricts
-      if (diets.includes("dietHalal") && !recipe.tags.includes("dietHalal")) return false;
+      if (diets.includes("dietHalal")) {
+        const isExplicitHalal = recipe.tags.includes("dietHalal");
+        const isVegOrFish = recipe.tags.includes("dietVegetarian") || recipe.tags.includes("dietVegan") || recipe.tags.includes("fish");
+        const ingText = (recipe.ingredients || []).map(i => (i.name?.fr || i.name?.en || "").toLowerCase()).join(" ");
+        const hasForbidden = /porc|jambon|bacon|lard|vin|bière|biere|alcool|rhum/.test(ingText);
+        if (!isExplicitHalal && (!isVegOrFish || hasForbidden)) return false;
+        if (hasForbidden) return false;
+      }
       if (diets.includes("dietNoPork") && (recipe.tags.includes("pork") || recipe.ingredients.some(i => (i.name.fr || "").toLowerCase().includes("porc") || (i.name.fr || "").toLowerCase().includes("bacon") || (i.name.fr || "").toLowerCase().includes("jambon")))) return false;
       if (diets.includes("dietVegetarian") && !recipe.tags.includes("dietVegetarian") && !recipe.tags.includes("dietVegan")) return false;
-      if (diets.includes("dietVegan") && !recipe.tags.includes("dietVegan")) return false;
-      if (diets.includes("dietGlutenFree") && !recipe.tags.includes("dietGlutenFree")) return false;
+      if (diets.includes("dietVegan")) {
+        const isExplicitVegan = recipe.tags.includes("dietVegan");
+        if (!isExplicitVegan) {
+          if (!recipe.tags.includes("dietVegetarian")) return false;
+          const ingText = (recipe.ingredients || []).map(i => (i.name?.fr || i.name?.en || "").toLowerCase()).join(" ");
+          const hasDairyEgg = /oeuf|œuf|fromage|parmesan|mozzarella|feta|cheddar|chèvre|chevre|beurre|yaourt|miel|crème\s+fraîche|lait\s+(de\s+vache|entier|demi)/.test(ingText);
+          if (hasDairyEgg) return false;
+        }
+      }
+      if (diets.includes("dietGlutenFree")) {
+        const isExplicitGF = recipe.tags.includes("dietGlutenFree");
+        if (!isExplicitGF) {
+          const ingText = (recipe.ingredients || []).map(i => (i.name?.fr || i.name?.en || "").toLowerCase()).join(" ");
+          const hasGluten = /farine\s+de\s+blé|farine\s+blanche|blé\b|ble\b|pâtes\b|pate\b|pain\b|boulgour|couscous|seigle|orge|chapelure|bagel|brioche|naan|lasagne|croûton|crouton|tortilla\s+de\s+blé/.test(ingText);
+          if (hasGluten) return false;
+        }
+      }
       if (diets.includes("dietLactoseFree") && !recipe.tags.includes("dietLactoseFree") && !recipe.tags.includes("dietVegan")) return false;
       if (diets.includes("dietKeto") && !recipe.tags.includes("dietLowCarb") && !recipe.tags.includes("dietKeto")) return false;
 
@@ -239,9 +261,12 @@ export class AIPlannerService {
     const containsDisliked = dislikes.some(d => d && fullMealText.includes(d));
     const violatesNoPork = (diets.includes("dietNoPork") || diets.includes("dietHalal")) && (fullMealText.includes("porc") || fullMealText.includes("jambon") || fullMealText.includes("bacon") || fullMealText.includes("lard") || fullMealText.includes("saucisse de porc"));
     const violatesVeggie = diets.includes("dietVegetarian") && (fullMealText.includes("poulet") || fullMealText.includes("viande") || fullMealText.includes("bœuf") || fullMealText.includes("boeuf") || fullMealText.includes("poisson") || fullMealText.includes("saumon") || fullMealText.includes("thon") || fullMealText.includes("crevette") || fullMealText.includes("veau") || fullMealText.includes("agneau"));
-    const violatesVegan = diets.includes("dietVegan") && (violatesVeggie || fullMealText.includes("œuf") || fullMealText.includes("oeuf") || fullMealText.includes("fromage") || fullMealText.includes("lait") || fullMealText.includes("beurre") || fullMealText.includes("crème") || fullMealText.includes("miel"));
-    const violatesGluten = diets.includes("dietGlutenFree") && (fullMealText.includes("farine de blé") || fullMealText.includes("pâtes") || fullMealText.includes("pain") || fullMealText.includes("boulgour") || fullMealText.includes("couscous") || fullMealText.includes("gluten"));
-    const violatesLactose = diets.includes("dietLactoseFree") && (fullMealText.includes("lait de vache") || fullMealText.includes("fromage") || fullMealText.includes("crème fraîche") || fullMealText.includes("beurre"));
+    
+    // Pour Vegan et Lactose, ne cibler que les produits laitiers animaux (ignorer lait de coco, amande, soja, avoine, etc.)
+    const hasDairyAnimal = /oeuf|œuf|fromage|parmesan|mozzarella|feta|cheddar|chèvre|chevre|beurre|yaourt|miel|crème\s+fraîche|lait\s+(de\s+vache|entier|demi)/i.test(fullMealText);
+    const violatesVegan = diets.includes("dietVegan") && (violatesVeggie || hasDairyAnimal);
+    const violatesGluten = diets.includes("dietGlutenFree") && /farine\s+de\s+blé|farine\s+blanche|blé\b|ble\b|pâtes\b|pate\b|pain\b|boulgour|couscous|seigle|orge|chapelure|bagel|brioche|naan|lasagne|croûton|crouton|tortilla\s+de\s+blé/i.test(fullMealText);
+    const violatesLactose = diets.includes("dietLactoseFree") && hasDairyAnimal;
 
     if (containsDisliked || violatesNoPork || violatesVeggie || violatesVegan || violatesGluten || violatesLactose) {
       const cleanCatalog = this.filterRecipes(profile, type);
@@ -489,15 +514,26 @@ export class AIPlannerService {
       if (titleFr) usedMealIds.add(`title_${titleFr.toLowerCase().trim()}`);
     };
 
-    const getNextUniqueMeal = (preferredPool, fallbackPool, avoidedCategories = []) => {
+    const getNextUniqueMeal = (preferredPool, fallbackPool, avoidedCategories = [], excludeMeal = null) => {
       const avoidedList = Array.isArray(avoidedCategories)
         ? avoidedCategories.filter(Boolean)
         : [avoidedCategories].filter(Boolean);
 
+      const excludeId = excludeMeal?.id;
+      const excludeTitle = typeof excludeMeal?.title === "string" ? excludeMeal.title : (excludeMeal?.title?.fr || "");
+
+      const isSameAsExcluded = (candidate) => {
+        if (!excludeMeal || !candidate) return false;
+        if (excludeId && candidate.id === excludeId) return true;
+        const candTitle = typeof candidate.title === "string" ? candidate.title : (candidate.title?.fr || "");
+        if (excludeTitle && candTitle && candTitle.toLowerCase().trim() === excludeTitle.toLowerCase().trim()) return true;
+        return false;
+      };
+
       // 1. Chercher dans le pool préféré un plat non consommé dont la catégorie est différente
       for (let i = 0; i < preferredPool.length; i++) {
         const candidate = preferredPool[i];
-        if (!isMealUsed(candidate)) {
+        if (!isMealUsed(candidate) && !isSameAsExcluded(candidate)) {
           const cat = this.getMealProteinCategory(candidate);
           if (cat === "other" || !avoidedList.includes(cat)) {
             markMealUsed(candidate);
@@ -509,7 +545,7 @@ export class AIPlannerService {
       // 2. Si pas trouvé dans le pool préféré, chercher dans le pool général avec catégorie différente
       for (let i = 0; i < fallbackPool.length; i++) {
         const candidate = fallbackPool[i];
-        if (!isMealUsed(candidate)) {
+        if (!isMealUsed(candidate) && !isSameAsExcluded(candidate)) {
           const cat = this.getMealProteinCategory(candidate);
           if (cat === "other" || !avoidedList.includes(cat)) {
             markMealUsed(candidate);
@@ -521,21 +557,23 @@ export class AIPlannerService {
       // 3. Si toutes les catégories disponibles ont déjà été consommées, prendre le premier non consommé
       for (let i = 0; i < preferredPool.length; i++) {
         const candidate = preferredPool[i];
-        if (!isMealUsed(candidate)) {
+        if (!isMealUsed(candidate) && !isSameAsExcluded(candidate)) {
           markMealUsed(candidate);
           return candidate;
         }
       }
       for (let i = 0; i < fallbackPool.length; i++) {
         const candidate = fallbackPool[i];
-        if (!isMealUsed(candidate)) {
+        if (!isMealUsed(candidate) && !isSameAsExcluded(candidate)) {
           markMealUsed(candidate);
           return candidate;
         }
       }
 
-      // 4. Fallback ultime
-      const fallback = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
+      // 4. Fallback ultime : ne jamais reprendre le même plat que le déjeuner du jour !
+      const nonExcluded = fallbackPool.filter(c => !isSameAsExcluded(c));
+      const pool = nonExcluded.length > 0 ? nonExcluded : fallbackPool;
+      const fallback = pool[Math.floor(Math.random() * pool.length)];
       return fallback;
     };
 
@@ -572,7 +610,7 @@ export class AIPlannerService {
       if (activeMealTypes.includes("dinner")) {
         // Le dîner doit impérativement éviter le déjeuner du jour (même journée !) ET le dîner de la veille
         const avoidedForDinner = [lastLunchCategory, lastDinnerCategory];
-        d = getNextUniqueMeal(dinnerPool, generalDinnerPool, avoidedForDinner);
+        d = getNextUniqueMeal(dinnerPool, generalDinnerPool, avoidedForDinner, l);
         lastDinnerCategory = this.getMealProteinCategory(d);
       }
 

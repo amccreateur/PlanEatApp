@@ -182,7 +182,7 @@ export const RECIPES_CATALOG = [
     cookTime: 14,
     difficulty: "easy",
     caloriesPerPerson: 380,
-    tags: ["dietBalanced","dietVegetarian","dietHalal","dietBudget","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietHalal","dietBudget","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Œufs", en: "Eggs" }, quantity: 2, unit: "pièces", dept: "deptDairy" },
       { name: { fr: "Tomates concassées en boîte", en: "Canned crushed tomatoes" }, quantity: 150, unit: "g", dept: "deptPantry" },
@@ -390,7 +390,7 @@ export const RECIPES_CATALOG = [
     cookTime: 10,
     difficulty: "easy",
     caloriesPerPerson: 480,
-    tags: ["asian","wok","dietBalanced","dietHalal","dietQuick"],
+    tags: ["asian","wok","dietBalanced","dietHalal","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Crevettes décortiquées", en: "Peeled shrimps" }, quantity: 150, unit: "g", dept: "deptMeat" },
       { name: { fr: "Nouilles de riz", en: "Rice noodles" }, quantity: 100, unit: "g", dept: "deptPantry" },
@@ -426,7 +426,7 @@ export const RECIPES_CATALOG = [
     cookTime: 22,
     difficulty: "medium",
     caloriesPerPerson: 490,
-    tags: ["italian","dietBalanced","dietVegetarian","dietGlutenFree"],
+    tags: ["italian","dietBalanced","dietVegetarian","dietGlutenFree","dietHalal"],
     ingredients: [
       { name: { fr: "Riz Arborio ou Carnaroli", en: "Arborio risotto rice" }, quantity: 120, unit: "g", dept: "deptPantry" },
       { name: { fr: "Champignons de Paris", en: "Button mushrooms" }, quantity: 150, unit: "g", dept: "deptProduce" },
@@ -567,7 +567,7 @@ export const RECIPES_CATALOG = [
     cookTime: 8,
     difficulty: "easy",
     caloriesPerPerson: 490,
-    tags: ["asian","wok","dietBalanced","dietHalal","dietQuick"],
+    tags: ["asian","wok","dietBalanced","dietHalal","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Bifteck ou bavette de bœuf", en: "Beef steak strips" }, quantity: 180, unit: "g", dept: "deptMeat" },
       { name: { fr: "Poivron et brocolis", en: "Bell pepper and broccoli" }, quantity: 150, unit: "g", dept: "deptProduce" },
@@ -602,7 +602,7 @@ export const RECIPES_CATALOG = [
     cookTime: 20,
     difficulty: "easy",
     caloriesPerPerson: 420,
-    tags: ["indian","dietBalanced","dietVegetarian","dietVegan","dietGlutenFree","dietBudget"],
+    tags: ["indian","dietBalanced","dietVegetarian","dietVegan","dietGlutenFree","dietBudget","dietHalal"],
     ingredients: [
       { name: { fr: "Lentilles corail", en: "Red lentils" }, quantity: 120, unit: "g", dept: "deptPantry" },
       { name: { fr: "Lait de coco", en: "Coconut milk" }, quantity: 120, unit: "ml", dept: "deptPantry" },
@@ -706,7 +706,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 310,
-    tags: ["dietBalanced","dietVegetarian","dietHalal","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietHalal","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Yaourt grec nature", en: "Plain Greek yogurt" }, quantity: 150, unit: "g", dept: "deptDairy" },
       { name: { fr: "Granola aux amandes", en: "Almond granola" }, quantity: 40, unit: "g", dept: "deptPantry" },
@@ -795,7 +795,7 @@ export const RECIPES_CATALOG = [
     cookTime: 8,
     difficulty: "easy",
     caloriesPerPerson: 460,
-    tags: ["italian","dietBalanced","dietVegetarian","dietHalal","dietQuick"],
+    tags: ["italian","dietBalanced","dietVegetarian","dietHalal","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Gnocchis à poêler", en: "Pan-fry gnocchi" }, quantity: 200, unit: "g", dept: "deptPantry" },
       { name: { fr: "Tomates séchées à l'huile", en: "Sun-dried tomatoes" }, quantity: 40, unit: "g", dept: "deptPantry" },
@@ -865,7 +865,7 @@ export const RECIPES_CATALOG = [
     cookTime: 12,
     difficulty: "easy",
     caloriesPerPerson: 520,
-    tags: ["asian","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Pavé de saumon frais", en: "Salmon fillet" }, quantity: 150, unit: "g", dept: "deptMeat" },
       { name: { fr: "Riz rond japonais ou basmati", en: "Rice" }, quantity: 80, unit: "g", dept: "deptPantry" },
@@ -900,7 +900,7 @@ export const RECIPES_CATALOG = [
     cookTime: 25,
     difficulty: "easy",
     caloriesPerPerson: 430,
-    tags: ["french","dietBalanced","dietVegetarian","dietHalal"],
+    tags: ["french","dietBalanced","dietVegetarian","dietHalal","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Pâte brisée ou sans pâte", en: "Shortcrust pastry" }, quantity: 1, unit: "pcs", dept: "deptBakery" },
       { name: { fr: "Œufs frais", en: "Eggs" }, quantity: 3, unit: "pcs", dept: "deptDairy" },
@@ -935,7 +935,7 @@ export const RECIPES_CATALOG = [
     cookTime: 10,
     difficulty: "easy",
     caloriesPerPerson: 470,
-    tags: ["french","dietBalanced","dietHalal","dietHighProtein","dietLowCarb","dietQuick"],
+    tags: ["french","dietBalanced","dietHalal","dietHighProtein","dietLowCarb","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Pavé ou faux-filet de bœuf", en: "Beef steak" }, quantity: 180, unit: "g", dept: "deptMeat" },
       { name: { fr: "Haricots verts frais ou surgelés", en: "Green beans" }, quantity: 200, unit: "g", dept: "deptProduce" },
@@ -969,7 +969,7 @@ export const RECIPES_CATALOG = [
     cookTime: 20,
     difficulty: "medium",
     caloriesPerPerson: 490,
-    tags: ["italian","dietBalanced","dietVegetarian","dietHalal"],
+    tags: ["italian","dietBalanced","dietVegetarian","dietHalal","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Riz arborio pour risotto", en: "Arborio rice" }, quantity: 80, unit: "g", dept: "deptPantry" },
       { name: { fr: "Champignons de Paris frais", en: "Mushrooms" }, quantity: 150, unit: "g", dept: "deptProduce" },
@@ -1039,7 +1039,7 @@ export const RECIPES_CATALOG = [
     cookTime: 25,
     difficulty: "easy",
     caloriesPerPerson: 480,
-    tags: ["maghreb","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["maghreb","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Cuisses ou aiguillettes de poulet", en: "Chicken pieces" }, quantity: 160, unit: "g", dept: "deptMeat" },
       { name: { fr: "Citron confit", en: "Preserved lemon" }, quantity: 0.5, unit: "pcs", dept: "deptProduce" },
@@ -1074,7 +1074,7 @@ export const RECIPES_CATALOG = [
     cookTime: 10,
     difficulty: "easy",
     caloriesPerPerson: 460,
-    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietQuick"],
+    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Nouilles de riz plates", en: "Rice noodles" }, quantity: 80, unit: "g", dept: "deptPantry" },
       { name: { fr: "Crevettes décortiquées", en: "Shrimp" }, quantity: 130, unit: "g", dept: "deptMeat" },
@@ -1101,15 +1101,15 @@ export const RECIPES_CATALOG = [
     id: "m25",
     mealType: "dinner",
     title: {
-      fr: "Dahl Crémeux de Lentilles Corail au Lait de Coco",
-      en: "Creamy Red Lentil Coconut Dahl"
+      fr: "Dahl Indien de Lentilles Vertes & Légumes Fondants",
+      en: "Indian Green Lentil & Vegetable Dahl"
     },
     emoji: "🍛",
     prepTime: 8,
     cookTime: 18,
     difficulty: "easy",
     caloriesPerPerson: 420,
-    tags: ["indian","dietBalanced","dietVegetarian","dietHalal","dietHighFiber"],
+    tags: ["indian","dietBalanced","dietVegetarian","dietHalal","dietHighFiber","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Lentilles corail", en: "Red lentils" }, quantity: 80, unit: "g", dept: "deptPantry" },
       { name: { fr: "Lait de coco", en: "Coconut milk" }, quantity: 120, unit: "ml", dept: "deptPantry" },
@@ -1144,7 +1144,7 @@ export const RECIPES_CATALOG = [
     cookTime: 15,
     difficulty: "easy",
     caloriesPerPerson: 360,
-    tags: ["mediterranean","french","dietBalanced","dietHalal","dietHighProtein","dietLowCarb","dietQuick"],
+    tags: ["mediterranean","french","dietBalanced","dietHalal","dietHighProtein","dietLowCarb","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Filet de cabillaud ou colin", en: "Cod fillet" }, quantity: 160, unit: "g", dept: "deptMeat" },
       { name: { fr: "Courgette moyenne", en: "Zucchini" }, quantity: 1, unit: "pcs", dept: "deptProduce" },
@@ -1213,7 +1213,7 @@ export const RECIPES_CATALOG = [
     cookTime: 18,
     difficulty: "easy",
     caloriesPerPerson: 410,
-    tags: ["mexican","dietBalanced","dietVegetarian","dietHalal","dietHighFiber"],
+    tags: ["mexican","dietBalanced","dietVegetarian","dietHalal","dietHighFiber","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Haricots noirs ou rouges égouttés", en: "Black or red beans" }, quantity: 140, unit: "g", dept: "deptPantry" },
       { name: { fr: "Maïs doux", en: "Sweet corn" }, quantity: 60, unit: "g", dept: "deptPantry" },
@@ -1248,7 +1248,7 @@ export const RECIPES_CATALOG = [
     cookTime: 12,
     difficulty: "easy",
     caloriesPerPerson: 480,
-    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietQuick"],
+    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Filets de poulet coupés en dés", en: "Chicken cubes" }, quantity: 150, unit: "g", dept: "deptMeat" },
       { name: { fr: "Sauce soja sucrée ou yakitori", en: "Sweet soy sauce" }, quantity: 2, unit: "c.à.s", dept: "deptPantry" },
@@ -1283,7 +1283,7 @@ export const RECIPES_CATALOG = [
     cookTime: 12,
     difficulty: "easy",
     caloriesPerPerson: 390,
-    tags: ["maghreb","mediterranean","dietBalanced","dietVegetarian","dietHalal","dietQuick"],
+    tags: ["maghreb","mediterranean","dietBalanced","dietVegetarian","dietHalal","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Œufs frais bio", en: "Eggs" }, quantity: 2, unit: "pcs", dept: "deptDairy" },
       { name: { fr: "Poivrons rouge et vert émincés", en: "Bell peppers" }, quantity: 1, unit: "pcs", dept: "deptProduce" },
@@ -1318,7 +1318,7 @@ export const RECIPES_CATALOG = [
     cookTime: 15,
     difficulty: "easy",
     caloriesPerPerson: 460,
-    tags: ["french","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["french","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Filet de truite ou saumon", en: "Trout fillet" }, quantity: 150, unit: "g", dept: "deptMeat" },
       { name: { fr: "Patate douce épluchée", en: "Sweet potato" }, quantity: 200, unit: "g", dept: "deptProduce" },
@@ -1387,7 +1387,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 450,
-    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietQuick"],
+    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Thon frais ou pavé décongelé de qualité", en: "Fresh tuna steak" }, quantity: 130, unit: "g", dept: "deptMeat" },
       { name: { fr: "Riz à sushi cuit et refroidi", en: "Cooked sushi rice" }, quantity: 90, unit: "g", dept: "deptPantry" },
@@ -1422,7 +1422,7 @@ export const RECIPES_CATALOG = [
     cookTime: 30,
     difficulty: "easy",
     caloriesPerPerson: 440,
-    tags: ["french","dietBalanced","dietVegetarian","dietHalal"],
+    tags: ["french","dietBalanced","dietVegetarian","dietHalal","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Pommes de terre à chair ferme", en: "Firm potatoes" }, quantity: 220, unit: "g", dept: "deptProduce" },
       { name: { fr: "Lait et crème liquide légère", en: "Milk & light cream" }, quantity: 140, unit: "ml", dept: "deptDairy" },
@@ -1456,7 +1456,7 @@ export const RECIPES_CATALOG = [
     cookTime: 15,
     difficulty: "easy",
     caloriesPerPerson: 510,
-    tags: ["asian","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Aiguillettes de poulet", en: "Chicken tenders" }, quantity: 150, unit: "g", dept: "deptMeat" },
       { name: { fr: "Pâte de curry rouge thaï", en: "Thai red curry paste" }, quantity: 1, unit: "c.à.s", dept: "deptSpices" },
@@ -1491,7 +1491,7 @@ export const RECIPES_CATALOG = [
     cookTime: 25,
     difficulty: "easy",
     caloriesPerPerson: 370,
-    tags: ["french","mediterranean","dietBalanced","dietVegetarian","dietHalal","dietHighFiber"],
+    tags: ["french","mediterranean","dietBalanced","dietVegetarian","dietHalal","dietHighFiber","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Aubergine, courgette & poivron", en: "Eggplant, zucchini & pepper" }, quantity: 200, unit: "g", dept: "deptProduce" },
       { name: { fr: "Tomates mûres concassées", en: "Crushed tomatoes" }, quantity: 120, unit: "g", dept: "deptProduce" },
@@ -1559,7 +1559,7 @@ export const RECIPES_CATALOG = [
     cookTime: 25,
     difficulty: "easy",
     caloriesPerPerson: 380,
-    tags: ["maghreb","dietBalanced","dietVegetarian","dietHalal","dietHighFiber"],
+    tags: ["maghreb","dietBalanced","dietVegetarian","dietHalal","dietHighFiber","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Pois chiches cuits & Lentilles", en: "Chickpeas & lentils" }, quantity: 100, unit: "g", dept: "deptPantry" },
       { name: { fr: "Tomates fraîches concassées & Concentré", en: "Tomatoes & paste" }, quantity: 120, unit: "g", dept: "deptProduce" },
@@ -1594,7 +1594,7 @@ export const RECIPES_CATALOG = [
     cookTime: 12,
     difficulty: "easy",
     caloriesPerPerson: 460,
-    tags: ["italian","dietBalanced","dietVegetarian","dietHalal","dietQuick"],
+    tags: ["italian","dietBalanced","dietVegetarian","dietHalal","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Spaghetti ou linguine", en: "Spaghetti pasta" }, quantity: 80, unit: "g", dept: "deptPantry" },
       { name: { fr: "Petits pois doux (frais ou surgelés)", en: "Sweet peas" }, quantity: 80, unit: "g", dept: "deptProduce" },
@@ -1628,7 +1628,7 @@ export const RECIPES_CATALOG = [
     cookTime: 20,
     difficulty: "easy",
     caloriesPerPerson: 320,
-    tags: ["maghreb","french","dietBalanced","dietVegetarian","dietHalal","dietHighFiber","dietLowCalorie"],
+    tags: ["maghreb","french","dietBalanced","dietVegetarian","dietHalal","dietHighFiber","dietLowCalorie","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Carottes fraîches", en: "Carrots" }, quantity: 250, unit: "g", dept: "deptProduce" },
       { name: { fr: "Lentilles corail", en: "Red lentils" }, quantity: 50, unit: "g", dept: "deptPantry" },
@@ -1662,7 +1662,7 @@ export const RECIPES_CATALOG = [
     cookTime: 15,
     difficulty: "easy",
     caloriesPerPerson: 440,
-    tags: ["mediterranean","dietBalanced","dietVegetarian","dietHalal","dietHighFiber"],
+    tags: ["mediterranean","dietBalanced","dietVegetarian","dietHalal","dietHighFiber","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Quinoa cuit", en: "Cooked quinoa" }, quantity: 80, unit: "g", dept: "deptPantry" },
       { name: { fr: "Pois chiches égouttés et séchés", en: "Chickpeas" }, quantity: 100, unit: "g", dept: "deptPantry" },
@@ -1696,7 +1696,7 @@ export const RECIPES_CATALOG = [
     cookTime: 8,
     difficulty: "easy",
     caloriesPerPerson: 460,
-    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietLowCarb","dietQuick"],
+    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietLowCarb","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Bœuf émincé très fin", en: "Thinly sliced beef" }, quantity: 150, unit: "g", dept: "deptMeat" },
       { name: { fr: "Fleurettes de brocolis frais", en: "Broccoli florets" }, quantity: 150, unit: "g", dept: "deptProduce" },
@@ -1730,7 +1730,7 @@ export const RECIPES_CATALOG = [
     cookTime: 12,
     difficulty: "easy",
     caloriesPerPerson: 390,
-    tags: ["french","mediterranean","dietBalanced","dietHalal","dietHighProtein","dietQuick"],
+    tags: ["french","mediterranean","dietBalanced","dietHalal","dietHighProtein","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Pavé de cabillaud frais", en: "Cod fillet" }, quantity: 160, unit: "g", dept: "deptMeat" },
       { name: { fr: "Riz basmati parfumé", en: "Basmati rice" }, quantity: 70, unit: "g", dept: "deptPantry" },
@@ -1764,7 +1764,7 @@ export const RECIPES_CATALOG = [
     cookTime: 15,
     difficulty: "easy",
     caloriesPerPerson: 490,
-    tags: ["maghreb","dietBalanced","dietHalal","dietHighProtein","dietQuick"],
+    tags: ["maghreb","dietBalanced","dietHalal","dietHighProtein","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Boulettes de bœuf kefta assaisonnées", en: "Spiced beef meatballs" }, quantity: 140, unit: "g", dept: "deptMeat" },
       { name: { fr: "Œufs frais", en: "Eggs" }, quantity: 2, unit: "pcs", dept: "deptDairy" },
@@ -1798,7 +1798,7 @@ export const RECIPES_CATALOG = [
     cookTime: 6,
     difficulty: "easy",
     caloriesPerPerson: 350,
-    tags: ["french","dietBalanced","dietVegetarian","dietHalal","dietHighProtein","dietLowCarb","dietQuick"],
+    tags: ["french","dietBalanced","dietVegetarian","dietHalal","dietHighProtein","dietLowCarb","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Œufs frais bio", en: "Eggs" }, quantity: 3, unit: "pcs", dept: "deptDairy" },
       { name: { fr: "Champignons de Paris émincés", en: "Sliced mushrooms" }, quantity: 100, unit: "g", dept: "deptProduce" },
@@ -1866,7 +1866,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 310,
-    tags: ["dietBalanced","dietVegetarian","dietHalal","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietHalal","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Mangue congelée ou fraîche", en: "Mango pieces" }, quantity: 150, unit: "g", dept: "deptProduce" },
       { name: { fr: "Yaourt grec ou végétal", en: "Greek yogurt" }, quantity: 120, unit: "g", dept: "deptDairy" },
@@ -1897,7 +1897,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 180,
-    tags: ["dietBalanced","dietVegetarian","dietHalal","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietHalal","dietQuick","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Dattes Medjool dénoyautées", en: "Dates" }, quantity: 3, unit: "pcs", dept: "deptProduce" },
       { name: { fr: "Amandes entières", en: "Almonds" }, quantity: 20, unit: "g", dept: "deptPantry" },
@@ -1928,7 +1928,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 190,
-    tags: ["dietBalanced","dietVegetarian","dietHalal","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietHalal","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Yaourt grec authentique", en: "Greek yogurt" }, quantity: 150, unit: "g", dept: "deptDairy" },
       { name: { fr: "Miel d'acacia ou de fleurs", en: "Pure honey" }, quantity: 1, unit: "c.à.c", dept: "deptSpices" },
@@ -1959,7 +1959,7 @@ export const RECIPES_CATALOG = [
     cookTime: 18,
     difficulty: "easy",
     caloriesPerPerson: 520,
-    tags: ["indian","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["indian","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Blancs de poulet coupés en dés", en: "Chicken breast cubes" }, quantity: 160, unit: "g", dept: "deptMeat" },
       { name: { fr: "Coulis de tomate & Beurre doux", en: "Tomato puree & butter" }, quantity: 120, unit: "g", dept: "deptProduce" },
@@ -2029,7 +2029,7 @@ export const RECIPES_CATALOG = [
     cookTime: 10,
     difficulty: "easy",
     caloriesPerPerson: 490,
-    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietQuick"],
+    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Bœuf émincé très finement", en: "Thinly sliced beef" }, quantity: 150, unit: "g", dept: "deptMeat" },
       { name: { fr: "Gros oignon émincé", en: "Large sliced onion" }, quantity: 1, unit: "pcs", dept: "deptProduce" },
@@ -2063,7 +2063,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 330,
-    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietLowCalorie","dietQuick"],
+    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietLowCalorie","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Galettes de riz", en: "Rice paper sheets" }, quantity: 3, unit: "pcs", dept: "deptPantry" },
       { name: { fr: "Crevettes cuites coupées en deux", en: "Cooked shrimp" }, quantity: 120, unit: "g", dept: "deptMeat" },
@@ -2098,7 +2098,7 @@ export const RECIPES_CATALOG = [
     cookTime: 10,
     difficulty: "easy",
     caloriesPerPerson: 480,
-    tags: ["italian","dietBalanced","dietVegetarian","dietHalal","dietQuick"],
+    tags: ["italian","dietBalanced","dietVegetarian","dietHalal","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Gnocchis à poêler de qualité", en: "Pan-fry gnocchi" }, quantity: 180, unit: "g", dept: "deptPantry" },
       { name: { fr: "Jeunes pousses d'épinards", en: "Baby spinach" }, quantity: 120, unit: "g", dept: "deptProduce" },
@@ -2132,7 +2132,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 360,
-    tags: ["mediterranean","dietBalanced","dietVegetarian","dietHalal","dietQuick"],
+    tags: ["mediterranean","dietBalanced","dietVegetarian","dietHalal","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Tomates mûres de saison", en: "Ripe tomatoes" }, quantity: 2, unit: "pcs", dept: "deptProduce" },
       { name: { fr: "Concombre croquant", en: "Crisp cucumber" }, quantity: 1, unit: "pcs", dept: "deptProduce" },
@@ -2270,7 +2270,7 @@ export const RECIPES_CATALOG = [
     cookTime: 6,
     difficulty: "easy",
     caloriesPerPerson: 420,
-    tags: ["maghreb","dietBalanced","dietHalal","dietHighProtein","dietQuick"],
+    tags: ["maghreb","dietBalanced","dietHalal","dietHighProtein","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Feuilles de brick (Malsouka)", en: "Brik pastry sheets" }, quantity: 2, unit: "pcs", dept: "deptBakery" },
       { name: { fr: "Thon au naturel égoutté", en: "Canned tuna" }, quantity: 100, unit: "g", dept: "deptPantry" },
@@ -2305,7 +2305,7 @@ export const RECIPES_CATALOG = [
     cookTime: 25,
     difficulty: "easy",
     caloriesPerPerson: 510,
-    tags: ["mediterranean","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["mediterranean","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Cuisses ou suprêmes de poulet", en: "Chicken thighs or breasts" }, quantity: 180, unit: "g", dept: "deptMeat" },
       { name: { fr: "Patate douce coupée en frites", en: "Sweet potato fries" }, quantity: 200, unit: "g", dept: "deptProduce" },
@@ -2339,7 +2339,7 @@ export const RECIPES_CATALOG = [
     cookTime: 8,
     difficulty: "easy",
     caloriesPerPerson: 430,
-    tags: ["mediterranean","dietBalanced","dietVegetarian","dietHalal","dietHighFiber"],
+    tags: ["mediterranean","dietBalanced","dietVegetarian","dietHalal","dietHighFiber","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Pois chiches trempés ou cuits", en: "Chickpeas" }, quantity: 150, unit: "g", dept: "deptPantry" },
       { name: { fr: "Persil, coriandre fraîche, ail & oignon", en: "Fresh herbs, garlic & onion" }, quantity: 40, unit: "g", dept: "deptProduce" },
@@ -2373,7 +2373,7 @@ export const RECIPES_CATALOG = [
     cookTime: 25,
     difficulty: "easy",
     caloriesPerPerson: 470,
-    tags: ["french","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["french","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Morceaux de poulet fermier", en: "Chicken pieces" }, quantity: 170, unit: "g", dept: "deptMeat" },
       { name: { fr: "Poivrons rouge et vert émincés", en: "Red & green peppers" }, quantity: 150, unit: "g", dept: "deptProduce" },
@@ -2408,7 +2408,7 @@ export const RECIPES_CATALOG = [
     cookTime: 25,
     difficulty: "easy",
     caloriesPerPerson: 490,
-    tags: ["french","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["french","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Escalope de dinde ou poulet en morceaux", en: "Turkey or chicken chunks" }, quantity: 160, unit: "g", dept: "deptMeat" },
       { name: { fr: "Carottes fraîches en rondelles", en: "Sliced carrots" }, quantity: 120, unit: "g", dept: "deptProduce" },
@@ -2443,7 +2443,7 @@ export const RECIPES_CATALOG = [
     cookTime: 25,
     difficulty: "easy",
     caloriesPerPerson: 520,
-    tags: ["french","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["french","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Bœuf haché maigre 5% MG", en: "Lean minced beef" }, quantity: 150, unit: "g", dept: "deptMeat" },
       { name: { fr: "Pommes de terre à purée", en: "Mashing potatoes" }, quantity: 200, unit: "g", dept: "deptProduce" },
@@ -2477,7 +2477,7 @@ export const RECIPES_CATALOG = [
     cookTime: 20,
     difficulty: "easy",
     caloriesPerPerson: 290,
-    tags: ["french","dietBalanced","dietVegetarian","dietHalal","dietHighFiber","dietLowCalorie"],
+    tags: ["french","dietBalanced","dietVegetarian","dietHalal","dietHighFiber","dietLowCalorie","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Potimarron bio (avec la peau)", en: "Red kuri squash" }, quantity: 250, unit: "g", dept: "deptProduce" },
       { name: { fr: "Bouillon de légumes", en: "Vegetable broth" }, quantity: 350, unit: "ml", dept: "deptPantry" },
@@ -2511,7 +2511,7 @@ export const RECIPES_CATALOG = [
     cookTime: 20,
     difficulty: "easy",
     caloriesPerPerson: 460,
-    tags: ["french","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["french","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Pâte feuilletée ou brisée", en: "Puff pastry sheet" }, quantity: 1, unit: "pcs", dept: "deptBakery" },
       { name: { fr: "Blancs de poireaux émincés", en: "Sliced leeks" }, quantity: 150, unit: "g", dept: "deptProduce" },
@@ -2545,7 +2545,7 @@ export const RECIPES_CATALOG = [
     cookTime: 8,
     difficulty: "easy",
     caloriesPerPerson: 390,
-    tags: ["french","mediterranean","dietBalanced","dietHalal","dietHighProtein","dietQuick"],
+    tags: ["french","mediterranean","dietBalanced","dietHalal","dietHighProtein","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Thon blanc au naturel", en: "Canned albacore tuna" }, quantity: 120, unit: "g", dept: "deptPantry" },
       { name: { fr: "Œuf dur (cuit 9 min)", en: "Hard-boiled egg" }, quantity: 1, unit: "pcs", dept: "deptDairy" },
@@ -2580,7 +2580,7 @@ export const RECIPES_CATALOG = [
     cookTime: 10,
     difficulty: "easy",
     caloriesPerPerson: 510,
-    tags: ["mexican","dietBalanced","dietHalal","dietHighProtein","dietQuick"],
+    tags: ["mexican","dietBalanced","dietHalal","dietHighProtein","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Bœuf haché 5% MG assaisonné", en: "Spiced minced beef" }, quantity: 140, unit: "g", dept: "deptMeat" },
       { name: { fr: "Riz blanc à la coriandre", en: "Cilantro rice" }, quantity: 80, unit: "g", dept: "deptPantry" },
@@ -2648,7 +2648,7 @@ export const RECIPES_CATALOG = [
     cookTime: 6,
     difficulty: "easy",
     caloriesPerPerson: 420,
-    tags: ["mexican","dietBalanced","dietVegetarian","dietHalal","dietQuick"],
+    tags: ["mexican","dietBalanced","dietVegetarian","dietHalal","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Grandes galettes tortillas", en: "Flour tortillas" }, quantity: 2, unit: "pcs", dept: "deptBakery" },
       { name: { fr: "Poivron émincé & Maïs doux", en: "Diced pepper & sweet corn" }, quantity: 80, unit: "g", dept: "deptProduce" },
@@ -2682,7 +2682,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 310,
-    tags: ["latin","dietBalanced","dietHalal","dietHighProtein","dietLowCalorie","dietQuick"],
+    tags: ["latin","dietBalanced","dietHalal","dietHighProtein","dietLowCalorie","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Filet de cabillaud ultra frais en dés", en: "Fresh cod cubes" }, quantity: 160, unit: "g", dept: "deptMeat" },
       { name: { fr: "Jus de 2 citrons verts frais", en: "Fresh lime juice" }, quantity: 2, unit: "pcs", dept: "deptProduce" },
@@ -2716,7 +2716,7 @@ export const RECIPES_CATALOG = [
     cookTime: 12,
     difficulty: "easy",
     caloriesPerPerson: 510,
-    tags: ["asian","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Pavé de saumon frais", en: "Salmon fillet" }, quantity: 150, unit: "g", dept: "deptMeat" },
       { name: { fr: "Riz noir ou complet cuit", en: "Cooked black or brown rice" }, quantity: 80, unit: "g", dept: "deptPantry" },
@@ -2750,7 +2750,7 @@ export const RECIPES_CATALOG = [
     cookTime: 15,
     difficulty: "easy",
     caloriesPerPerson: 420,
-    tags: ["french","dietBalanced","dietHalal","dietHighProtein","dietHighFiber"],
+    tags: ["french","dietBalanced","dietHalal","dietHighProtein","dietHighFiber","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Lentilles vertes du Puy", en: "French green lentils" }, quantity: 80, unit: "g", dept: "deptPantry" },
       { name: { fr: "Saumon fumé en lanières", en: "Smoked salmon strips" }, quantity: 80, unit: "g", dept: "deptMeat" },
@@ -2784,7 +2784,7 @@ export const RECIPES_CATALOG = [
     cookTime: 15,
     difficulty: "easy",
     caloriesPerPerson: 260,
-    tags: ["french","dietBalanced","dietVegetarian","dietHalal","dietHighFiber","dietLowCalorie"],
+    tags: ["french","dietBalanced","dietVegetarian","dietHalal","dietHighFiber","dietLowCalorie","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Brocoli frais coupé en fleurettes", en: "Broccoli florets" }, quantity: 200, unit: "g", dept: "deptProduce" },
       { name: { fr: "Courgette coupée en rondelles", en: "Zucchini" }, quantity: 150, unit: "g", dept: "deptProduce" },
@@ -2852,7 +2852,7 @@ export const RECIPES_CATALOG = [
     cookTime: 20,
     difficulty: "medium",
     caloriesPerPerson: 470,
-    tags: ["italian","dietBalanced","dietVegetarian","dietHalal"],
+    tags: ["italian","dietBalanced","dietVegetarian","dietHalal","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Riz arborio pour risotto", en: "Arborio rice" }, quantity: 80, unit: "g", dept: "deptPantry" },
       { name: { fr: "Asperges vertes fraîches", en: "Green asparagus" }, quantity: 150, unit: "g", dept: "deptProduce" },
@@ -2886,7 +2886,7 @@ export const RECIPES_CATALOG = [
     cookTime: 15,
     difficulty: "easy",
     caloriesPerPerson: 380,
-    tags: ["mediterranean","french","dietBalanced","dietHalal","dietHighProtein","dietLowCarb"],
+    tags: ["mediterranean","french","dietBalanced","dietHalal","dietHighProtein","dietLowCarb","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Filet de dorade royale", en: "Sea bream fillet" }, quantity: 160, unit: "g", dept: "deptMeat" },
       { name: { fr: "Bulbe de fenouil émincé", en: "Sliced fennel bulb" }, quantity: 180, unit: "g", dept: "deptProduce" },
@@ -2917,7 +2917,7 @@ export const RECIPES_CATALOG = [
     cookTime: 8,
     difficulty: "easy",
     caloriesPerPerson: 420,
-    tags: ["asian","dietBalanced","dietVegetarian","dietHalal","dietQuick"],
+    tags: ["asian","dietBalanced","dietVegetarian","dietHalal","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Riz blanc cuit de la veille", en: "Day-old cooked white rice" }, quantity: 140, unit: "g", dept: "deptPantry" },
       { name: { fr: "Œufs frais", en: "Eggs" }, quantity: 2, unit: "pcs", dept: "deptDairy" },
@@ -2951,7 +2951,7 @@ export const RECIPES_CATALOG = [
     cookTime: 12,
     difficulty: "easy",
     caloriesPerPerson: 410,
-    tags: ["asian","dietBalanced","dietVegetarian","dietHalal","dietHighFiber"],
+    tags: ["asian","dietBalanced","dietVegetarian","dietHalal","dietHighFiber","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Tofu ferme en dés dorés", en: "Firm tofu cubes" }, quantity: 140, unit: "g", dept: "deptProduce" },
       { name: { fr: "Pâte de curry vert thaï", en: "Thai green curry paste" }, quantity: 1, unit: "c.à.s", dept: "deptSpices" },
@@ -3018,7 +3018,7 @@ export const RECIPES_CATALOG = [
     cookTime: 5,
     difficulty: "easy",
     caloriesPerPerson: 340,
-    tags: ["dietBalanced","dietVegetarian","dietHalal","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietHalal","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Flocons d'avoine", en: "Oat flakes" }, quantity: 60, unit: "g", dept: "deptPantry" },
       { name: { fr: "Lait demi-écrémé ou d'amande", en: "Milk or almond milk" }, quantity: 180, unit: "ml", dept: "deptDairy" },
@@ -3084,7 +3084,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 110,
-    tags: ["dietBalanced","dietVegetarian","dietHalal","dietLowCalorie","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietHalal","dietLowCalorie","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Concombre frais en bâtonnets", en: "Cucumber sticks" }, quantity: 150, unit: "g", dept: "deptProduce" },
       { name: { fr: "Yaourt grec authentique", en: "Greek yogurt" }, quantity: 80, unit: "g", dept: "deptDairy" },
@@ -3115,7 +3115,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 160,
-    tags: ["dietBalanced","dietVegetarian","dietHalal","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietHalal","dietQuick","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Galettes de riz complet soufflé", en: "Brown rice cakes" }, quantity: 2, unit: "pcs", dept: "deptBakery" },
       { name: { fr: "Purée d'amande complète", en: "Almond butter" }, quantity: 15, unit: "g", dept: "deptPantry" },
@@ -3146,7 +3146,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 120,
-    tags: ["dietBalanced","dietVegetarian","dietHalal","dietLowCalorie","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietHalal","dietLowCalorie","dietQuick","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Fraises, melon ou pomme en dés", en: "Mixed fresh fruits" }, quantity: 180, unit: "g", dept: "deptProduce" },
       { name: { fr: "Jus de citron vert & Feuilles de menthe", en: "Lime juice & fresh mint" }, quantity: 1, unit: "c.à.s", dept: "deptProduce" }
@@ -3176,7 +3176,7 @@ export const RECIPES_CATALOG = [
     cookTime: 25,
     difficulty: "easy",
     caloriesPerPerson: 510,
-    tags: ["african","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["african","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Cuisses ou aiguillettes de poulet", en: "Chicken pieces" }, quantity: 170, unit: "g", dept: "deptMeat" },
       { name: { fr: "Oignons jaunes émincés", en: "Sliced yellow onions" }, quantity: 200, unit: "g", dept: "deptProduce" },
@@ -3211,7 +3211,7 @@ export const RECIPES_CATALOG = [
     cookTime: 20,
     difficulty: "easy",
     caloriesPerPerson: 390,
-    tags: ["maghreb","dietBalanced","dietVegetarian","dietHalal","dietHighFiber"],
+    tags: ["maghreb","dietBalanced","dietVegetarian","dietHalal","dietHighFiber","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Haricots blancs cuits égouttés", en: "Cooked cannellini beans" }, quantity: 200, unit: "g", dept: "deptPantry" },
       { name: { fr: "Tomates fraîches râpées & Concentré", en: "Grated tomatoes & paste" }, quantity: 150, unit: "g", dept: "deptProduce" },
@@ -3245,7 +3245,7 @@ export const RECIPES_CATALOG = [
     cookTime: 10,
     difficulty: "easy",
     caloriesPerPerson: 490,
-    tags: ["mediterranean","dietBalanced","dietHalal","dietHighProtein","dietQuick"],
+    tags: ["mediterranean","dietBalanced","dietHalal","dietHighProtein","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Haut de cuisse de poulet émincé", en: "Chicken thighs sliced" }, quantity: 160, unit: "g", dept: "deptMeat" },
       { name: { fr: "Épices shawarma (cardamome, cumin, paprika)", en: "Shawarma spices" }, quantity: 1, unit: "c.à.s", dept: "deptSpices" },
@@ -3381,7 +3381,7 @@ export const RECIPES_CATALOG = [
     cookTime: 18,
     difficulty: "easy",
     caloriesPerPerson: 530,
-    tags: ["indian","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["indian","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Blancs de poulet en morceaux", en: "Chicken breast pieces" }, quantity: 160, unit: "g", dept: "deptMeat" },
       { name: { fr: "Poudre d'amandes & Yaourt nature", en: "Almond flour & plain yogurt" }, quantity: 50, unit: "g", dept: "deptDairy" },
@@ -3449,7 +3449,7 @@ export const RECIPES_CATALOG = [
     cookTime: 8,
     difficulty: "easy",
     caloriesPerPerson: 510,
-    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietQuick"],
+    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Bœuf haché 5% MG", en: "Lean minced beef" }, quantity: 150, unit: "g", dept: "deptMeat" },
       { name: { fr: "Feuilles de basilic thaï ou classique", en: "Thai basil leaves" }, quantity: 20, unit: "g", dept: "deptProduce" },
@@ -3484,7 +3484,7 @@ export const RECIPES_CATALOG = [
     cookTime: 15,
     difficulty: "easy",
     caloriesPerPerson: 480,
-    tags: ["asian","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Aiguillettes de poulet", en: "Chicken strips" }, quantity: 160, unit: "g", dept: "deptMeat" },
       { name: { fr: "Lait de coco", en: "Coconut milk" }, quantity: 120, unit: "ml", dept: "deptPantry" },
@@ -3519,7 +3519,7 @@ export const RECIPES_CATALOG = [
     cookTime: 25,
     difficulty: "easy",
     caloriesPerPerson: 490,
-    tags: ["french","dietBalanced","dietVegetarian","dietHalal"],
+    tags: ["french","dietBalanced","dietVegetarian","dietHalal","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Pommes de terre cuites à la vapeur", en: "Steamed potatoes" }, quantity: 220, unit: "g", dept: "deptProduce" },
       { name: { fr: "Oignons émincés caramélisés", en: "Caramelized onions" }, quantity: 120, unit: "g", dept: "deptProduce" },
@@ -3553,7 +3553,7 @@ export const RECIPES_CATALOG = [
     cookTime: 20,
     difficulty: "easy",
     caloriesPerPerson: 520,
-    tags: ["mexican","dietBalanced","dietHalal","dietHighProtein","dietHighFiber"],
+    tags: ["mexican","dietBalanced","dietHalal","dietHighProtein","dietHighFiber","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Bœuf haché maigre", en: "Lean ground beef" }, quantity: 150, unit: "g", dept: "deptMeat" },
       { name: { fr: "Haricots rouges égouttés & Maïs", en: "Red kidney beans & corn" }, quantity: 120, unit: "g", dept: "deptPantry" },
@@ -3588,7 +3588,7 @@ export const RECIPES_CATALOG = [
     cookTime: 15,
     difficulty: "easy",
     caloriesPerPerson: 420,
-    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietLowCarb"],
+    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietLowCarb","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Blancs de poulet émincés", en: "Sliced chicken breast" }, quantity: 150, unit: "g", dept: "deptMeat" },
       { name: { fr: "Lait de coco", en: "Coconut milk" }, quantity: 160, unit: "ml", dept: "deptPantry" },
@@ -3623,7 +3623,7 @@ export const RECIPES_CATALOG = [
     cookTime: 15,
     difficulty: "easy",
     caloriesPerPerson: 440,
-    tags: ["mediterranean","french","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["mediterranean","french","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Filet de loup de mer ou bar", en: "Sea bass fillet" }, quantity: 160, unit: "g", dept: "deptMeat" },
       { name: { fr: "Pommes de terre", en: "Potatoes" }, quantity: 180, unit: "g", dept: "deptProduce" },
@@ -3655,7 +3655,7 @@ export const RECIPES_CATALOG = [
     cookTime: 30,
     difficulty: "medium",
     caloriesPerPerson: 560,
-    tags: ["maghreb","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["maghreb","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Morceaux d'agneau tendre (épaule)", en: "Tender lamb pieces" }, quantity: 160, unit: "g", dept: "deptMeat" },
       { name: { fr: "Pruneaux dénoyautés & Miel", en: "Prunes & honey" }, quantity: 40, unit: "g", dept: "deptPantry" },
@@ -3722,7 +3722,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 350,
-    tags: ["dietBalanced","dietVegetarian","dietHalal","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietHalal","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Yaourt blanc ou végétal", en: "Yogurt" }, quantity: 150, unit: "g", dept: "deptDairy" },
       { name: { fr: "Granola d'avoine aux noix de pécan", en: "Pecan oat granola" }, quantity: 40, unit: "g", dept: "deptPantry" },
@@ -3753,7 +3753,7 @@ export const RECIPES_CATALOG = [
     cookTime: 12,
     difficulty: "easy",
     caloriesPerPerson: 150,
-    tags: ["dietBalanced","dietVegetarian","dietHalal","dietLowCalorie"],
+    tags: ["dietBalanced","dietVegetarian","dietHalal","dietLowCalorie","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Pomme moyenne évidée", en: "Cored medium apple" }, quantity: 1, unit: "pcs", dept: "deptProduce" },
       { name: { fr: "Cannelle moulue & Filet de miel", en: "Cinnamon & honey drizzle" }, quantity: 1, unit: "c.à.c", dept: "deptSpices" },
@@ -3784,7 +3784,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 140,
-    tags: ["dietBalanced","dietVegetarian","dietHalal","dietLowCalorie","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietHalal","dietLowCalorie","dietQuick","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Carottes fraîches en bâtonnets", en: "Carrot sticks" }, quantity: 150, unit: "g", dept: "deptProduce" },
       { name: { fr: "Houmous crémeux de pois chiches", en: "Creamy hummus" }, quantity: 50, unit: "g", dept: "deptPantry" }
@@ -3814,7 +3814,7 @@ export const RECIPES_CATALOG = [
     cookTime: 25,
     difficulty: "easy",
     caloriesPerPerson: 480,
-    tags: ["italian","dietBalanced","dietVegetarian","dietHalal"],
+    tags: ["italian","dietBalanced","dietVegetarian","dietHalal","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Tubes de cannellonis précuits", en: "Cannelloni tubes" }, quantity: 4, unit: "pcs", dept: "deptPantry" },
       { name: { fr: "Ricotta fraîche & Épinards hachés", en: "Ricotta & chopped spinach" }, quantity: 180, unit: "g", dept: "deptDairy" },
@@ -3848,7 +3848,7 @@ export const RECIPES_CATALOG = [
     cookTime: 18,
     difficulty: "easy",
     caloriesPerPerson: 460,
-    tags: ["mexican","dietBalanced","dietVegetarian","dietHalal","dietHighFiber"],
+    tags: ["mexican","dietBalanced","dietVegetarian","dietHalal","dietHighFiber","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Patate douce rôtie au paprika", en: "Paprika roasted sweet potato" }, quantity: 150, unit: "g", dept: "deptProduce" },
       { name: { fr: "Haricots noirs & Maïs doux", en: "Black beans & corn" }, quantity: 100, unit: "g", dept: "deptPantry" },
@@ -3882,7 +3882,7 @@ export const RECIPES_CATALOG = [
     cookTime: 12,
     difficulty: "easy",
     caloriesPerPerson: 530,
-    tags: ["french","dietBalanced","dietHalal","dietHighProtein","dietQuick"],
+    tags: ["french","dietBalanced","dietHalal","dietHighProtein","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Bavette ou rumsteck de bœuf émincé", en: "Beef steak strips" }, quantity: 150, unit: "g", dept: "deptMeat" },
       { name: { fr: "Champignons de Paris émincés", en: "Mushrooms" }, quantity: 120, unit: "g", dept: "deptProduce" },
@@ -3950,7 +3950,7 @@ export const RECIPES_CATALOG = [
     cookTime: 20,
     difficulty: "easy",
     caloriesPerPerson: 510,
-    tags: ["asian","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Blancs de poulet en cubes", en: "Chicken breast cubes" }, quantity: 160, unit: "g", dept: "deptMeat" },
       { name: { fr: "Carottes et pommes de terre en morceaux", en: "Carrots & potatoes" }, quantity: 150, unit: "g", dept: "deptProduce" },
@@ -3984,7 +3984,7 @@ export const RECIPES_CATALOG = [
     cookTime: 20,
     difficulty: "easy",
     caloriesPerPerson: 410,
-    tags: ["maghreb","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["maghreb","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Filet de poisson blanc épais (cabillaud/merlu)", en: "White fish fillet" }, quantity: 160, unit: "g", dept: "deptMeat" },
       { name: { fr: "Poivron & Pomme de terre en rondelles", en: "Bell pepper & potato slices" }, quantity: 150, unit: "g", dept: "deptProduce" },
@@ -4018,7 +4018,7 @@ export const RECIPES_CATALOG = [
     cookTime: 15,
     difficulty: "easy",
     caloriesPerPerson: 410,
-    tags: ["mediterranean","dietBalanced","dietVegetarian","dietHalal"],
+    tags: ["mediterranean","dietBalanced","dietVegetarian","dietHalal","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Œufs frais", en: "Eggs" }, quantity: 3, unit: "pcs", dept: "deptDairy" },
       { name: { fr: "Pommes de terre coupées en lamelles", en: "Thinly sliced potatoes" }, quantity: 180, unit: "g", dept: "deptProduce" },
@@ -4052,7 +4052,7 @@ export const RECIPES_CATALOG = [
     cookTime: 8,
     difficulty: "easy",
     caloriesPerPerson: 420,
-    tags: ["mediterranean","french","dietBalanced","dietHalal","dietHighProtein","dietLowCarb","dietQuick"],
+    tags: ["mediterranean","french","dietBalanced","dietHalal","dietHighProtein","dietLowCarb","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Pavé de thon frais", en: "Fresh tuna steak" }, quantity: 160, unit: "g", dept: "deptMeat" },
       { name: { fr: "Haricots verts frais ou surgelés", en: "Green beans" }, quantity: 200, unit: "g", dept: "deptProduce" },
@@ -4084,7 +4084,7 @@ export const RECIPES_CATALOG = [
     cookTime: 8,
     difficulty: "easy",
     caloriesPerPerson: 450,
-    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietQuick"],
+    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Nouilles udon fraîches", en: "Fresh udon noodles" }, quantity: 180, unit: "g", dept: "deptPantry" },
       { name: { fr: "Crevettes décortiquées", en: "Peeled shrimp" }, quantity: 130, unit: "g", dept: "deptMeat" },
@@ -4118,7 +4118,7 @@ export const RECIPES_CATALOG = [
     cookTime: 15,
     difficulty: "easy",
     caloriesPerPerson: 240,
-    tags: ["french","dietBalanced","dietVegetarian","dietHalal","dietLowCalorie","dietQuick"],
+    tags: ["french","dietBalanced","dietVegetarian","dietHalal","dietLowCalorie","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Courgettes fraîches non épluchées", en: "Fresh zucchinis" }, quantity: 300, unit: "g", dept: "deptProduce" },
       { name: { fr: "Portions de fromage fondu (Vache qui rit/Kiri)", en: "Cream cheese portions" }, quantity: 2, unit: "pcs", dept: "deptDairy" },
@@ -4183,7 +4183,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 290,
-    tags: ["dietBalanced","dietVegetarian","dietHalal","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietHalal","dietQuick","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Graines de chia", en: "Chia seeds" }, quantity: 25, unit: "g", dept: "deptPantry" },
       { name: { fr: "Lait de coco ou d'amande", en: "Coconut or almond milk" }, quantity: 140, unit: "ml", dept: "deptPantry" },
@@ -4214,7 +4214,7 @@ export const RECIPES_CATALOG = [
     cookTime: 10,
     difficulty: "easy",
     caloriesPerPerson: 130,
-    tags: ["dietBalanced","dietVegetarian","dietHalal","dietLowCalorie"],
+    tags: ["dietBalanced","dietVegetarian","dietHalal","dietLowCalorie","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Pomme & Poire coupées en dés", en: "Diced apple & pear" }, quantity: 180, unit: "g", dept: "deptProduce" },
       { name: { fr: "Amandes effilées grillées", en: "Sliced toasted almonds" }, quantity: 10, unit: "g", dept: "deptPantry" }
@@ -4278,7 +4278,7 @@ export const RECIPES_CATALOG = [
     cookTime: 12,
     difficulty: "easy",
     caloriesPerPerson: 460,
-    tags: ["french","dietBalanced","dietHalal","dietHighProtein","dietQuick"],
+    tags: ["french","dietBalanced","dietHalal","dietHighProtein","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Escalope de dinde", en: "Turkey cutlet" }, quantity: 160, unit: "g", dept: "deptMeat" },
       { name: { fr: "Champignons de Paris frais émincés", en: "Sliced mushrooms" }, quantity: 120, unit: "g", dept: "deptProduce" },
@@ -4312,7 +4312,7 @@ export const RECIPES_CATALOG = [
     cookTime: 10,
     difficulty: "easy",
     caloriesPerPerson: 360,
-    tags: ["mediterranean","maghreb","dietBalanced","dietVegetarian","dietHalal","dietQuick"],
+    tags: ["mediterranean","maghreb","dietBalanced","dietVegetarian","dietHalal","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Œufs frais bio", en: "Eggs" }, quantity: 2, unit: "pcs", dept: "deptDairy" },
       { name: { fr: "Pousses d'épinards & Courgette râpée", en: "Baby spinach & zucchini" }, quantity: 150, unit: "g", dept: "deptProduce" },
@@ -4380,7 +4380,7 @@ export const RECIPES_CATALOG = [
     cookTime: 20,
     difficulty: "medium",
     caloriesPerPerson: 490,
-    tags: ["italian","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["italian","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Riz arborio pour risotto", en: "Arborio rice" }, quantity: 80, unit: "g", dept: "deptPantry" },
       { name: { fr: "Crevettes décortiquées", en: "Peeled shrimp" }, quantity: 130, unit: "g", dept: "deptMeat" },
@@ -4414,7 +4414,7 @@ export const RECIPES_CATALOG = [
     cookTime: 10,
     difficulty: "easy",
     caloriesPerPerson: 460,
-    tags: ["italian","dietBalanced","dietVegetarian","dietHalal","dietQuick"],
+    tags: ["italian","dietBalanced","dietVegetarian","dietHalal","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Gnocchis à poêler", en: "Pan-fry gnocchi" }, quantity: 180, unit: "g", dept: "deptPantry" },
       { name: { fr: "Coulis de tomate parfumé à l'ail", en: "Garlic tomato sauce" }, quantity: 120, unit: "g", dept: "deptProduce" },
@@ -4448,7 +4448,7 @@ export const RECIPES_CATALOG = [
     cookTime: 8,
     difficulty: "easy",
     caloriesPerPerson: 490,
-    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietQuick"],
+    tags: ["asian","dietBalanced","dietHalal","dietHighProtein","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Aiguillettes de poulet enfilées sur piques", en: "Chicken skewers" }, quantity: 160, unit: "g", dept: "deptMeat" },
       { name: { fr: "Beurre de cacahuète pur & Lait de coco", en: "Peanut butter & coconut milk" }, quantity: 50, unit: "g", dept: "deptPantry" },
@@ -4480,7 +4480,7 @@ export const RECIPES_CATALOG = [
     cookTime: 15,
     difficulty: "easy",
     caloriesPerPerson: 420,
-    tags: ["indian","dietBalanced","dietVegetarian","dietHalal","dietHighFiber"],
+    tags: ["indian","dietBalanced","dietVegetarian","dietHalal","dietHighFiber","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Pois chiches cuits égouttés", en: "Cooked chickpeas" }, quantity: 180, unit: "g", dept: "deptPantry" },
       { name: { fr: "Pousses d'épinards fraîches", en: "Fresh baby spinach" }, quantity: 100, unit: "g", dept: "deptProduce" },
@@ -4514,7 +4514,7 @@ export const RECIPES_CATALOG = [
     cookTime: 20,
     difficulty: "easy",
     caloriesPerPerson: 320,
-    tags: ["mediterranean","dietBalanced","dietVegetarian","dietHalal","dietHighFiber","dietLowCalorie"],
+    tags: ["mediterranean","dietBalanced","dietVegetarian","dietHalal","dietHighFiber","dietLowCalorie","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Lentilles corail rincées", en: "Red lentils" }, quantity: 80, unit: "g", dept: "deptPantry" },
       { name: { fr: "Carotte, oignon & pomme de terre", en: "Carrot, onion & potato" }, quantity: 150, unit: "g", dept: "deptProduce" },
@@ -4614,7 +4614,7 @@ export const RECIPES_CATALOG = [
     cookTime: 6,
     difficulty: "easy",
     caloriesPerPerson: 330,
-    tags: ["dietBalanced","dietVegetarian","dietHalal","dietHighProtein","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietHalal","dietHighProtein","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Flocons d'avoine mixés", en: "Ground oats" }, quantity: 50, unit: "g", dept: "deptPantry" },
       { name: { fr: "Fromage blanc ou yaourt grec", en: "Greek yogurt" }, quantity: 60, unit: "g", dept: "deptDairy" },
@@ -4646,7 +4646,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 160,
-    tags: ["dietBalanced","dietVegetarian","dietHalal"],
+    tags: ["dietBalanced","dietVegetarian","dietHalal","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Chocolat noir 70% fondu", en: "Melted 70% dark chocolate" }, quantity: 25, unit: "g", dept: "deptPantry" },
       { name: { fr: "Blancs d'œufs battus en neige ferme", en: "Whipped egg whites" }, quantity: 2, unit: "pcs", dept: "deptDairy" }
@@ -4676,7 +4676,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 170,
-    tags: ["dietBalanced","dietVegetarian","dietHalal","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietHalal","dietQuick","dietVegan","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Amandes et noisettes entières non salées", en: "Raw or roasted nuts" }, quantity: 30, unit: "g", dept: "deptPantry" }
     ],
@@ -4865,7 +4865,7 @@ export const RECIPES_CATALOG = [
     cookTime: 10,
     difficulty: "easy",
     caloriesPerPerson: 520,
-    tags: ["dietBalanced","dietHalal","asian","dietQuick"],
+    tags: ["dietBalanced","dietHalal","asian","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Pavé de saumon frais (cru ou poêlé)", en: "Fresh salmon fillet" }, quantity: 130, unit: "g", dept: "deptMeat" },
       { name: { fr: "Riz sushi ou basmati", en: "Sushi or basmati rice" }, quantity: 80, unit: "g", dept: "deptPantry" },
@@ -5039,7 +5039,7 @@ export const RECIPES_CATALOG = [
     cookTime: 15,
     difficulty: "easy",
     caloriesPerPerson: 520,
-    tags: ["dietBalanced","dietVegetarian","dietHalal","italian"],
+    tags: ["dietBalanced","dietVegetarian","dietHalal","italian","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Gnocchis frais à poêler", en: "Fresh gnocchi" }, quantity: 180, unit: "g", dept: "deptPantry" },
       { name: { fr: "Coulis de tomates au basilic", en: "Tomato basil sauce" }, quantity: 150, unit: "g", dept: "deptPantry" },
@@ -5074,7 +5074,7 @@ export const RECIPES_CATALOG = [
     cookTime: 10,
     difficulty: "easy",
     caloriesPerPerson: 490,
-    tags: ["dietBalanced","dietHalal","asian","dietQuick"],
+    tags: ["dietBalanced","dietHalal","asian","dietQuick","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Nouilles de riz", en: "Rice noodles" }, quantity: 120, unit: "g", dept: "deptPantry" },
       { name: { fr: "Crevettes décortiquées", en: "Peeled shrimp" }, quantity: 150, unit: "g", dept: "deptMeat" },
@@ -5181,7 +5181,7 @@ export const RECIPES_CATALOG = [
     cookTime: 18,
     difficulty: "easy",
     caloriesPerPerson: 540,
-    tags: ["dietBalanced","dietHalal","indian"],
+    tags: ["dietBalanced","dietHalal","indian","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Filets de poulet en dés", en: "Diced chicken breast" }, quantity: 160, unit: "g", dept: "deptMeat" },
       { name: { fr: "Sauce tomate & crème de coco (ou crème fluide)", en: "Tomato sauce & coconut cream" }, quantity: 150, unit: "g", dept: "deptPantry" },
@@ -5215,7 +5215,7 @@ export const RECIPES_CATALOG = [
     cookTime: 18,
     difficulty: "easy",
     caloriesPerPerson: 360,
-    tags: ["dietBalanced","dietVegetarian","dietHalal","french","dietGlutenFree"],
+    tags: ["dietBalanced","dietVegetarian","dietHalal","french","dietGlutenFree","dietVegan"],
     ingredients: [
       { name: { fr: "Potimarron ou courge butternut en dés", en: "Diced pumpkin" }, quantity: 250, unit: "g", dept: "deptProduce" },
       { name: { fr: "Châtaignes cuites", en: "Cooked chestnuts" }, quantity: 60, unit: "g", dept: "deptPantry" },
@@ -5247,7 +5247,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 290,
-    tags: ["dietBalanced","dietVegetarian","dietVegan","dietGlutenFree","dietLactoseFree","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietVegan","dietGlutenFree","dietLactoseFree","dietQuick","dietHalal"],
     ingredients: [
       { name: { fr: "Graines de chia", en: "Chia seeds" }, quantity: 40, unit: "g", dept: "deptPantry" },
       { name: { fr: "Lait de coco ou amande", en: "Coconut or almond milk" }, quantity: 200, unit: "ml", dept: "deptDairy" },
@@ -5280,7 +5280,7 @@ export const RECIPES_CATALOG = [
     cookTime: 6,
     difficulty: "easy",
     caloriesPerPerson: 340,
-    tags: ["dietBalanced","dietVegetarian","dietKids","dietBudget","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietKids","dietBudget","dietQuick","dietHalal"],
     ingredients: [
       { name: { fr: "Tranches de brioche ou pain complet", en: "Brioche slices" }, quantity: 4, unit: "tranches", dept: "deptBakery" },
       { name: { fr: "Œufs frais", en: "Fresh eggs" }, quantity: 2, unit: "pièces", dept: "deptDairy" },
@@ -5313,7 +5313,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 320,
-    tags: ["dietBalanced","dietVegetarian","dietHighProtein","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietHighProtein","dietQuick","dietHalal","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Yaourt grec ou Skyr", en: "Greek yogurt" }, quantity: 250, unit: "g", dept: "deptDairy" },
       { name: { fr: "Granola chocolat noir", en: "Dark chocolate granola" }, quantity: 60, unit: "g", dept: "deptPantry" },
@@ -5342,7 +5342,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 280,
-    tags: ["dietBalanced","dietVegetarian","dietVegan","dietGlutenFree","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietVegan","dietGlutenFree","dietQuick","dietHalal"],
     ingredients: [
       { name: { fr: "Fruits rouges surgelés", en: "Frozen berries" }, quantity: 150, unit: "g", dept: "deptFrozen" },
       { name: { fr: "Banane", en: "Banana" }, quantity: 1, unit: "pièce", dept: "deptProduce" },
@@ -5372,7 +5372,7 @@ export const RECIPES_CATALOG = [
     cookTime: 4,
     difficulty: "easy",
     caloriesPerPerson: 350,
-    tags: ["dietBalanced","dietVegetarian","dietHighProtein","dietBudget","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietHighProtein","dietBudget","dietQuick","dietHalal","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Flocons d'avoine", en: "Rolled oats" }, quantity: 70, unit: "g", dept: "deptPantry" },
       { name: { fr: "Lait ou boisson végétale", en: "Milk" }, quantity: 200, unit: "ml", dept: "deptDairy" },
@@ -5403,7 +5403,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 300,
-    tags: ["dietBalanced","dietVegetarian","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietQuick","dietHalal","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Flocons d'avoine", en: "Rolled oats" }, quantity: 60, unit: "g", dept: "deptPantry" },
       { name: { fr: "Pomme", en: "Apple" }, quantity: 1, unit: "pièce", dept: "deptProduce" },
@@ -5433,7 +5433,7 @@ export const RECIPES_CATALOG = [
     cookTime: 8,
     difficulty: "easy",
     caloriesPerPerson: 320,
-    tags: ["dietBalanced","dietVegetarian","flavorSavory","dietQuick","dietGlutenFree"],
+    tags: ["dietBalanced","dietVegetarian","flavorSavory","dietQuick","dietGlutenFree","dietHalal"],
     ingredients: [
       { name: { fr: "Œufs frais", en: "Fresh eggs" }, quantity: 2, unit: "pièces", dept: "deptDairy" },
       { name: { fr: "Coulis de tomates", en: "Tomato passata" }, quantity: 180, unit: "g", dept: "deptPantry" },
@@ -5463,7 +5463,7 @@ export const RECIPES_CATALOG = [
     cookTime: 4,
     difficulty: "easy",
     caloriesPerPerson: 290,
-    tags: ["dietBalanced","dietVegetarian","flavorSavory","dietKeto","dietLowCarb","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","flavorSavory","dietKeto","dietLowCarb","dietQuick","dietHalal","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Œufs frais", en: "Eggs" }, quantity: 2, unit: "pièces", dept: "deptDairy" },
       { name: { fr: "Fromage frais type St-Moret", en: "Cream cheese" }, quantity: 40, unit: "g", dept: "deptDairy" },
@@ -5492,7 +5492,7 @@ export const RECIPES_CATALOG = [
     cookTime: 2,
     difficulty: "easy",
     caloriesPerPerson: 360,
-    tags: ["dietBalanced","flavorSavory","dietHighProtein","dietQuick"],
+    tags: ["dietBalanced","flavorSavory","dietHighProtein","dietQuick","dietHalal"],
     ingredients: [
       { name: { fr: "Mini bagels ou pain complet", en: "Bagels" }, quantity: 2, unit: "pièces", dept: "deptBakery" },
       { name: { fr: "Saumon fumé ou truite", en: "Smoked salmon" }, quantity: 60, unit: "g", dept: "deptMeat" },
@@ -5522,7 +5522,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 180,
-    tags: ["dietBalanced","dietVegetarian","dietVegan","dietGlutenFree","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietVegan","dietGlutenFree","dietQuick","dietHalal"],
     ingredients: [
       { name: { fr: "Dattes Medjool", en: "Pitted dates" }, quantity: 60, unit: "g", dept: "deptProduce" },
       { name: { fr: "Poudre d'amandes", en: "Almond flour" }, quantity: 30, unit: "g", dept: "deptPantry" },
@@ -5551,7 +5551,7 @@ export const RECIPES_CATALOG = [
     cookTime: 5,
     difficulty: "easy",
     caloriesPerPerson: 160,
-    tags: ["dietBalanced","dietVegetarian","dietVegan","dietKids","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","dietVegan","dietKids","dietQuick","dietHalal","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Pommes", en: "Apples" }, quantity: 2, unit: "pièces", dept: "deptProduce" },
       { name: { fr: "Cannelle", en: "Cinnamon" }, quantity: 1, unit: "c.à.c", dept: "deptSpices" },
@@ -5580,7 +5580,7 @@ export const RECIPES_CATALOG = [
     cookTime: 12,
     difficulty: "easy",
     caloriesPerPerson: 190,
-    tags: ["dietBalanced","dietVegetarian","dietVegan","dietKids","dietBudget"],
+    tags: ["dietBalanced","dietVegetarian","dietVegan","dietKids","dietBudget","dietHalal","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Banane mûre", en: "Ripe banana" }, quantity: 1, unit: "pièce", dept: "deptProduce" },
       { name: { fr: "Flocons d'avoine", en: "Rolled oats" }, quantity: 60, unit: "g", dept: "deptPantry" },
@@ -5609,7 +5609,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 170,
-    tags: ["dietBalanced","dietVegetarian","dietVegan","flavorSavory","dietQuick","dietLowCarb"],
+    tags: ["dietBalanced","dietVegetarian","dietVegan","flavorSavory","dietQuick","dietLowCarb","dietHalal","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Carottes", en: "Carrots" }, quantity: 2, unit: "pièces", dept: "deptProduce" },
       { name: { fr: "Concombre", en: "Cucumber" }, quantity: 0.5, unit: "pièce", dept: "deptProduce" },
@@ -5636,7 +5636,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 190,
-    tags: ["dietBalanced","flavorSavory","dietHighProtein","dietQuick"],
+    tags: ["dietBalanced","flavorSavory","dietHighProtein","dietQuick","dietHalal","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Mini tortillas", en: "Tortillas" }, quantity: 2, unit: "pièces", dept: "deptBakery" },
       { name: { fr: "Blanc de dinde", en: "Turkey breast" }, quantity: 2, unit: "tranches", dept: "deptMeat" },
@@ -5664,7 +5664,7 @@ export const RECIPES_CATALOG = [
     cookTime: 0,
     difficulty: "easy",
     caloriesPerPerson: 180,
-    tags: ["dietBalanced","dietVegetarian","flavorSavory","dietQuick"],
+    tags: ["dietBalanced","dietVegetarian","flavorSavory","dietQuick","dietHalal","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Crackers aux graines", en: "Seeded crackers" }, quantity: 4, unit: "pièces", dept: "deptPantry" },
       { name: { fr: "Fromage de chèvre frais", en: "Goat cheese" }, quantity: 40, unit: "g", dept: "deptDairy" },
@@ -6033,7 +6033,7 @@ export const RECIPES_CATALOG = [
     cookTime: 15,
     difficulty: "easy",
     caloriesPerPerson: 470,
-    tags: ["streetfood","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["streetfood","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Aiguillettes de poulet", en: "Chicken tenders" }, quantity: 250, unit: "g", dept: "deptMeat" },
       { name: { fr: "Pétales de maïs (Corn-Flakes nature)", en: "Cornflakes" }, quantity: 60, unit: "g", dept: "deptPantry" },
@@ -6102,7 +6102,7 @@ export const RECIPES_CATALOG = [
     cookTime: 10,
     difficulty: "easy",
     caloriesPerPerson: 480,
-    tags: ["streetfood","dietBalanced","dietHalal","dietHighProtein"],
+    tags: ["streetfood","dietBalanced","dietHalal","dietHighProtein","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Riz basmati ou complet cuit", en: "Cooked basmati rice" }, quantity: 180, unit: "g", dept: "deptPantry" },
       { name: { fr: "Bœuf haché assaisonné tex-mex", en: "Spiced ground beef" }, quantity: 220, unit: "g", dept: "deptMeat" },
@@ -6204,7 +6204,7 @@ export const RECIPES_CATALOG = [
     cookTime: 18,
     difficulty: "easy",
     caloriesPerPerson: 470,
-    tags: ["streetfood","dietBalanced","dietHalal"],
+    tags: ["streetfood","dietBalanced","dietHalal","dietGlutenFree"],
     ingredients: [
       { name: { fr: "Frites de patate douce au four", en: "Sweet potato fries" }, quantity: 300, unit: "g", dept: "deptProduce" },
       { name: { fr: "Dés de poulet épicé (paprika, ail)", en: "Spiced chicken bites" }, quantity: 200, unit: "g", dept: "deptMeat" },

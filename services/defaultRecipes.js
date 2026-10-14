@@ -5740,7 +5740,7 @@ export const RECIPES_CATALOG = [
   }
 ,
   {
-  "id": "b17",
+  "id": "b17_b",
   "mealType": "breakfast",
   "title": {
     "fr": "Shakshuka Matinale aux Poivrons & Œufs Coulants",
@@ -5832,7 +5832,7 @@ export const RECIPES_CATALOG = [
   }
 },
   {
-  "id": "b18",
+  "id": "b18_b",
   "mealType": "breakfast",
   "title": {
     "fr": "Pain Perdu Brioché à la Cannelle & Myrtilles",
@@ -7127,7 +7127,7 @@ export const RECIPES_CATALOG = [
   }
 },
 {
-  id: "b19",
+  id: "b19_b",
   mealType: "breakfast",
   title: { fr: "Pudding de Chia au Lait de Coco & Mangue", en: "Coconut Chia Pudding with Mango" },
   emoji: "🥭",
@@ -7375,7 +7375,7 @@ export const RECIPES_CATALOG = [
   }
 },
 {
-  id: "s12",
+  id: "s12_b",
   mealType: "snack",
   title: { fr: "Energy Balls Dattes, Amandes & Coco", en: "Date, Almond & Coconut Energy Balls" },
   emoji: "🥥",
@@ -7401,7 +7401,7 @@ export const RECIPES_CATALOG = [
   }
 },
 {
-  id: "s13",
+  id: "s13_b",
   mealType: "snack",
   title: { fr: "Pommes Rôties Cannelle & Amandes", en: "Warm Baked Cinnamon Apples" },
   emoji: "🍎",
@@ -7427,7 +7427,7 @@ export const RECIPES_CATALOG = [
   }
 },
 {
-  id: "s14",
+  id: "s14_b",
   mealType: "snack",
   title: { fr: "Cookies Express Banane, Avoine & Chocolat", en: "Banana Oat Chocolate Cookies" },
   emoji: "🍪",
@@ -7453,7 +7453,7 @@ export const RECIPES_CATALOG = [
   }
 },
 {
-  id: "s15",
+  id: "s15_b",
   mealType: "snack",
   title: { fr: "Bâtonnets de Carottes, Concombre & Houmous", en: "Veggie Sticks with Hummus" },
   emoji: "🥕",
@@ -7477,7 +7477,7 @@ export const RECIPES_CATALOG = [
   }
 },
 {
-  id: "s16",
+  id: "s16_b",
   mealType: "snack",
   title: { fr: "Mini-Wrap Dinde, Fromage Frais & Mâche", en: "Turkey & Cream Cheese Mini-Wrap" },
   emoji: "🌯",

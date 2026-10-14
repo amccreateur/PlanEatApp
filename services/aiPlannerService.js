@@ -65,7 +65,14 @@ export class AIPlannerService {
           if (hasGluten) return false;
         }
       }
-      if (diets.includes("dietLactoseFree") && !recipe.tags.includes("dietLactoseFree") && !recipe.tags.includes("dietVegan")) return false;
+      if (diets.includes("dietLactoseFree")) {
+        const isExplicitLF = recipe.tags.includes("dietLactoseFree") || recipe.tags.includes("dietVegan");
+        if (!isExplicitLF) {
+          const ingText = (recipe.ingredients || []).map(i => (i.name?.fr || i.name?.en || "").toLowerCase()).join(" ");
+          const hasDairy = /lait\b|crème|creme|fromage|beurre|yaourt|parmesan|mozzarella|feta|cheddar|chèvre|chevre|ricotta|gruyère|gruyere|emmental|mascarpone|roquefort|gorgonzola|comté|comte|burrata/.test(ingText);
+          if (hasDairy) return false;
+        }
+      }
       if (diets.includes("dietKeto") && !recipe.tags.includes("dietLowCarb") && !recipe.tags.includes("dietKeto")) return false;
 
       // Exclusions selon les curseurs de cuisines (niveau 0 = exclu)
@@ -104,8 +111,8 @@ export class AIPlannerService {
         if (profile.snackFlavor === "savory" && !isSavory) return false;
       }
 
-      // Préférence Dîner Léger
-      if ((mealType === "dinner" || recipe.mealType === "dinner") && profile?.dinnerStyle === "light") {
+      // Préférence Dîner Léger (s'applique uniquement lors du filtrage du dîner)
+      if (mealType === "dinner" && profile?.dinnerStyle === "light") {
         if (recipe.caloriesPerPerson && recipe.caloriesPerPerson > 430) return false;
       }
 
@@ -263,8 +270,9 @@ export class AIPlannerService {
     const violatesVeggie = diets.includes("dietVegetarian") && (fullMealText.includes("poulet") || fullMealText.includes("viande") || fullMealText.includes("bœuf") || fullMealText.includes("boeuf") || fullMealText.includes("poisson") || fullMealText.includes("saumon") || fullMealText.includes("thon") || fullMealText.includes("crevette") || fullMealText.includes("veau") || fullMealText.includes("agneau"));
     
     // Pour Vegan et Lactose, ne cibler que les produits laitiers animaux (ignorer lait de coco, amande, soja, avoine, etc.)
-    const hasDairyAnimal = /oeuf|œuf|fromage|parmesan|mozzarella|feta|cheddar|chèvre|chevre|beurre|yaourt|miel|crème\s+fraîche|lait\s+(de\s+vache|entier|demi)/i.test(fullMealText);
-    const violatesVegan = diets.includes("dietVegan") && (violatesVeggie || hasDairyAnimal);
+    const hasAnimalProducts = /oeuf|œuf|miel|gelatine|gélatine/i.test(fullMealText);
+    const hasDairyAnimal = /fromage|parmesan|mozzarella|feta|cheddar|chèvre|chevre|beurre|yaourt|crème\s+(fraîche|entière|épaisse|liquide)|creme\s+fraiche|lait\s+(de\s+vache|entier|demi|écrémé|concentré)|ricotta|mascarpone|roquefort|emmental|gruyère|gruyere|comté|comte|burrata/i.test(fullMealText);
+    const violatesVegan = diets.includes("dietVegan") && (violatesVeggie || hasAnimalProducts || hasDairyAnimal);
     const violatesGluten = diets.includes("dietGlutenFree") && /farine\s+de\s+blé|farine\s+blanche|blé\b|ble\b|pâtes\b|pate\b|pain\b|boulgour|couscous|seigle|orge|chapelure|bagel|brioche|naan|lasagne|croûton|crouton|tortilla\s+de\s+blé/i.test(fullMealText);
     const violatesLactose = diets.includes("dietLactoseFree") && hasDairyAnimal;
 
@@ -277,8 +285,10 @@ export class AIPlannerService {
     }
 
     // Si le repas actuel est conservé, l'enregistrer dans les utilisés
-    if (usedMealIds && meal.id) {
-      usedMealIds.add(meal.id);
+    if (usedMealIds) {
+      if (meal.id) usedMealIds.add(meal.id);
+      const titleFr = typeof meal.title === "string" ? meal.title : (meal.title?.fr || "");
+      if (titleFr) usedMealIds.add(`title_${titleFr.toLowerCase().trim()}`);
     }
 
     return meal;
@@ -495,6 +505,7 @@ export class AIPlannerService {
     let generalDinnerPool = this.getWeightedPool(generalDinnerFallback, userCuisines);
 
     const usedMealIds = new Set();
+    const mealUsageDay = new Map();
     const days = [];
     let lastLunchCategory = null;
     let lastDinnerCategory = null;
@@ -507,14 +518,21 @@ export class AIPlannerService {
       return false;
     };
 
-    const markMealUsed = (meal) => {
+    const markMealUsed = (meal, dayIndex = 0) => {
       if (!meal) return;
-      if (meal.id) usedMealIds.add(meal.id);
+      if (meal.id) {
+        usedMealIds.add(meal.id);
+        mealUsageDay.set(meal.id, dayIndex);
+      }
       const titleFr = typeof meal.title === "string" ? meal.title : (meal.title?.fr || "");
-      if (titleFr) usedMealIds.add(`title_${titleFr.toLowerCase().trim()}`);
+      if (titleFr) {
+        const key = `title_${titleFr.toLowerCase().trim()}`;
+        usedMealIds.add(key);
+        mealUsageDay.set(key, dayIndex);
+      }
     };
 
-    const getNextUniqueMeal = (preferredPool, fallbackPool, avoidedCategories = [], excludeMeal = null) => {
+    const getNextUniqueMeal = (preferredPool, fallbackPool, avoidedCategories = [], excludeMeal = null, currentDayIndex = 0) => {
       const avoidedList = Array.isArray(avoidedCategories)
         ? avoidedCategories.filter(Boolean)
         : [avoidedCategories].filter(Boolean);
@@ -536,7 +554,7 @@ export class AIPlannerService {
         if (!isMealUsed(candidate) && !isSameAsExcluded(candidate)) {
           const cat = this.getMealProteinCategory(candidate);
           if (cat === "other" || !avoidedList.includes(cat)) {
-            markMealUsed(candidate);
+            markMealUsed(candidate, currentDayIndex);
             return candidate;
           }
         }
@@ -548,7 +566,7 @@ export class AIPlannerService {
         if (!isMealUsed(candidate) && !isSameAsExcluded(candidate)) {
           const cat = this.getMealProteinCategory(candidate);
           if (cat === "other" || !avoidedList.includes(cat)) {
-            markMealUsed(candidate);
+            markMealUsed(candidate, currentDayIndex);
             return candidate;
           }
         }
@@ -558,22 +576,32 @@ export class AIPlannerService {
       for (let i = 0; i < preferredPool.length; i++) {
         const candidate = preferredPool[i];
         if (!isMealUsed(candidate) && !isSameAsExcluded(candidate)) {
-          markMealUsed(candidate);
+          markMealUsed(candidate, currentDayIndex);
           return candidate;
         }
       }
       for (let i = 0; i < fallbackPool.length; i++) {
         const candidate = fallbackPool[i];
         if (!isMealUsed(candidate) && !isSameAsExcluded(candidate)) {
-          markMealUsed(candidate);
+          markMealUsed(candidate, currentDayIndex);
           return candidate;
         }
       }
 
-      // 4. Fallback ultime : ne jamais reprendre le même plat que le déjeuner du jour !
+      // 4. Fallback ultime si tout le catalogue a déjà été utilisé (par ex. plan très long) :
+      // On choisit le plat non exclu consommé il y a le plus longtemps (jamais mangé dans les derniers jours !)
       const nonExcluded = fallbackPool.filter(c => !isSameAsExcluded(c));
       const pool = nonExcluded.length > 0 ? nonExcluded : fallbackPool;
-      const fallback = pool[Math.floor(Math.random() * pool.length)];
+      const sortedByAge = [...pool].sort((a, b) => {
+        const titleA = typeof a.title === "string" ? a.title : (a.title?.fr || "");
+        const titleB = typeof b.title === "string" ? b.title : (b.title?.fr || "");
+        const dayA = mealUsageDay.get(a.id) ?? mealUsageDay.get(`title_${titleA.toLowerCase().trim()}`) ?? -999;
+        const dayB = mealUsageDay.get(b.id) ?? mealUsageDay.get(`title_${titleB.toLowerCase().trim()}`) ?? -999;
+        return dayA - dayB;
+      });
+
+      const fallback = sortedByAge[0] || pool[0];
+      markMealUsed(fallback, currentDayIndex);
       return fallback;
     };
 
@@ -602,7 +630,7 @@ export class AIPlannerService {
       if (activeMealTypes.includes("lunch")) {
         // Le déjeuner doit éviter le dîner de la veille (repas consécutif !) ET le déjeuner précédent
         const avoidedForLunch = [lastDinnerCategory, lastLunchCategory];
-        l = getNextUniqueMeal(lunchPool, generalMainsPool, avoidedForLunch);
+        l = getNextUniqueMeal(lunchPool, generalMainsPool, avoidedForLunch, null, i);
         lastLunchCategory = this.getMealProteinCategory(l);
       }
 
@@ -610,7 +638,7 @@ export class AIPlannerService {
       if (activeMealTypes.includes("dinner")) {
         // Le dîner doit impérativement éviter le déjeuner du jour (même journée !) ET le dîner de la veille
         const avoidedForDinner = [lastLunchCategory, lastDinnerCategory];
-        d = getNextUniqueMeal(dinnerPool, generalDinnerPool, avoidedForDinner, l);
+        d = getNextUniqueMeal(dinnerPool, generalDinnerPool, avoidedForDinner, l, i);
         lastDinnerCategory = this.getMealProteinCategory(d);
       }
 

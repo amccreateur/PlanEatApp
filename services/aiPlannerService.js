@@ -1577,7 +1577,7 @@ export class AIPlannerService {
     validRecipes.forEach(recipe => {
       let matchCount = 0;
       recipe.ingredients.forEach(ing => {
-        const fullNames = [ing.name.fr, ing.name.en, ing.name.ar].join(" ").toLowerCase();
+        const fullNames = [ing.name?.fr, ing.name?.en].filter(Boolean).join(" ").toLowerCase();
         lowerInputs.forEach(input => {
           if (input && fullNames.includes(input)) matchCount++;
         });

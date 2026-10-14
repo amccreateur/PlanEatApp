@@ -114,6 +114,10 @@ class PurchaseService {
     if (!ENABLE_SUBSCRIPTIONS || Platform.OS === "web" || !Purchases) {
       throw new Error("Paiement non supporté en phase de test");
     }
+    const apiKey = Platform.OS === "ios" ? REVENUECAT_KEYS.ios : REVENUECAT_KEYS.android;
+    if (!apiKey) {
+      throw new Error("La clé d'API RevenueCat Android n'est pas encore renseignée. Veuillez ajouter votre clé publique (goog_...) dans purchaseService.js pour activer la facturation Google Play.");
+    }
     try {
       const { customerInfo } = await Purchases.purchasePackage(pkg);
       this._handleCustomerInfoUpdate(customerInfo);
@@ -128,6 +132,10 @@ class PurchaseService {
 
   async restorePurchases() {
     if (!ENABLE_SUBSCRIPTIONS || Platform.OS === "web" || !Purchases) {
+      return this.isPro;
+    }
+    const apiKey = Platform.OS === "ios" ? REVENUECAT_KEYS.ios : REVENUECAT_KEYS.android;
+    if (!apiKey) {
       return this.isPro;
     }
     try {

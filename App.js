@@ -55,8 +55,6 @@ function MainApp() {
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
 
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generationProgress, setGenerationProgress] = useState(0);
-  const [generationStep, setGenerationStep] = useState(0);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isOnboarding, setIsOnboarding] = useState(false);
@@ -171,76 +169,36 @@ function MainApp() {
     activeLang = lang
   ) => {
     setIsGenerating(true);
-    setGenerationProgress(0.15);
-    setGenerationStep(0); // Étape 1 : Analyse des profils
-
-    // 1. Tâche de fond immédiate : Génération du menu et calcul des courses
-    const planPromise = (async () => {
-      // Laisser le temps à l'utilisateur d'apercevoir l'étape 1
-      await new Promise(r => setTimeout(r, 600));
-      setGenerationStep(1); // Étape 2 : Création des recettes
-      setGenerationProgress(0.40);
-
-      const result = await AIPlannerService.generateMealPlan(
+    // Déclencher la vidéo récompensée (avec fallback automatique)
+    setTimeout(() => {
+      adService.showRewardedVideo();
+    }, 1200);
+    try {
+      const { plan, groceries: compiledGroceries, error } = await AIPlannerService.generateMealPlan(
         customProfile,
         durationWeeks,
         config,
         activeLang
       );
-
-      setGenerationStep(2); // Étape 3 : Calcul des portions
-      setGenerationProgress(0.70);
-
-      await new Promise(r => setTimeout(r, 400));
-      setGenerationStep(3); // Étape 4 : Génération de la liste de courses
-      setGenerationProgress(0.90);
-
-      if (result?.plan) {
-        await StorageService.saveCurrentPlan(result.plan);
-        await StorageService.saveGroceries(result.groceries);
-      }
-      return result;
-    })();
-
-    // 2. Vidéo récompensée lancée en parallèle pour les utilisateurs non-Pro
-    const adPromise = (async () => {
-      if (!isPro) {
-        // Laisser 1.2s avant d'ouvrir la vidéo plein écran
-        await new Promise(r => setTimeout(r, 1200));
-        await adService.showRewardedVideoAsync();
-      }
-    })();
-
-    try {
-      // Attendre que la génération des recettes SOIT PRÊTE ET que la vidéo SOIT FERMÉE
-      const [result] = await Promise.all([planPromise, adPromise]);
-
-      const { plan, groceries: compiledGroceries, error } = result || {};
       if (error) {
         Alert.alert("⚠️ Information Mistral AI", `${error}\n\nUn planning local a été généré.`);
       }
+      setCurrentPlan(plan);
+      setSelectedDurationWeeks(durationWeeks);
+      setGroceries(compiledGroceries);
+      setSelectedWeek(1);
+      setSelectedDayIndex(0);
 
-      if (plan) {
-        setCurrentPlan(plan);
-        setSelectedDurationWeeks(durationWeeks);
-        setGroceries(compiledGroceries);
-        setSelectedWeek(1);
-        setSelectedDayIndex(0);
-      }
+      await StorageService.saveCurrentPlan(plan);
+      await StorageService.saveGroceries(compiledGroceries);
 
-      // Tout est finalisé : marquer 100% avec coche verte
-      setGenerationStep(4);
-      setGenerationProgress(1.0);
-
-      // Laisser 650ms pour confirmer visuellement le succès
-      await new Promise(r => setTimeout(r, 650));
+      // Laisser l'animation de 3s se compléter naturellement
+      await new Promise(r => setTimeout(r, 2600));
     } catch (err) {
       console.error("Erreur lors de la génération du plan:", err);
       Alert.alert("Erreur", err.message || "Erreur inconnue");
     } finally {
       setIsGenerating(false);
-      setGenerationProgress(0);
-      setGenerationStep(0);
     }
   };
 
@@ -1095,8 +1053,6 @@ function MainApp() {
           lang={lang}
           themeMode={themeMode}
           durationWeeks={selectedDurationWeeks}
-          progress={generationProgress}
-          stepIndex={generationStep}
         />
       </SafeAreaView>
   );

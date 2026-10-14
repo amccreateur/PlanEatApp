@@ -18,9 +18,7 @@ export default function AiGenerationLoadingModal({
   visible,
   lang = "fr",
   themeMode = "dark",
-  durationWeeks = 1,
-  progress = null,
-  stepIndex = null
+  durationWeeks = 1
 }) {
   const insets = useSafeAreaInsets();
   const theme = THEMES[themeMode] || THEMES.dark;
@@ -28,7 +26,6 @@ export default function AiGenerationLoadingModal({
   const isRTL = lang === "ar";
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [percentDisplay, setPercentDisplay] = useState(0);
 
   // Animated values
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -42,59 +39,30 @@ export default function AiGenerationLoadingModal({
     { key: "step4", text: t.aiLoadingStep4 || "Génération de la liste de courses optimisée...", icon: "cart-outline", color: "#38bdf8" }
   ];
 
-  // Synchroniser le pourcentage affiché en continu avec l'animation
-  useEffect(() => {
-    const listenerId = progressAnim.addListener(({ value }) => {
-      setPercentDisplay(Math.min(100, Math.max(0, Math.round(value * 100))));
-    });
-    return () => {
-      progressAnim.removeListener(listenerId);
-    };
-  }, []);
-
-  // Gestion du prop progress piloté par le parent
-  useEffect(() => {
-    if (progress !== null && progress !== undefined) {
-      Animated.timing(progressAnim, {
-        toValue: Math.min(1, Math.max(0, progress)),
-        duration: progress >= 1 ? 400 : 300,
-        easing: Easing.out(Easing.quad),
-        useNativeDriver: false
-      }).start();
-    }
-  }, [progress]);
-
-  // Gestion du prop stepIndex piloté par le parent
-  useEffect(() => {
-    if (stepIndex !== null && stepIndex !== undefined) {
-      setCurrentStepIndex(stepIndex);
-    }
-  }, [stepIndex]);
-
   useEffect(() => {
     let stepInterval = null;
     let pulseLoop = null;
     let rotateLoop = null;
 
     if (visible) {
-      if (stepIndex === null) setCurrentStepIndex(0);
-      if (progress === null) {
-        progressAnim.setValue(0.1);
-        // Fallback progress bar animation si non piloté par le parent
-        Animated.timing(progressAnim, {
-          toValue: 0.94,
-          duration: 10000,
-          easing: Easing.out(Easing.quad),
-          useNativeDriver: false
-        }).start();
+      setCurrentStepIndex(0);
+      progressAnim.setValue(0);
 
-        stepInterval = setInterval(() => {
-          setCurrentStepIndex(prev => {
-            if (prev < steps.length - 1) return prev + 1;
-            return prev;
-          });
-        }, 2500);
-      }
+      // Start progress bar animation (smooth 0 -> 100% over 3s)
+      Animated.timing(progressAnim, {
+        toValue: 1,
+        duration: 3000,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: false
+      }).start();
+
+      // Step switcher (750ms par étape)
+      stepInterval = setInterval(() => {
+        setCurrentStepIndex(prev => {
+          if (prev < steps.length - 1) return prev + 1;
+          return prev;
+        });
+      }, 750);
 
       // Pulsing glow
       pulseLoop = Animated.loop(
@@ -148,8 +116,6 @@ export default function AiGenerationLoadingModal({
     outputRange: ["0%", "100%"]
   });
 
-  const isCompletedAll = percentDisplay >= 100 || currentStepIndex >= 4;
-
   return (
     <Modal
       visible={visible}
@@ -158,7 +124,7 @@ export default function AiGenerationLoadingModal({
       statusBarTranslucent
     >
       <View style={[styles.backdrop, { paddingBottom: Math.max(insets.bottom, 20), paddingTop: Math.max(insets.top, 20) }]}>
-        <View style={[styles.card, { backgroundColor: theme.cardBg, borderColor: isCompletedAll ? "#10b981" : theme.border }]}>
+        <View style={[styles.card, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
           
           {/* Animated Chef Glowing Icon */}
           <View style={styles.iconContainer}>
@@ -171,50 +137,32 @@ export default function AiGenerationLoadingModal({
               ]}
             >
               <LinearGradient
-                colors={isCompletedAll ? ["rgba(16, 185, 129, 0.4)", "rgba(52, 211, 153, 0.15)"] : ["rgba(168, 85, 247, 0.35)", "rgba(56, 189, 248, 0.15)"]}
+                colors={["rgba(168, 85, 247, 0.35)", "rgba(56, 189, 248, 0.15)"]}
                 style={styles.glowGradient}
               />
             </Animated.View>
 
             <LinearGradient
-              colors={isCompletedAll ? ["#10b981", "#059669"] : ["#7c3aed", "#6366f1"]}
+              colors={["#7c3aed", "#6366f1"]}
               style={styles.chefBadge}
             >
-              <Ionicons name={isCompletedAll ? "checkmark-done" : "sparkles"} size={36} color="#ffffff" />
+              <Ionicons name="sparkles" size={36} color="#ffffff" />
             </LinearGradient>
           </View>
 
           {/* Main Title & Subtitle */}
           <Text style={[styles.title, { color: theme.text }, isRTL && styles.rtlText]}>
-            {isCompletedAll
-              ? (t.aiLoadingReady || "Votre planning est prêt !")
-              : (t.aiLoadingTitle || "Votre Chef IA est aux fourneaux...")}
+            {t.aiLoadingTitle || "Votre Chef IA est aux fourneaux..."}
           </Text>
           <Text style={[styles.subtitle, { color: theme.textSub }, isRTL && styles.rtlText]}>
-            {isCompletedAll
-              ? (t.aiLoadingReadySubtitle || "Recettes & liste de courses finalisées 🎉")
-              : (t.aiLoadingSubtitle || "Préparation d'un planning savoureux & équilibré")}
+            {t.aiLoadingSubtitle || "Préparation d'un planning savoureux & équilibré"}
           </Text>
 
-          {/* Progress Header Row with Percentage Badge */}
-          <View style={[styles.progressHeaderRow, isRTL && styles.rtlRow]}>
-            <Text style={[styles.progressStatusText, { color: theme.textSub }]} numberOfLines={1}>
-              {isCompletedAll
-                ? "✨ Finalisation complète"
-                : (steps[Math.min(currentStepIndex, steps.length - 1)]?.text || "Calcul en cours...")}
-            </Text>
-            <View style={[styles.percentBadge, { backgroundColor: isCompletedAll ? "rgba(16, 185, 129, 0.2)" : "rgba(168, 85, 247, 0.2)", borderColor: isCompletedAll ? "#10b981" : "#a855f7" }]}>
-              <Text style={[styles.percentText, { color: isCompletedAll ? "#10b981" : "#c084fc" }]}>
-                {percentDisplay}%
-              </Text>
-            </View>
-          </View>
-
-          {/* Dynamic Progress Bar */}
+          {/* Progress Bar */}
           <View style={[styles.progressBarTrack, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}>
             <Animated.View style={[styles.progressBarFill, { width: progressWidth }]}>
               <LinearGradient
-                colors={isCompletedAll ? ["#10b981", "#34d399"] : ["#a855f7", "#38bdf8"]}
+                colors={["#a855f7", "#38bdf8"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.progressGradient}
@@ -225,84 +173,71 @@ export default function AiGenerationLoadingModal({
           {/* Steps List */}
           <View style={styles.stepsContainer}>
             {steps.map((step, idx) => {
-              const isCompleted = isCompletedAll || idx < currentStepIndex;
-              const isCurrent = !isCompletedAll && idx === currentStepIndex;
+              const isCompleted = idx < currentStepIndex;
+              const isCurrent = idx === currentStepIndex;
 
               return (
-                <View key={step.key} style={styles.stepWrapper}>
+                <View
+                  key={step.key}
+                  style={[
+                    styles.stepRow,
+                    isRTL && styles.rtlRow,
+                    isCurrent && styles.stepRowActive,
+                    { borderColor: isCurrent ? "rgba(168, 85, 247, 0.4)" : "transparent" }
+                  ]}
+                >
                   <View
                     style={[
-                      styles.stepRow,
-                      isRTL && styles.rtlRow,
-                      isCurrent && styles.stepRowActive,
-                      { borderColor: isCurrent ? "rgba(168, 85, 247, 0.4)" : "transparent" }
+                      styles.stepIconBubble,
+                      {
+                        backgroundColor: isCompleted
+                          ? "#10b981"
+                          : isCurrent
+                          ? "rgba(168, 85, 247, 0.2)"
+                          : theme.cardBgAlt
+                      }
                     ]}
                   >
-                    <View
-                      style={[
-                        styles.stepIconBubble,
-                        {
-                          backgroundColor: isCompleted
-                            ? "#10b981"
-                            : isCurrent
-                            ? "rgba(168, 85, 247, 0.2)"
-                            : theme.cardBgAlt
-                        }
-                      ]}
-                    >
-                      {isCompleted ? (
-                        <Ionicons name="checkmark" size={14} color="#ffffff" />
-                      ) : (
-                        <Ionicons
-                          name={step.icon}
-                          size={14}
-                          color={isCurrent ? "#c084fc" : theme.textMuted}
-                        />
-                      )}
-                    </View>
-
-                    <Text
-                      style={[
-                        styles.stepText,
-                        { color: theme.textMuted },
-                        isCurrent && [styles.stepTextCurrent, { color: theme.text }],
-                        isCompleted && [styles.stepTextCompleted, { color: theme.textSub }],
-                        isRTL && styles.rtlText
-                      ]}
-                      numberOfLines={1}
-                    >
-                      {step.text}
-                    </Text>
+                    {isCompleted ? (
+                      <Ionicons name="checkmark" size={14} color="#ffffff" />
+                    ) : (
+                      <Ionicons
+                        name={step.icon}
+                        size={14}
+                        color={isCurrent ? "#c084fc" : theme.textMuted}
+                      />
+                    )}
                   </View>
 
-                  {/* Sub-badge actif spécifique pour l'étape Liste de courses pour rassurer sur l'avancement */}
-                  {isCurrent && idx === 3 && (
-                    <View style={[styles.groceryActiveSubBox, isRTL && styles.rtlRow]}>
-                      <Ionicons name="sparkles-outline" size={13} color="#38bdf8" />
-                      <Text style={styles.groceryActiveSubText}>
-                        {t.aiLoadingGroceryInProgress || "Optimisation des rayons et calcul des quantités..."}
-                      </Text>
-                    </View>
-                  )}
+                  <Text
+                    style={[
+                      styles.stepText,
+                      { color: theme.textMuted },
+                      isCurrent && [styles.stepTextCurrent, { color: theme.text }],
+                      isCompleted && [styles.stepTextCompleted, { color: theme.textSub }],
+                      isRTL && styles.rtlText
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {step.text}
+                  </Text>
                 </View>
               );
             })}
           </View>
 
           {/* Reassuring Notice Box */}
-          {!isCompletedAll && (
-            <View style={[styles.noticeBox, { backgroundColor: "rgba(168, 85, 247, 0.1)", borderColor: "rgba(168, 85, 247, 0.25)" }]}>
-              <View style={[styles.noticeHeader, isRTL && styles.rtlRow]}>
-                <Ionicons name="play-circle-outline" size={18} color="#a855f7" />
-                <Text style={styles.noticeTitle}>
-                  {t.aiLoadingAdNoticeTitle || "Pourquoi une courte annonce ?"}
-                </Text>
-              </View>
-              <Text style={[styles.noticeText, isRTL && styles.rtlText]}>
-                {t.aiLoadingAdNoticeText || "Pendant que notre IA cuisine vos repas, une courte annonce est diffusée pour garder PlanEat 100% gratuit. Ne quittez pas l'application, tout sera prêt dans quelques secondes !"}
+          <View style={[styles.noticeBox, { backgroundColor: "rgba(168, 85, 247, 0.1)", borderColor: "rgba(168, 85, 247, 0.25)" }]}>
+            <View style={[styles.noticeHeader, isRTL && styles.rtlRow]}>
+              <Ionicons name="play-circle-outline" size={18} color="#a855f7" />
+              <Text style={styles.noticeTitle}>
+                {t.aiLoadingAdNoticeTitle || "Pourquoi une courte annonce ?"}
               </Text>
             </View>
-          )}
+            <Text style={[styles.noticeText, isRTL && styles.rtlText]}>
+              {t.aiLoadingAdNoticeText || "Pendant que notre IA cuisine vos repas, une courte annonce est diffusée pour garder PlanEat 100% gratuit. Ne quittez pas l'application, tout sera prêt dans quelques secondes !"}
+            </Text>
+          </View>
 
         </View>
       </View>
@@ -370,34 +305,11 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 13,
     textAlign: "center",
-    marginBottom: 16
-  },
-  progressHeaderRow: {
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 8,
-    gap: 8
-  },
-  progressStatusText: {
-    flex: 1,
-    fontSize: 11.5,
-    fontWeight: "600"
-  },
-  percentBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 12,
-    borderWidth: 1
-  },
-  percentText: {
-    fontSize: 11.5,
-    fontWeight: "800"
+    marginBottom: 18
   },
   progressBarTrack: {
     width: "100%",
-    height: 8,
+    height: 7,
     borderRadius: 4,
     overflow: "hidden",
     borderWidth: 1,
@@ -414,10 +326,7 @@ const styles = StyleSheet.create({
   stepsContainer: {
     width: "100%",
     gap: 8,
-    marginBottom: 16
-  },
-  stepWrapper: {
-    width: "100%"
+    marginBottom: 18
   },
   stepRow: {
     flexDirection: "row",
@@ -450,24 +359,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     textDecorationLine: "none"
   },
-  groceryActiveSubBox: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    marginTop: 4,
-    marginLeft: 32,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 8,
-    backgroundColor: "rgba(56, 189, 248, 0.12)",
-    borderWidth: 1,
-    borderColor: "rgba(56, 189, 248, 0.25)"
-  },
-  groceryActiveSubText: {
-    color: "#38bdf8",
-    fontSize: 10.5,
-    fontWeight: "600"
-  },
   noticeBox: {
     width: "100%",
     borderRadius: 14,
@@ -497,3 +388,4 @@ const styles = StyleSheet.create({
     textAlign: "right"
   }
 });
+

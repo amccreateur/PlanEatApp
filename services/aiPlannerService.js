@@ -101,10 +101,42 @@ export class AIPlannerService {
   }
 
   /**
-   * Vérifie et corrige automatiquement tout repas non conforme aux règles strictes de saveurs (Sucré / Salé)
+   * Vérifie et corrige automatiquement tout repas non conforme aux règles strictes de saveurs (Sucré / Salé),
+   * calories et régimes/allergies, en garantissant qu'aucun repas de secours ne répète un plat déjà planifié.
    */
-  static sanitizeMeal(meal, type, profile, servings = 2, fallbackIndex = 0) {
+  static sanitizeMeal(meal, type, profile, servings = 2, fallbackIndex = 0, usedMealIds = null) {
     if (!meal) return null;
+
+    const pickUniqueReplacement = (candidatesPool, defaultPrefix) => {
+      if (!candidatesPool || candidatesPool.length === 0) return null;
+      // 1. Chercher d'abord un plat non encore utilisé dans la semaine (par ID et par Titre)
+      if (usedMealIds) {
+        const unused = candidatesPool.filter(r => {
+          if (usedMealIds.has(r.id)) return false;
+          const tFr = typeof r.title === "string" ? r.title : (r.title?.fr || "");
+          if (tFr && usedMealIds.has(`title_${tFr.toLowerCase().trim()}`)) return false;
+          return true;
+        });
+        if (unused.length > 0) {
+          const selected = unused[fallbackIndex % unused.length];
+          usedMealIds.add(selected.id);
+          const tFr = typeof selected.title === "string" ? selected.title : (selected.title?.fr || "");
+          if (tFr) usedMealIds.add(`title_${tFr.toLowerCase().trim()}`);
+          return {
+            ...selected,
+            id: `${defaultPrefix}_${Date.now()}_${fallbackIndex}`,
+            calculatedServings: servings
+          };
+        }
+      }
+      // 2. Si tous ont été utilisés, choisir avec décalage de fallbackIndex
+      const fallback = candidatesPool[fallbackIndex % candidatesPool.length];
+      return {
+        ...fallback,
+        id: `${defaultPrefix}_${Date.now()}_${fallbackIndex}`,
+        calculatedServings: servings
+      };
+    };
 
     // 1. Validation Petit-Déjeuner
     if (type === "breakfast" && profile?.breakfastFlavor && profile.breakfastFlavor !== "both") {
@@ -131,12 +163,8 @@ export class AIPlannerService {
           return !t.includes("avocat") && !t.includes("œuf") && !t.includes("oeuf") && !t.includes("omelette");
         });
         const pool = sweetCatalog.length > 0 ? sweetCatalog : RECIPES_CATALOG.filter(r => r.mealType === "breakfast" && r.id !== "b2");
-        const replacement = pool[fallbackIndex % pool.length];
-        return {
-          ...replacement,
-          id: `sweet_breakfast_${Date.now()}_${fallbackIndex}`,
-          calculatedServings: servings
-        };
+        const replaced = pickUniqueReplacement(pool, "sweet_breakfast");
+        if (replaced) return replaced;
       }
 
       // Si l'utilisateur voulait du salé et que le plat généré est sucré
@@ -146,12 +174,8 @@ export class AIPlannerService {
           return t.includes("avocat") || t.includes("œuf") || t.includes("oeuf") || t.includes("omelette");
         });
         const pool = savoryCatalog.length > 0 ? savoryCatalog : RECIPES_CATALOG.filter(r => r.mealType === "breakfast" && r.id === "b2");
-        const replacement = pool[fallbackIndex % pool.length];
-        return {
-          ...replacement,
-          id: `savory_breakfast_${Date.now()}_${fallbackIndex}`,
-          calculatedServings: servings
-        };
+        const replaced = pickUniqueReplacement(pool, "savory_breakfast");
+        if (replaced) return replaced;
       }
     }
 
@@ -171,23 +195,15 @@ export class AIPlannerService {
       if (profile.snackFlavor === "sweet" && hasSavoryKeywords) {
         const sweetCatalog = this.filterRecipes(profile, "snack");
         const pool = sweetCatalog.length > 0 ? sweetCatalog : RECIPES_CATALOG.filter(r => r.mealType === "snack");
-        const replacement = pool[fallbackIndex % pool.length];
-        return {
-          ...replacement,
-          id: `sweet_snack_${Date.now()}_${fallbackIndex}`,
-          calculatedServings: servings
-        };
+        const replaced = pickUniqueReplacement(pool, "sweet_snack");
+        if (replaced) return replaced;
       }
 
       if (profile.snackFlavor === "savory" && !hasSavoryKeywords) {
         const savoryCatalog = this.filterRecipes(profile, "snack");
         const pool = savoryCatalog.length > 0 ? savoryCatalog : RECIPES_CATALOG.filter(r => r.mealType === "snack");
-        const replacement = pool[fallbackIndex % pool.length];
-        return {
-          ...replacement,
-          id: `savory_snack_${Date.now()}_${fallbackIndex}`,
-          calculatedServings: servings
-        };
+        const replaced = pickUniqueReplacement(pool, "savory_snack");
+        if (replaced) return replaced;
       }
     }
 
@@ -206,12 +222,8 @@ export class AIPlannerService {
       if (isHeavy) {
         const lightCatalog = this.filterRecipes(profile, "dinner").filter(r => (r.caloriesPerPerson || 400) <= 410);
         if (lightCatalog.length > 0) {
-          const replacement = lightCatalog[fallbackIndex % lightCatalog.length];
-          return {
-            ...replacement,
-            id: `light_dinner_${Date.now()}_${fallbackIndex}`,
-            calculatedServings: servings
-          };
+          const replaced = pickUniqueReplacement(lightCatalog, "light_dinner");
+          if (replaced) return replaced;
         }
       }
     }
@@ -234,13 +246,14 @@ export class AIPlannerService {
     if (containsDisliked || violatesNoPork || violatesVeggie || violatesVegan || violatesGluten || violatesLactose) {
       const cleanCatalog = this.filterRecipes(profile, type);
       if (cleanCatalog.length > 0) {
-        const replacement = cleanCatalog[fallbackIndex % cleanCatalog.length];
-        return {
-          ...replacement,
-          id: `safe_${type}_${Date.now()}_${fallbackIndex}`,
-          calculatedServings: servings
-        };
+        const replaced = pickUniqueReplacement(cleanCatalog, `safe_${type}`);
+        if (replaced) return replaced;
       }
+    }
+
+    // Si le repas actuel est conservé, l'enregistrer dans les utilisés
+    if (usedMealIds && meal.id) {
+      usedMealIds.add(meal.id);
     }
 
     return meal;
@@ -269,6 +282,7 @@ export class AIPlannerService {
             ? profile.mealTypes
             : ["breakfast", "lunch", "snack", "dinner"];
 
+          const usedMealIds = new Set();
           const days = mistralResult.days.map((d, i) => {
             const weekIndex = Math.floor(i / 7) + 1;
             const dayIndexInWeek = i % 7;
@@ -309,10 +323,10 @@ export class AIPlannerService {
               dayKey: dayKey,
               servings: servings,
               meals: {
-                breakfast: this.sanitizeMeal(rawB, "breakfast", profile, servings, i),
-                lunch: this.sanitizeMeal(rawL, "lunch", profile, servings, i),
-                snack: this.sanitizeMeal(rawS, "snack", profile, servings, i),
-                dinner: this.sanitizeMeal(rawD, "dinner", profile, servings, i)
+                breakfast: this.sanitizeMeal(rawB, "breakfast", profile, servings, i * 4, usedMealIds),
+                lunch: this.sanitizeMeal(rawL, "lunch", profile, servings, i * 4 + 1, usedMealIds),
+                snack: this.sanitizeMeal(rawS, "snack", profile, servings, i * 4 + 2, usedMealIds),
+                dinner: this.sanitizeMeal(rawD, "dinner", profile, servings, i * 4 + 3, usedMealIds)
               }
             };
           });
@@ -460,6 +474,21 @@ export class AIPlannerService {
     let lastLunchCategory = null;
     let lastDinnerCategory = null;
 
+    const isMealUsed = (meal) => {
+      if (!meal) return true;
+      if (usedMealIds.has(meal.id)) return true;
+      const titleFr = typeof meal.title === "string" ? meal.title : (meal.title?.fr || "");
+      if (titleFr && usedMealIds.has(`title_${titleFr.toLowerCase().trim()}`)) return true;
+      return false;
+    };
+
+    const markMealUsed = (meal) => {
+      if (!meal) return;
+      if (meal.id) usedMealIds.add(meal.id);
+      const titleFr = typeof meal.title === "string" ? meal.title : (meal.title?.fr || "");
+      if (titleFr) usedMealIds.add(`title_${titleFr.toLowerCase().trim()}`);
+    };
+
     const getNextUniqueMeal = (preferredPool, fallbackPool, avoidedCategories = []) => {
       const avoidedList = Array.isArray(avoidedCategories)
         ? avoidedCategories.filter(Boolean)
@@ -468,10 +497,10 @@ export class AIPlannerService {
       // 1. Chercher dans le pool préféré un plat non consommé dont la catégorie est différente
       for (let i = 0; i < preferredPool.length; i++) {
         const candidate = preferredPool[i];
-        if (!usedMealIds.has(candidate.id)) {
+        if (!isMealUsed(candidate)) {
           const cat = this.getMealProteinCategory(candidate);
           if (cat === "other" || !avoidedList.includes(cat)) {
-            usedMealIds.add(candidate.id);
+            markMealUsed(candidate);
             return candidate;
           }
         }
@@ -480,10 +509,10 @@ export class AIPlannerService {
       // 2. Si pas trouvé dans le pool préféré, chercher dans le pool général avec catégorie différente
       for (let i = 0; i < fallbackPool.length; i++) {
         const candidate = fallbackPool[i];
-        if (!usedMealIds.has(candidate.id)) {
+        if (!isMealUsed(candidate)) {
           const cat = this.getMealProteinCategory(candidate);
           if (cat === "other" || !avoidedList.includes(cat)) {
-            usedMealIds.add(candidate.id);
+            markMealUsed(candidate);
             return candidate;
           }
         }
@@ -492,15 +521,15 @@ export class AIPlannerService {
       // 3. Si toutes les catégories disponibles ont déjà été consommées, prendre le premier non consommé
       for (let i = 0; i < preferredPool.length; i++) {
         const candidate = preferredPool[i];
-        if (!usedMealIds.has(candidate.id)) {
-          usedMealIds.add(candidate.id);
+        if (!isMealUsed(candidate)) {
+          markMealUsed(candidate);
           return candidate;
         }
       }
       for (let i = 0; i < fallbackPool.length; i++) {
         const candidate = fallbackPool[i];
-        if (!usedMealIds.has(candidate.id)) {
-          usedMealIds.add(candidate.id);
+        if (!isMealUsed(candidate)) {
+          markMealUsed(candidate);
           return candidate;
         }
       }
@@ -559,10 +588,10 @@ export class AIPlannerService {
         dayKey: dayKey,
         servings: servings,
         meals: {
-          breakfast: this.sanitizeMeal(mealB, "breakfast", profile, servings, i),
-          lunch: this.sanitizeMeal(mealL, "lunch", profile, servings, i),
-          dinner: this.sanitizeMeal(mealD, "dinner", profile, servings, i),
-          snack: this.sanitizeMeal(mealS, "snack", profile, servings, i)
+          breakfast: this.sanitizeMeal(mealB, "breakfast", profile, servings, i * 4, usedMealIds),
+          lunch: this.sanitizeMeal(mealL, "lunch", profile, servings, i * 4 + 1, usedMealIds),
+          dinner: this.sanitizeMeal(mealD, "dinner", profile, servings, i * 4 + 3, usedMealIds),
+          snack: this.sanitizeMeal(mealS, "snack", profile, servings, i * 4 + 2, usedMealIds)
         }
       });
     }

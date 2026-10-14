@@ -15,7 +15,7 @@ export const ENABLE_SUBSCRIPTIONS = true;
 
 export const REVENUECAT_KEYS = {
   ios: "appl_fyeupvTKMGvuvRdPAtTDjmQIiXp",
-  android: "" // Laisser vide en test pour éviter l'erreur de clé test sur Android release
+  android: "goog_zMAoXvTEWPkQiyclxuDghWxoFoc"
 };
 
 export const ENTITLEMENT_IDS = ["PlanEat Pro", "pro", "premium", "planeat_pro"];

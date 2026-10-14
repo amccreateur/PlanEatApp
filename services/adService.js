@@ -258,6 +258,40 @@ class AdService {
     this._preloadInterstitial();
     onRewarded({ type: "fallback_reward", amount: 1 });
   }
+
+  /**
+   * Promesse qui se résout lorsque la vidéo récompensée (ou son fallback) a été fermée
+   */
+  showRewardedVideoAsync() {
+    return new Promise((resolve) => {
+      let resolved = false;
+      const finish = () => {
+        if (!resolved) {
+          resolved = true;
+          resolve();
+        }
+      };
+
+      if (purchaseService.getIsPro()) {
+        finish();
+        return;
+      }
+
+      this.showRewardedVideo({
+        onRewarded: () => {
+          // Si pas de pub récompensée chargée (interstitiel ou fallback immédiat), terminer
+          if (!this.isRewardedLoaded) {
+            finish();
+          }
+        },
+        onDismiss: () => finish(),
+        onFail: () => finish()
+      });
+
+      // Sécurité anti-blocage
+      setTimeout(finish, 35000);
+    });
+  }
 }
 
 export const adService = new AdService();

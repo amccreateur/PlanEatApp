@@ -60,9 +60,9 @@ export default function PaywallModal({
             packageType: "MONTHLY",
             product: {
               title: "PlanEat Pro Mensuel",
-              priceString: "0,99 € / mois",
-              price: 0.99,
-              description: "Facturé 0,99 € par mois"
+              priceString: "1,99 € / mois",
+              price: 1.99,
+              description: "Facturé 1,99 € par mois"
             }
           },
           {
@@ -70,8 +70,8 @@ export default function PaywallModal({
             packageType: "LIFETIME",
             product: {
               title: "PlanEat Pro À Vie",
-              priceString: "19,99 €",
-              price: 19.99,
+              priceString: "9,99 €",
+              price: 9.99,
               description: "Paiement unique • Accès illimité à vie"
             }
           }
@@ -241,7 +241,7 @@ export default function PaywallModal({
 
               const priceStr =
                 pkg.product?.priceString ||
-                (isLifetime ? "19,99 €" : isAnnual ? "9,99 € / an" : "0,99 € / mois");
+                (isLifetime ? "9,99 €" : isAnnual ? "9,99 € / an" : "1,99 € / mois");
 
               const planTitle = isLifetime
                 ? "PlanEat Pro À Vie"
@@ -253,7 +253,7 @@ export default function PaywallModal({
                 ? "Paiement unique • Accès à vie sans abonnement"
                 : isAnnual
                 ? "7 jours d'essai gratuit, puis 9,99 € / an"
-                : "0,99 € / mois • Sans engagement";
+                : "Sans engagement • Résiliable à tout moment";
 
               return (
                 <TouchableOpacity

@@ -62,7 +62,20 @@ const STORE_DETECTOR_INJECTION_JS = `
 
   function emitStoreChosen(reason) {
     try {
+      if (document.activeElement && document.activeElement.blur) {
+        document.activeElement.blur();
+      }
+      var inputs = document.querySelectorAll('input, textarea, select');
+      for (var i = 0; i < inputs.length; i++) {
+        inputs[i].blur();
+      }
+      if (document.body && document.body.focus) {
+        document.body.focus();
+      }
       if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: 'DISMISS_KEYBOARD'
+        }));
         window.ReactNativeWebView.postMessage(JSON.stringify({
           type: 'STORE_SELECTED',
           url: window.location.href,
@@ -165,6 +178,19 @@ const STORE_DETECTOR_INJECTION_JS = `
   document.addEventListener('click', function(e) {
     try {
       var el = e.target;
+
+      // Si l'utilisateur clique en dehors d'un champ texte (ex: sur une suggestion de magasin ou la page)
+      if (el && el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA') {
+        try {
+          if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
+            document.activeElement.blur();
+            if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+              window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'DISMISS_KEYBOARD' }));
+            }
+          }
+        } catch(eClickBlur) {}
+      }
+
       var depth = 0;
       while (el && depth < 8) {
         var text = (el.innerText || el.textContent || '').trim().toLowerCase();
@@ -228,6 +254,22 @@ const STORE_DETECTOR_INJECTION_JS = `
         );
 
         if (isStoreAction) {
+          try {
+            if (document.activeElement && document.activeElement.blur) {
+              document.activeElement.blur();
+            }
+            var allInputs = document.querySelectorAll('input, textarea, select');
+            for (var k = 0; k < allInputs.length; k++) {
+              allInputs[k].blur();
+            }
+            if (document.body && document.body.focus) {
+              document.body.focus();
+            }
+            if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+              window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'DISMISS_KEYBOARD' }));
+            }
+          } catch(eStoreBlur) {}
+
           setTimeout(function() {
             emitStoreChosen('click:' + text.substring(0, 30));
           }, 400);
@@ -238,6 +280,16 @@ const STORE_DETECTOR_INJECTION_JS = `
       }
     } catch(err) {}
   }, true);
+
+  // Écoute des changements d'URL hash (utilisé par Leclerc pour les modales de magasin)
+  window.addEventListener('hashchange', function() {
+    try {
+      if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+      if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'DISMISS_KEYBOARD' }));
+      }
+    } catch(eHash) {}
+  });
 
   // Masquage CSS non destructif des bannières smartbanner et popups intrusives
   try {
@@ -560,11 +612,21 @@ export default function DriveCartModal({
             for (var i = 0; i < inputs.length; i++) {
               inputs[i].blur();
             }
+            if (document.body && document.body.focus) {
+              document.body.focus();
+            }
           } catch(e) {}
         })();
         true;
       `;
       webViewRef.current?.injectJavaScript(blurJs);
+      setTimeout(() => {
+        Keyboard.dismiss();
+        webViewRef.current?.injectJavaScript(blurJs);
+      }, 150);
+      setTimeout(() => {
+        Keyboard.dismiss();
+      }, 350);
     }
   };
 
@@ -597,7 +659,11 @@ export default function DriveCartModal({
   const handleWebViewMessage = (event) => {
     try {
       const data = JSON.parse(event.nativeEvent.data);
+      if (data && data.type === "DISMISS_KEYBOARD") {
+        dismissAllKeyboards();
+      }
       if (data && data.type === "STORE_SELECTED") {
+        dismissAllKeyboards();
         if (isSelectingStoreRef.current && Date.now() >= ignoreAutoDetectUntilRef.current) {
           triggerStoreSelectionSuccess(data.url);
         }
@@ -613,6 +679,14 @@ export default function DriveCartModal({
     const url = navState.url || "";
     if (url) {
       sendRemoteLog("WEBVIEW_NAV", `URL: ${url}`);
+      if (
+        url.includes("/magasin-") ||
+        url.includes("courses.leclercdrive.fr/magasin") ||
+        url.includes("/drive-") ||
+        url.includes("/pdv/")
+      ) {
+        dismissAllKeyboards();
+      }
       if (url.includes("pgeWCSD") || url.includes("Erreur.aspx")) {
         sendRemoteLog("RECOVERING_FROM_ERROR_PAGE", url);
         setTimeout(() => {
@@ -1485,23 +1559,38 @@ export default function DriveCartModal({
             </View>
           )}
 
-          {isSelectingStore && !isKeyboardVisible && (
+          {isSelectingStore && (
             <View style={styles.floatingStartBar}>
-              <TouchableOpacity
-                style={styles.floatingStartBtn}
-                onPress={handleStartShopping}
-                activeOpacity={0.85}
-              >
-                <LinearGradient
-                  colors={["#10b981", "#059669"]}
-                  style={styles.floatingStartGradient}
+              {isKeyboardVisible ? (
+                <TouchableOpacity
+                  style={[styles.floatingStartBtn, { opacity: 0.95 }]}
+                  onPress={dismissAllKeyboards}
+                  activeOpacity={0.8}
                 >
-                  <Ionicons name="checkmark-circle" size={16} color="#ffffff" />
-                  <Text style={styles.floatingStartBtnText}>
-                    J'ai choisi mon magasin ➔ Commencer
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
+                  <View style={[styles.floatingStartGradient, { backgroundColor: "#334155" }]}>
+                    <Ionicons name="chevron-down-circle-outline" size={16} color="#ffffff" />
+                    <Text style={styles.floatingStartBtnText}>
+                      Fermer le clavier ⌨️
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={styles.floatingStartBtn}
+                  onPress={handleStartShopping}
+                  activeOpacity={0.85}
+                >
+                  <LinearGradient
+                    colors={["#10b981", "#059669"]}
+                    style={styles.floatingStartGradient}
+                  >
+                    <Ionicons name="checkmark-circle" size={16} color="#ffffff" />
+                    <Text style={styles.floatingStartBtnText}>
+                      J'ai choisi mon magasin ➔ Commencer
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              )}
             </View>
           )}
         </View>

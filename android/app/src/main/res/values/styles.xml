@@ -9,4 +9,8 @@
   <style name="Theme.App.SplashScreen" parent="AppTheme">
     <item name="android:windowBackground">@drawable/splashscreen_logo</item>
   </style>
+  <style name="AdMobActivityTheme" parent="@android:style/Theme.Translucent.NoTitleBar">
+    <item name="android:windowOptOutEdgeToEdgeEnforcement" tools:targetApi="35">true</item>
+    <item name="android:fitsSystemWindows">true</item>
+  </style>
 </resources>

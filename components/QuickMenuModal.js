@@ -46,32 +46,42 @@ export default function QuickMenuModal({
       transparent={true}
       onRequestClose={onClose}
     >
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={[styles.modalOverlay, { backgroundColor: theme.modalOverlay, paddingTop: topInset + 8 }]}>
-          <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
-            <View style={styles.modalContainer}>
-              <View style={[styles.modalCard, { backgroundColor: theme.cardBg, borderColor: theme.border, maxHeight: "92%" }]}>
-                {/* Header with Title and Close button */}
-                <View style={[styles.headerRow, { borderBottomColor: theme.border }, isRTL && styles.rtlRow]}>
-                  <View style={[styles.headerTitleBox, isRTL && styles.rtlRow]}>
-                    <View style={styles.headerIconBadge}>
-                      <Ionicons name="apps" size={20} color="#10b981" />
-                    </View>
-                    <View>
-                      <Text style={[styles.headerTitle, { color: theme.text }]}>Menu & Raccourcis</Text>
-                      <Text style={[styles.headerSubtitle, { color: theme.textSub }]}>PlanEat Smart Menu</Text>
-                    </View>
-                  </View>
-                  <TouchableOpacity
-                    hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
-                    style={[styles.closeBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, borderWidth: 1 }]}
-                    onPress={onClose}
-                  >
-                    <Ionicons name="close" size={20} color={theme.textSub} />
-                  </TouchableOpacity>
+      <View style={[styles.modalOverlay, { backgroundColor: theme.modalOverlay, paddingTop: topInset + 8 }]}>
+        <TouchableOpacity
+          style={StyleSheet.absoluteFillObject}
+          activeOpacity={1}
+          onPress={onClose}
+        />
+        <View style={styles.modalContainer} pointerEvents="box-none">
+          <View style={[styles.modalCard, { backgroundColor: theme.cardBg, borderColor: theme.border, maxHeight: "92%" }]}>
+            {/* Header with Title and Close button */}
+            <View style={[styles.headerRow, { borderBottomColor: theme.border }, isRTL && styles.rtlRow]}>
+              <View style={[styles.headerTitleBox, isRTL && styles.rtlRow]}>
+                <View style={styles.headerIconBadge}>
+                  <Ionicons name="apps" size={20} color="#10b981" />
                 </View>
+                <View>
+                  <Text style={[styles.headerTitle, { color: theme.text }]}>Menu & Raccourcis</Text>
+                  <Text style={[styles.headerSubtitle, { color: theme.textSub }]}>PlanEat Smart Menu</Text>
+                </View>
+              </View>
+              <TouchableOpacity
+                hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+                style={[styles.closeBtn, { backgroundColor: theme.cardBgAlt, borderColor: theme.border, borderWidth: 1 }]}
+                onPress={onClose}
+              >
+                <Ionicons name="close" size={20} color={theme.textSub} />
+              </TouchableOpacity>
+            </View>
 
-                <ScrollView style={styles.menuScroll} showsVerticalScrollIndicator={false}>
+            <ScrollView
+              style={styles.menuScroll}
+              contentContainerStyle={{ paddingBottom: 28 }}
+              showsVerticalScrollIndicator={true}
+              nestedScrollEnabled={true}
+              keyboardShouldPersistTaps="handled"
+              bounces={true}
+            >
                   {/* Action 1 : Remplir mon panier Drive */}
                   <TouchableOpacity
                     style={[styles.menuActionCard, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}
@@ -265,10 +275,8 @@ export default function QuickMenuModal({
                 </ScrollView>
               </View>
             </View>
-          </TouchableWithoutFeedback>
-        </View>
-      </TouchableWithoutFeedback>
-    </Modal>
+          </View>
+        </Modal>
   );
 }
 

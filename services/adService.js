@@ -6,6 +6,7 @@ let BannerAd = null;
 let BannerAdSize = null;
 let InterstitialAd = null;
 let RewardedAd = null;
+let AppOpenAd = null;
 let AdEventType = null;
 let RewardedAdEventType = null;
 let TestIds = null;
@@ -18,6 +19,7 @@ if (Platform.OS !== "web") {
     BannerAdSize = GoogleAds.BannerAdSize;
     InterstitialAd = GoogleAds.InterstitialAd;
     RewardedAd = GoogleAds.RewardedAd;
+    AppOpenAd = GoogleAds.AppOpenAd;
     AdEventType = GoogleAds.AdEventType;
     RewardedAdEventType = GoogleAds.RewardedAdEventType;
     TestIds = GoogleAds.TestIds;
@@ -40,6 +42,10 @@ export const AD_UNIT_IDS = {
   rewarded: {
     ios: "ca-app-pub-5303925075056294/6570159575",
     android: "ca-app-pub-5303925075056294/1509404584"
+  },
+  appOpen: {
+    ios: "ca-app-pub-5303925075056294/4632088499",
+    android: "ca-app-pub-5303925075056294/3007270775"
   }
 };
 
@@ -48,9 +54,12 @@ class AdService {
     this.isInitialized = false;
     this.interstitialAd = null;
     this.rewardedAd = null;
+    this.appOpenAd = null;
     this.isInterstitialLoaded = false;
     this.isRewardedLoaded = false;
+    this.isAppOpenLoaded = false;
     this.lastInterstitialTime = 0;
+    this.lastAppOpenTime = 0;
     this.actionCounter = 0;
   }
 
@@ -64,6 +73,7 @@ class AdService {
       await MobileAds().initialize();
       this._preloadInterstitial();
       this._preloadRewarded();
+      this._preloadAppOpen();
     } catch (e) {
       console.warn("AdMob initialization error:", e);
     }
@@ -71,6 +81,10 @@ class AdService {
 
   getBannerAdUnitId() {
     return Platform.OS === "ios" ? AD_UNIT_IDS.banner.ios : AD_UNIT_IDS.banner.android;
+  }
+
+  getAppOpenAdUnitId() {
+    return Platform.OS === "ios" ? AD_UNIT_IDS.appOpen.ios : AD_UNIT_IDS.appOpen.android;
   }
 
   getInterstitialAdUnitId() {
@@ -151,6 +165,35 @@ class AdService {
       this.rewardedAd.load();
     } catch (e) {
       this.isRewardedLoaded = false;
+    }
+  }
+
+  _preloadAppOpen() {
+    if (!AppOpenAd) return;
+    try {
+      const unitId = this.getAppOpenAdUnitId();
+      this.appOpenAd = AppOpenAd.createForAdRequest(unitId, {
+        requestNonPersonalizedAdsOnly: false
+      });
+
+      this.appOpenAd.addAdEventListener(AdEventType.LOADED, () => {
+        this.isAppOpenLoaded = true;
+      });
+
+      this.appOpenAd.addAdEventListener(AdEventType.CLOSED, () => {
+        this.isAppOpenLoaded = false;
+        this.lastAppOpenTime = Date.now();
+        setTimeout(() => this._preloadAppOpen(), 3000);
+      });
+
+      this.appOpenAd.addAdEventListener(AdEventType.ERROR, (error) => {
+        this.isAppOpenLoaded = false;
+        setTimeout(() => this._preloadAppOpen(), 30000);
+      });
+
+      this.appOpenAd.load();
+    } catch (e) {
+      this.isAppOpenLoaded = false;
     }
   }
 
@@ -257,6 +300,45 @@ class AdService {
     this._preloadRewarded();
     this._preloadInterstitial();
     onRewarded({ type: "fallback_reward", amount: 1 });
+  }
+
+  /**
+   * Tente d'afficher une publicité App Open au lancement de l'application
+   * Attend jusqu'à maxWaitMs que l'annonce se charge pour une transition fluide
+   */
+  async showAppOpenOnStartup({ maxWaitMs = 1800, minIntervalHours = 2 } = {}) {
+    if (purchaseService.getIsPro()) return;
+
+    const now = Date.now();
+    if (this.lastAppOpenTime && (now - this.lastAppOpenTime < minIntervalHours * 3600 * 1000)) {
+      return;
+    }
+
+    if (this.isAppOpenLoaded && this.appOpenAd) {
+      try {
+        await this.appOpenAd.show();
+        return;
+      } catch (e) {}
+    }
+
+    return new Promise((resolve) => {
+      let finished = false;
+      const timeout = setTimeout(() => {
+        if (!finished) {
+          finished = true;
+          resolve();
+        }
+      }, maxWaitMs);
+
+      const checkInterval = setInterval(() => {
+        if (this.isAppOpenLoaded && this.appOpenAd && !finished) {
+          finished = true;
+          clearInterval(checkInterval);
+          clearTimeout(timeout);
+          this.appOpenAd.show().catch(() => {}).finally(() => resolve());
+        }
+      }, 150);
+    });
   }
 }
 

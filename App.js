@@ -127,6 +127,11 @@ function MainApp() {
     if (!hasCompletedOnboarding) {
       setIsOnboarding(true);
       setIsProfileModalOpen(true);
+    } else {
+      // Déclencher l'annonce App Open au démarrage (comme les applis météo)
+      setTimeout(() => {
+        adService.showAppOpenOnStartup({ maxWaitMs: 1800, minIntervalHours: 2 });
+      }, 600);
     }
   };
 

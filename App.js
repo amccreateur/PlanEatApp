@@ -237,7 +237,7 @@ function MainApp() {
       setGroceries(updatedGroceries);
       await StorageService.saveCurrentPlan(updatedPlan);
       await StorageService.saveGroceries(updatedGroceries);
-      adService.recordActionAndCheckInterstitial({ triggerEveryActions: 3, minIntervalSeconds: 30 });
+      adService.recordActionAndCheckInterstitial({ triggerEveryActions: 5, minIntervalSeconds: 60 });
     } catch (err) {
       console.error("Erreur lors du swap:", err);
     } finally {
@@ -363,7 +363,7 @@ function MainApp() {
       await Share.share({
         message: lines.join("\n")
       });
-      adService.showInterstitial({ minIntervalSeconds: 30 });
+      adService.showInterstitial({ minIntervalSeconds: 60 });
     } catch {}
   };
 

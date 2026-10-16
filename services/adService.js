@@ -158,9 +158,9 @@ class AdService {
    * Affiche une publicité interstitielle plein écran (si l'utilisateur n'est pas Pro)
    * @param {Object} options
    * @param {Function} options.onComplete Callback appelé à la fermeture de la pub ou si ignorée
-   * @param {number} options.minIntervalSeconds Intervalle minimum entre 2 interstitiels (défaut: 30s)
+   * @param {number} options.minIntervalSeconds Intervalle minimum entre 2 interstitiels (défaut: 60s)
    */
-  async showInterstitial({ onComplete = () => {}, minIntervalSeconds = 20 } = {}) {
+  async showInterstitial({ onComplete = () => {}, minIntervalSeconds = 60 } = {}) {
     // Si l'utilisateur est abonné Pro, ignorer immédiatement
     if (purchaseService.getIsPro()) {
       onComplete();
@@ -193,13 +193,13 @@ class AdService {
 
   /**
    * Enregistre une action importante (ex: swap de repas, recette frigo, export)
-   * et déclenche l'interstitiel toutes les N actions (défaut: 3).
+   * et déclenche l'interstitiel toutes les N actions (défaut: 5).
    * @param {Object} options
-   * @param {number} options.triggerEveryActions Nombre d'actions requises (défaut: 3)
+   * @param {number} options.triggerEveryActions Nombre d'actions requises (défaut: 5)
    * @param {Function} options.onComplete Callback appelé à la fin
-   * @param {number} options.minIntervalSeconds Intervalle minimum en secondes (défaut: 30s)
+   * @param {number} options.minIntervalSeconds Intervalle minimum en secondes (défaut: 60s)
    */
-  async recordActionAndCheckInterstitial({ triggerEveryActions = 3, onComplete = () => {}, minIntervalSeconds = 30 } = {}) {
+  async recordActionAndCheckInterstitial({ triggerEveryActions = 5, onComplete = () => {}, minIntervalSeconds = 60 } = {}) {
     if (purchaseService.getIsPro()) {
       onComplete();
       return;

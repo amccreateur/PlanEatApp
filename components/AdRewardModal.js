@@ -17,6 +17,7 @@ export default function AdRewardModal({
   visible,
   onClose,
   onRewardEarned,
+  onStartAd,
   onOpenPaywall,
   title = "Fonctionnalité Avancée",
   subtitle = "Regardez une courte vidéo pour débloquer cette action gratuitement, ou passez à PlanEat Pro pour un accès illimité sans publicité.",
@@ -31,6 +32,11 @@ export default function AdRewardModal({
 
   const handleWatchVideo = async () => {
     setIsLoadingAd(true);
+    if (onStartAd) {
+      try {
+        onStartAd();
+      } catch (err) {}
+    }
     try {
       await adService.showRewardedVideo({
         onRewarded: (reward) => {

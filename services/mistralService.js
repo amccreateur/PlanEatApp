@@ -546,13 +546,16 @@ Format JSON attendu :
     const adults = profile?.adults || 2;
     const children = profile?.children || 0;
     const diets = (profile?.diets || []).join(", ") || "aucun régime particulier";
-    const dislikes = (profile?.dislikedFoods || []).join(", ") || "aucun";
-    const fridgeItems = ingredients.join(", ");
+    const fridgeItems = ingredients.map(i => {
+      if (typeof i === "string") return i;
+      if (i.quantity) return `${i.quantity} ${i.unit || ""} ${i.name}`.trim();
+      return i.name;
+    }).join(", ");
     const hasThermomix = profile?.appliances?.thermomix;
 
     const prompt = `Tu es un Chef cuisinier expert en cuisine anti-gaspillage créative pour PlanEat.
-L'utilisateur a ces ingrédients dans son réfrigérateur/placard : [${fridgeItems}].
-Génère une recette complète, délicieuse et inventive qui met en valeur ces ingrédients en ajoutant des basiques simples du placard si nécessaire (huile, ail, oignon, sel, poivre, épices).
+L'utilisateur a EXACTEMENT ces ingrédients et ces quantités restantes dans son réfrigérateur/placard : [${fridgeItems}].
+Génère une recette complète, délicieuse et inventive qui met en valeur ces ingrédients en RESPECTANT SCRUPULEUSEMENT les quantités fournies (ne demande pas plus que ce que l'utilisateur possède !). Tu peux compléter uniquement avec des basiques indispensables du placard (huile, sel, poivre, eau, épices, ail/oignon si nécessaire).
 Foyer : ${adults} adulte(s), ${children} enfant(s).
 Régimes : ${diets}.
 Exclusions : ${dislikes}.
@@ -561,7 +564,8 @@ Langue principale : ${lang}.
 
 RÈGLES STRICTES DE QUALITÉ :
 - Réponds UNIQUEMENT en JSON valide.
-- Inclus 4 à 7 ingrédients précis avec quantité pour 2 personnes et rayon.
+- RESPECT DES QUANTITÉS DU FRIGO : Dans la liste des ingrédients de la recette, réutilise les quantités indiquées par l'utilisateur pour ses ingrédients du frigo (ex: si l'utilisateur a 2 œufs, la recette doit utiliser ces 2 œufs).
+- Inclus 4 à 7 ingrédients précis avec quantité et rayon.
 - Instructions détaillées étape par étape (3 à 4 étapes complètes de préparation et cuisson).
 ${hasThermomix ? "- Inclus impérativement 'thermomixInstructions' (tableau d'étapes adaptées au robot Thermomix avec durées, températures et vitesses)." : ""}
 - Ajoute une astuce anti-gaspi du chef 'chefTip'.

@@ -40,54 +40,147 @@ export default function FridgeModal({
   const theme = THEMES[themeMode] || THEMES.dark;
 
   const [inputItem, setInputItem] = useState("");
-  const [fridgeItems, setFridgeItems] = useState(["Œufs", "Courgettes", "Riz"]);
+  const [fridgeItems, setFridgeItems] = useState([
+    { name: "Œufs", quantity: 2, unit: "pcs" },
+    { name: "Courgettes", quantity: 1, unit: "pcs" },
+    { name: "Riz", quantity: 150, unit: "g" }
+  ]);
   const [mealType, setMealType] = useState("lunch");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedRecipe, setGeneratedRecipe] = useState(null);
   const [isRewardModalOpen, setIsRewardModalOpen] = useState(false);
 
   const quickSuggestions = [
-    { name: "Œufs", emoji: "🥚" },
-    { name: "Riz", emoji: "🍚" },
-    { name: "Pâtes", emoji: "🍝" },
-    { name: "Tomates", emoji: "🍅" },
-    { name: "Fromage", emoji: "🧀" },
-    { name: "Courgettes", emoji: "🥒" },
-    { name: "Poulet", emoji: "🍗" },
-    { name: "Pommes de terre", emoji: "🥔" },
-    { name: "Carottes", emoji: "🥕" },
-    { name: "Oignons", emoji: "🧅" }
+    { name: "Œufs", emoji: "🥚", defaultQty: 2, defaultUnit: "pcs" },
+    { name: "Riz", emoji: "🍚", defaultQty: 150, defaultUnit: "g" },
+    { name: "Pâtes", emoji: "🍝", defaultQty: 150, defaultUnit: "g" },
+    { name: "Tomates", emoji: "🍅", defaultQty: 2, defaultUnit: "pcs" },
+    { name: "Fromage", emoji: "🧀", defaultQty: 60, defaultUnit: "g" },
+    { name: "Courgettes", emoji: "🥒", defaultQty: 1, defaultUnit: "pcs" },
+    { name: "Poulet", emoji: "🍗", defaultQty: 200, defaultUnit: "g" },
+    { name: "Pommes de terre", emoji: "🥔", defaultQty: 3, defaultUnit: "pcs" },
+    { name: "Carottes", emoji: "🥕", defaultQty: 2, defaultUnit: "pcs" },
+    { name: "Oignons", emoji: "🧅", defaultQty: 1, defaultUnit: "pcs" }
   ];
 
-  const handleAddItem = (itemToAdd = null) => {
-    const text = itemToAdd || inputItem.trim();
-    if (!text) return;
-    if (!fridgeItems.includes(text)) {
-      setFridgeItems([...fridgeItems, text]);
+  // Détection automatique de l'unité et quantité par défaut si l'utilisateur tape un nombre
+  const parseInputItem = (rawText) => {
+    let text = rawText.trim();
+    if (!text) return null;
+
+    // Détecte "150g riz" ou "2 tomates" ou "300 ml lait"
+    const match = text.match(/^(\d+(?:[.,]\d+)?)\s*(g|kg|ml|cl|l|pcs|tranches?|pots?)?\s*(?:de\s+|d')?\s*(.+)$/i);
+    if (match) {
+      const qty = parseFloat(match[1].replace(",", "."));
+      let unit = (match[2] || "").toLowerCase();
+      const name = match[3].trim();
+      if (!unit) {
+        unit = (name.toLowerCase().includes("riz") || name.toLowerCase().includes("pâte") || name.toLowerCase().includes("farine")) ? "g" : "pcs";
+      }
+      return { name, quantity: qty, unit };
     }
-    if (!itemToAdd) setInputItem("");
+
+    const lower = text.toLowerCase();
+    const isWeight = lower.includes("riz") || lower.includes("pâte") || lower.includes("farine") || lower.includes("fromage") || lower.includes("poulet") || lower.includes("viande") || lower.includes("saumon") || lower.includes("flocon");
+    return {
+      name: text,
+      quantity: isWeight ? 150 : 2,
+      unit: isWeight ? "g" : "pcs"
+    };
+  };
+
+  const handleAddItem = (itemToAdd = null) => {
+    let parsed = null;
+    if (itemToAdd && typeof itemToAdd === "object") {
+      parsed = itemToAdd;
+    } else if (itemToAdd && typeof itemToAdd === "string") {
+      parsed = parseInputItem(itemToAdd);
+    } else {
+      parsed = parseInputItem(inputItem);
+    }
+
+    if (!parsed || !parsed.name) return;
+
+    const existingIndex = fridgeItems.findIndex(i => i.name.toLowerCase() === parsed.name.toLowerCase());
+    if (existingIndex >= 0) {
+      // Si déjà présent, augmenter la quantité
+      const updated = [...fridgeItems];
+      updated[existingIndex].quantity = (updated[existingIndex].quantity || 1) + (parsed.quantity || 1);
+      setFridgeItems(updated);
+    } else {
+      setFridgeItems([...fridgeItems, parsed]);
+    }
+    if (!itemToAdd || typeof itemToAdd !== "object") setInputItem("");
+  };
+
+  const handleUpdateQuantity = (index, delta) => {
+    setFridgeItems(prev => {
+      const updated = [...prev];
+      const item = updated[index];
+      if (!item) return prev;
+      const step = item.unit === "g" || item.unit === "ml" ? 50 : 1;
+      const newQty = Math.max(1, (item.quantity || step) + (delta * step));
+      updated[index] = { ...item, quantity: newQty };
+      return updated;
+    });
+  };
+
+  const handleToggleUnit = (index) => {
+    setFridgeItems(prev => {
+      const updated = [...prev];
+      const item = updated[index];
+      if (!item) return prev;
+      const unitsCycle = ["pcs", "g", "tranche"];
+      const currentIdx = unitsCycle.indexOf(item.unit);
+      const nextUnit = unitsCycle[(currentIdx + 1) % unitsCycle.length] || "pcs";
+      const newQty = nextUnit === "g" ? 100 : (item.unit === "g" ? 2 : item.quantity);
+      updated[index] = { ...item, unit: nextUnit, quantity: newQty };
+      return updated;
+    });
   };
 
   const handleRemoveItem = (index) => {
     setFridgeItems(fridgeItems.filter((_, i) => i !== index));
   };
 
+  // Promesse de génération en tâche de fond pour temps masqué pendant la vidéo
+  const pendingGenerationRef = React.useRef(null);
+
+  const startBackgroundGeneration = () => {
+    setIsGenerating(true);
+    pendingGenerationRef.current = AIPlannerService.generateFridgeRecipe(
+      fridgeItems,
+      mealType,
+      profile,
+      aiConfig,
+      lang
+    );
+  };
+
   const executeGenerate = async () => {
     setIsGenerating(true);
     try {
-      const recipe = await AIPlannerService.generateFridgeRecipe(
-        fridgeItems,
-        mealType,
-        profile,
-        aiConfig,
-        lang
-      );
+      let recipePromise = pendingGenerationRef.current;
+      pendingGenerationRef.current = null;
+
+      if (!recipePromise) {
+        recipePromise = AIPlannerService.generateFridgeRecipe(
+          fridgeItems,
+          mealType,
+          profile,
+          aiConfig,
+          lang
+        );
+      }
+
+      const recipe = await recipePromise;
       setGeneratedRecipe(recipe);
     } catch (err) {
       console.error("Erreur génération frigo:", err);
       Alert.alert("Erreur", err.message || "Impossible de générer la recette");
     } finally {
       setIsGenerating(false);
+      pendingGenerationRef.current = null;
     }
   };
 
@@ -137,7 +230,7 @@ export default function FridgeModal({
           {/* Saisie des ingrédients */}
           <View style={[styles.card, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
             <Text style={[styles.sectionTitle, { color: theme.text }, isRTL && styles.rtlText]}>
-              📝 Ingrédients dans mon frigo :
+              📝 Ingrédients dans mon frigo & quantités :
             </Text>
 
             <View style={[styles.inputRow, isRTL && styles.rtlRow]}>
@@ -154,15 +247,51 @@ export default function FridgeModal({
               </TouchableOpacity>
             </View>
 
-            {/* Tags des ingrédients ajoutés */}
+            {/* Liste des ingrédients avec sélecteur de quantité */}
             {fridgeItems.length > 0 ? (
-              <View style={[styles.chipsWrap, isRTL && styles.rtlRow]}>
+              <View style={styles.itemsListContainer}>
                 {fridgeItems.map((item, idx) => (
-                  <View key={idx} style={[styles.chip, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }]}>
-                    <Text style={[styles.chipText, { color: theme.text }]}>{item}</Text>
-                    <TouchableOpacity onPress={() => handleRemoveItem(idx)}>
-                      <Ionicons name="close-circle" size={18} color="#ef4444" />
-                    </TouchableOpacity>
+                  <View key={idx} style={[styles.itemCardRow, { backgroundColor: theme.cardBgAlt, borderColor: theme.border }, isRTL && styles.rtlRow]}>
+                    <View style={styles.itemTitleBox}>
+                      <Text style={[styles.itemDot, { color: "#38bdf8" }]}>•</Text>
+                      <Text style={[styles.itemNameText, { color: theme.text }]}>{item.name}</Text>
+                    </View>
+
+                    {/* Contrôleur de Quantité (- / + et unité) */}
+                    <View style={[styles.stepperContainer, isRTL && styles.rtlRow]}>
+                      <TouchableOpacity
+                        style={[styles.stepperBtn, { backgroundColor: theme.border }]}
+                        onPress={() => handleUpdateQuantity(idx, -1)}
+                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                      >
+                        <Ionicons name="remove" size={16} color={theme.text} />
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={[styles.stepperValueBox, { backgroundColor: theme.cardBg, borderColor: theme.border }]}
+                        onPress={() => handleToggleUnit(idx)}
+                      >
+                        <Text style={[styles.stepperValueText, { color: "#38bdf8" }]}>
+                          {item.quantity} <Text style={styles.stepperUnitText}>{item.unit}</Text>
+                        </Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={[styles.stepperBtn, { backgroundColor: theme.border }]}
+                        onPress={() => handleUpdateQuantity(idx, 1)}
+                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                      >
+                        <Ionicons name="add" size={16} color={theme.text} />
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={styles.deleteBtn}
+                        onPress={() => handleRemoveItem(idx)}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                      >
+                        <Ionicons name="trash-outline" size={18} color="#ef4444" />
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 ))}
               </View>
@@ -177,26 +306,29 @@ export default function FridgeModal({
               {t.fridgeSuggestionsTitle}
             </Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.suggestScroll}>
-              {quickSuggestions.map((sug, idx) => (
-                <TouchableOpacity
-                  key={idx}
-                  style={[
-                    styles.suggestChip,
-                    { backgroundColor: theme.cardBgAlt, borderColor: theme.border },
-                    fridgeItems.includes(sug.name) && styles.suggestChipSelected
-                  ]}
-                  onPress={() => handleAddItem(sug.name)}
-                >
-                  <Text style={styles.suggestEmoji}>{sug.emoji}</Text>
-                  <Text style={[
-                    styles.suggestText,
-                    { color: theme.textSub },
-                    fridgeItems.includes(sug.name) && styles.suggestTextSelected
-                  ]}>
-                    {sug.name}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+              {quickSuggestions.map((sug, idx) => {
+                const isSelected = fridgeItems.some(i => i.name.toLowerCase() === sug.name.toLowerCase());
+                return (
+                  <TouchableOpacity
+                    key={idx}
+                    style={[
+                      styles.suggestChip,
+                      { backgroundColor: theme.cardBgAlt, borderColor: theme.border },
+                      isSelected && styles.suggestChipSelected
+                    ]}
+                    onPress={() => handleAddItem({ name: sug.name, quantity: sug.defaultQty, unit: sug.defaultUnit })}
+                  >
+                    <Text style={styles.suggestEmoji}>{sug.emoji}</Text>
+                    <Text style={[
+                      styles.suggestText,
+                      { color: theme.textSub },
+                      isSelected && styles.suggestTextSelected
+                    ]}>
+                      {sug.name}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </ScrollView>
           </View>
 
@@ -284,7 +416,12 @@ export default function FridgeModal({
 
       <AdRewardModal
         visible={isRewardModalOpen}
-        onClose={() => setIsRewardModalOpen(false)}
+        onClose={() => {
+          setIsRewardModalOpen(false);
+          setIsGenerating(false);
+          pendingGenerationRef.current = null;
+        }}
+        onStartAd={startBackgroundGeneration}
         onRewardEarned={() => executeGenerate()}
         onOpenPaywall={onOpenPaywall}
         title="Recette Frigo Anti-Gaspi"
@@ -395,27 +532,69 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center"
   },
-  chipsWrap: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+  itemsListContainer: {
     gap: 8,
-    marginBottom: 14
+    marginBottom: 16
   },
-  chip: {
+  itemCardRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#0f172a",
+    justifyContent: "space-between",
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 10,
+    paddingVertical: 10,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: "rgba(56, 189, 248, 0.4)",
+    borderColor: "#334155"
+  },
+  itemTitleBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    marginRight: 8,
     gap: 6
   },
-  chipText: {
-    color: "#38bdf8",
+  itemDot: {
+    fontSize: 18,
+    fontWeight: "900"
+  },
+  itemNameText: {
+    fontSize: 14,
+    fontWeight: "600",
+    flexShrink: 1
+  },
+  stepperContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6
+  },
+  stepperBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  stepperValueBox: {
+    minWidth: 64,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  stepperValueText: {
     fontSize: 13,
-    fontWeight: "600"
+    fontWeight: "700"
+  },
+  stepperUnitText: {
+    fontSize: 11,
+    fontWeight: "500",
+    color: "#94a3b8"
+  },
+  deleteBtn: {
+    padding: 4,
+    marginLeft: 4
   },
   hintText: {
     color: "#64748b",

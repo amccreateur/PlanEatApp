@@ -1611,11 +1611,23 @@ export class AIPlannerService {
   static async generateFridgeRecipe(ingredients = [], mealType = "lunch", profile = null, aiConfig = null, lang = "fr") {
     const servings = this.calculateHouseholdServings(profile);
 
+    // Normalisation des ingrédients (chaîne ou objet { name, quantity, unit })
+    const normalizedIngredients = (ingredients || []).map(item => {
+      if (typeof item === "string") {
+        return { name: item, quantity: null, unit: "" };
+      }
+      return {
+        name: item.name || "Ingrédient",
+        quantity: item.quantity,
+        unit: item.unit || ""
+      };
+    });
+
     // 1. Tenter avec Mistral AI (par défaut)
     if (aiConfig?.engine !== "local") {
       try {
         const generated = await MistralService.generateFridgeRecipe({
-          ingredients,
+          ingredients: normalizedIngredients,
           mealType,
           profile,
           apiKey: aiConfig?.mistralApiKey,
@@ -1643,7 +1655,7 @@ export class AIPlannerService {
             })),
             instructions: generated.instructions || { fr: ["Préparer et cuisiner avec vos restes."] },
             isAntiWaste: true,
-            fridgeInputs: ingredients
+            fridgeInputs: normalizedIngredients
           };
         }
       } catch (err) {
@@ -1652,7 +1664,7 @@ export class AIPlannerService {
     }
 
     // 2. Fallback local intelligent : recherche de la recette du catalogue qui contient le plus d'ingrédients demandés
-    const lowerInputs = ingredients.map(i => i.toLowerCase().trim());
+    const lowerInputs = normalizedIngredients.map(i => (i.name || "").toLowerCase().trim()).filter(Boolean);
     const validRecipes = this.filterRecipes(profile);
 
     let bestRecipe = null;

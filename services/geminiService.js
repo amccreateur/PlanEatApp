@@ -210,7 +210,8 @@ Réponds UNIQUEMENT en JSON valide conforme au schéma :
     profile,
     apiKey,
     model = DEFAULT_GEMINI_MODEL,
-    lang = "fr"
+    lang = "fr",
+    previousRecipeTitle = ""
   }) {
     const keyToUse = (apiKey && apiKey.trim()) || DEFAULT_GEMINI_API_KEY;
     if (!keyToUse) throw new Error("Clé API Gemini requise");
@@ -230,6 +231,7 @@ Réponds UNIQUEMENT en JSON valide conforme au schéma :
     const prompt = `Tu es un Chef cuisinier étoilé et expert en cuisine anti-gaspillage pour l'application PlanEat.
 L'utilisateur a ces ingrédients et ces quantités précises dans son frigo : [${fridgeItems}].
 Génère une délicieuse recette complète et inventive qui utilise ces ingrédients en respectant rigoureusement les quantités fournies. Tu peux ajouter uniquement des basiques indispensables du placard (huile, sel, poivre, eau, ail/oignon si nécessaire).
+${previousRecipeTitle ? `IMPORTANT : L'utilisateur souhaite une NOUVELLE alternative. La nouvelle recette DOIT IMPÉRATIVEMENT ÊTRE DIFFÉRENTE de '${previousRecipeTitle}' (change le mode de cuisson, le style culinaire, les épices et le titre).` : ""}
 Foyer : ${adults} adulte(s), ${children} enfant(s).
 Régime : ${diets}. Type de repas : ${mealType}. Langue : ${lang}.
 

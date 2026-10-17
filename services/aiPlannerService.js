@@ -1614,8 +1614,10 @@ export class AIPlannerService {
    * @param {object} aiConfig
    * @param {string} lang
    * @param {boolean} forceAi - Si true, sollicite Google Gemini 2.5 Flash pour une recette gastronomique IA
+   * @param {number} variantIndex - Index de variante pour renouveler les recettes à chaque clic
+   * @param {string} previousRecipeTitle - Titre de la recette précédente pour que Gemini génère une alternative distincte
    */
-  static async generateFridgeRecipe(ingredients = [], mealType = "lunch", profile = null, aiConfig = null, lang = "fr", forceAi = false) {
+  static async generateFridgeRecipe(ingredients = [], mealType = "lunch", profile = null, aiConfig = null, lang = "fr", forceAi = false, variantIndex = 0, previousRecipeTitle = "") {
     const servings = this.calculateHouseholdServings(profile);
 
     // Normalisation des ingrédients (chaîne ou objet { name, quantity, unit })
@@ -1637,7 +1639,8 @@ export class AIPlannerService {
           ingredients: normalizedIngredients,
           mealType,
           profile,
-          lang
+          lang,
+          previousRecipeTitle
         });
 
         if (geminiResult && geminiResult.title) {
@@ -1672,41 +1675,8 @@ export class AIPlannerService {
     }
 
     // 2. Moteur Culinaire Anti-Gaspillage Autonome :
-    // Si une recette du catalogue a une très forte correspondance (au moins 2 ingrédients), on peut la proposer,
-    // sinon le Chef Autonome compose une recette sur-mesure avec les ingrédients exacts !
-    const lowerInputs = normalizedIngredients.map(i => (i.name || "").toLowerCase().trim()).filter(Boolean);
-    const validRecipes = this.filterRecipes(profile);
-
-    let bestRecipe = null;
-    let maxMatch = 0;
-
-    validRecipes.forEach(recipe => {
-      let matchCount = 0;
-      recipe.ingredients.forEach(ing => {
-        const fullNames = [ing.name?.fr, ing.name?.en].filter(Boolean).join(" ").toLowerCase();
-        lowerInputs.forEach(input => {
-          if (input && fullNames.includes(input)) matchCount++;
-        });
-      });
-
-      if (matchCount > maxMatch) {
-        maxMatch = matchCount;
-        bestRecipe = recipe;
-      }
-    });
-
-    // Si le catalogue a un plat avec au moins 2 correspondances réelles, on peut l'adapter
-    if (bestRecipe && maxMatch >= 2) {
-      return {
-        ...bestRecipe,
-        id: `fridge_cat_${Date.now()}`,
-        calculatedServings: servings,
-        isAntiWaste: true,
-        fridgeInputs: normalizedIngredients
-      };
-    }
-
-    // Sinon, composition d'une VRAIE recette sur-mesure avec les ingrédients et quantités de l'utilisateur !
-    return buildAutonomousFridgeRecipe(normalizedIngredients, mealType, profile, lang);
+    // Composition d'une VRAIE recette sur-mesure avec les ingrédients exacts de l'utilisateur
+    // avec rotation des variantes (variantIndex) pour renouveler les recettes à chaque clic !
+    return buildAutonomousFridgeRecipe(normalizedIngredients, mealType, profile, lang, variantIndex);
   }
 }

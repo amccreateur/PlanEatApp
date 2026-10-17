@@ -48,6 +48,7 @@ export default function FridgeModal({
   const [mealType, setMealType] = useState("lunch");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedRecipe, setGeneratedRecipe] = useState(null);
+  const [variantIndex, setVariantIndex] = useState(0);
   const [isRewardModalOpen, setIsRewardModalOpen] = useState(false);
 
   const quickSuggestions = [
@@ -185,33 +186,41 @@ export default function FridgeModal({
   // Promesse de génération en tâche de fond pour temps masqué pendant la vidéo
   const pendingGenerationRef = React.useRef(null);
 
-  const startBackgroundGeneration = () => {
+  const startBackgroundGeneration = (nextVariant = null) => {
     if (pendingGenerationRef.current) return;
     setIsGenerating(true);
+    const activeVariant = nextVariant !== null ? nextVariant : (generatedRecipe ? variantIndex + 1 : 0);
+    const prevTitle = generatedRecipe?.title?.[lang] || generatedRecipe?.title?.fr || (typeof generatedRecipe?.title === "string" ? generatedRecipe?.title : "") || "";
     pendingGenerationRef.current = AIPlannerService.generateFridgeRecipe(
       fridgeItems,
       mealType,
       profile,
       aiConfig,
       lang,
-      true // forceAi
+      true, // forceAi
+      activeVariant,
+      prevTitle
     );
   };
 
-  const executeGenerate = async (forceAi = false) => {
+  const executeGenerate = async (forceAi = false, nextVariant = null) => {
     setIsGenerating(true);
     try {
       let recipePromise = pendingGenerationRef.current;
       pendingGenerationRef.current = null;
 
       if (!recipePromise) {
+        const activeVariant = nextVariant !== null ? nextVariant : (generatedRecipe ? variantIndex + 1 : 0);
+        const prevTitle = generatedRecipe?.title?.[lang] || generatedRecipe?.title?.fr || (typeof generatedRecipe?.title === "string" ? generatedRecipe?.title : "") || "";
         recipePromise = AIPlannerService.generateFridgeRecipe(
           fridgeItems,
           mealType,
           profile,
           aiConfig,
           lang,
-          forceAi
+          forceAi,
+          activeVariant,
+          prevTitle
         );
       }
 
@@ -231,8 +240,9 @@ export default function FridgeModal({
       Alert.alert("⚠️", t.fridgeEmptyIngredients);
       return;
     }
-    // Génération locale instantanée par défaut (0 latence, 100% cohérent)
-    executeGenerate(false);
+    const nextVariant = generatedRecipe ? variantIndex + 1 : 0;
+    setVariantIndex(nextVariant);
+    executeGenerate(false, nextVariant);
   };
 
   const handleRequestAiRecipe = () => {
@@ -241,11 +251,14 @@ export default function FridgeModal({
       return;
     }
 
+    const nextVariant = generatedRecipe ? variantIndex + 1 : 0;
+    setVariantIndex(nextVariant);
+
     if (purchaseService.getIsPro()) {
-      executeGenerate(true);
+      executeGenerate(true, nextVariant);
     } else {
       // Démarre la génération Gemini TOUT DE SUITE en arrière-plan pendant que la pub se charge/joue
-      startBackgroundGeneration();
+      startBackgroundGeneration(nextVariant);
       setIsRewardModalOpen(true);
     }
   };
@@ -282,9 +295,25 @@ export default function FridgeModal({
 
           {/* Saisie des ingrédients */}
           <View style={[styles.card, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-            <Text style={[styles.sectionTitle, { color: theme.text }, isRTL && styles.rtlText]}>
-              📝 Ingrédients dans mon frigo & quantités :
-            </Text>
+            <View style={[{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }, isRTL && styles.rtlRow]}>
+              <Text style={[styles.sectionTitle, { color: theme.text, marginBottom: 0 }, isRTL && styles.rtlText]}>
+                📝 Ingrédients ({fridgeItems.length}) :
+              </Text>
+              {fridgeItems.length > 0 && (
+                <TouchableOpacity
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  onPress={() => {
+                    setFridgeItems([]);
+                    setGeneratedRecipe(null);
+                    setVariantIndex(0);
+                  }}
+                >
+                  <Text style={{ color: "#ef4444", fontSize: 13, fontWeight: "700" }}>
+                    🗑️ Tout effacer
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
 
             <View style={[styles.inputRow, isRTL && styles.rtlRow]}>
               <TextInput
@@ -440,8 +469,10 @@ export default function FridgeModal({
                 </>
               ) : (
                 <>
-                  <Ionicons name="sparkles" size={20} color="#ffffff" />
-                  <Text style={styles.generateBtnText}>{t.fridgeGenerateBtn}</Text>
+                  <Ionicons name={generatedRecipe ? "shuffle" : "sparkles"} size={20} color="#ffffff" />
+                  <Text style={styles.generateBtnText}>
+                    {generatedRecipe ? (t.fridgeGenerateAnotherBtn || "🔀 Proposer une autre recette") : t.fridgeGenerateBtn}
+                  </Text>
                 </>
               )}
             </LinearGradient>

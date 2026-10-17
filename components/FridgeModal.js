@@ -41,8 +41,8 @@ export default function FridgeModal({
 
   const [inputItem, setInputItem] = useState("");
   const [fridgeItems, setFridgeItems] = useState([
-    { name: "Œufs", quantity: 2, unit: "pcs" },
-    { name: "Courgettes", quantity: 1, unit: "pcs" },
+    { name: "Œufs", quantity: 2, unit: "" },
+    { name: "Brocoli", quantity: 200, unit: "g" },
     { name: "Riz", quantity: 150, unit: "g" }
   ]);
   const [mealType, setMealType] = useState("lunch");
@@ -51,19 +51,20 @@ export default function FridgeModal({
   const [isRewardModalOpen, setIsRewardModalOpen] = useState(false);
 
   const quickSuggestions = [
-    { name: "Œufs", emoji: "🥚", defaultQty: 2, defaultUnit: "pcs" },
+    { name: "Œufs", emoji: "🥚", defaultQty: 2, defaultUnit: "" },
+    { name: "Brocoli", emoji: "🥦", defaultQty: 200, defaultUnit: "g" },
+    { name: "Courgettes", emoji: "🥒", defaultQty: 1, defaultUnit: "" },
     { name: "Riz", emoji: "🍚", defaultQty: 150, defaultUnit: "g" },
     { name: "Pâtes", emoji: "🍝", defaultQty: 150, defaultUnit: "g" },
-    { name: "Tomates", emoji: "🍅", defaultQty: 2, defaultUnit: "pcs" },
+    { name: "Tomates", emoji: "🍅", defaultQty: 2, defaultUnit: "" },
     { name: "Fromage", emoji: "🧀", defaultQty: 60, defaultUnit: "g" },
-    { name: "Courgettes", emoji: "🥒", defaultQty: 1, defaultUnit: "pcs" },
     { name: "Poulet", emoji: "🍗", defaultQty: 200, defaultUnit: "g" },
-    { name: "Pommes de terre", emoji: "🥔", defaultQty: 3, defaultUnit: "pcs" },
-    { name: "Carottes", emoji: "🥕", defaultQty: 2, defaultUnit: "pcs" },
-    { name: "Oignons", emoji: "🧅", defaultQty: 1, defaultUnit: "pcs" }
+    { name: "Pommes de terre", emoji: "🥔", defaultQty: 3, defaultUnit: "" },
+    { name: "Carottes", emoji: "🥕", defaultQty: 2, defaultUnit: "" },
+    { name: "Oignons", emoji: "🧅", defaultQty: 1, defaultUnit: "" }
   ];
 
-  // Détection automatique de l'unité et quantité par défaut si l'utilisateur tape un nombre
+  // Détection intelligente de l'unité et quantité
   const parseInputItem = (rawText) => {
     let text = rawText.trim();
     if (!text) return null;
@@ -74,19 +75,48 @@ export default function FridgeModal({
       const qty = parseFloat(match[1].replace(",", "."));
       let unit = (match[2] || "").toLowerCase();
       const name = match[3].trim();
-      if (!unit) {
-        unit = (name.toLowerCase().includes("riz") || name.toLowerCase().includes("pâte") || name.toLowerCase().includes("farine")) ? "g" : "pcs";
+      const lowerName = name.toLowerCase();
+      if (!unit || unit === "pcs") {
+        const isWeight = isGramIngredient(lowerName);
+        unit = isWeight ? "g" : "";
       }
       return { name, quantity: qty, unit };
     }
 
     const lower = text.toLowerCase();
-    const isWeight = lower.includes("riz") || lower.includes("pâte") || lower.includes("farine") || lower.includes("fromage") || lower.includes("poulet") || lower.includes("viande") || lower.includes("saumon") || lower.includes("flocon");
+    const isWeight = isGramIngredient(lower);
     return {
       name: text,
       quantity: isWeight ? 150 : 2,
-      unit: isWeight ? "g" : "pcs"
+      unit: isWeight ? "g" : ""
     };
+  };
+
+  // Les légumes verts, viandes, féculents et fromages sont par défaut en grammes
+  const isGramIngredient = (lower) => {
+    return (
+      lower.includes("brocoli") ||
+      lower.includes("épinard") ||
+      lower.includes("epinard") ||
+      lower.includes("haricot") ||
+      lower.includes("chou") ||
+      lower.includes("salade") ||
+      lower.includes("roquette") ||
+      lower.includes("riz") ||
+      lower.includes("pâte") ||
+      lower.includes("pate") ||
+      lower.includes("farine") ||
+      lower.includes("fromage") ||
+      lower.includes("poulet") ||
+      lower.includes("viande") ||
+      lower.includes("saumon") ||
+      lower.includes("boeuf") ||
+      lower.includes("dinde") ||
+      lower.includes("flocon") ||
+      lower.includes("quinoa") ||
+      lower.includes("lentille") ||
+      lower.includes("pois")
+    );
   };
 
   const handleAddItem = (itemToAdd = null) => {
@@ -130,10 +160,19 @@ export default function FridgeModal({
       const updated = [...prev];
       const item = updated[index];
       if (!item) return prev;
-      const unitsCycle = ["pcs", "g", "tranche"];
-      const currentIdx = unitsCycle.indexOf(item.unit);
-      const nextUnit = unitsCycle[(currentIdx + 1) % unitsCycle.length] || "pcs";
-      const newQty = nextUnit === "g" ? 100 : (item.unit === "g" ? 2 : item.quantity);
+      // Cycle intelligent : grammes (g) <-> unité unitaire ("") <-> tranche
+      let nextUnit = "";
+      let newQty = item.quantity;
+      if (item.unit === "g") {
+        nextUnit = "";
+        newQty = 1;
+      } else if (item.unit === "") {
+        nextUnit = "g";
+        newQty = 150;
+      } else {
+        nextUnit = "";
+        newQty = 1;
+      }
       updated[index] = { ...item, unit: nextUnit, quantity: newQty };
       return updated;
     });
@@ -272,7 +311,8 @@ export default function FridgeModal({
                         onPress={() => handleToggleUnit(idx)}
                       >
                         <Text style={[styles.stepperValueText, { color: "#38bdf8" }]}>
-                          {item.quantity} <Text style={styles.stepperUnitText}>{item.unit}</Text>
+                          {item.quantity}{item.unit ? ` ` : ""}
+                          {item.unit ? <Text style={styles.stepperUnitText}>{item.unit}</Text> : null}
                         </Text>
                       </TouchableOpacity>
 

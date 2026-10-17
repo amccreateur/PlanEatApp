@@ -1,6 +1,7 @@
 import { RECIPES_CATALOG } from "./defaultRecipes.js";
 import { MistralService } from "./mistralService.js";
 import { DriveService } from "./driveService.js";
+import { buildAutonomousFridgeRecipe } from "./fridgeChefEngine.js";
 
 export class AIPlannerService {
   /**
@@ -1663,12 +1664,14 @@ export class AIPlannerService {
       }
     }
 
-    // 2. Fallback local intelligent : recherche de la recette du catalogue qui contient le plus d'ingrédients demandés
+    // 2. Moteur Culinaire Anti-Gaspillage Autonome :
+    // Si une recette du catalogue a une très forte correspondance (au moins 2 ingrédients), on peut la proposer,
+    // sinon le Chef Autonome compose une recette sur-mesure avec les ingrédients exacts !
     const lowerInputs = normalizedIngredients.map(i => (i.name || "").toLowerCase().trim()).filter(Boolean);
     const validRecipes = this.filterRecipes(profile);
 
     let bestRecipe = null;
-    let maxMatch = -1;
+    let maxMatch = 0;
 
     validRecipes.forEach(recipe => {
       let matchCount = 0;
@@ -1685,14 +1688,18 @@ export class AIPlannerService {
       }
     });
 
-    const chosen = bestRecipe || validRecipes[Math.floor(Math.random() * validRecipes.length)] || RECIPES_CATALOG[0];
+    // Si le catalogue a un plat avec au moins 2 correspondances réelles, on peut l'adapter
+    if (bestRecipe && maxMatch >= 2) {
+      return {
+        ...bestRecipe,
+        id: `fridge_cat_${Date.now()}`,
+        calculatedServings: servings,
+        isAntiWaste: true,
+        fridgeInputs: normalizedIngredients
+      };
+    }
 
-    return {
-      ...chosen,
-      id: `fridge_local_${Date.now()}`,
-      calculatedServings: servings,
-      isAntiWaste: true,
-      fridgeInputs: ingredients
-    };
+    // Sinon, composition d'une VRAIE recette sur-mesure avec les ingrédients et quantités de l'utilisateur !
+    return buildAutonomousFridgeRecipe(normalizedIngredients, mealType, profile, lang);
   }
 }

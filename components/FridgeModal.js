@@ -186,6 +186,7 @@ export default function FridgeModal({
   const pendingGenerationRef = React.useRef(null);
 
   const startBackgroundGeneration = () => {
+    if (pendingGenerationRef.current) return;
     setIsGenerating(true);
     pendingGenerationRef.current = AIPlannerService.generateFridgeRecipe(
       fridgeItems,
@@ -243,6 +244,8 @@ export default function FridgeModal({
     if (purchaseService.getIsPro()) {
       executeGenerate(true);
     } else {
+      // Démarre la génération Gemini TOUT DE SUITE en arrière-plan pendant que la pub se charge/joue
+      startBackgroundGeneration();
       setIsRewardModalOpen(true);
     }
   };

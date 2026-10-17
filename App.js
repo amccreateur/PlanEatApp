@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -210,20 +210,40 @@ function MainApp() {
   const [pendingAiSwap, setPendingAiSwap] = useState(null);
   const [isAiSwapRewardModalOpen, setIsAiSwapRewardModalOpen] = useState(false);
   const [isReinventingRecipe, setIsReinventingRecipe] = useState(false);
+  const pendingAiMealPromiseRef = useRef(null);
+
+  const startBackgroundAiMeal = (mealType, currentMeal) => {
+    if (pendingAiMealPromiseRef.current) return;
+    pendingAiMealPromiseRef.current = AIPlannerService.swapMeal(
+      currentMeal?.id,
+      mealType,
+      profile,
+      currentMeal,
+      aiConfig,
+      lang,
+      true // forceAi
+    );
+  };
 
   const handleSwapMeal = async (dayId, mealType, currentMeal, forceAi = false) => {
     if (!currentPlan) return;
     setIsGenerating(true);
     try {
-      const newMeal = await AIPlannerService.swapMeal(
-        currentMeal?.id,
-        mealType,
-        profile,
-        currentMeal,
-        aiConfig,
-        lang,
-        forceAi
-      );
+      let newMeal;
+      if (forceAi && pendingAiMealPromiseRef.current) {
+        newMeal = await pendingAiMealPromiseRef.current;
+        pendingAiMealPromiseRef.current = null;
+      } else {
+        newMeal = await AIPlannerService.swapMeal(
+          currentMeal?.id,
+          mealType,
+          profile,
+          currentMeal,
+          aiConfig,
+          lang,
+          forceAi
+        );
+      }
       const updatedDays = currentPlan.days.map(day => {
         if (day.id === dayId) {
           return {
@@ -255,6 +275,7 @@ function MainApp() {
       Alert.alert("Erreur", "Impossible de changer la recette pour le moment.");
     } finally {
       setIsGenerating(false);
+      pendingAiMealPromiseRef.current = null;
     }
   };
 
@@ -263,6 +284,8 @@ function MainApp() {
       handleSwapMeal(dayId, mealType, currentMeal, true);
     } else {
       setPendingAiSwap({ dayId, mealType, currentMeal });
+      // Lancement immédiat en tâche de fond pour temps masqué pendant la pub !
+      startBackgroundAiMeal(mealType, currentMeal);
       setIsAiSwapRewardModalOpen(true);
     }
   };
@@ -273,6 +296,8 @@ function MainApp() {
       executeReinventRecipeModal();
     } else {
       setPendingAiSwap({ isModalReinvent: true, currentMeal: selectedRecipe });
+      // Lancement immédiat en tâche de fond pour temps masqué pendant la pub !
+      startBackgroundAiMeal(selectedRecipe.mealType || "dinner", selectedRecipe);
       setIsAiSwapRewardModalOpen(true);
     }
   };
@@ -282,15 +307,21 @@ function MainApp() {
     setIsReinventingRecipe(true);
     try {
       const mealType = selectedRecipe.mealType || "dinner";
-      const newMeal = await AIPlannerService.swapMeal(
-        selectedRecipe.id,
-        mealType,
-        profile,
-        selectedRecipe,
-        aiConfig,
-        lang,
-        true // forceAi
-      );
+      let newMeal;
+      if (pendingAiMealPromiseRef.current) {
+        newMeal = await pendingAiMealPromiseRef.current;
+        pendingAiMealPromiseRef.current = null;
+      } else {
+        newMeal = await AIPlannerService.swapMeal(
+          selectedRecipe.id,
+          mealType,
+          profile,
+          selectedRecipe,
+          aiConfig,
+          lang,
+          true // forceAi
+        );
+      }
 
       setSelectedRecipe(newMeal);
 
@@ -321,6 +352,7 @@ function MainApp() {
       Alert.alert("Erreur", "Impossible de réinventer la recette pour le moment.");
     } finally {
       setIsReinventingRecipe(false);
+      pendingAiMealPromiseRef.current = null;
     }
   };
 
@@ -1130,6 +1162,12 @@ function MainApp() {
           onClose={() => {
             setIsAiSwapRewardModalOpen(false);
             setPendingAiSwap(null);
+            pendingAiMealPromiseRef.current = null;
+          }}
+          onStartAd={() => {
+            if (!pendingAiMealPromiseRef.current && pendingAiSwap?.currentMeal) {
+              startBackgroundAiMeal(pendingAiSwap.mealType || "dinner", pendingAiSwap.currentMeal);
+            }
           }}
           onRewardEarned={() => {
             if (pendingAiSwap?.isModalReinvent) {

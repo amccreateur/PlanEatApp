@@ -41,27 +41,27 @@ export default function AdRewardModal({
       await adService.showRewardedVideo({
         onRewarded: (reward) => {
           setIsLoadingAd(false);
-          onClose();
           if (onRewardEarned) {
-            setTimeout(() => onRewardEarned(reward), 200);
+            onRewardEarned(reward);
           }
+          onClose();
         },
         onDismiss: () => {
           setIsLoadingAd(false);
         },
         onFail: () => {
           setIsLoadingAd(false);
-          // En cas d'erreur de chargement, débloquer gracieusement
-          onClose();
+          // En cas d'erreur de chargement pub, débloquer gracieusement
           if (onRewardEarned) {
-            setTimeout(() => onRewardEarned({ type: "fallback" }), 200);
+            onRewardEarned({ type: "fallback" });
           }
+          onClose();
         }
       });
     } catch (e) {
       setIsLoadingAd(false);
-      onClose();
       if (onRewardEarned) onRewardEarned({ type: "error_fallback" });
+      onClose();
     }
   };
 

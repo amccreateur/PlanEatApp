@@ -10,6 +10,7 @@ let AppOpenAd = null;
 let AdEventType = null;
 let RewardedAdEventType = null;
 let TestIds = null;
+let AdsConsent = null;
 
 if (Platform.OS !== "web") {
   try {
@@ -23,6 +24,7 @@ if (Platform.OS !== "web") {
     AdEventType = GoogleAds.AdEventType;
     RewardedAdEventType = GoogleAds.RewardedAdEventType;
     TestIds = GoogleAds.TestIds;
+    AdsConsent = GoogleAds.AdsConsent;
   } catch (e) {
     // Graceful fallback for web or unsupported environments
   }
@@ -70,6 +72,16 @@ class AdService {
     if (Platform.OS === "web" || !MobileAds) return;
 
     try {
+      // 1. Demande de consentement RGPD / UMP officiel Google
+      if (AdsConsent) {
+        try {
+          await AdsConsent.gatherConsent();
+        } catch (consentError) {
+          console.warn("AdsConsent.gatherConsent error:", consentError);
+        }
+      }
+
+      // 2. Initialisation d'AdMob
       await MobileAds().initialize();
       this._preloadInterstitial();
       this._preloadRewarded();

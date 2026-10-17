@@ -1,5 +1,6 @@
 import { RECIPES_CATALOG } from "./defaultRecipes.js";
 import { MistralService } from "./mistralService.js";
+import { GeminiService } from "./geminiService.js";
 import { DriveService } from "./driveService.js";
 import { buildAutonomousFridgeRecipe } from "./fridgeChefEngine.js";
 
@@ -1624,44 +1625,42 @@ export class AIPlannerService {
       };
     });
 
-    // 1. Tenter avec Mistral AI (par défaut)
-    if (aiConfig?.engine !== "local") {
-      try {
-        const generated = await MistralService.generateFridgeRecipe({
-          ingredients: normalizedIngredients,
-          mealType,
-          profile,
-          apiKey: aiConfig?.mistralApiKey,
-          model: aiConfig?.mistralModel || "codestral-latest",
-          lang
-        });
+    // 1. Tenter la génération par Google Gemini AI (ultra-rapide et créatif)
+    try {
+      const geminiResult = await GeminiService.generateFridgeRecipe({
+        ingredients: normalizedIngredients,
+        mealType,
+        profile,
+        lang
+      });
 
-        if (generated) {
-          return {
-            id: `fridge_mistral_${Date.now()}`,
-            mealType: mealType,
-            title: typeof generated.title === "string" ? { fr: generated.title, en: generated.title, ar: generated.title } : (generated.title || { fr: "Plat Anti-Gaspi" }),
-            emoji: generated.emoji || "🍳",
-            prepTime: generated.prepTime || 15,
-            cookTime: generated.cookTime || 15,
-            difficulty: generated.difficulty || "easy",
-            caloriesPerPerson: generated.caloriesPerPerson || 420,
-            tags: profile?.diets || [],
-            calculatedServings: servings,
-            ingredients: (generated.ingredients || []).map(ing => ({
-              name: typeof ing.name === "string" ? { fr: ing.name, en: ing.name, ar: ing.name } : (ing.name || { fr: "Ingrédient" }),
-              quantity: Number(ing.quantity) || 1,
-              unit: ing.unit || "portion",
-              dept: ing.dept || "deptProduce"
-            })),
-            instructions: generated.instructions || { fr: ["Préparer et cuisiner avec vos restes."] },
-            isAntiWaste: true,
-            fridgeInputs: normalizedIngredients
-          };
-        }
-      } catch (err) {
-        console.warn("Échec Vide-Frigo Mistral, repli local:", err.message);
+      if (geminiResult && geminiResult.title) {
+        return {
+          id: `fridge_gemini_${Date.now()}`,
+          mealType: mealType,
+          title: typeof geminiResult.title === "string" ? { fr: geminiResult.title, en: geminiResult.title, ar: geminiResult.title } : (geminiResult.title || { fr: "Plat Anti-Gaspi" }),
+          emoji: geminiResult.emoji || "🍳",
+          prepTime: geminiResult.prepTime || 15,
+          cookTime: geminiResult.cookTime || 15,
+          difficulty: geminiResult.difficulty || "easy",
+          caloriesPerPerson: geminiResult.caloriesPerPerson || 420,
+          tags: profile?.diets || [],
+          calculatedServings: servings,
+          ingredients: (geminiResult.ingredients || []).map(ing => ({
+            name: typeof ing.name === "string" ? { fr: ing.name, en: ing.name, ar: ing.name } : (ing.name || { fr: "Ingrédient" }),
+            quantity: Number(ing.quantity) || 1,
+            unit: ing.unit || "",
+            dept: ing.dept || "deptProduce"
+          })),
+          instructions: geminiResult.instructions || { fr: ["Préparer et cuisiner avec vos restes."] },
+          thermomixInstructions: geminiResult.thermomixInstructions,
+          chefTip: geminiResult.chefTip,
+          isAntiWaste: true,
+          fridgeInputs: normalizedIngredients
+        };
       }
+    } catch (geminiErr) {
+      console.warn("Échec Vide-Frigo Gemini, passage au repli:", geminiErr.message);
     }
 
     // 2. Moteur Culinaire Anti-Gaspillage Autonome :

@@ -475,12 +475,7 @@ export default function FridgeModal({
                   style={styles.aiReinventGradient}
                 >
                   <Ionicons name="sparkles" size={18} color="#fef08a" />
-                  <Text style={styles.aiReinventText}>✨ Réinventer avec le Chef IA (Gemini)</Text>
-                  {!purchaseService.getIsPro() && (
-                    <View style={styles.proOrAdBadge}>
-                      <Text style={styles.proOrAdText}>PUB / PRO</Text>
-                    </View>
-                  )}
+                  <Text style={styles.aiReinventText}>✨ Réinventer avec le Chef IA</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </View>
@@ -498,11 +493,11 @@ export default function FridgeModal({
         onStartAd={startBackgroundGeneration}
         onRewardEarned={() => executeGenerate(true)}
         onOpenPaywall={onOpenPaywall}
-        title="Chef Étoilé IA Gemini"
-        subtitle="Regardez une courte vidéo pour débloquer une recette gastronomique réinventée par notre IA Gemini, ou passez à PlanEat Pro pour un accès illimité."
+        title="Chef Étoilé IA"
+        subtitle="Regardez une courte vidéo pour débloquer une recette gastronomique réinventée par notre Chef IA, ou passez à PlanEat Pro pour un accès illimité."
         icon="sparkles"
         iconColor="#a855f7"
-        actionLabel="Réinventer avec l'IA"
+        actionLabel="Réinventer avec le Chef IA"
         themeMode={themeMode}
       />
     </Modal>

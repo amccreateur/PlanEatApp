@@ -1140,8 +1140,8 @@ function MainApp() {
             setPendingAiSwap(null);
           }}
           onOpenPaywall={() => setIsPaywallOpen(true)}
-          title="Chef Étoilé IA Gemini"
-          subtitle="Regardez une courte vidéo pour débloquer une recette gastronomique réinventée par notre IA Gemini, ou passez à PlanEat Pro pour un accès illimité."
+          title="Chef Étoilé IA"
+          subtitle="Regardez une courte vidéo pour débloquer une recette gastronomique réinventée par notre Chef IA, ou passez à PlanEat Pro pour un accès illimité."
           icon="sparkles"
           iconColor="#a855f7"
           actionLabel="Générer avec le Chef IA"

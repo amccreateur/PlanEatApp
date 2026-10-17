@@ -282,5 +282,101 @@ Schéma JSON :
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     return this.safeJsonParse(text);
   }
+
+  /**
+   * Génère une recette de remplacement originale et créative avec Google Gemini 2.5 Flash
+   */
+  static async generateSingleMealReplacement({
+    currentMeal,
+    mealType = "dinner",
+    profile,
+    apiKey = DEFAULT_GEMINI_API_KEY,
+    model = DEFAULT_GEMINI_MODEL,
+    lang = "fr"
+  }) {
+    const keyToUse = (apiKey && apiKey.trim()) || DEFAULT_GEMINI_API_KEY;
+    if (!keyToUse) throw new Error("Clé API Gemini requise");
+    const endpoint = this.getEndpoint(keyToUse, model);
+
+    const adults = profile?.adults || 2;
+    const children = profile?.children || 0;
+    const diets = (profile?.diets || []).join(", ") || "aucun régime particulier";
+    const dislikes = (profile?.dislikedFoods || []).join(", ") || "aucun";
+    const currentTitle = currentMeal?.title?.fr || currentMeal?.title?.en || "le plat précédent";
+    const hasThermomix = profile?.appliances?.thermomix;
+
+    const breakfastFlavor = profile?.breakfastFlavor || "both";
+    const snackFlavor = profile?.snackFlavor || "both";
+    const dinnerStyle = profile?.dinnerStyle || "standard";
+    let flavorInstruction = "";
+    if (mealType === "breakfast") {
+      if (breakfastFlavor === "sweet") flavorInstruction = "\nConsigne de saveur : La recette de petit-déjeuner DOIT IMPÉRATIVEMENT ÊTRE SUCRÉE (fruits, porridge, pancakes, yaourt, tartines...).";
+      else if (breakfastFlavor === "savory") flavorInstruction = "\nConsigne de saveur : La recette de petit-déjeuner DOIT IMPÉRATIVEMENT ÊTRE SALÉE (œufs, avocat, omelette, fromage frais, toasts...).";
+    } else if (mealType === "snack") {
+      if (snackFlavor === "sweet") flavorInstruction = "\nConsigne de saveur : La recette de goûter DOIT IMPÉRATIVEMENT ÊTRE SUCRÉE (fruits, compotes, muffins, oléagineux...).";
+      else if (snackFlavor === "savory") flavorInstruction = "\nConsigne de saveur : La recette de goûter DOIT IMPÉRATIVEMENT ÊTRE SALÉE (crudités & sauce, mini-wrap, houmous, crackers fromage...).";
+    } else if (mealType === "dinner") {
+      if (dinnerStyle === "light") flavorInstruction = "\nConsigne de style : La recette de dîner DOIT ÊTRE TRÈS LÉGÈRE ET DIGESTE (soupe, velouté, poisson blanc/vapeur, salade gourmande, poêlée de légumes). Pas de viandes grasses ni de friture (300-380 kcal max).";
+    }
+
+    const prompt = `Tu es un Chef cuisinier étoilé pour PlanEat.
+Génère une NOUVELLE recette de chef originale, inventive et délicieuse pour le type de repas '${mealType}'.
+IMPORTANT : Cette recette doit être complètement différente de '${currentTitle}'.
+Foyer : ${adults} adulte(s), ${children} enfant(s).
+Régimes : ${diets}.${flavorInstruction}
+Aliments exclus : ${dislikes}.
+Langue : ${lang}.
+
+RÈGLES IMPORTANTES :
+- Réponds UNIQUEMENT en JSON valide conforme au schéma.
+- Quantités précises pour une base étalon de 2 personnes (PlanEat applique le multiplicateur selon le foyer).
+- 4 à 7 ingrédients précis (dept parmi: deptProduce, deptMeat, deptDairy, deptBakery, deptPantry, deptSpices, deptFrozen, deptDrinks).
+- Instructions détaillées pas à pas (3 à 4 étapes claires).
+${hasThermomix ? "- Inclus 'thermomixInstructions' (tableau d'étapes adaptées au robot Thermomix avec durées, températures et vitesses)." : ""}
+- Ajoute une astuce de chef 'chefTip'.
+
+Schéma JSON :
+{
+  "title": { "fr": "Titre gourmand FR", "en": "Gourmet title EN", "ar": "..." },
+  "emoji": "🍲",
+  "prepTime": 15,
+  "cookTime": 20,
+  "difficulty": "easy",
+  "caloriesPerPerson": 450,
+  "ingredients": [
+    { "name": { "fr": "Ingrédient 1", "en": "Ingredient 1" }, "quantity": 150, "unit": "g", "dept": "deptProduce" }
+  ],
+  "instructions": {
+    "fr": ["1. Préparation...", "2. Cuisson...", "3. Dressage..."],
+    "en": ["1. Prep...", "2. Cooking...", "3. Plating..."]
+  },
+  ${hasThermomix ? `"thermomixInstructions": {
+    "fr": ["1. Étape Thermomix..."]
+  },` : ""}
+  "chefTip": { "fr": "Astuce du chef..." }
+}`;
+
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: "application/json",
+          temperature: 0.8
+        }
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || `Erreur Gemini API (${response.status})`);
+    }
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    return this.safeJsonParse(text);
+  }
 }
+
 

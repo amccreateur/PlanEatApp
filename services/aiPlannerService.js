@@ -1545,59 +1545,58 @@ export class AIPlannerService {
 
   /**
    * Remplacement d'un seul repas dans un planning existant
+   * @param {string} currentMealId
+   * @param {string} mealType
+   * @param {object} profile
+   * @param {object} currentMeal
+   * @param {object} aiConfig
+   * @param {string} lang
+   * @param {boolean} forceAi - Si true, sollicite Google Gemini 2.5 Flash pour créer un plat sur-mesure
    */
-  static async swapMeal(currentMealId, mealType, profile, currentMeal = null, aiConfig = null, lang = "fr") {
+  static async swapMeal(currentMealId, mealType, profile, currentMeal = null, aiConfig = null, lang = "fr", forceAi = false) {
     const servings = this.calculateHouseholdServings(profile);
 
-    // Si mode Mistral AI explicitement activé avec clé valide
-    const mistralKey = (aiConfig?.mistralApiKey || "").trim();
-    const isMistralExplicit = aiConfig?.engine === "mistral" && mistralKey.length > 5;
-
-    if (isMistralExplicit) {
+    // 1. Si forceAi est activé (demande explicite Premium / Pub) : Appel Google Gemini AI
+    if (forceAi) {
       try {
-        const mistralPromise = MistralService.swapSingleMeal({
+        const generated = await GeminiService.generateSingleMealReplacement({
           currentMeal,
           mealType,
           profile,
-          apiKey: mistralKey,
-          model: aiConfig?.mistralModel || "codestral-latest",
           lang
         });
 
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("MISTRAL_TIMEOUT")), 5000)
-        );
-
-        const generated = await Promise.race([mistralPromise, timeoutPromise]);
-
-        if (generated) {
+        if (generated && generated.title) {
           const rawSwap = {
-            id: `mistral_swap_${Date.now()}`,
+            id: `gemini_swap_${Date.now()}`,
             mealType: mealType,
-            title: typeof generated.title === "string" ? { fr: generated.title, en: generated.title, ar: generated.title } : (generated.title || { fr: "Nouveau plat" }),
+            title: typeof generated.title === "string" ? { fr: generated.title, en: generated.title, ar: generated.title } : (generated.title || { fr: "Nouveau plat du Chef" }),
             emoji: generated.emoji || "🍲",
             prepTime: generated.prepTime || 15,
             cookTime: generated.cookTime || 20,
             difficulty: generated.difficulty || "easy",
-            caloriesPerPerson: generated.caloriesPerPerson || 400,
+            caloriesPerPerson: generated.caloriesPerPerson || 450,
             tags: profile?.diets || [],
             calculatedServings: servings,
             ingredients: (generated.ingredients || []).map(ing => ({
               name: typeof ing.name === "string" ? { fr: ing.name, en: ing.name, ar: ing.name } : (ing.name || { fr: "Ingrédient" }),
               quantity: Number(ing.quantity) || 1,
-              unit: ing.unit || "portion",
+              unit: ing.unit || "g",
               dept: ing.dept || "deptProduce"
             })),
-            instructions: generated.instructions || { fr: ["Préparer et déguster."] }
+            instructions: generated.instructions || { fr: ["Préparer et déguster."] },
+            thermomixInstructions: generated.thermomixInstructions,
+            chefTip: generated.chefTip,
+            isAiGenerated: true
           };
           return this.sanitizeMeal(rawSwap, mealType, profile, servings, Math.floor(Math.random() * 5));
         }
       } catch (err) {
-        console.warn("Échec du swap Mistral AI, repli sur local:", err.message);
+        console.warn("Échec du swap Gemini AI, repli sur local:", err.message);
       }
     }
 
-    // Fallback local avec choix aléatoire parmi les autres recettes
+    // 2. Remplacement instantané depuis le catalogue local filtré selon le profil (0 latence, 0 quota)
     const candidates = this.filterRecipes(profile, mealType).filter(r => r.id !== currentMealId);
     if (candidates.length === 0) {
       const all = RECIPES_CATALOG.filter(r => r.mealType === mealType && r.id !== currentMealId);
@@ -1609,8 +1608,14 @@ export class AIPlannerService {
 
   /**
    * Génération de recette Anti-Gaspillage (Vide-Frigo)
+   * @param {Array} ingredients
+   * @param {string} mealType
+   * @param {object} profile
+   * @param {object} aiConfig
+   * @param {string} lang
+   * @param {boolean} forceAi - Si true, sollicite Google Gemini 2.5 Flash pour une recette gastronomique IA
    */
-  static async generateFridgeRecipe(ingredients = [], mealType = "lunch", profile = null, aiConfig = null, lang = "fr") {
+  static async generateFridgeRecipe(ingredients = [], mealType = "lunch", profile = null, aiConfig = null, lang = "fr", forceAi = false) {
     const servings = this.calculateHouseholdServings(profile);
 
     // Normalisation des ingrédients (chaîne ou objet { name, quantity, unit })
@@ -1625,42 +1630,45 @@ export class AIPlannerService {
       };
     });
 
-    // 1. Tenter la génération par Google Gemini AI (ultra-rapide et créatif)
-    try {
-      const geminiResult = await GeminiService.generateFridgeRecipe({
-        ingredients: normalizedIngredients,
-        mealType,
-        profile,
-        lang
-      });
+    // 1. Si forceAi est explicitement demandé (Premium ou débloqué par pub) : Appel Google Gemini AI
+    if (forceAi) {
+      try {
+        const geminiResult = await GeminiService.generateFridgeRecipe({
+          ingredients: normalizedIngredients,
+          mealType,
+          profile,
+          lang
+        });
 
-      if (geminiResult && geminiResult.title) {
-        return {
-          id: `fridge_gemini_${Date.now()}`,
-          mealType: mealType,
-          title: typeof geminiResult.title === "string" ? { fr: geminiResult.title, en: geminiResult.title, ar: geminiResult.title } : (geminiResult.title || { fr: "Plat Anti-Gaspi" }),
-          emoji: geminiResult.emoji || "🍳",
-          prepTime: geminiResult.prepTime || 15,
-          cookTime: geminiResult.cookTime || 15,
-          difficulty: geminiResult.difficulty || "easy",
-          caloriesPerPerson: geminiResult.caloriesPerPerson || 420,
-          tags: profile?.diets || [],
-          calculatedServings: servings,
-          ingredients: (geminiResult.ingredients || []).map(ing => ({
-            name: typeof ing.name === "string" ? { fr: ing.name, en: ing.name, ar: ing.name } : (ing.name || { fr: "Ingrédient" }),
-            quantity: Number(ing.quantity) || 1,
-            unit: ing.unit || "",
-            dept: ing.dept || "deptProduce"
-          })),
-          instructions: geminiResult.instructions || { fr: ["Préparer et cuisiner avec vos restes."] },
-          thermomixInstructions: geminiResult.thermomixInstructions,
-          chefTip: geminiResult.chefTip,
-          isAntiWaste: true,
-          fridgeInputs: normalizedIngredients
-        };
+        if (geminiResult && geminiResult.title) {
+          return {
+            id: `fridge_gemini_${Date.now()}`,
+            mealType: mealType,
+            title: typeof geminiResult.title === "string" ? { fr: geminiResult.title, en: geminiResult.title, ar: geminiResult.title } : (geminiResult.title || { fr: "Plat Anti-Gaspi" }),
+            emoji: geminiResult.emoji || "🍳",
+            prepTime: geminiResult.prepTime || 15,
+            cookTime: geminiResult.cookTime || 15,
+            difficulty: geminiResult.difficulty || "easy",
+            caloriesPerPerson: geminiResult.caloriesPerPerson || 420,
+            tags: profile?.diets || [],
+            calculatedServings: servings,
+            ingredients: (geminiResult.ingredients || []).map(ing => ({
+              name: typeof ing.name === "string" ? { fr: ing.name, en: ing.name, ar: ing.name } : (ing.name || { fr: "Ingrédient" }),
+              quantity: Number(ing.quantity) || 1,
+              unit: ing.unit || "",
+              dept: ing.dept || "deptProduce"
+            })),
+            instructions: geminiResult.instructions || { fr: ["Préparer et cuisiner avec vos restes."] },
+            thermomixInstructions: geminiResult.thermomixInstructions,
+            chefTip: geminiResult.chefTip,
+            isAntiWaste: true,
+            isAiGenerated: true,
+            fridgeInputs: normalizedIngredients
+          };
+        }
+      } catch (geminiErr) {
+        console.warn("Échec Vide-Frigo Gemini, passage au repli autonome:", geminiErr.message);
       }
-    } catch (geminiErr) {
-      console.warn("Échec Vide-Frigo Gemini, passage au repli:", geminiErr.message);
     }
 
     // 2. Moteur Culinaire Anti-Gaspillage Autonome :

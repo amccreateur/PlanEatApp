@@ -7,10 +7,12 @@ import {
   TouchableOpacity,
   ScrollView,
   Platform,
-  StatusBar
+  StatusBar,
+  ActivityIndicator
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { TRANSLATIONS } from "../i18n/translations";
 import { THEMES } from "../utils/theme";
 
@@ -18,6 +20,8 @@ export default function RecipeModal({
   visible,
   recipe,
   onClose,
+  onReinventWithAi,
+  isReinventing = false,
   lang = "fr",
   themeMode = "dark"
 }) {
@@ -259,6 +263,35 @@ export default function RecipeModal({
               </View>
             </View>
           )}
+
+          {/* Bouton Magique : Réinventer avec le Chef IA */}
+          {onReinventWithAi && (
+            <TouchableOpacity
+              style={styles.reinventAiBtn}
+              onPress={onReinventWithAi}
+              disabled={isReinventing}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={["#8b5cf6", "#6366f1"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.reinventAiGradient}
+              >
+                {isReinventing ? (
+                  <>
+                    <ActivityIndicator size="small" color="#ffffff" />
+                    <Text style={styles.reinventAiText}>Le Chef IA réinvente votre plat...</Text>
+                  </>
+                ) : (
+                  <>
+                    <Ionicons name="sparkles" size={18} color="#fef08a" />
+                    <Text style={styles.reinventAiText}>✨ Réinventer ce plat avec le Chef IA</Text>
+                  </>
+                )}
+              </LinearGradient>
+            </TouchableOpacity>
+          )}
         </ScrollView>
       </View>
     </Modal>
@@ -499,6 +532,30 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
     fontStyle: "italic"
+  },
+  reinventAiBtn: {
+    borderRadius: 16,
+    overflow: "hidden",
+    marginTop: 8,
+    marginBottom: 24,
+    elevation: 3,
+    shadowColor: "#8b5cf6",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6
+  },
+  reinventAiGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    gap: 10
+  },
+  reinventAiText: {
+    color: "#ffffff",
+    fontSize: 15,
+    fontWeight: "800"
   }
 });
 

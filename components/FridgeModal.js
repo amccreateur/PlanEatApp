@@ -192,11 +192,12 @@ export default function FridgeModal({
       mealType,
       profile,
       aiConfig,
-      lang
+      lang,
+      true // forceAi
     );
   };
 
-  const executeGenerate = async () => {
+  const executeGenerate = async (forceAi = false) => {
     setIsGenerating(true);
     try {
       let recipePromise = pendingGenerationRef.current;
@@ -208,7 +209,8 @@ export default function FridgeModal({
           mealType,
           profile,
           aiConfig,
-          lang
+          lang,
+          forceAi
         );
       }
 
@@ -228,9 +230,18 @@ export default function FridgeModal({
       Alert.alert("⚠️", t.fridgeEmptyIngredients);
       return;
     }
+    // Génération locale instantanée par défaut (0 latence, 100% cohérent)
+    executeGenerate(false);
+  };
+
+  const handleRequestAiRecipe = () => {
+    if (fridgeItems.length === 0) {
+      Alert.alert("⚠️", t.fridgeEmptyIngredients);
+      return;
+    }
 
     if (purchaseService.getIsPro()) {
-      executeGenerate();
+      executeGenerate(true);
     } else {
       setIsRewardModalOpen(true);
     }
@@ -446,9 +457,32 @@ export default function FridgeModal({
                 meal={generatedRecipe}
                 onPressRecipe={() => onOpenRecipe(generatedRecipe)}
                 onPressSwap={() => handleGenerate()}
+                onPressAiSwap={handleRequestAiRecipe}
                 lang={lang}
                 theme={theme}
               />
+
+              <TouchableOpacity
+                style={styles.aiReinventBtn}
+                onPress={handleRequestAiRecipe}
+                disabled={isGenerating}
+                activeOpacity={0.8}
+              >
+                <LinearGradient
+                  colors={["#8b5cf6", "#6366f1"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.aiReinventGradient}
+                >
+                  <Ionicons name="sparkles" size={18} color="#fef08a" />
+                  <Text style={styles.aiReinventText}>✨ Réinventer avec le Chef IA (Gemini)</Text>
+                  {!purchaseService.getIsPro() && (
+                    <View style={styles.proOrAdBadge}>
+                      <Text style={styles.proOrAdText}>PUB / PRO</Text>
+                    </View>
+                  )}
+                </LinearGradient>
+              </TouchableOpacity>
             </View>
           )}
         </ScrollView>
@@ -462,13 +496,13 @@ export default function FridgeModal({
           pendingGenerationRef.current = null;
         }}
         onStartAd={startBackgroundGeneration}
-        onRewardEarned={() => executeGenerate()}
+        onRewardEarned={() => executeGenerate(true)}
         onOpenPaywall={onOpenPaywall}
-        title="Recette Frigo Anti-Gaspi"
-        subtitle="Regardez une courte vidéo pour générer votre recette personnalisée avec vos ingrédients, ou passez à PlanEat Pro pour un accès illimité."
+        title="Chef Étoilé IA Gemini"
+        subtitle="Regardez une courte vidéo pour débloquer une recette gastronomique réinventée par notre IA Gemini, ou passez à PlanEat Pro pour un accès illimité."
         icon="sparkles"
-        iconColor="#10b981"
-        actionLabel="Générer ma recette"
+        iconColor="#a855f7"
+        actionLabel="Réinventer avec l'IA"
         themeMode={themeMode}
       />
     </Modal>
@@ -747,6 +781,42 @@ const styles = StyleSheet.create({
   resultTitle: {
     color: "#f8fafc",
     fontSize: 16,
+    fontWeight: "800"
+  },
+  aiReinventBtn: {
+    borderRadius: 14,
+    overflow: "hidden",
+    marginTop: 10,
+    marginBottom: 4,
+    elevation: 3,
+    shadowColor: "#8b5cf6",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4
+  },
+  aiReinventGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    gap: 8
+  },
+  aiReinventText: {
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: "800"
+  },
+  proOrAdBadge: {
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    marginLeft: 4
+  },
+  proOrAdText: {
+    color: "#ffffff",
+    fontSize: 10,
     fontWeight: "800"
   },
   rtlRow: {

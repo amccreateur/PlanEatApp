@@ -207,7 +207,11 @@ function MainApp() {
     }
   };
 
-  const handleSwapMeal = async (dayId, mealType, currentMeal) => {
+  const [pendingAiSwap, setPendingAiSwap] = useState(null);
+  const [isAiSwapRewardModalOpen, setIsAiSwapRewardModalOpen] = useState(false);
+  const [isReinventingRecipe, setIsReinventingRecipe] = useState(false);
+
+  const handleSwapMeal = async (dayId, mealType, currentMeal, forceAi = false) => {
     if (!currentPlan) return;
     setIsGenerating(true);
     try {
@@ -217,7 +221,8 @@ function MainApp() {
         profile,
         currentMeal,
         aiConfig,
-        lang
+        lang,
+        forceAi
       );
       const updatedDays = currentPlan.days.map(day => {
         if (day.id === dayId) {
@@ -242,11 +247,80 @@ function MainApp() {
       setGroceries(updatedGroceries);
       await StorageService.saveCurrentPlan(updatedPlan);
       await StorageService.saveGroceries(updatedGroceries);
-      adService.recordActionAndCheckInterstitial({ triggerEveryActions: 5, minIntervalSeconds: 60 });
+      if (!forceAi) {
+        adService.recordActionAndCheckInterstitial({ triggerEveryActions: 5, minIntervalSeconds: 60 });
+      }
     } catch (err) {
       console.error("Erreur lors du swap:", err);
+      Alert.alert("Erreur", "Impossible de changer la recette pour le moment.");
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleRequestAiMeal = (dayId, mealType, currentMeal) => {
+    if (isPro) {
+      handleSwapMeal(dayId, mealType, currentMeal, true);
+    } else {
+      setPendingAiSwap({ dayId, mealType, currentMeal });
+      setIsAiSwapRewardModalOpen(true);
+    }
+  };
+
+  const handleReinventRecipeModalWithAi = async () => {
+    if (!selectedRecipe) return;
+    if (isPro) {
+      executeReinventRecipeModal();
+    } else {
+      setPendingAiSwap({ isModalReinvent: true, currentMeal: selectedRecipe });
+      setIsAiSwapRewardModalOpen(true);
+    }
+  };
+
+  const executeReinventRecipeModal = async () => {
+    if (!selectedRecipe) return;
+    setIsReinventingRecipe(true);
+    try {
+      const mealType = selectedRecipe.mealType || "dinner";
+      const newMeal = await AIPlannerService.swapMeal(
+        selectedRecipe.id,
+        mealType,
+        profile,
+        selectedRecipe,
+        aiConfig,
+        lang,
+        true // forceAi
+      );
+
+      setSelectedRecipe(newMeal);
+
+      if (currentPlan) {
+        let planModified = false;
+        const updatedDays = currentPlan.days.map(day => {
+          const updatedMeals = { ...day.meals };
+          Object.keys(updatedMeals).forEach(mType => {
+            if (updatedMeals[mType]?.id === selectedRecipe.id || (updatedMeals[mType]?.title?.fr === selectedRecipe.title?.fr)) {
+              updatedMeals[mType] = { ...newMeal, calculatedServings: day.servings };
+              planModified = true;
+            }
+          });
+          return { ...day, meals: updatedMeals };
+        });
+
+        if (planModified) {
+          const updatedPlan = { ...currentPlan, days: updatedDays };
+          const updatedGroceries = AIPlannerService.compileGroceries(updatedPlan);
+          setCurrentPlan(updatedPlan);
+          setGroceries(updatedGroceries);
+          await StorageService.saveCurrentPlan(updatedPlan);
+          await StorageService.saveGroceries(updatedGroceries);
+        }
+      }
+    } catch (err) {
+      console.error("Erreur lors de la réinvention par IA:", err);
+      Alert.alert("Erreur", "Impossible de réinventer la recette pour le moment.");
+    } finally {
+      setIsReinventingRecipe(false);
     }
   };
 
@@ -615,6 +689,7 @@ function MainApp() {
                     meal={currentDay.meals.breakfast}
                     onPressRecipe={() => setSelectedRecipe(currentDay.meals.breakfast)}
                     onPressSwap={() => handleSwapMeal(currentDay.id, "breakfast", currentDay.meals.breakfast)}
+                    onPressAiSwap={() => handleRequestAiMeal(currentDay.id, "breakfast", currentDay.meals.breakfast)}
                     lang={lang}
                     theme={currentTheme}
                   />
@@ -626,6 +701,7 @@ function MainApp() {
                     meal={currentDay.meals.lunch}
                     onPressRecipe={() => setSelectedRecipe(currentDay.meals.lunch)}
                     onPressSwap={() => handleSwapMeal(currentDay.id, "lunch", currentDay.meals.lunch)}
+                    onPressAiSwap={() => handleRequestAiMeal(currentDay.id, "lunch", currentDay.meals.lunch)}
                     lang={lang}
                     theme={currentTheme}
                   />
@@ -637,6 +713,7 @@ function MainApp() {
                     meal={currentDay.meals.snack}
                     onPressRecipe={() => setSelectedRecipe(currentDay.meals.snack)}
                     onPressSwap={() => handleSwapMeal(currentDay.id, "snack", currentDay.meals.snack)}
+                    onPressAiSwap={() => handleRequestAiMeal(currentDay.id, "snack", currentDay.meals.snack)}
                     lang={lang}
                     theme={currentTheme}
                   />
@@ -648,6 +725,7 @@ function MainApp() {
                     meal={currentDay.meals.dinner}
                     onPressRecipe={() => setSelectedRecipe(currentDay.meals.dinner)}
                     onPressSwap={() => handleSwapMeal(currentDay.id, "dinner", currentDay.meals.dinner)}
+                    onPressAiSwap={() => handleRequestAiMeal(currentDay.id, "dinner", currentDay.meals.dinner)}
                     lang={lang}
                     theme={currentTheme}
                   />
@@ -969,6 +1047,8 @@ function MainApp() {
         visible={!!selectedRecipe}
         recipe={selectedRecipe}
         onClose={() => setSelectedRecipe(null)}
+        onReinventWithAi={handleReinventRecipeModalWithAi}
+        isReinventing={isReinventingRecipe}
         lang={lang}
         themeMode={themeMode}
       />
@@ -1042,6 +1122,29 @@ function MainApp() {
           icon="cart"
           iconColor="#0284c7"
           actionLabel="Lancer le Drive"
+          themeMode={themeMode}
+        />
+
+        <AdRewardModal
+          visible={isAiSwapRewardModalOpen}
+          onClose={() => {
+            setIsAiSwapRewardModalOpen(false);
+            setPendingAiSwap(null);
+          }}
+          onRewardEarned={() => {
+            if (pendingAiSwap?.isModalReinvent) {
+              executeReinventRecipeModal();
+            } else if (pendingAiSwap) {
+              handleSwapMeal(pendingAiSwap.dayId, pendingAiSwap.mealType, pendingAiSwap.currentMeal, true);
+            }
+            setPendingAiSwap(null);
+          }}
+          onOpenPaywall={() => setIsPaywallOpen(true)}
+          title="Chef Étoilé IA Gemini"
+          subtitle="Regardez une courte vidéo pour débloquer une recette gastronomique réinventée par notre IA Gemini, ou passez à PlanEat Pro pour un accès illimité."
+          icon="sparkles"
+          iconColor="#a855f7"
+          actionLabel="Générer avec le Chef IA"
           themeMode={themeMode}
         />
 

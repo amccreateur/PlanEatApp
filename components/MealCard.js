@@ -9,6 +9,7 @@ export default function MealCard({
   meal,
   onPressRecipe,
   onPressSwap,
+  onPressAiSwap,
   lang = "fr",
   theme = "dark"
 }) {
@@ -35,21 +36,44 @@ export default function MealCard({
       { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.border }
     ]}>
       <View style={[styles.cardHeader, isRTL && styles.rtlRow]}>
-        <View style={[styles.typeBadge, { backgroundColor: meta.color + "20" }]}>
-          <Ionicons name={meta.icon} size={14} color={meta.color} />
-          <Text style={[styles.typeLabel, { color: meta.color }]} maxFontSizeMultiplier={1.2}>{meta.label}</Text>
+        <View style={[styles.headerLeftBadges, isRTL && styles.rtlRow]}>
+          <View style={[styles.typeBadge, { backgroundColor: meta.color + "20" }]}>
+            <Ionicons name={meta.icon} size={14} color={meta.color} />
+            <Text style={[styles.typeLabel, { color: meta.color }]} maxFontSizeMultiplier={1.2}>{meta.label}</Text>
+          </View>
+          {meal.isAiGenerated && (
+            <View style={styles.aiBadge}>
+              <Ionicons name="sparkles" size={11} color="#a855f7" />
+              <Text style={styles.aiBadgeText}>Chef IA</Text>
+            </View>
+          )}
         </View>
 
-        <TouchableOpacity
-          style={styles.swapBtn}
-          onPress={onPressSwap}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Ionicons name="shuffle" size={16} color={currentTheme.textSub} />
-          <Text style={[styles.swapText, { color: currentTheme.textSub }]} maxFontSizeMultiplier={1.2}>
-            {t.swapMeal.split(" ")[0]}
-          </Text>
-        </TouchableOpacity>
+        <View style={[styles.headerRightButtons, isRTL && styles.rtlRow]}>
+          {onPressAiSwap && (
+            <TouchableOpacity
+              style={styles.aiSwapBtn}
+              onPress={onPressAiSwap}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons name="sparkles" size={13} color="#a855f7" />
+              <Text style={styles.aiSwapText} maxFontSizeMultiplier={1.2}>
+                IA
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          <TouchableOpacity
+            style={styles.swapBtn}
+            onPress={onPressSwap}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Ionicons name="shuffle" size={16} color={currentTheme.textSub} />
+            <Text style={[styles.swapText, { color: currentTheme.textSub }]} maxFontSizeMultiplier={1.2}>
+              {t.swapMeal.split(" ")[0]}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <TouchableOpacity
@@ -112,6 +136,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10
   },
+  headerLeftBadges: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6
+  },
+  headerRightButtons: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8
+  },
   typeBadge: {
     flexDirection: "row",
     alignItems: "center",
@@ -123,6 +157,38 @@ const styles = StyleSheet.create({
   typeLabel: {
     fontSize: 12,
     fontWeight: "700"
+  },
+  aiBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#a855f718",
+    borderColor: "#a855f750",
+    borderWidth: 1,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 6,
+    gap: 3
+  },
+  aiBadgeText: {
+    color: "#a855f7",
+    fontSize: 10,
+    fontWeight: "800"
+  },
+  aiSwapBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#a855f715",
+    borderColor: "#a855f760",
+    borderWidth: 1,
+    paddingHorizontal: 7,
+    paddingVertical: 4,
+    borderRadius: 8,
+    gap: 3
+  },
+  aiSwapText: {
+    color: "#a855f7",
+    fontSize: 11,
+    fontWeight: "800"
   },
   swapBtn: {
     flexDirection: "row",

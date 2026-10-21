@@ -116,7 +116,7 @@ class PurchaseService {
     }
     const apiKey = Platform.OS === "ios" ? REVENUECAT_KEYS.ios : REVENUECAT_KEYS.android;
     if (!apiKey) {
-      throw new Error("La clé d'API RevenueCat Android n'est pas encore renseignée. Veuillez ajouter votre clé publique (goog_...) dans purchaseService.js pour activer la facturation Google Play.");
+      throw new Error("Clé de facturation non configurée pour cette plateforme.");
     }
     try {
       const { customerInfo } = await Purchases.purchasePackage(pkg);

@@ -1,7 +1,7 @@
 # Politique de Confidentialité — PlanEat
 
 **Dernière mise à jour :** 21 septembre 2026  
-**Conformité :** RGPD / GDPR & Règlement du programme pour les développeurs Google Play
+**Conformité :** RGPD / GDPR
 
 ---
 

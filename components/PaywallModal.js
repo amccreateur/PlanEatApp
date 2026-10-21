@@ -332,10 +332,12 @@ export default function PaywallModal({
             🔒 Annulation facile à tout moment en 1 clic dans les réglages de votre compte
           </Text>
 
-          {/* Legal Footers (Apple & Google Compliant) */}
+          {/* Legal Footers (Apple Compliant) */}
           <View style={styles.legalSection}>
             <Text style={styles.legalText}>
-              Le paiement sera débité de votre compte Apple ou Google Play à la confirmation de l'achat ou après la fin de la période d'essai gratuit. L'abonnement se renouvelle automatiquement sauf résiliation au moins 24h avant la fin de la période en cours.
+              {Platform.OS === "ios"
+                ? "Le paiement sera débité de votre compte Apple à la confirmation de l'achat ou après la fin de la période d'essai gratuit. L'abonnement se renouvelle automatiquement sauf résiliation au moins 24h avant la fin de la période en cours dans les réglages de votre compte Apple."
+                : "Le paiement sera débité de votre compte à la confirmation de l'achat ou après la fin de la période d'essai gratuit. L'abonnement se renouvelle automatiquement sauf résiliation au moins 24h avant la fin de la période en cours."}
             </Text>
 
             <View style={styles.legalLinksRow}>

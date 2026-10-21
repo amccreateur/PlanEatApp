@@ -2206,7 +2206,8 @@ export const RECIPES_CATALOG = [
       { name: { fr: "Courgette, carotte & haricots blancs", en: "Zucchini, carrot & cannellini" }, quantity: 180, unit: "g", dept: "deptProduce" },
       { name: { fr: "Tomates concassées & Bouillon", en: "Diced tomatoes & broth" }, quantity: 200, unit: "g", dept: "deptPantry" },
       { name: { fr: "Petites pâtes (coquillettes ou ditalini)", en: "Small pasta" }, quantity: 40, unit: "g", dept: "deptPantry" },
-      { name: { fr: "Parmesan râpé & Huile d'olive", en: "Parmesan & olive oil" }, quantity: 15, unit: "g", dept: "deptDairy" }
+      { name: { fr: "Parmesan râpé", en: "Grated parmesan" }, quantity: 15, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Huile d'olive", en: "Olive oil" }, quantity: 1, unit: "c.à.s", dept: "deptPantry" }
     ],
     instructions: {
       fr: [
@@ -2516,7 +2517,8 @@ export const RECIPES_CATALOG = [
       { name: { fr: "Pâte feuilletée ou brisée", en: "Puff pastry sheet" }, quantity: 1, unit: "pcs", dept: "deptBakery" },
       { name: { fr: "Blancs de poireaux émincés", en: "Sliced leeks" }, quantity: 150, unit: "g", dept: "deptProduce" },
       { name: { fr: "Pavé de saumon frais en dés", en: "Fresh salmon cubes" }, quantity: 120, unit: "g", dept: "deptMeat" },
-      { name: { fr: "Fromage frais ou ricotta & Moutarde", en: "Cream cheese & mustard" }, quantity: 40, unit: "g", dept: "deptDairy" }
+      { name: { fr: "Fromage frais ou ricotta", en: "Cream cheese or ricotta" }, quantity: 40, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Moutarde de Dijon", en: "Dijon mustard" }, quantity: 1, unit: "c.à.c", dept: "deptPantry" }
     ],
     instructions: {
       fr: [
@@ -3886,7 +3888,8 @@ export const RECIPES_CATALOG = [
     ingredients: [
       { name: { fr: "Bavette ou rumsteck de bœuf émincé", en: "Beef steak strips" }, quantity: 150, unit: "g", dept: "deptMeat" },
       { name: { fr: "Champignons de Paris émincés", en: "Mushrooms" }, quantity: 120, unit: "g", dept: "deptProduce" },
-      { name: { fr: "Crème fraîche épaisse & Moutarde", en: "Sour cream & mustard" }, quantity: 40, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Crème fraîche épaisse", en: "Sour cream" }, quantity: 40, unit: "g", dept: "deptDairy" },
+      { name: { fr: "Moutarde de Dijon", en: "Dijon mustard" }, quantity: 1, unit: "c.à.c", dept: "deptPantry" },
       { name: { fr: "Tagliatelles fraîches", en: "Tagliatelle pasta" }, quantity: 80, unit: "g", dept: "deptPantry" }
     ],
     instructions: {
@@ -4022,7 +4025,8 @@ export const RECIPES_CATALOG = [
     ingredients: [
       { name: { fr: "Œufs frais", en: "Eggs" }, quantity: 3, unit: "pcs", dept: "deptDairy" },
       { name: { fr: "Pommes de terre coupées en lamelles", en: "Thinly sliced potatoes" }, quantity: 180, unit: "g", dept: "deptProduce" },
-      { name: { fr: "Oignon émincé & Huile d'olive", en: "Sliced onion & olive oil" }, quantity: 60, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Oignon émincé", en: "Sliced onion" }, quantity: 60, unit: "g", dept: "deptProduce" },
+      { name: { fr: "Huile d'olive", en: "Olive oil" }, quantity: 1.5, unit: "c.à.s", dept: "deptPantry" },
       { name: { fr: "Salade verte d'accompagnement", en: "Green side salad" }, quantity: 50, unit: "g", dept: "deptProduce" }
     ],
     instructions: {
@@ -4551,7 +4555,9 @@ export const RECIPES_CATALOG = [
     tags: ["french","dietBalanced","dietHalal","dietHighProtein","dietQuick","dietLactoseFree"],
     ingredients: [
       { name: { fr: "Filet de colin ou cabillaud", en: "Pollock fillet" }, quantity: 160, unit: "g", dept: "deptMeat" },
-      { name: { fr: "Chapelure, persil, thym & huile d'olive", en: "Herb crust mix" }, quantity: 25, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Chapelure", en: "Breadcrumbs" }, quantity: 25, unit: "g", dept: "deptPantry" },
+      { name: { fr: "Huile d'olive", en: "Olive oil" }, quantity: 1, unit: "c.à.s", dept: "deptPantry" },
+      { name: { fr: "Persil & thym frais", en: "Fresh parsley & thyme" }, quantity: 1, unit: "c.à.c", dept: "deptProduce" },
       { name: { fr: "Riz complet cuit", en: "Cooked brown rice" }, quantity: 80, unit: "g", dept: "deptPantry" },
       { name: { fr: "Courgette sautée en dés", en: "Sautéed diced zucchini" }, quantity: 100, unit: "g", dept: "deptProduce" }
     ],

@@ -1169,10 +1169,10 @@ export class AIPlannerService {
       return { canonKey: "canon_coulis_tomate", name: { fr: "Coulis de tomate", en: "Tomato coulis", ar: "صلصة طماطم" }, unit: "g", dept: "deptPantry", multiplier: unit === "ml" ? 1 : 1 };
     }
     if (lower.includes("huile d'olive") || lower.includes("huile olive")) {
-      return { canonKey: "canon_huile_olive", name: { fr: "Huile d'olive", en: "Olive oil", ar: "زيت زيتون" }, unit: "c.à.s", dept: "deptPantry", multiplier: unit === "ml" ? 0.067 : (unit === "c.à.c" ? 0.33 : 1) };
+      return { canonKey: "canon_huile_olive", name: { fr: "Huile d'olive", en: "Olive oil", ar: "زيت زيتون" }, unit: "c.à.s", dept: "deptPantry", multiplier: (unit === "ml" || unit === "g") ? 0.067 : (unit === "c.à.c" ? 0.33 : 1) };
     }
     if (lower.includes("huile de sesame")) {
-      return { canonKey: "canon_huile_sesame", name: { fr: "Huile de sésame", en: "Sesame oil", ar: "زيت سمسم" }, unit: "c.à.s", dept: "deptPantry", multiplier: unit === "c.à.c" ? 0.33 : 1 };
+      return { canonKey: "canon_huile_sesame", name: { fr: "Huile de sésame", en: "Sesame oil", ar: "زيت سمسم" }, unit: "c.à.s", dept: "deptPantry", multiplier: (unit === "ml" || unit === "g") ? 0.067 : (unit === "c.à.c" ? 0.33 : 1) };
     }
     if (lower.includes("olive") && lower.includes("noire") && !lower.includes("huile")) {
       return { canonKey: "canon_olives_noires", name: { fr: "Olives noires", en: "Black olives", ar: "زيتون أسود" }, unit: "g", dept: "deptPantry", multiplier: 1 };
@@ -1262,10 +1262,10 @@ export class AIPlannerService {
 
     // Sauces & Huiles & Condiments d'épicerie
     if (lower.includes("huile d'olive") || lower.includes("huile olive")) {
-      return { canonKey: "canon_huile_olive", name: { fr: "Huile d'olive", en: "Olive oil", ar: "زيت زيتون" }, unit: "c.à.s", dept: "deptPantry", multiplier: unit === "ml" ? 0.067 : (unit === "c.à.c" ? 0.33 : 1) };
+      return { canonKey: "canon_huile_olive", name: { fr: "Huile d'olive", en: "Olive oil", ar: "زيت زيتون" }, unit: "c.à.s", dept: "deptPantry", multiplier: (unit === "ml" || unit === "g") ? 0.067 : (unit === "c.à.c" ? 0.33 : 1) };
     }
     if (lower.includes("huile de sesame")) {
-      return { canonKey: "canon_huile_sesame", name: { fr: "Huile de sésame", en: "Sesame oil", ar: "زيت سمسم" }, unit: "c.à.s", dept: "deptPantry", multiplier: unit === "c.à.c" ? 0.33 : 1 };
+      return { canonKey: "canon_huile_sesame", name: { fr: "Huile de sésame", en: "Sesame oil", ar: "زيت سمسم" }, unit: "c.à.s", dept: "deptPantry", multiplier: (unit === "ml" || unit === "g") ? 0.067 : (unit === "c.à.c" ? 0.33 : 1) };
     }
     if (lower.includes("sauce soja")) {
       const isSucree = lower.includes("sucre");
@@ -1284,7 +1284,7 @@ export class AIPlannerService {
       return { canonKey: "canon_sauce_cacahuete", name: { fr: "Sauce cacahuète", en: "Peanut sauce", ar: "صلصة الفول السوداني" }, unit: "c.à.s", dept: "deptPantry", multiplier: 1 };
     }
     if (lower.includes("moutarde")) {
-      return { canonKey: "canon_moutarde", name: { fr: "Moutarde de Dijon", en: "Dijon mustard", ar: "خردل ديجون" }, unit: "c.à.s", dept: "deptPantry", multiplier: unit === "c.à.c" ? 0.33 : 1 };
+      return { canonKey: "canon_moutarde", name: { fr: "Moutarde de Dijon", en: "Dijon mustard", ar: "خردل ديجون" }, unit: "c.à.s", dept: "deptPantry", multiplier: (unit === "ml" || unit === "g") ? 0.067 : (unit === "c.à.c" ? 0.33 : 1) };
     }
     if (lower.includes("mayonnaise") || lower === "mayo") {
       return { canonKey: "canon_mayo", name: { fr: "Mayonnaise", en: "Mayonnaise", ar: "مايونيز" }, unit: "c.à.s", dept: "deptPantry", multiplier: unit === "c.à.c" ? 0.33 : 1 };
@@ -1490,10 +1490,36 @@ export class AIPlannerService {
 
           const subItems = expanded.length > 0 ? expanded : [rawName];
 
-          subItems.forEach(rawPart => {
+          subItems.forEach((rawPart, partIdx) => {
             const partName = rawPart.split(/\s+(?:ou|ou bien|\/)\s+/i)[0].trim() || rawPart;
-            const canon = this.getCanonicalGrocery(partName, ing.unit, ing.dept);
-            const qty = ((Number(ing.quantity) || 1) * factor) * canon.multiplier;
+            let ingQty = Number(ing.quantity) || 1;
+            let ingUnit = ing.unit;
+
+            // Protection anti-anomalie pour ingrédients combinés découpés (ex: "Oignon 60g & Huile d'olive") :
+            // Si une part secondaire (partIdx > 0) est une huile, un condiment ou une épice et que l'ingrédient
+            // d'origine avait une unité de masse/volume (g/ml) supérieure à 15, on ne lui applique PAS la masse
+            // du légume ou de la viande, mais une dose culinaire réaliste (1 c.à.s ou 1 c.à.c).
+            if (subItems.length > 1 && partIdx > 0) {
+              const lowerP = partName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+              const isCondimentOrOil = (
+                lowerP.includes("huile") ||
+                lowerP.includes("moutarde") ||
+                lowerP.includes("vinaigre") ||
+                lowerP.includes("sauce") ||
+                lowerP.includes("epice") ||
+                lowerP.includes("sel") ||
+                lowerP.includes("poivre") ||
+                lowerP.includes("origan") ||
+                lowerP.includes("thym")
+              );
+              if (isCondimentOrOil && (ingUnit === "g" || ingUnit === "ml") && ingQty > 15) {
+                ingQty = 1;
+                ingUnit = "c.à.s";
+              }
+            }
+
+            const canon = this.getCanonicalGrocery(partName, ingUnit, ing.dept);
+            const qty = (ingQty * factor) * canon.multiplier;
 
             if (!itemsMap[canon.canonKey]) {
               itemsMap[canon.canonKey] = {
@@ -1514,17 +1540,54 @@ export class AIPlannerService {
 
     const result = Object.values(itemsMap).map(item => {
       let rounded = item.totalQuantity;
-      const u = (item.unit || "").trim().toLowerCase();
+      let finalUnit = (item.unit || "").trim().toLowerCase();
+      const lowerName = (item.name?.fr || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-      if (u === "g" || u === "ml") {
+      // =========================================================================
+      // CONVERSION COURSES : Des cuillères de cuisine vers les vrais conditionnements de magasin !
+      // =========================================================================
+      // Huiles (Olive, Sésame, Colza, Tournesol...) :
+      // 1 c.à.s = ~15 ml. Une bouteille standard fait 500 à 750 ml (soit ~35 à 50 c.à.s).
+      // On affiche "1 bouteille" (ou 2 si gros volume hebdomadaire > 40 c.à.s).
+      if (lowerName.includes("huile") && (finalUnit === "c.a.s" || finalUnit === "c.à.s" || finalUnit === "c.a.c" || finalUnit === "c.à.c" || finalUnit === "ml" || finalUnit === "g")) {
+        const totalCas = (finalUnit === "ml" || finalUnit === "g") ? item.totalQuantity / 15 : (finalUnit.includes("c") ? item.totalQuantity / 3 : item.totalQuantity);
+        rounded = Math.max(1, Math.ceil(totalCas / 40));
+        finalUnit = rounded > 1 ? "bouteilles" : "bouteille";
+      }
+      // Vinaigres (Balsamique, Cidre, Blanc) : "1 bouteille"
+      else if (lowerName.includes("vinaigre") && (finalUnit === "c.a.s" || finalUnit === "c.à.s" || finalUnit === "c.a.c" || finalUnit === "c.à.c" || finalUnit === "ml")) {
+        rounded = 1;
+        finalUnit = "bouteille";
+      }
+      // Sauces en bouteille (Sauce soja, Teriyaki) : "1 bouteille"
+      else if ((lowerName.includes("sauce soja") || lowerName.includes("teriyaki")) && (finalUnit === "c.a.s" || finalUnit === "c.à.s" || finalUnit === "ml")) {
+        rounded = 1;
+        finalUnit = "bouteille";
+      }
+      // Condiments en pot / flacon (Moutarde, Mayonnaise, Ketchup, Harissa) : "1 pot" ou "1 flacon"
+      else if (lowerName.includes("moutarde") || lowerName.includes("mayo")) {
+        rounded = 1;
+        finalUnit = "pot";
+      }
+      else if (lowerName.includes("ketchup")) {
+        rounded = 1;
+        finalUnit = "flacon";
+      }
+      // Épices & herbes déshydratées du rayon épices (Curry, Paprika, Cumin, Herbes de Provence...) :
+      // On n'achète pas "2.5 c.à.s de curry", on achète "1 flacon" ou "1 pot"
+      else if (item.dept === "deptSpices" && (finalUnit === "c.a.s" || finalUnit === "c.à.s" || finalUnit === "c.a.c" || finalUnit === "c.à.c")) {
+        rounded = 1;
+        finalUnit = "flacon";
+      }
+      else if (finalUnit === "g" || finalUnit === "ml") {
         if (item.totalQuantity < 10 && item.totalQuantity > 0) {
           rounded = Math.ceil(item.totalQuantity);
         } else {
           rounded = Math.ceil(item.totalQuantity / 5) * 5;
         }
-      } else if (u === "c.à.s" || u === "c.à.c") {
+      } else if (finalUnit === "c.a.s" || finalUnit === "c.à.s" || finalUnit === "c.a.c" || finalUnit === "c.à.c") {
         rounded = Math.ceil(item.totalQuantity * 2) / 2;
-      } else if (u === "l" || u === "kg") {
+      } else if (finalUnit === "l" || finalUnit === "kg") {
         rounded = Math.round(item.totalQuantity * 10) / 10;
         if (rounded === 0 && item.totalQuantity > 0) rounded = 0.1;
       } else {
@@ -1532,10 +1595,11 @@ export class AIPlannerService {
         rounded = Math.ceil(item.totalQuantity);
       }
 
-      const minQty = (u === "g" || u === "ml" || u === "l" || u === "kg" || u === "c.à.s" || u === "c.à.c") ? 0.1 : 1;
+      const minQty = (finalUnit === "g" || finalUnit === "ml" || finalUnit === "l" || finalUnit === "kg" || finalUnit.includes("c.")) ? 0.1 : 1;
 
       return {
         ...item,
+        unit: finalUnit,
         totalQuantity: Math.max(minQty, rounded)
       };
     });

@@ -297,13 +297,104 @@ export class AIPlannerService {
   }
 
   /**
-   * Génère un planning complet (Mistral AI ou Local déterministe avec variété)
+   * Génère un planning complet (Gemini AI, Mistral AI ou Local déterministe avec variété)
+   * @param {object} profile
+   * @param {number} durationWeeks
+   * @param {object} aiConfig
+   * @param {string} lang
+   * @param {boolean} forceAi - Si true, sollicite Google Gemini 2.5 Flash pour créer un menu sur-mesure
    */
-  static async generateMealPlan(profile, durationWeeks = 1, aiConfig = null, lang = "fr") {
+  static async generateMealPlan(profile, durationWeeks = 1, aiConfig = null, lang = "fr", forceAi = false) {
     const servings = this.calculateHouseholdServings(profile);
     const dayKeys = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 
-    // 1. Tenter la génération avec Mistral AI UNIQUEMENT si explicitement configuré avec une clé valide
+    // 1. Génération avec Google Gemini 2.5 Flash si demandée explicitement (Vidéo récompensée ou Pro)
+    if (forceAi) {
+      try {
+        const geminiResult = await GeminiService.generateMealPlan({
+          profile,
+          durationWeeks,
+          lang
+        });
+
+        if (geminiResult?.days && Array.isArray(geminiResult.days)) {
+          const activeMealTypes = profile?.mealTypes && profile.mealTypes.length > 0
+            ? profile.mealTypes
+            : ["breakfast", "lunch", "snack", "dinner"];
+
+          const usedMealIds = new Set();
+          const days = geminiResult.days.map((d, i) => {
+            const weekIndex = Math.floor(i / 7) + 1;
+            const dayIndexInWeek = i % 7;
+            const dayKey = dayKeys[dayIndexInWeek];
+
+            const formatMeal = (m, type) => {
+              if (!activeMealTypes.includes(type) || !m) return null;
+              return {
+                id: `gemini_${type}_${i + 1}_${Date.now()}`,
+                mealType: type,
+                title: typeof m.title === "string" ? { [lang]: m.title, fr: m.title } : (m.title || { fr: "Plat Chef IA" }),
+                emoji: m.emoji || "✨",
+                prepTime: m.prepTime || 15,
+                cookTime: m.cookTime || 20,
+                difficulty: m.difficulty || "easy",
+                caloriesPerPerson: m.caloriesPerPerson || 450,
+                tags: profile?.diets || [],
+                calculatedServings: servings,
+                ingredients: (m.ingredients || []).map(ing => ({
+                  name: typeof ing.name === "string" ? { [lang]: ing.name, fr: ing.name } : (ing.name || { fr: "Ingrédient" }),
+                  quantity: Number(ing.quantity) || 1,
+                  unit: ing.unit || "portion",
+                  dept: ing.dept || "deptProduce"
+                })),
+                instructions: m.instructions || { [lang]: ["Préparer les ingrédients", "Cuire et servir chaud."] },
+                thermomixInstructions: m.thermomixInstructions,
+                chefTip: m.chefTip,
+                isAiGenerated: true
+              };
+            };
+
+            const rawB = formatMeal(d.meals?.breakfast, "breakfast");
+            const rawL = formatMeal(d.meals?.lunch, "lunch");
+            const rawS = formatMeal(d.meals?.snack, "snack");
+            const rawD = formatMeal(d.meals?.dinner, "dinner");
+
+            return {
+              id: `day_${i + 1}`,
+              dayNumber: i + 1,
+              weekNumber: weekIndex,
+              dayKey: dayKey,
+              servings: servings,
+              meals: {
+                breakfast: this.sanitizeMeal(rawB, "breakfast", profile, servings, i * 4, usedMealIds),
+                lunch: this.sanitizeMeal(rawL, "lunch", profile, servings, i * 4 + 1, usedMealIds),
+                snack: this.sanitizeMeal(rawS, "snack", profile, servings, i * 4 + 2, usedMealIds),
+                dinner: this.sanitizeMeal(rawD, "dinner", profile, servings, i * 4 + 3, usedMealIds)
+              }
+            };
+          });
+
+          const plan = {
+            id: `plan_gemini_${Date.now()}`,
+            createdAt: new Date().toISOString(),
+            durationWeeks: durationWeeks,
+            householdServings: servings,
+            generatedBy: "gemini",
+            isAiGenerated: true,
+            days: days
+          };
+
+          const groceries = this.compileGroceries(plan);
+          return { plan, groceries, isAiPlan: true, error: null };
+        }
+      } catch (geminiErr) {
+        console.warn("Échec Gemini AI meal plan, repli sur local:", geminiErr.message);
+        const localFallback = this.generateLocalPlan(profile, durationWeeks, servings);
+        return { ...localFallback, error: null, fallbackFromAi: true };
+      }
+    }
+
+    // 2. Tenter la génération avec Mistral AI UNIQUEMENT si explicitement configuré avec une clé valide
     const mistralKey = (aiConfig?.mistralApiKey || "").trim();
     const isMistralExplicit = aiConfig?.engine === "mistral" && mistralKey.length > 5;
 
@@ -396,7 +487,7 @@ export class AIPlannerService {
       }
     }
 
-    // 2. Génération locale avec mélange aléatoire (Variety)
+    // 3. Génération locale avec mélange aléatoire (Variety)
     const localResult = this.generateLocalPlan(profile, durationWeeks, servings);
     return { ...localResult, error: null };
   }

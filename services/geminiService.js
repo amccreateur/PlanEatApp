@@ -103,102 +103,153 @@ export class GeminiService {
   }
 
   /**
-   * Génère un planning de repas via Gemini
+   * Génère un planning de repas via Gemini 2.5 Flash
    */
   static async generateMealPlan({
     profile,
     durationWeeks = 1,
-    apiKey,
+    apiKey = DEFAULT_GEMINI_API_KEY,
     model = DEFAULT_GEMINI_MODEL,
     lang = "fr"
   }) {
-    if (!apiKey) throw new Error("Clé API Gemini requise");
-    const endpoint = this.getEndpoint(apiKey, model);
-    const daysCount = durationWeeks * 7;
+    const keyToUse = (apiKey && apiKey.trim()) || DEFAULT_GEMINI_API_KEY;
+    if (!keyToUse) throw new Error("Clé API Gemini requise");
+    const endpoint = this.getEndpoint(keyToUse, model);
+    const daysCount = Math.min(14, Math.max(1, durationWeeks * 7));
     const adults = profile?.adults || 2;
     const children = profile?.children || 0;
     const diets = (profile?.diets || []).join(", ") || "aucun régime particulier";
     const dislikes = (profile?.dislikedFoods || []).join(", ") || "aucun";
 
-    const prompt = `Tu es un Chef cuisinier étoilé et nutritionniste pour PlanEat.
-Génère un menu complet équilibré pour ${daysCount} jours pour ${adults} adulte(s) et ${children} enfant(s).
-Régimes : ${diets}.
-Exclusions : ${dislikes}.
-Langue : ${lang}.
+    const activeMealTypes = profile?.mealTypes && profile.mealTypes.length > 0
+      ? profile.mealTypes
+      : ["breakfast", "lunch", "snack", "dinner"];
 
-Fournis les repas suivants pour chaque jour (breakfast, lunch, snack, dinner) avec ingrédients, portions pour 2 personnes, rayons d'épicerie ('deptProduce', 'deptMeat', 'deptDairy', 'deptBakery', 'deptPantry', 'deptSpices', 'deptFrozen', 'deptDrinks', 'deptOther'), et instructions étape par étape.
+    const cuisineLabels = {
+      french: "Française & Terroir",
+      italian: "Italienne & Méditerranée",
+      oriental: "Orientale & Maghrébine",
+      asian: "Asiatique & Wok",
+      mexican: "Mexicaine & Tex-Mex",
+      indian: "Indienne & Épices",
+      streetfood: "Street Food Gourmande"
+    };
 
-Réponds UNIQUEMENT en JSON valide conforme au schéma :
+    const cuisineLevels = { 1: "Un peu (modéré)", 2: "Souvent (fréquent)", 3: "Favori ⭐ (prioritaire)" };
+    const preferredCuisines = profile?.cuisines
+      ? Object.entries(profile.cuisines)
+          .filter(([_, lvl]) => lvl > 0)
+          .map(([k, lvl]) => `${cuisineLabels[k] || k}: ${cuisineLevels[lvl] || lvl}`)
+          .join(", ")
+      : "Française, Italienne, Méditerranéenne, variée";
+
+    const appliances = profile?.appliances
+      ? Object.entries(profile.appliances)
+          .filter(([_, active]) => active)
+          .map(([k]) => k)
+          .join(", ")
+      : "";
+
+    const prompt = `Tu es un Chef cuisinier étoilé et nutritionniste expert pour l'application PlanEat.
+Génère un menu hebdomadaire complet, équilibré, gourmand et réaliste pour ${daysCount} jours pour un foyer de ${adults} adulte(s) et ${children} enfant(s).
+
+DIRECTIVES STRICTES & OBLIGATOIRES :
+- Langue de réponse pour tous les titres, instructions et ingrédients : "${lang}".
+- Régimes stricts du foyer : ${diets}.
+  ${diets.includes("dietHalal") ? "⚠️ RÈGLE STRICTE HALAL : ZÉRO porc, ZÉRO lardons, ZÉRO jambon, ZÉRO alcool ou vin de cuisson dans toutes les recettes !" : ""}
+  ${diets.includes("dietNoPork") ? "⚠️ RÈGLE SANS PORC : Zéro porc, jambon, lardons !" : ""}
+  ${diets.includes("dietVegetarian") ? "⚠️ RÈGLE VÉGÉTARIENNE : Zéro viande, zéro volaille, zéro poisson !" : ""}
+- Aliments exclus ou rejetés : ${dislikes}.
+- Gastronomies et préférences du foyer (respecter rigoureusement ces proportions) : ${preferredCuisines}.
+${profile?.dinnerStyle === "light" ? "- Style de dîner : Dîners légers, digestes et modérés en calories." : ""}
+${appliances ? `- Appareils disponibles au domicile : ${appliances}.` : ""}
+- Repas à générer UNIQUEMENT : ${activeMealTypes.join(", ")}.
+- Équilibre et alternance : Varie les protéines (volaille, poisson, bœuf, légumineuses/végétarien) pour ne jamais répéter deux fois d'affilée la même protéine.
+- Ingrédients précis avec unités simples : 'g', 'kg', 'ml', 'cl', 'L', 'c.à.s', 'c.à.c', 'piece'.
+- Rayons d'épicerie pour chaque ingrédient : 'deptProduce' (fruits/légumes), 'deptMeat' (boucherie/poissonnerie), 'deptDairy' (crémerie), 'deptBakery' (boulangerie), 'deptPantry' (épicerie), 'deptSpices' (épices/condiments), 'deptFrozen' (surgelés), 'deptDrinks' (boissons), 'deptOther'.
+
+Réponds UNIQUEMENT en JSON valide conforme à cette structure :
 {
   "days": [
     {
       "dayIndex": 1,
       "meals": {
-        "breakfast": {
-          "title": { "fr": "Titre Petit Déjeuner" },
+        ${activeMealTypes.includes("breakfast") ? `"breakfast": {
+          "title": { "${lang}": "Titre du petit-déjeuner" },
           "emoji": "🥣",
           "prepTime": 10,
           "cookTime": 5,
           "caloriesPerPerson": 350,
-          "ingredients": [{ "name": { "fr": "Flocons d avoine" }, "quantity": 80, "unit": "g", "dept": "deptPantry" }],
-          "instructions": { "fr": ["1. Préparer...", "2. Déguster..."] },
-          "chefTip": { "fr": "Astuce..." }
-        },
-        "lunch": {
-          "title": { "fr": "Titre Déjeuner" },
+          "ingredients": [{ "name": { "${lang}": "Flocons d'avoine" }, "quantity": 80, "unit": "g", "dept": "deptPantry" }],
+          "instructions": { "${lang}": ["1. Faire chauffer...", "2. Déguster chaud."] },
+          "chefTip": "Astuce gourmande du chef"
+        },` : ""}
+        ${activeMealTypes.includes("lunch") ? `"lunch": {
+          "title": { "${lang}": "Titre du déjeuner" },
           "emoji": "🍗",
           "prepTime": 15,
           "cookTime": 20,
           "caloriesPerPerson": 520,
-          "ingredients": [{ "name": { "fr": "Filet de poulet" }, "quantity": 250, "unit": "g", "dept": "deptMeat" }],
-          "instructions": { "fr": ["1. Découper...", "2. Cuire..."] },
-          "chefTip": { "fr": "Astuce..." }
-        },
-        "snack": {
-          "title": { "fr": "Titre Goûter" },
+          "ingredients": [{ "name": { "${lang}": "Filet de poulet" }, "quantity": 250, "unit": "g", "dept": "deptMeat" }],
+          "instructions": { "${lang}": ["1. Découper...", "2. Cuire à feu moyen..."] },
+          "chefTip": "Astuce du chef"
+        },` : ""}
+        ${activeMealTypes.includes("snack") ? `"snack": {
+          "title": { "${lang}": "Titre du goûter" },
           "emoji": "🍎",
           "prepTime": 5,
           "cookTime": 0,
           "caloriesPerPerson": 180,
-          "ingredients": [{ "name": { "fr": "Pomme" }, "quantity": 1, "unit": "portion", "dept": "deptProduce" }],
-          "instructions": { "fr": ["1. Laver et couper..."] },
-          "chefTip": { "fr": "Astuce..." }
-        },
-        "dinner": {
-          "title": { "fr": "Titre Dîner" },
+          "ingredients": [{ "name": { "${lang}": "Pomme" }, "quantity": 1, "unit": "piece", "dept": "deptProduce" }],
+          "instructions": { "${lang}": ["1. Laver et trancher."] },
+          "chefTip": "Astuce fraîcheur"
+        },` : ""}
+        ${activeMealTypes.includes("dinner") ? `"dinner": {
+          "title": { "${lang}": "Titre du dîner" },
           "emoji": "🍲",
           "prepTime": 15,
           "cookTime": 20,
           "caloriesPerPerson": 420,
-          "ingredients": [{ "name": { "fr": "Courgettes" }, "quantity": 2, "unit": "pcs", "dept": "deptProduce" }],
-          "instructions": { "fr": ["1. Couper...", "2. Faire revenir..."] },
-          "chefTip": { "fr": "Astuce..." }
-        }
+          "ingredients": [{ "name": { "${lang}": "Courgettes" }, "quantity": 2, "unit": "piece", "dept": "deptProduce" }],
+          "instructions": { "${lang}": ["1. Laver...", "2. Faire mijoter..."] },
+          "chefTip": "Astuce légère"
+        }` : ""}
       }
     }
   ]
 }`;
 
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.8
-        }
-      })
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 22000);
 
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.error?.message || `Erreur Gemini API (${response.status})`);
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: "application/json",
+            temperature: 0.75
+          }
+        })
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error?.message || `Erreur Gemini API (${response.status})`);
+      }
+
+      const data = await response.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      return this.safeJsonParse(text);
+    } catch (err) {
+      clearTimeout(timeoutId);
+      throw err;
     }
-
-    const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    return this.safeJsonParse(text);
   }
 
   /**

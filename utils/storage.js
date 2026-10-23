@@ -9,7 +9,8 @@ const KEYS = {
   DIETS: "@planeat_diets",
   AI_CONFIG: "@planeat_ai_config",
   THEME: "@planeat_theme_mode",
-  ONBOARDING: "@planeat_has_completed_onboarding"
+  ONBOARDING: "@planeat_has_completed_onboarding",
+  LAST_AI_PLAN_DATE: "@planeat_last_ai_plan_date"
 };
 
 export const DEFAULT_AI_CONFIG = {
@@ -181,6 +182,41 @@ export class StorageService {
       return true;
     } catch {
       return false;
+    }
+  }
+
+  static async getLastAiPlanDate() {
+    try {
+      const val = await AsyncStorage.getItem(KEYS.LAST_AI_PLAN_DATE);
+      return val ? parseInt(val, 10) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  static async recordAiPlanGeneration() {
+    try {
+      await AsyncStorage.setItem(KEYS.LAST_AI_PLAN_DATE, Date.now().toString());
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  static async checkCanGenerateAiPlan(isPro = false) {
+    if (isPro) return { allowed: true, daysRemaining: 0 };
+    try {
+      const last = await this.getLastAiPlanDate();
+      if (!last) return { allowed: true, daysRemaining: 0 };
+      const elapsedMs = Date.now() - last;
+      const cooldownMs = 6 * 24 * 3600 * 1000;
+      if (elapsedMs >= cooldownMs) {
+        return { allowed: true, daysRemaining: 0 };
+      }
+      const daysRemaining = Math.ceil((cooldownMs - elapsedMs) / (24 * 3600 * 1000));
+      return { allowed: false, daysRemaining: Math.max(1, daysRemaining) };
+    } catch {
+      return { allowed: true, daysRemaining: 0 };
     }
   }
 }

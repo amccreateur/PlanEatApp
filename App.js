@@ -32,6 +32,7 @@ import DriveCartModal from "./components/DriveCartModal";
 import PaywallModal from "./components/PaywallModal";
 import BannerAdView from "./components/BannerAdView";
 import AdRewardModal from "./components/AdRewardModal";
+import PlanGenerationModal from "./components/PlanGenerationModal";
 import AiGenerationLoadingModal from "./components/AiGenerationLoadingModal";
 import { purchaseService } from "./services/purchaseService";
 import { adService } from "./services/adService";
@@ -167,26 +168,51 @@ function MainApp() {
     }
   };
 
-  const handleGeneratePlan = async (
+  const [isPlanChoiceModalOpen, setIsPlanChoiceModalOpen] = useState(false);
+  const pendingAiPlanPromiseRef = useRef(null);
+
+  const startBackgroundAiMealPlan = (
     customProfile = profile,
-    durationWeeks = 1,
+    durationWeeks = selectedDurationWeeks,
     config = aiConfig,
     activeLang = lang
   ) => {
+    pendingAiPlanPromiseRef.current = AIPlannerService.generateMealPlan(
+      customProfile,
+      durationWeeks,
+      config,
+      activeLang,
+      true // forceAi
+    );
+  };
+
+  const handleGeneratePlan = async (
+    customProfile = profile,
+    durationWeeks = selectedDurationWeeks,
+    config = aiConfig,
+    activeLang = lang,
+    forceAi = false
+  ) => {
     setIsGenerating(true);
-    // Déclencher la vidéo récompensée (avec fallback automatique)
-    setTimeout(() => {
-      adService.showRewardedVideo();
-    }, 1200);
     try {
-      const { plan, groceries: compiledGroceries, error } = await AIPlannerService.generateMealPlan(
-        customProfile,
-        durationWeeks,
-        config,
-        activeLang
-      );
+      let planGenResult;
+      if (forceAi && pendingAiPlanPromiseRef.current) {
+        planGenResult = await pendingAiPlanPromiseRef.current;
+        pendingAiPlanPromiseRef.current = null;
+      } else {
+        planGenResult = await AIPlannerService.generateMealPlan(
+          customProfile,
+          durationWeeks,
+          config,
+          activeLang,
+          forceAi
+        );
+      }
+
+      const { plan, groceries: compiledGroceries, error, isAiPlan, fallbackFromAi } = planGenResult;
+
       if (error) {
-        Alert.alert("⚠️ Information Mistral AI", `${error}\n\nUn planning local a été généré.`);
+        Alert.alert("⚠️ Information", `${error}\n\nUn planning équilibré a été généré.`);
       }
       setCurrentPlan(plan);
       setSelectedDurationWeeks(durationWeeks);
@@ -197,13 +223,32 @@ function MainApp() {
       await StorageService.saveCurrentPlan(plan);
       await StorageService.saveGroceries(compiledGroceries);
 
-      // Laisser l'animation de 3s se compléter naturellement
-      await new Promise(r => setTimeout(r, 2600));
+      if (isAiPlan) {
+        if (!isPro) {
+          await StorageService.recordAiPlanGeneration();
+        }
+        Alert.alert(
+          "✨ Chef IA Gemini",
+          lang === "fr"
+            ? "Votre menu hebdomadaire sur-mesure a été créé avec succès !"
+            : "Your custom weekly menu has been crafted successfully!"
+        );
+      } else if (fallbackFromAi) {
+        Alert.alert(
+          "ℹ️ Information",
+          lang === "fr"
+            ? "L'IA étant momentanément indisponible, un menu équilibré a été créé pour vous."
+            : "AI was temporarily unavailable, a balanced menu was created for you."
+        );
+      }
+
+      await new Promise(r => setTimeout(r, 1800));
     } catch (err) {
       console.error("Erreur lors de la génération du plan:", err);
       Alert.alert("Erreur", err.message || "Erreur inconnue");
     } finally {
       setIsGenerating(false);
+      pendingAiPlanPromiseRef.current = null;
     }
   };
 
@@ -581,7 +626,7 @@ function MainApp() {
           <View style={[styles.plannerControls, isRTL && styles.rtlRow]}>
             <TouchableOpacity
               style={[styles.aiGenerateBtn, isGenerating && styles.btnDisabled]}
-              onPress={() => handleGeneratePlan(profile, selectedDurationWeeks, aiConfig, lang)}
+              onPress={() => setIsPlanChoiceModalOpen(true)}
               disabled={isGenerating}
             >
               <LinearGradient
@@ -1142,6 +1187,27 @@ function MainApp() {
           onToggleItem={handleToggleGrocery}
           lang={lang}
           themeMode={themeMode}
+        />
+
+        <PlanGenerationModal
+          visible={isPlanChoiceModalOpen}
+          onClose={() => {
+            setIsPlanChoiceModalOpen(false);
+            pendingAiPlanPromiseRef.current = null;
+          }}
+          onSelectExpress={() => {
+            handleGeneratePlan(profile, selectedDurationWeeks, aiConfig, lang, false);
+          }}
+          onSelectAi={() => {
+            handleGeneratePlan(profile, selectedDurationWeeks, aiConfig, lang, true);
+          }}
+          onStartAiAd={() => {
+            startBackgroundAiMealPlan(profile, selectedDurationWeeks, aiConfig, lang);
+          }}
+          onOpenPaywall={() => setIsPaywallOpen(true)}
+          isPro={isPro}
+          themeMode={themeMode}
+          lang={lang}
         />
 
         <AdRewardModal

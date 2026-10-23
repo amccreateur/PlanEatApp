@@ -8,7 +8,7 @@ const _P2 = "MpvVXaUcCxv";
 const _P3 = "qCv8F4qM9egv";
 const _P4 = "D_zDvQ3kDonplYVPtg";
 export const DEFAULT_GEMINI_API_KEY = [_P1, _P2, _P3, _P4].join("");
-export const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
+export const DEFAULT_GEMINI_MODEL = "gemini-3.5-flash-lite";
 
 export class GeminiService {
   static getEndpoint(apiKey = DEFAULT_GEMINI_API_KEY, model = DEFAULT_GEMINI_MODEL) {
@@ -220,7 +220,7 @@ Réponds UNIQUEMENT en JSON valide conforme à cette structure :
 }`;
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 22000);
+    const timeoutId = setTimeout(() => controller.abort(), 45000);
 
     try {
       const response = await fetch(endpoint, {

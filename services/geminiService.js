@@ -219,37 +219,48 @@ Réponds UNIQUEMENT en JSON valide conforme à cette structure :
   ]
 }`;
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 45000);
+    const maxAttempts = 2;
+    let lastError = null;
 
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        signal: controller.signal,
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: "application/json",
-            temperature: 0.75
-          }
-        })
-      });
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 40000);
 
-      clearTimeout(timeoutId);
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              responseMimeType: "application/json",
+              temperature: 0.7
+            }
+          })
+        });
 
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.error?.message || `Erreur Gemini API (${response.status})`);
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err.error?.message || `Erreur Gemini API (${response.status})`);
+        }
+
+        const data = await response.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        return this.safeJsonParse(text);
+      } catch (err) {
+        clearTimeout(timeoutId);
+        lastError = err;
+        console.warn(`Tentative Gemini ${attempt}/${maxAttempts} échouée:`, err.message);
+        if (attempt < maxAttempts) {
+          await new Promise(r => setTimeout(r, 1500));
+        }
       }
-
-      const data = await response.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      return this.safeJsonParse(text);
-    } catch (err) {
-      clearTimeout(timeoutId);
-      throw err;
     }
+
+    throw lastError || new Error("Échec de la génération Gemini après plusieurs tentatives");
   }
 
   /**

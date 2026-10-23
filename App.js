@@ -1193,7 +1193,7 @@ function MainApp() {
           visible={isPlanChoiceModalOpen}
           onClose={() => {
             setIsPlanChoiceModalOpen(false);
-            pendingAiPlanPromiseRef.current = null;
+
           }}
           onSelectExpress={() => {
             handleGeneratePlan(profile, selectedDurationWeeks, aiConfig, lang, false);

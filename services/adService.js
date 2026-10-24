@@ -42,8 +42,8 @@ export const AD_UNIT_IDS = {
     android: "ca-app-pub-5303925075056294/5354025685"
   },
   rewarded: {
-    ios: "ca-app-pub-5303925075056294/6570159575",
-    android: "ca-app-pub-5303925075056294/1509404584"
+    ios: "ca-app-pub-5303925075056294/2133648168",
+    android: "ca-app-pub-5303925075056294/7446392432"
   },
   appOpen: {
     ios: "ca-app-pub-5303925075056294/4632088499",

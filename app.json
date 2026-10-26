@@ -19,7 +19,7 @@
       "icon": "./assets/icon.png",
       "supportsTablet": true,
       "bundleIdentifier": "com.amccreateur.PlanEatApp",
-      "buildNumber": "63",
+      "buildNumber": "64",
       "config": {
         "usesNonExemptEncryption": false
       },
@@ -55,6 +55,12 @@
           "androidAppId": "ca-app-pub-5303925075056294~4135567925",
           "iosAppId": "ca-app-pub-5303925075056294~8146965129",
           "userTrackingUsageDescription": "Cette autorisation permet d'afficher des annonces pertinentes et de débloquer vos fonctionnalités sans abonnement."
+        }
+      ],
+      [
+        "expo-tracking-transparency",
+        {
+          "userTrackingPermission": "Cette autorisation permet d'afficher des annonces pertinentes et de débloquer vos fonctionnalités sans abonnement."
         }
       ]
     ],

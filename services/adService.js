@@ -1,4 +1,4 @@
-import { Platform } from "react-native";
+import { AppState, Platform } from "react-native";
 import { purchaseService } from "./purchaseService";
 
 let MobileAds = null;
@@ -72,7 +72,38 @@ class AdService {
     if (Platform.OS === "web" || !MobileAds) return;
 
     try {
-      // 1. Demande de consentement RGPD / UMP officiel Google
+      // 1. Demande d'autorisation App Tracking Transparency (ATT) sur iOS (Guideline 2.1 Apple)
+      if (Platform.OS === "ios") {
+        try {
+          if (AppState.currentState !== "active") {
+            await new Promise((resolve) => {
+              const subscription = AppState.addEventListener("change", (nextState) => {
+                if (nextState === "active") {
+                  subscription.remove();
+                  resolve();
+                }
+              });
+              setTimeout(() => {
+                try {
+                  subscription.remove();
+                } catch (_) {}
+                resolve();
+              }, 1200);
+            });
+          }
+          await new Promise((r) => setTimeout(r, 400));
+
+          const TrackingTransparency = require("expo-tracking-transparency");
+          const { status } = await TrackingTransparency.getTrackingPermissionsAsync();
+          if (status === "undetermined") {
+            await TrackingTransparency.requestTrackingPermissionsAsync();
+          }
+        } catch (attError) {
+          console.warn("ATT permission request error:", attError);
+        }
+      }
+
+      // 2. Demande de consentement RGPD / UMP officiel Google
       if (AdsConsent) {
         try {
           await AdsConsent.gatherConsent();

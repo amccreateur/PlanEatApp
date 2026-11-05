@@ -65,44 +65,45 @@ class AdService {
     this.actionCounter = 0;
   }
 
+  async requestATTWithRetry(maxAttempts = 3, delayMs = 1500) {
+    if (Platform.OS !== "ios") return;
+    try {
+      const TrackingTransparency = require("expo-tracking-transparency");
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        const { status } = await TrackingTransparency.getTrackingPermissionsAsync();
+        if (status !== "undetermined") {
+          return status;
+        }
+
+        // Attendre que la vue native de l'application soit totalement active et visible
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+
+        const res = await TrackingTransparency.requestTrackingPermissionsAsync();
+        if (res.status !== "undetermined") {
+          return res.status;
+        }
+        console.warn(`ATT request attempt ${attempt} undetermined, retrying...`);
+      }
+    } catch (attError) {
+      console.warn("ATT permission request error:", attError);
+    }
+  }
+
   async init() {
     if (this.isInitialized) return;
     this.isInitialized = true;
 
-    if (Platform.OS === "web" || !MobileAds) return;
+    if (Platform.OS === "web") return;
+
+    // 1. Demande d'autorisation App Tracking Transparency (ATT) sur iOS (Guideline 2.1 Apple)
+    // Toujours exécutée AVANT toute collecte ou initialisation d'AdMob
+    if (Platform.OS === "ios") {
+      await this.requestATTWithRetry();
+    }
+
+    if (!MobileAds) return;
 
     try {
-      // 1. Demande d'autorisation App Tracking Transparency (ATT) sur iOS (Guideline 2.1 Apple)
-      if (Platform.OS === "ios") {
-        try {
-          if (AppState.currentState !== "active") {
-            await new Promise((resolve) => {
-              const subscription = AppState.addEventListener("change", (nextState) => {
-                if (nextState === "active") {
-                  subscription.remove();
-                  resolve();
-                }
-              });
-              setTimeout(() => {
-                try {
-                  subscription.remove();
-                } catch (_) {}
-                resolve();
-              }, 1200);
-            });
-          }
-          await new Promise((r) => setTimeout(r, 400));
-
-          const TrackingTransparency = require("expo-tracking-transparency");
-          const { status } = await TrackingTransparency.getTrackingPermissionsAsync();
-          if (status === "undetermined") {
-            await TrackingTransparency.requestTrackingPermissionsAsync();
-          }
-        } catch (attError) {
-          console.warn("ATT permission request error:", attError);
-        }
-      }
-
       // 2. Demande de consentement RGPD / UMP officiel Google
       if (AdsConsent) {
         try {
@@ -112,7 +113,7 @@ class AdService {
         }
       }
 
-      // 2. Initialisation d'AdMob
+      // 3. Initialisation d'AdMob
       await MobileAds().initialize();
       this._preloadInterstitial();
       this._preloadRewarded();

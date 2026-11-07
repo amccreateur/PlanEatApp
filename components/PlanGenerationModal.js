@@ -47,13 +47,6 @@ export default function PlanGenerationModal({
       return;
     }
 
-    // Si l'utilisateur Free a déjà consommé sa génération IA de la semaine
-    if (!aiLimitStatus.allowed) {
-      onClose();
-      if (onOpenPaywall) onOpenPaywall();
-      return;
-    }
-
     setIsLoadingAd(true);
     // 1. Déclencher immédiatement la génération IA en arrière-plan pendant la vidéo
     if (onStartAiAd) {
@@ -208,7 +201,7 @@ export default function PlanGenerationModal({
                     !isPro && !aiLimitStatus.allowed && styles.limitBadge
                   ]}>
                     <Ionicons
-                      name={isPro ? "star" : (!aiLimitStatus.allowed ? "time-outline" : "videocam")}
+                      name={isPro ? "star" : "videocam"}
                       size={12}
                       color="#ffffff"
                     />
@@ -216,7 +209,7 @@ export default function PlanGenerationModal({
                       {isPro
                         ? (t.aiChefPlanBadgePro || "Inclus Pro ⭐")
                         : (!aiLimitStatus.allowed
-                            ? `⏳ Dispo dans ${aiLimitStatus.daysRemaining}j`
+                            ? (lang === "fr" ? "🎁 Menu Bonus Vidéo" : "🎁 Bonus Video Menu")
                             : (t.aiChefPlanBadgeFree || "Court extrait vidéo"))}
                     </Text>
                   </View>
@@ -224,8 +217,8 @@ export default function PlanGenerationModal({
                 <Text style={[styles.optionDesc, { color: theme.textSub }]}>
                   {!isPro && !aiLimitStatus.allowed
                     ? (lang === "fr"
-                        ? "1 menu IA offert par semaine utilisé. Passez à Pro pour une IA illimitée ou choisissez le Menu Express !"
-                        : "1 free AI menu per week used. Upgrade to Pro for unlimited AI or pick Express Menu!")
+                        ? "Menu hebdomadaire gratuit utilisé. Regardez une courte vidéo pour débloquer immédiatement un nouveau menu Chef IA !"
+                        : "Weekly free menu used. Watch a short video to instantly unlock another Chef AI menu!")
                     : (t.aiChefPlanDesc || "Menu 100% sur-mesure créé en direct par l'IA selon vos régimes, portions et cuisines favorites.")}
                 </Text>
               </View>
@@ -234,7 +227,7 @@ export default function PlanGenerationModal({
             <LinearGradient
               colors={
                 !isPro && !aiLimitStatus.allowed
-                  ? ["#d97706", "#7c3aed"]
+                  ? ["#7c3aed", "#9333ea"]
                   : ["#7c3aed", "#9333ea"]
               }
               start={{ x: 0, y: 0 }}
@@ -251,7 +244,7 @@ export default function PlanGenerationModal({
               ) : (
                 <View style={styles.btnRow}>
                   <Ionicons
-                    name={isPro ? "sparkles" : (!aiLimitStatus.allowed ? "star" : "play-circle")}
+                    name={isPro ? "sparkles" : "play-circle"}
                     size={18}
                     color="#ffffff"
                   />
@@ -259,7 +252,7 @@ export default function PlanGenerationModal({
                     {isPro
                       ? (t.aiChefPlanBtnPro || "Générer avec le Chef IA")
                       : (!aiLimitStatus.allowed
-                          ? (lang === "fr" ? "⭐ Passer à Pro pour l'IA illimitée" : "⭐ Upgrade to Pro for Unlimited AI")
+                          ? (lang === "fr" ? "Regarder la vidéo & Débloquer le menu" : "Watch video & Unlock menu")
                           : (t.aiChefPlanBtnFree || "Regarder la vidéo & Créer le menu"))}
                   </Text>
                 </View>

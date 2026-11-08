@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  Alert,
   Platform
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -48,18 +49,19 @@ export default function PlanGenerationModal({
     }
 
     setIsLoadingAd(true);
-    // 1. Déclencher immédiatement la génération IA en arrière-plan pendant la vidéo
-    if (onStartAiAd) {
-      try {
-        onStartAiAd();
-      } catch (e) {
-        console.warn("Erreur pré-lancement IA:", e);
-      }
-    }
 
-    // 2. Afficher la vidéo récompensée AdMob
     try {
       await adService.showRewardedVideo({
+        // La vidéo commence réellement à l'écran : ON DÉCLENCHE L'IA UNIQUEMENT À CE MOMENT !
+        onStarted: () => {
+          if (onStartAiAd) {
+            try {
+              onStartAiAd();
+            } catch (e) {
+              console.warn("Erreur pré-lancement IA:", e);
+            }
+          }
+        },
         onRewarded: () => {
           setIsLoadingAd(false);
           onSelectAi();
@@ -70,15 +72,19 @@ export default function PlanGenerationModal({
         },
         onFail: () => {
           setIsLoadingAd(false);
-          // En cas de non-disponibilité de pub, offrir gracieusement l'action
-          onSelectAi();
-          onClose();
-        }
+          Alert.alert(
+            lang === "fr" ? "Vidéo en cours de chargement" : "Video Still Loading",
+            lang === "fr"
+              ? "La vidéo publicitaire n'est pas encore prête en mémoire. Veuillez patienter quelques secondes et réessayer, ou choisir le Menu Express."
+              : "The video ad is still loading. Please wait a few seconds and try again, or choose Express Menu.",
+            [{ text: "OK" }]
+          );
+        },
+        allowFallbackReward: false, // Protection des tokens : pas de pub démarrée = pas d'appel IA
+        maxWaitMs: 3500 // Attend jusqu'à 3,5s que la vidéo soit en cache
       });
     } catch (err) {
       setIsLoadingAd(false);
-      onSelectAi();
-      onClose();
     }
   };
 
@@ -238,7 +244,7 @@ export default function PlanGenerationModal({
                 <View style={styles.btnRow}>
                   <ActivityIndicator size="small" color="#ffffff" />
                   <Text style={styles.aiActionBtnText}>
-                    {t.generatingAiPlan || "Préparation du Chef IA..."}
+                    {lang === "fr" ? "Préparation de la vidéo..." : "Preparing video..."}
                   </Text>
                 </View>
               ) : (

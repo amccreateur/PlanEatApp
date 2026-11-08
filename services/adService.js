@@ -180,6 +180,13 @@ class AdService {
         this.isRewardedLoaded = true;
       });
 
+      this.rewardedAd.addAdEventListener(AdEventType.OPENED, () => {
+        if (this._onAdStartedCallback) {
+          this._onAdStartedCallback();
+          this._onAdStartedCallback = null;
+        }
+      });
+
       this.rewardedAd.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
         if (this._onRewardedCallback) {
           this._onRewardedCallback(reward);
@@ -308,19 +315,49 @@ class AdService {
    * @param {Function} options.onDismiss Callback appelé si la vidéo est fermée
    * @param {Function} options.onFail Callback appelé en cas d'erreur de chargement
    */
-  async showRewardedVideo({ onRewarded = () => {}, onDismiss = () => {}, onFail = () => {} } = {}) {
+  async showRewardedVideo({
+    onStarted = () => {},
+    onRewarded = () => {},
+    onDismiss = () => {},
+    onFail = () => {},
+    allowFallbackReward = false,
+    maxWaitMs = 3500
+  } = {}) {
     // Si l'utilisateur est abonné Pro, récompense accordée instantanément sans pub
     if (purchaseService.getIsPro()) {
+      onStarted();
       onRewarded({ type: "pro_bypass", amount: 1 });
       return;
     }
 
+    // Si la vidéo est en cours de préchargement, attendre jusqu'à maxWaitMs
+    if (!this.isRewardedLoaded && maxWaitMs > 0) {
+      await new Promise((resolve) => {
+        let elapsed = 0;
+        const interval = setInterval(() => {
+          elapsed += 150;
+          if (this.isRewardedLoaded || elapsed >= maxWaitMs) {
+            clearInterval(interval);
+            resolve();
+          }
+        }, 150);
+      });
+    }
+
     if (this.isRewardedLoaded && this.rewardedAd) {
       try {
+        this._onAdStartedCallback = onStarted;
         this._onRewardedCallback = onRewarded;
         this._onDismissCallback = onDismiss;
         this._onFailCallback = onFail;
         await this.rewardedAd.show();
+        // Filet de sécurité au cas où l'événement OPENED est retardé par le bridge natif
+        setTimeout(() => {
+          if (this._onAdStartedCallback) {
+            this._onAdStartedCallback();
+            this._onAdStartedCallback = null;
+          }
+        }, 400);
         return;
       } catch (e) {
         console.warn("Erreur affichage rewarded ad:", e);
@@ -330,20 +367,33 @@ class AdService {
     // Si la vidéo récompensée n'est pas encore en cache, afficher l'interstitiel
     if (this.isInterstitialLoaded && this.interstitialAd) {
       try {
+        this._onAdStartedCallback = onStarted;
         await this.showInterstitial({
           onComplete: () => {
             onRewarded({ type: "interstitial_reward", amount: 1 });
           },
           minIntervalSeconds: 0
         });
+        if (this._onAdStartedCallback) {
+          this._onAdStartedCallback();
+          this._onAdStartedCallback = null;
+        }
         return;
       } catch (e) {}
     }
 
-    // Si aucune pub n'était prête en cache, recharger et débloquer pour ne pas bloquer l'expérience
+    // Si aucune pub n'était prête en cache
     this._preloadRewarded();
     this._preloadInterstitial();
-    onRewarded({ type: "fallback_reward", amount: 1 });
+
+    if (allowFallbackReward) {
+      onStarted();
+      onRewarded({ type: "fallback_reward", amount: 1 });
+    } else {
+      if (onFail) {
+        onFail({ reason: "not_ready" });
+      }
+    }
   }
 
   /**

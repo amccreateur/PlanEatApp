@@ -131,7 +131,7 @@ function MainApp() {
     } else {
       // Déclencher l'annonce App Open au démarrage (comme les applis météo)
       setTimeout(() => {
-        adService.showAppOpenOnStartup({ maxWaitMs: 1800, minIntervalHours: 2 });
+        adService.showAppOpenOnStartup({ maxWaitMs: 2500, minIntervalMinutes: 45 });
       }, 600);
     }
   };

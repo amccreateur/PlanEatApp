@@ -400,11 +400,11 @@ class AdService {
    * Tente d'afficher une publicité App Open au lancement de l'application
    * Attend jusqu'à maxWaitMs que l'annonce se charge pour une transition fluide
    */
-  async showAppOpenOnStartup({ maxWaitMs = 1800, minIntervalHours = 2 } = {}) {
+  async showAppOpenOnStartup({ maxWaitMs = 2500, minIntervalMinutes = 45 } = {}) {
     if (purchaseService.getIsPro()) return;
 
     const now = Date.now();
-    if (this.lastAppOpenTime && (now - this.lastAppOpenTime < minIntervalHours * 3600 * 1000)) {
+    if (this.lastAppOpenTime && (now - this.lastAppOpenTime < minIntervalMinutes * 60 * 1000)) {
       return;
     }
 

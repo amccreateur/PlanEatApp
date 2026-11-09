@@ -622,15 +622,18 @@ function MainApp() {
       {/* TAB 1 : PLANNING DES REPAS */}
       {activeTab === "planner" && (
         <View style={styles.tabContent}>
-          {/* Controls bar (Générer + Durée) */}
-          <View style={[styles.plannerControls, isRTL && styles.rtlRow]}>
+          {/* Controls bar (Générer le menu de la semaine) */}
+          <View style={styles.plannerControls}>
             <TouchableOpacity
               style={[styles.aiGenerateBtn, isGenerating && styles.btnDisabled]}
               onPress={() => setIsPlanChoiceModalOpen(true)}
               disabled={isGenerating}
+              activeOpacity={0.85}
             >
               <LinearGradient
                 colors={["#7c3aed", "#6d28d9"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
                 style={styles.aiGradient}
               >
                 {isGenerating ? (
@@ -641,33 +644,15 @@ function MainApp() {
                     </Text>
                   </View>
                 ) : (
-                  <Text style={styles.aiBtnText}>
-                    {t.generatePlan || "Générer le menu"}
-                  </Text>
+                  <View style={styles.loadingBtnRow}>
+                    <Ionicons name="sparkles" size={17} color="#ffffff" style={{ marginRight: 6 }} />
+                    <Text style={styles.aiBtnText}>
+                      {t.generatePlan || "Générer le menu de la semaine"}
+                    </Text>
+                  </View>
                 )}
               </LinearGradient>
             </TouchableOpacity>
-
-            {/* Durée selector */}
-            <View style={[styles.durationRow, { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.border, borderWidth: 1 }]}>
-              {[1, 2].map(w => (
-                <TouchableOpacity
-                  key={w}
-                  style={[
-                    styles.durationChip,
-                    { backgroundColor: selectedDurationWeeks === w ? "#0284c7" : "transparent" }
-                  ]}
-                  onPress={() => setSelectedDurationWeeks(w)}
-                >
-                  <Text style={[
-                    styles.durationChipText,
-                    { color: selectedDurationWeeks === w ? "#ffffff" : currentTheme.textSub }
-                  ]}>
-                    {w === 1 ? t.oneWeek : t.twoWeeks}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
           </View>
 
           {/* Week Selector (si > 1 semaine) */}
@@ -1425,24 +1410,25 @@ const styles = StyleSheet.create({
     flex: 1
   },
   plannerControls: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingVertical: 10,
-    gap: 8
+    paddingVertical: 10
   },
   aiGenerateBtn: {
-    borderRadius: 12,
+    borderRadius: 14,
     overflow: "hidden",
-    minWidth: 142
+    width: "100%",
+    elevation: 3,
+    shadowColor: "#7c3aed",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5
   },
   aiGradient: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 8,
-    paddingHorizontal: 14
+    paddingVertical: 12,
+    paddingHorizontal: 16
   },
   loadingBtnRow: {
     flexDirection: "row",
@@ -1453,7 +1439,7 @@ const styles = StyleSheet.create({
   aiBtnText: {
     color: "#ffffff",
     fontWeight: "800",
-    fontSize: 13,
+    fontSize: 14,
     textAlign: "center"
   },
   btnDisabled: {

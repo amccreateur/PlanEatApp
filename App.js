@@ -644,12 +644,9 @@ function MainApp() {
                     </Text>
                   </View>
                 ) : (
-                  <View style={styles.loadingBtnRow}>
-                    <Ionicons name="sparkles" size={17} color="#ffffff" style={{ marginRight: 6 }} />
-                    <Text style={styles.aiBtnText}>
-                      {t.generatePlan || "Générer le menu de la semaine"}
-                    </Text>
-                  </View>
+                  <Text style={styles.aiBtnText}>
+                    {t.generatePlan || "Générer mon menu"}
+                  </Text>
                 )}
               </LinearGradient>
             </TouchableOpacity>

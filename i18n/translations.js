@@ -10,7 +10,7 @@ export const TRANSLATIONS = {
     tabProfile: "Mon Foyer",
     
     // Header & Actions
-    generatePlan: "Générer le menu",
+    generatePlan: "Générer mon menu",
     regenerating: "Génération...",
     choosePlanMode: "Mode de génération",
     choosePlanModeSubtitle: "Choisissez comment concevoir votre semaine :",
@@ -258,7 +258,7 @@ export const TRANSLATIONS = {
     tabProfile: "My Household",
     
     // Header & Actions
-    generatePlan: "Generate menu",
+    generatePlan: "Generate my menu",
     regenerating: "Generating...",
     choosePlanMode: "Generation Mode",
     choosePlanModeSubtitle: "Choose how to design your week:",

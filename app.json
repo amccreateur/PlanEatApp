@@ -6,7 +6,7 @@
   "expo": {
     "name": "PlanEat",
     "slug": "PlanEatApp",
-    "version": "1.5.14",
+    "version": "1.5.15",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -19,7 +19,7 @@
       "icon": "./assets/icon.png",
       "supportsTablet": true,
       "bundleIdentifier": "com.amccreateur.PlanEatApp",
-      "buildNumber": "71",
+      "buildNumber": "72",
       "config": {
         "usesNonExemptEncryption": false
       },
@@ -31,7 +31,7 @@
     },
     "android": {
       "package": "com.amccreateur.PlanEatApp",
-      "versionCode": 63,
+      "versionCode": 64,
       "adaptiveIcon": {
         "backgroundColor": "#3eb5ec",
         "foregroundImage": "./assets/android-icon-foreground.png"
